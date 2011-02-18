@@ -1,10 +1,11 @@
-package de.dfki.km.click2sight.plugins.positionFinderPlugins;
+package de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import de.dfki.km.click2sight.plugins.PositionFinder;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
  * 
@@ -12,10 +13,7 @@ import de.dfki.km.click2sight.plugins.PositionFinder;
  *
  */
 @PluginImplementation
-public class SimplePositionFinder implements PositionFinder {
-
-    public SimplePositionFinder() {
-    }
+public class SimpleSobel implements SaliencyDetector {
 
     /**
      * Derivates the given screenshot in y-direction.
@@ -95,15 +93,7 @@ public class SimplePositionFinder implements PositionFinder {
      * some informations...
      */
     @Override
-    public String getInformation() {
-        return new String("simple method");
-    }
-
-    /**
-     * the name of the method
-     */
-    @Override
-    public String toString() {
-        return new String("simple method");
+    public SaliencyPluginInformation getInformation() {
+        return new SaliencyPluginInformation();
     }
 }

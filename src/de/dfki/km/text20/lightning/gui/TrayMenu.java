@@ -1,13 +1,13 @@
-package de.dfki.km.click2sight.gui;
+package de.dfki.km.text20.lightning.gui;
 
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import de.dfki.km.click2sight.MainClass;
-import de.dfki.km.click2sight.plugins.MethodManager;
-import de.dfki.km.click2sight.tools.Tools;
+import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
  * 
@@ -47,7 +47,7 @@ public class TrayMenu {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.changeStatus();
+                    MainClass.toggleStatus();
                     if (MainClass.isActivated()) {
                         changeState.setLabel("Disable");
                     } else {
@@ -62,7 +62,7 @@ public class TrayMenu {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.changeMode();
+                    MainClass.toggleMode();
                     if (MainClass.isNormalMode()) {
                         changeMode.setLabel("Change Modus: Training");
                     } else {

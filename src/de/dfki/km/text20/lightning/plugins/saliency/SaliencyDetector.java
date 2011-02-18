@@ -1,4 +1,4 @@
-package de.dfki.km.click2sight.plugins;
+package de.dfki.km.text20.lightning.plugins.saliency;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -9,11 +9,12 @@ import net.xeoh.plugins.base.Plugin;
  * Interface for different algorithms for screen analyzing.
  * 
  * @author Christoph Kaeding
- *
  */
-public interface PositionFinder extends Plugin{
+public interface SaliencyDetector extends Plugin{
 
     /**
+     * TODO: What does this do?
+     * 
      * Processes the given screenshot to allow the analyze of it.
      *     
      * @param screenShot
@@ -34,13 +35,5 @@ public interface PositionFinder extends Plugin{
      * 
      * @return
      */
-    public String getInformation();
-    
-    /**
-     * Name which is shown in the comboboxes of the gui.
-     * 
-     * @return
-     */
-    @Override
-    public String toString();
+    public SaliencyPluginInformation getInformation();
 }

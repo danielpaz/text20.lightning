@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Wed Feb 16 12:14:36 CET 2011
  */
 
-package de.dfki.km.click2sight.gui;
+package de.dfki.km.text20.lightning.gui;
 
 import java.awt.CardLayout;
 import java.awt.Container;
@@ -25,16 +25,15 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import de.dfki.km.click2sight.MainClass;
-import de.dfki.km.click2sight.plugins.MethodManager;
-import de.dfki.km.click2sight.plugins.PositionFinder;
-import de.dfki.km.click2sight.tools.Hotkey;
-import de.dfki.km.click2sight.tools.HotkeyContainer;
+import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.tools.Hotkey;
+import de.dfki.km.text20.lightning.tools.HotkeyContainer;
 
 /**
  * @author Christoph Käding
  */
-
 @SuppressWarnings("all")
 public class ConfigWindow extends JFrame {
     public ConfigWindow(MethodManager manager) {
@@ -98,7 +97,7 @@ public class ConfigWindow extends JFrame {
         MainClass.setShowImages(this.checkBoxShowPictures.isSelected());
         MainClass.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         MainClass.setOutputPath(this.textFieldOutputPath.getText());
-        methodManager.setCurrentPositionFinder((PositionFinder)comboBoxSearchMethod.getSelectedItem());
+        methodManager.setCurrentPositionFinder((SaliencyDetector)comboBoxSearchMethod.getSelectedItem());
         this.dispose();
     }
 
@@ -134,27 +133,27 @@ public class ConfigWindow extends JFrame {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        // Generated using JFormDesigner Evaluation license - Christoph Käding
-        dialogPane = new JPanel();
-        contentPanel = new JPanel();
-        label1 = new JLabel();
-        checkBoxShowPictures = new JCheckBox();
-        label2 = new JLabel();
-        spinnerDimension = new JSpinner();
-        label3 = new JLabel();
-        buttonSelect = new JButton();
-        textFieldOutputPath = new JTextField();
-        label4 = new JLabel();
-        comboBoxActionHotkey = new JComboBox();
-        label5 = new JLabel();
-        comboBoxStatusHotkey = new JComboBox();
-        label6 = new JLabel();
-        comboBoxSearchMethod = new JComboBox();
-        label7 = new JLabel();
-        comboBoxLearnMethod = new JComboBox();
-        buttonOK = new JButton();
-        buttonCancel = new JButton();
-        buttonBar = new JPanel();
+        // Generated using JFormDesigner non-commercial license
+        this.dialogPane = new JPanel();
+        this.contentPanel = new JPanel();
+        this.label1 = new JLabel();
+        this.checkBoxShowPictures = new JCheckBox();
+        this.label2 = new JLabel();
+        this.spinnerDimension = new JSpinner();
+        this.label3 = new JLabel();
+        this.buttonSelect = new JButton();
+        this.textFieldOutputPath = new JTextField();
+        this.label4 = new JLabel();
+        this.comboBoxActionHotkey = new JComboBox();
+        this.label5 = new JLabel();
+        this.comboBoxStatusHotkey = new JComboBox();
+        this.label6 = new JLabel();
+        this.comboBoxSearchMethod = new JComboBox();
+        this.label7 = new JLabel();
+        this.comboBoxLearnMethod = new JComboBox();
+        this.buttonOK = new JButton();
+        this.buttonCancel = new JButton();
+        this.buttonBar = new JPanel();
         CellConstraints cc = new CellConstraints();
 
         //======== this ========
@@ -165,140 +164,132 @@ public class ConfigWindow extends JFrame {
 
         //======== dialogPane ========
         {
-            dialogPane.setBorder(Borders.DIALOG_BORDER);
-
-            // JFormDesigner evaluation mark
-            dialogPane.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0), "JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12), java.awt.Color.red), dialogPane.getBorder()));
-            dialogPane.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-                public void propertyChange(java.beans.PropertyChangeEvent e) {
-                    if ("border".equals(e.getPropertyName()))
-                        throw new RuntimeException();
-                }
-            });
-
-            dialogPane.setLayout(new GridLayout());
+            this.dialogPane.setBorder(Borders.DIALOG_BORDER);
+            this.dialogPane.setLayout(new GridLayout());
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 8*(default, $lcgap), default", "19*(default, $lgap), default"));
+                this.contentPanel.setLayout(new FormLayout(
+                    "4*(30dlu, $lcgap), 8*(default, $lcgap), default",
+                    "19*(default, $lgap), default"));
 
                 //---- label1 ----
-                label1.setText("show images");
-                contentPanel.add(label1, cc.xywh(1, 1, 3, 1));
-                contentPanel.add(checkBoxShowPictures, cc.xywh(5, 1, 3, 1));
+                this.label1.setText("show images");
+                this.contentPanel.add(this.label1, cc.xywh(1, 1, 3, 1));
+                this.contentPanel.add(this.checkBoxShowPictures, cc.xywh(5, 1, 3, 1));
 
                 //---- label2 ----
-                label2.setText("dimesnion");
-                contentPanel.add(label2, cc.xywh(1, 3, 3, 1));
+                this.label2.setText("dimesnion");
+                this.contentPanel.add(this.label2, cc.xywh(1, 3, 3, 1));
 
                 //---- spinnerDimension ----
-                spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
-                contentPanel.add(spinnerDimension, cc.xywh(5, 3, 3, 1));
+                this.spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+                this.contentPanel.add(this.spinnerDimension, cc.xywh(5, 3, 3, 1));
 
                 //---- label3 ----
-                label3.setText("output directory");
-                contentPanel.add(label3, cc.xywh(1, 5, 3, 1));
+                this.label3.setText("output directory");
+                this.contentPanel.add(this.label3, cc.xywh(1, 5, 3, 1));
 
                 //---- buttonSelect ----
-                buttonSelect.setText("Select");
-                buttonSelect.addActionListener(new ActionListener() {
+                this.buttonSelect.setText("Select");
+                this.buttonSelect.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonSelectActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonSelect, cc.xywh(5, 5, 3, 1));
-                contentPanel.add(textFieldOutputPath, cc.xywh(1, 7, 7, 1));
+                this.contentPanel.add(this.buttonSelect, cc.xywh(5, 5, 3, 1));
+                this.contentPanel.add(this.textFieldOutputPath, cc.xywh(1, 7, 7, 1));
 
                 //---- label4 ----
-                label4.setText("action hotkey");
-                contentPanel.add(label4, cc.xywh(1, 9, 3, 1));
+                this.label4.setText("action hotkey");
+                this.contentPanel.add(this.label4, cc.xywh(1, 9, 3, 1));
 
                 //---- comboBoxActionHotkey ----
-                comboBoxActionHotkey.addActionListener(new ActionListener() {
+                this.comboBoxActionHotkey.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxActionHotkeyActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxActionHotkey, cc.xywh(5, 9, 3, 1));
+                this.contentPanel.add(this.comboBoxActionHotkey, cc.xywh(5, 9, 3, 1));
 
                 //---- label5 ----
-                label5.setText("status hotkey");
-                contentPanel.add(label5, cc.xywh(1, 11, 3, 1));
+                this.label5.setText("status hotkey");
+                this.contentPanel.add(this.label5, cc.xywh(1, 11, 3, 1));
 
                 //---- comboBoxStatusHotkey ----
-                comboBoxStatusHotkey.addActionListener(new ActionListener() {
+                this.comboBoxStatusHotkey.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxStatusHotkeyActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 11, 3, 1));
+                this.contentPanel.add(this.comboBoxStatusHotkey, cc.xywh(5, 11, 3, 1));
 
                 //---- label6 ----
-                label6.setText("search method");
-                contentPanel.add(label6, cc.xywh(1, 13, 3, 1));
+                this.label6.setText("search method");
+                this.contentPanel.add(this.label6, cc.xywh(1, 13, 3, 1));
 
                 //---- comboBoxSearchMethod ----
-                comboBoxSearchMethod.addActionListener(new ActionListener() {
+                this.comboBoxSearchMethod.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxSearchMethodActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxSearchMethod, cc.xywh(5, 13, 3, 1));
+                this.contentPanel.add(this.comboBoxSearchMethod, cc.xywh(5, 13, 3, 1));
 
                 //---- label7 ----
-                label7.setText("learn method");
-                contentPanel.add(label7, cc.xywh(1, 15, 3, 1));
+                this.label7.setText("learn method");
+                this.contentPanel.add(this.label7, cc.xywh(1, 15, 3, 1));
 
                 //---- comboBoxLearnMethod ----
-                comboBoxLearnMethod.addActionListener(new ActionListener() {
+                this.comboBoxLearnMethod.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxLearnMethodActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxLearnMethod, cc.xywh(5, 15, 3, 1));
+                this.contentPanel.add(this.comboBoxLearnMethod, cc.xywh(5, 15, 3, 1));
 
                 //---- buttonOK ----
-                buttonOK.setText("OK");
-                buttonOK.addActionListener(new ActionListener() {
+                this.buttonOK.setText("OK");
+                this.buttonOK.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonOKActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonOK, cc.xywh(1, 17, 3, 1));
+                this.contentPanel.add(this.buttonOK, cc.xywh(1, 17, 3, 1));
 
                 //---- buttonCancel ----
-                buttonCancel.setText("Cancel");
-                buttonCancel.addActionListener(new ActionListener() {
+                this.buttonCancel.setText("Cancel");
+                this.buttonCancel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonCancelActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonCancel, cc.xywh(5, 17, 3, 1));
+                this.contentPanel.add(this.buttonCancel, cc.xywh(5, 17, 3, 1));
 
                 //======== buttonBar ========
                 {
-                    buttonBar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
-                    buttonBar.setLayout(new CardLayout());
+                    this.buttonBar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
+                    this.buttonBar.setLayout(new CardLayout());
                 }
-                contentPanel.add(buttonBar, cc.xy(11, 23));
+                this.contentPanel.add(this.buttonBar, cc.xy(11, 23));
             }
-            dialogPane.add(contentPanel);
+            this.dialogPane.add(this.contentPanel);
         }
-        contentPane.add(dialogPane);
-        pack();
+        contentPane.add(this.dialogPane);
+        setSize(295, 345);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    // Generated using JFormDesigner Evaluation license - Christoph Käding
+    // Generated using JFormDesigner non-commercial license
     private JPanel dialogPane;
     private JPanel contentPanel;
     private JLabel label1;

@@ -1,4 +1,4 @@
-package de.dfki.km.click2sight.tools;
+package de.dfki.km.text20.lightning.tools;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import de.dfki.km.click2sight.MainClass;
+import de.dfki.km.text20.lightning.MainClass;
 
 /**
  * 
