@@ -1,4 +1,4 @@
-package de.dfki.km.click2sight.plugins;
+package de.dfki.km.text20.lightning.plugins;
 
 import java.util.ArrayList;
 
@@ -6,34 +6,42 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-import de.dfki.km.click2sight.plugins.positionFinderPlugins.FakePositionFinder;
-import de.dfki.km.click2sight.plugins.positionFinderPlugins.SimplePositionFinder;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
+import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
 
 /**
+ * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
  * 
  * @author Christoph Kaeding
- *
- * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
  */
 public class MethodManager {
 
     /** */
     private PluginManager pluginManager;
+    
     /** */
     private PluginManagerUtil pluginManagerUtil;
+    
     /** */
-    private PositionFinder currentPositionFinder;
+    private SaliencyDetector currentPositionFinder;
+    
     /** */
-    private ArrayList<PositionFinder> positionFinder;
+    private ArrayList<SaliencyDetector> positionFinder;
 
     /** */
     //TODO: change plugins to jars
     public MethodManager() {
+        // Create a new plugin manager 
         this.pluginManager = PluginManagerFactory.createPluginManager();
+        
+        // Add internal plugins
         this.pluginManager.addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
-        this.pluginManager.addPluginsFrom(new ClassURI(SimplePositionFinder.class).toURI());
+        this.pluginManager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());
+        
+        
         this.pluginManagerUtil = new PluginManagerUtil(this.pluginManager);
-        this.positionFinder = new ArrayList<PositionFinder>(this.pluginManagerUtil.getPlugins(PositionFinder.class));
+        this.positionFinder = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
         this.currentPositionFinder = this.positionFinder.get(0);
     }
 
@@ -50,7 +58,7 @@ public class MethodManager {
      * 
      * @return
      */
-    public PositionFinder getCurrentPositionFinder() {
+    public SaliencyDetector getCurrentPositionFinder() {
         return this.currentPositionFinder;
     }
 
@@ -59,7 +67,7 @@ public class MethodManager {
      * 
      * @return
      */
-    public ArrayList<PositionFinder> getPositionFinder() {
+    public ArrayList<SaliencyDetector> getPositionFinder() {
         return this.positionFinder;
     }
 
@@ -68,7 +76,7 @@ public class MethodManager {
      * 
      * @param choice
      */
-    public void setCurrentPositionFinder(PositionFinder choice) {
+    public void setCurrentPositionFinder(SaliencyDetector choice) {
         this.currentPositionFinder = choice;
         System.out.println("search method: " + this.currentPositionFinder);
     }

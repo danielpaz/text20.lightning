@@ -1,10 +1,11 @@
-package de.dfki.km.click2sight.plugins.positionFinderPlugins;
+package de.dfki.km.text20.lightning.plugins.saliency.impl.dummy;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import de.dfki.km.click2sight.plugins.PositionFinder;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
  * 
@@ -12,7 +13,7 @@ import de.dfki.km.click2sight.plugins.PositionFinder;
  *
  */
 @PluginImplementation
-public class FakePositionFinder implements PositionFinder {
+public class FakePositionFinder implements SaliencyDetector {
 
     public FakePositionFinder() {
     }
@@ -28,12 +29,7 @@ public class FakePositionFinder implements PositionFinder {
     }
 
     @Override
-    public String getInformation() {
-        return new String("fake method");
-    }
-
-    @Override
-    public String toString() {
-        return new String("fake method");
+    public SaliencyPluginInformation getInformation() {
+        return new SaliencyPluginInformation();
     }
 }

@@ -1,11 +1,11 @@
-package de.dfki.km.click2sight.tools;
+package de.dfki.km.text20.lightning.tools;
 
 import java.util.ArrayList;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
-import de.dfki.km.click2sight.MainClass;
+import de.dfki.km.text20.lightning.MainClass;
 
 /**
  * 
@@ -13,7 +13,6 @@ import de.dfki.km.click2sight.MainClass;
  * 
  * This is the hotkey management which is designed as a kind of singleton. 
  */
-@SuppressWarnings("all")
 public class Hotkey implements HotkeyListener {
 
     /** instance of singleton */
@@ -76,7 +75,7 @@ public class Hotkey implements HotkeyListener {
             Hotkey.getInstance().isHotKeyTyped = true;
             break;
         case 2:
-            MainClass.changeStatus();
+            MainClass.toggleStatus();
             Hotkey.getInstance().isHotKeyTyped = false;
             break;
         default:

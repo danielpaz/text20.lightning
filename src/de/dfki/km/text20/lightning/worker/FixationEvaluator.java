@@ -1,4 +1,4 @@
-package de.dfki.km.click2sight.worker;
+package de.dfki.km.text20.lightning.worker;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -12,9 +12,9 @@ import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 
-import de.dfki.km.click2sight.MainClass;
-import de.dfki.km.click2sight.plugins.MethodManager;
-import de.dfki.km.click2sight.tools.Tools;
+import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.tools.Tools;
 
 public class FixationEvaluator {
 

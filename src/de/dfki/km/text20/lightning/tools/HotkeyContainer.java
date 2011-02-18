@@ -1,4 +1,4 @@
-package de.dfki.km.click2sight.tools;
+package de.dfki.km.text20.lightning.tools;
 
 /**
  * 
