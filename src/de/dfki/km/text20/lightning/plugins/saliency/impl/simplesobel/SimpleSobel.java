@@ -1,7 +1,7 @@
 /*
  * SimpleSobel.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Kï¿½ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 /**
  * Simple implementation of the algorithm to search sth. interesting around the provided point on the screen.
  * 
- * @author Christoph Käding
+ * @author Christoph Kï¿½ding
  *
  */
 @PluginImplementation
@@ -45,33 +45,35 @@ public class SimpleSobel implements SaliencyDetector {
     private BufferedImage derivate(BufferedImage screenShot) {
         
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        
+
+        // Go through each pixel position in the derivate image ... 
         for (int x = 0; x < screenShot.getHeight(); x++) {
             for (int y = 0; y < screenShot.getHeight() - 1; y++) {
-                
-                // subtract the grey value of a pixel by the value of the following one to derivate the screenshot in y-direction
+                // ... and subtract the grey value of a pixel by the value of the following one to 
+                // derivate the screenshot in y-direction
                 derivatedScreenShot.setRGB(x, y, (screenShot.getRGB(x, y) & 0xFF) - (screenShot.getRGB(x, y + 1) & 0xFF));
             }
         }
         return derivatedScreenShot;
     }
 
-    /**
-     * Analyses the given screenshot. A kind of spiral grows from the middle of the image and gives the first point, which is not black back. 
-     * 
-     * encoding for direction:
-     * 0 = down
-     * 1 = left
-     * 2 = up
-     * 3 = right 
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#analyse(java.awt.image.BufferedImage)
      */
     @Override
     public Point analyse(BufferedImage screenShot) {
         int direction = 0;
         int size = 1;
-        BufferedImage derivatedScreenShot = derivate(screenShot);
-        Point point = new Point(derivatedScreenShot.getHeight() / 2, derivatedScreenShot.getHeight() / 2);
-        Point offset = new Point(0, 0);
+        
+        //encoding for direction:
+        // 0 = down
+        // 1 = left
+        // 2 = up
+        // 3 = right 
+        final BufferedImage derivatedScreenShot = derivate(screenShot);
+        final Point point = new Point(derivatedScreenShot.getHeight() / 2, derivatedScreenShot.getHeight() / 2);
+        final Point offset = new Point(0, 0);
+        
         while ((size < derivatedScreenShot.getHeight()) && (Math.abs(offset.x) < derivatedScreenShot.getHeight() / 2) && (Math.abs(offset.y) < derivatedScreenShot.getHeight() / 2)) {
             switch (direction) {
             case 0:
@@ -117,20 +119,15 @@ public class SimpleSobel implements SaliencyDetector {
         return offset;
     }
 
-    /**
-     * some informations...
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#getInformation()
      */
     @Override
     public SaliencyPluginInformation getInformation() {
-        return new SaliencyPluginInformation();
-    }
-
-    /**
-     * the displayed name...
-     */
-    @Override
-    public String getDisplayName() {
-                return new String("simple sobel");
+        final SaliencyPluginInformation information = new SaliencyPluginInformation();
+        information.displayName = "Simple Sobel";
+        
+        return information;
     }
     
 }

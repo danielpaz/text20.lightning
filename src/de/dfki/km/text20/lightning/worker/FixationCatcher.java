@@ -1,7 +1,7 @@
 /*
  * FixationCatcher.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Kï¿½ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDeviceProvider
 /**
  * Central class were catching of fixations is done and its processing depending on the modus is started.
  * 
- * @author Christoph Käding
+ * @author Christoph Kï¿½ding
  */
 public class FixationCatcher {
 
@@ -115,8 +115,11 @@ public class FixationCatcher {
                             MainClass.showTrayMessage("training", "fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
                             
                             // wait for another hotkey event to catch the mouse position
-                            while (!Hotkey.getInstance().isTyped() && !MainClass.isNormalMode())
-                                ;
+                            while (!Hotkey.getInstance().isTyped() && !MainClass.isNormalMode()) {
+                                try {
+                                    Thread.sleep(10);
+                                } catch (InterruptedException e) {}
+                            }
                             
                                 if (!MainClass.isNormalMode()) {
                                     
