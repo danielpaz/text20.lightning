@@ -4,7 +4,7 @@
 /*
  * ConfigWindow.java
  *
- * Copyright (c) 2011, Christoph K�ding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import de.dfki.km.text20.lightning.tools.HotkeyContainer;
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
  * Here are all the things shown, which are important an should be changeable.
  * 
- * @author Christoph K�ding
+ * @author Christoph Käding
  */
 @SuppressWarnings({ "boxing", "serial" })
 public class ConfigWindow extends JFrame {

@@ -1,7 +1,7 @@
 /*
  * Hotkey.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph KÃ¤ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import de.dfki.km.text20.lightning.MainClass;
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys are linked with thier functions or removed from the listener by this class.
  * 
- * @author Christoph Käding
+ * @author Christoph KÃ¤ding
  * 
  */
 public class Hotkey implements HotkeyListener {

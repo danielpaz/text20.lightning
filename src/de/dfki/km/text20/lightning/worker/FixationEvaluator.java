@@ -1,7 +1,7 @@
 /*
  * FixationEvaluator.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph KÃ¤ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import de.dfki.km.text20.lightning.tools.Tools;
  * and gives it to the current saliency detector plugin. The offset which is provided by the plugin 
  * is used to click on the calculated target.
  * 
- * @author Christoph Käding
+ * @author Christoph KÃ¤ding
  *
  */
 public class FixationEvaluator {

@@ -1,7 +1,7 @@
 /*
  * Properties.java
  * 
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph KÃ¤ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import de.dfki.km.text20.lightning.tools.HotkeyContainer;
 /**
  * stores configurations, write them to a file on exit and tries to load them on startup 
  * 
- * @author Christoph Käding
+ * @author Christoph KÃ¤ding
  *
  */
 @SuppressWarnings("serial")
@@ -71,58 +71,56 @@ public class Properties implements Serializable {
      * creates properties, tries to load property file
      */
     public Properties() {
-        
+
         // TODO: delete
         String propertiesPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2Sight" + File.separator + "properties";
         //        String propertiesPath = "." + File.separator + "properties";
-        
+
         // creates properties file
         this.propertiesFile = new File(propertiesPath);
-        
+
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
-        
-        
+
         if (this.propertiesFile.exists()) {
             try {
-                
+
                 // read object from file
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
-                
+
                 if (this.object instanceof Properties) {
-                    
+
                     // store readed configurations
                     this.showImages = ((Properties) this.object).isShowImages();
                     this.dimension = ((Properties) this.object).getDimension();
                     this.outputPath = ((Properties) this.object).getOutputPath();
                     this.actionHotkey = ((Properties) this.object).getActionHotkey();
                     this.statusHotkey = ((Properties) this.object).getStatusHotkey();
-                    
+
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("showImages: " + this.showImages + ", dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                 }
-                
+
                 // cleanup
                 inputStream.close();
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
-                MainClass.exit();
             }
         }
-        
+
         // if reading was not successful or properties file was not found
         if (!status) {
-            
+
             // set default values
             this.showImages = false;
             this.dimension = 100;
-            // TODO: delete
-            this.outputPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2SightOutput";
-            //this.outputPath = "." + File.separator + "output";
+            // TODO: change path
+            //            this.outputPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2SightOutput";
+            this.outputPath = "." + File.separator + "output";
             this.actionHotkey = null;
             this.statusHotkey = null;
             System.out.println("Properties file was not found.");
@@ -190,19 +188,19 @@ public class Properties implements Serializable {
     public void setOutputPath(String choosedOutputPath) {
         try {
             File outputDir = new File(choosedOutputPath);
-            
+
             // creates path if it not exists
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
             } else {
-                
+
                 if (outputDir.isDirectory()) {
-                    
+
                     // if the choosed path is a directory, its path is the new outputpath
                     this.outputPath = choosedOutputPath;
                 }
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -249,14 +247,13 @@ public class Properties implements Serializable {
      */
     public void writeProperties() {
         try {
-            
+
             // write object
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
-            MainClass.exit();
         }
     }
 }

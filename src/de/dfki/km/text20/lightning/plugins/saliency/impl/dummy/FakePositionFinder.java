@@ -1,7 +1,7 @@
 /*
  * FakePositionFinder.java
  *
- * Copyright (c) 2011, Christoph K�ding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 /**
  * The name says everything ;)
  * 
- * @author Christoph K�ding
+ * @author Christoph Käding
  * 
  */
 @PluginImplementation

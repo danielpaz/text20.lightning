@@ -1,7 +1,7 @@
 /*
  * TrayMenu.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph KÃ¤ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import de.dfki.km.text20.lightning.plugins.MethodManager;
 /**
  * A singleton of the menu which is shown by a click on the tray icon.
  * 
- * @author Christoph Käding
+ * @author Christoph KÃ¤ding
  *
  */
 public class TrayMenu {

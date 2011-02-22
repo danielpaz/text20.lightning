@@ -1,7 +1,7 @@
 /*
  * MethodManager.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph KÃ¤ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel
 /**
  * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
  * 
- * @author Christoph Käding
+ * @author Christoph KÃ¤ding
  */
 public class MethodManager {
 
