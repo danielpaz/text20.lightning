@@ -1,3 +1,24 @@
+/*
+ * SimpleSobel.java
+ *
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ *
+ */
 package de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel;
 
 import java.awt.Point;
@@ -8,21 +29,27 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
+ * Simple implementation of the algorithm to search sth. interesting around the provided point on the screen.
  * 
- * @author Christoph Kaeding
+ * @author Christoph Käding
  *
  */
 @PluginImplementation
 public class SimpleSobel implements SaliencyDetector {
 
     /**
-     * Derivates the given screenshot in y-direction.
+     * Derivates the given screenshot in y-direction. 
+     * This painted pixels which have any different color as their following ones in white or grey color.
+     * All the other ones will be colored black.
      */
-    @Override
-    public BufferedImage derivate(BufferedImage screenShot) {
+    private BufferedImage derivate(BufferedImage screenShot) {
+        
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        
         for (int x = 0; x < screenShot.getHeight(); x++) {
             for (int y = 0; y < screenShot.getHeight() - 1; y++) {
+                
+                // subtract the grey value of a pixel by the value of the following one to derivate the screenshot in y-direction
                 derivatedScreenShot.setRGB(x, y, (screenShot.getRGB(x, y) & 0xFF) - (screenShot.getRGB(x, y + 1) & 0xFF));
             }
         }
@@ -39,9 +66,10 @@ public class SimpleSobel implements SaliencyDetector {
      * 3 = right 
      */
     @Override
-    public Point analyse(BufferedImage derivatedScreenShot) {
+    public Point analyse(BufferedImage screenShot) {
         int direction = 0;
         int size = 1;
+        BufferedImage derivatedScreenShot = derivate(screenShot);
         Point point = new Point(derivatedScreenShot.getHeight() / 2, derivatedScreenShot.getHeight() / 2);
         Point offset = new Point(0, 0);
         while ((size < derivatedScreenShot.getHeight()) && (Math.abs(offset.x) < derivatedScreenShot.getHeight() / 2) && (Math.abs(offset.y) < derivatedScreenShot.getHeight() / 2)) {
@@ -96,4 +124,13 @@ public class SimpleSobel implements SaliencyDetector {
     public SaliencyPluginInformation getInformation() {
         return new SaliencyPluginInformation();
     }
+
+    /**
+     * the displayed name...
+     */
+    @Override
+    public String getDisplayName() {
+                return new String("simple sobel");
+    }
+    
 }

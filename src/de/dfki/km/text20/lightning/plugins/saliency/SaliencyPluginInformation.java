@@ -27,6 +27,11 @@
  */
 package de.dfki.km.text20.lightning.plugins.saliency;
 
+/**
+ * 
+ * @author Christoph Käding
+ *
+ */
 public class SaliencyPluginInformation {
-    //
+    // TODO: do anything with this
 }

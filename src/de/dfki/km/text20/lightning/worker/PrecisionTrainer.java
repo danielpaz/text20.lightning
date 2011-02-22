@@ -1,3 +1,24 @@
+/*
+ * PrecisionTrainer.java
+ *
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ *
+ */
 package de.dfki.km.text20.lightning.worker;
 
 import java.awt.AWTException;
@@ -12,19 +33,42 @@ import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.MethodManager;
 import de.dfki.km.text20.lightning.tools.Tools;
 
-//TODO: add comments
+/**
+ * The precision trainer is used in trainings mode. Here the collected data is handeled.
+ * 
+ * @author Christoph Käding
+ *
+ */
 //TODO: do sth with the trainingsdata
 //TODO: use plugin for trainings method
 public class PrecisionTrainer {
 
+    /** last fixation point */
     private Point fixation;
+
+    /** associated mouse position which shows the real target*/
     private Point mousePosition;
+
+    /** offset between fixation point and mouse position */
     private Point offset;
+
+    /** robot for creating screenshots */
     private Robot robot;
+
+    /** actual time */
     private long timestamp;
+
+    /** for later use to add different training methods*/
     private MethodManager methodManager;
 
+    /**
+     * creates the precision trainer
+     * 
+     * @param manager
+     */
     public PrecisionTrainer(MethodManager manager) {
+
+        // initialize variables
         this.fixation = new Point();
         this.offset = new Point();
         this.methodManager = manager;
@@ -37,33 +81,62 @@ public class PrecisionTrainer {
         }
     }
 
+    /**
+     * stores fixation and creates timestamp
+     * 
+     * @param fixation
+     */
     public void setFixationPoint(Point fixation) {
         this.fixation = fixation;
         this.timestamp = System.currentTimeMillis();
     }
 
+    /**
+     * sets the mouseposition to associate it with the stored fixation
+     * 
+     * @param mousePosition
+     */
     public void setMousePosition(Point mousePosition) {
         this.mousePosition = mousePosition;
-        if (MainClass.showImages()) {
+
+        if (MainClass.getProperties().isShowImages()) {
+            // draw both points to a image
             this.drawPicture();
         }
+
+        // calculate offset
         this.offset.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
-        Tools.updateLogFile("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getDimension() + System.getProperty("line.separator"));
+
+        // update logfile
+        Tools.updateLogFile("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getProperties().getDimension() + System.getProperty("line.separator"));
         System.out.println("step recognised...");
     }
 
+    /**
+     * draw image to global output path
+     */
     private void drawPicture() {
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getDimension() / 2, this.fixation.y - MainClass.getDimension() / 2, MainClass.getDimension(), MainClass.getDimension());
+
+        // create screenshot
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getProperties().getDimension() / 2, this.fixation.y - MainClass.getProperties().getDimension() / 2, MainClass.getProperties().getDimension(), MainClass.getProperties().getDimension());
         BufferedImage screenShot = this.robot.createScreenCapture(screenShotRect);
         Graphics2D graphic = screenShot.createGraphics();
+
+        // visualize fixation point 
         graphic.setColor(new Color(255, 255, 0, 255));
-        graphic.drawOval(MainClass.getDimension() / 2 - 5, MainClass.getDimension() / 2 - 5, 10, 10);
+        graphic.drawOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+        graphic.drawChars(("fixation point").toCharArray(), 0, 14, 3, 10);
         graphic.setColor(new Color(255, 255, 0, 32));
-        graphic.fillOval(MainClass.getDimension() / 2 - 5, MainClass.getDimension() / 2 - 5, 10, 10);
+        graphic.fillOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+
+        // visualize mouse position
         graphic.setColor(new Color(255, 0, 0, 255));
-        graphic.drawOval(this.offset.x + MainClass.getDimension() / 2, this.offset.y + MainClass.getDimension() / 2, 10, 10);
+        graphic.drawOval(this.offset.x + MainClass.getProperties().getDimension() / 2, this.offset.y + MainClass.getProperties().getDimension() / 2, 10, 10);
+        graphic.drawChars(("mouse position").toCharArray(), 0, 14, 3, 25);
         graphic.setColor(new Color(255, 0, 0, 32));
-        graphic.fillOval(this.offset.x + MainClass.getDimension() / 2, this.offset.y + MainClass.getDimension() / 2, 10, 10);
+        graphic.fillOval(this.offset.x + MainClass.getProperties().getDimension() / 2, this.offset.y + MainClass.getProperties().getDimension() / 2, 10, 10);
+
+        // write the image
         Tools.writeImage(screenShot, this.timestamp + "_training.png");
     }
 }
