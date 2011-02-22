@@ -1,7 +1,7 @@
 /*
  * TraySymbol.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Kï¿½ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 package de.dfki.km.text20.lightning.gui;
 
 import java.awt.AWTException;
+import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -32,7 +33,7 @@ import de.dfki.km.text20.lightning.plugins.MethodManager;
 /**
  * The icon which is shown in the system tray.
  * 
- * @author Christoph Käding
+ * @author Christoph Kï¿½ding
  *
  */
 public class TraySymbol {
@@ -94,6 +95,8 @@ public class TraySymbol {
      */
     public boolean setActivatedIcon() {
         if (SystemTray.isSupported()) {
+             = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif"));
+            
             this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(this.activeIconPath));
         } else {
             return false;
