@@ -1,7 +1,7 @@
 /*
  * SaliencyDetector.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Kï¿½ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import net.xeoh.plugins.base.Plugin;
 /**
  * Interface for different algorithms for screen analyzing.
  * 
- * @author Christoph Käding
+ * @author Christoph Kï¿½ding
  */
 public interface SaliencyDetector extends Plugin {
 
@@ -47,11 +47,4 @@ public interface SaliencyDetector extends Plugin {
      * @return ??
      */
     public SaliencyPluginInformation getInformation();
-    
-    /**
-     * Returns the string which is shown in the combobox of the gui.
-     * 
-     * @return the name of the method
-     */
-    public String getDisplayName();
 }

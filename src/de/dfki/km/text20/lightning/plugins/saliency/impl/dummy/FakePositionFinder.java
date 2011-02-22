@@ -1,7 +1,7 @@
 /*
  * FakePositionFinder.java
  *
- * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Kï¿½ding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,28 +31,34 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 /**
  * The name says everything ;)
  * 
- * @author Christoph Käding
- *
+ * @author Christoph Kï¿½ding
+ * 
  */
 @PluginImplementation
 public class FakePositionFinder implements SaliencyDetector {
 
     /** */
-    public FakePositionFinder() {
-    }
+    public FakePositionFinder() {}
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#analyse(java.awt.image.BufferedImage)
+     */
     @Override
     public Point analyse(BufferedImage derivatedScreenShot) {
-        return new Point(0,0);
+        return new Point(0, 0);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#getInformation()
+     */
     @Override
     public SaliencyPluginInformation getInformation() {
-        return new SaliencyPluginInformation();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return new String("fake method");
+        final SaliencyPluginInformation information = new SaliencyPluginInformation();
+        information.displayName = "Dummy Filter (returns always 0,0)";
+        return information;
     }
 }

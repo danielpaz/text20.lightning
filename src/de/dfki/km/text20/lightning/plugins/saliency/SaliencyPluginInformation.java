@@ -28,10 +28,11 @@
 package de.dfki.km.text20.lightning.plugins.saliency;
 
 /**
+ * Provides information about the given filter.
  * 
- * @author Christoph Käding
- *
+ * @author Christoph Kï¿½ding
  */
 public class SaliencyPluginInformation {
-    // TODO: do anything with this
+    /** The name to display in the interface for this filter */
+    public String displayName;
 }
