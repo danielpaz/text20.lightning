@@ -1,11 +1,31 @@
+/*
+ * MethodManager.java
+ *
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ *
+ */
 package de.dfki.km.text20.lightning.plugins;
 
 import java.util.ArrayList;
 
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
@@ -13,62 +33,51 @@ import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel
 /**
  * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
  * 
- * @author Christoph Kaeding
+ * @author Christoph Käding
  */
 public class MethodManager {
 
-    /** */
-    private PluginManager pluginManager;
     
-    /** */
+    /** utility which can create a list of all available plugins */
     private PluginManagerUtil pluginManagerUtil;
     
-    /** */
-    private SaliencyDetector currentPositionFinder;
+    /** current elected saliency detector */
+    private SaliencyDetector currentSaliencyDetector;
     
     /** */
-    private ArrayList<SaliencyDetector> positionFinder;
+    private ArrayList<SaliencyDetector> saliencyDetectors;
 
     /** */
     //TODO: change plugins to jars
+    //TODO: store current plugin in properties
     public MethodManager() {
-        // Create a new plugin manager 
-        this.pluginManager = PluginManagerFactory.createPluginManager();
         
         // Add internal plugins
-        this.pluginManager.addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
-        this.pluginManager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());
+        MainClass.getPluginManager().addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
+        MainClass.getPluginManager().addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());        
         
-        
-        this.pluginManagerUtil = new PluginManagerUtil(this.pluginManager);
-        this.positionFinder = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
-        this.currentPositionFinder = this.positionFinder.get(0);
-    }
-
-    /** 
-     * Returns the active pluginmanager to shut it down from outside to leave the program cleanly.
-     * 
-     * @return
-     */
-    public PluginManager getPluginManager() {
-        return this.pluginManager;
+        this.pluginManagerUtil = new PluginManagerUtil(MainClass.getPluginManager());
+        this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
+        // TODO: get this from properties
+        this.currentSaliencyDetector = this.saliencyDetectors.get(0);
     }
 
     /**
+     * gives the current saliency detecting method back
      * 
-     * @return
+     * @return currentSaliencyDetector
      */
-    public SaliencyDetector getCurrentPositionFinder() {
-        return this.currentPositionFinder;
+    public SaliencyDetector getCurrentSaliencyDetector() {
+        return this.currentSaliencyDetector;
     }
 
     /**
      * Returns a ArrayList of all the given plugins for position finding.
      * 
-     * @return
+     * @return saliencyDetectors
      */
-    public ArrayList<SaliencyDetector> getPositionFinder() {
-        return this.positionFinder;
+    public ArrayList<SaliencyDetector> getSaliencyDetectors() {
+        return this.saliencyDetectors;
     }
 
     /**
@@ -76,8 +85,8 @@ public class MethodManager {
      * 
      * @param choice
      */
-    public void setCurrentPositionFinder(SaliencyDetector choice) {
-        this.currentPositionFinder = choice;
-        System.out.println("search method: " + this.currentPositionFinder);
+    public void setCurrentSaliencyDetector(SaliencyDetector choice) {
+        this.currentSaliencyDetector = choice;
+        System.out.println("search method: " + this.currentSaliencyDetector);
     }
 }

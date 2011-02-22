@@ -1,48 +1,89 @@
+/*
+ * Hotkey.java
+ *
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ *
+ */
 package de.dfki.km.text20.lightning.tools;
 
 import java.util.ArrayList;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.melloware.jintellitype.JIntellitypeConstants;
 
 import de.dfki.km.text20.lightning.MainClass;
 
 /**
+ * This is the hotkey management which is designed as a singleton. The hotkeys are linked with thier functions or removed from the listener by this class.
  * 
- * @author Christoph Kaeding
+ * @author Christoph Käding
  * 
- * This is the hotkey management which is designed as a kind of singleton. 
  */
 public class Hotkey implements HotkeyListener {
 
     /** instance of singleton */
     private static Hotkey instance = null;
-    /** */
-    private static boolean isHotKeyTyped;
+
+    /** indicates if the action hotkey is typed */
+    private boolean isHotKeyTyped;
+
     /** the active hotkey to start the mouse click */
-    private static HotkeyContainer actionHotkey;
-    /** the active hotkey to enable/disable the tool */
-    private static HotkeyContainer statusHotkey;
+    private HotkeyContainer actionHotkey;
+
+    /** the status hotkey to enable/disable the tool */
+    private HotkeyContainer statusHotkey;
+
     /** a list of all available hotkeys */
-    private static ArrayList<HotkeyContainer> hotkeys;
+    private ArrayList<HotkeyContainer> hotkeys;
 
     /** */
     private Hotkey() {
-        isHotKeyTyped = false;
+
+        this.isHotKeyTyped = false;
         this.initHotkeys();
-        actionHotkey = hotkeys.get(0);
-        statusHotkey = hotkeys.get(1);
-        JIntellitype.getInstance().registerHotKey(1, actionHotkey.modificator, actionHotkey.button);
-        JIntellitype.getInstance().registerHotKey(2, statusHotkey.modificator, statusHotkey.button);
+
+        if ((MainClass.getProperties().getActionHotkey() != null) && (MainClass.getProperties().getStatusHotkey() != null)) {
+            // if already hotekeys are stored in the properties, these will be used as current hotkeys
+            this.actionHotkey = MainClass.getProperties().getActionHotkey();
+            this.statusHotkey = MainClass.getProperties().getStatusHotkey();
+
+        } else {
+            // otherwise the default hotkeys were set and stored to properties
+            this.actionHotkey = this.hotkeys.get(0);
+            MainClass.getProperties().setActionHotkey(this.actionHotkey);
+            this.statusHotkey = this.hotkeys.get(1);
+            MainClass.getProperties().setStatusHotkey(this.statusHotkey);
+        }
+
+        // add hotkeys to listener
+        JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.modificator, this.actionHotkey.button);
+        JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.modificator, this.statusHotkey.button);
         JIntellitype.getInstance().addHotKeyListener(this);
     }
 
     /**
      * Returns the singleton. This method should be used before every call of any hotkey function.   
      * 
-     * @return
+     * @return instance 
+     * the only instance of Hotkey
      */
-    private static Hotkey getInstance() {
+    public static Hotkey getInstance() {
         if (instance == null) {
             instance = new Hotkey();
         }
@@ -50,19 +91,19 @@ public class Hotkey implements HotkeyListener {
     }
 
     /**
-     * Shows if the hotkey is type.
+     * Indicates if the action hotkey is typed.
      * 
-     * @return
+     * @return isHotKeyTyped
      */
-    public static boolean isTyped() {
-        return Hotkey.getInstance().isHotKeyTyped;
+    public boolean isTyped() {
+        return this.isHotKeyTyped;
     }
 
     /**
-     * If the hotkey is typed and the algorithm which have to be processed after is finished, the boolean is reseted with this function.
+     * If the hotkey is typed and the algorithm which have to be processed after is finished, the boolean have to be reseted with this function.
      */
-    public static void resetHotkeyTyped() {
-        Hotkey.getInstance().isHotKeyTyped = false;
+    public void resetHotkeyTyped() {
+        this.isHotKeyTyped = false;
     }
 
     /**
@@ -71,12 +112,19 @@ public class Hotkey implements HotkeyListener {
     @Override
     public void onHotKey(int keyCode) {
         switch (keyCode) {
+
+        // action hotkey
         case 1:
-            Hotkey.getInstance().isHotKeyTyped = true;
+            this.isHotKeyTyped = true;
             break;
+
+        // status hotkey
         case 2:
+            // change status
             MainClass.toggleStatus();
-            Hotkey.getInstance().isHotKeyTyped = false;
+
+            // necessary if status is changed in trainings mode 
+            this.isHotKeyTyped = false;
             break;
         default:
             return;
@@ -84,7 +132,7 @@ public class Hotkey implements HotkeyListener {
     }
 
     /**
-     * Registers an new hotkey to a specific function.
+     * Registers the given hotkey to a specific function.
      * 
      * encoding of index:
      * 1 = action hotkey
@@ -93,39 +141,53 @@ public class Hotkey implements HotkeyListener {
      * @param index
      * @param hotkey
      */
-    public static void setHotkey(int index, HotkeyContainer hotkey) {
+    public void setHotkey(int index, HotkeyContainer hotkey) {
         switch (index) {
+
+        // action hotkey
         case 1:
-            Hotkey.getInstance().actionHotkey = hotkey;
+            this.actionHotkey = hotkey;
+            MainClass.getProperties().setActionHotkey(this.actionHotkey);
             System.out.println("action hotkey changed: " + hotkey);
             break;
+
+        // status hotkey
         case 2:
-            Hotkey.getInstance().statusHotkey = hotkey;
+            this.statusHotkey = hotkey;
+            MainClass.getProperties().setStatusHotkey(this.statusHotkey);
             System.out.println("status hotkey changed: " + hotkey);
             break;
         default:
             return;
         }
+
+        // change listener
         JIntellitype.getInstance().unregisterHotKey(index);
         JIntellitype.getInstance().registerHotKey(index, hotkey.modificator, hotkey.button);
     }
 
     /**
-     * returns the current hotkey for a given function.
+     * Returns the current hotkey for a given function.
      * 
      * encoding of index:
      * 1 = action hotkey
      * 2 = status hotkey
      * 
      * @param index
-     * @return
+     * @return the specific hotkey container
      */
-    public static HotkeyContainer getCurrentHotkey(int index) {
+    public HotkeyContainer getCurrentHotkey(int index) {
         switch (index) {
+
+        // action hotkey 
         case 1:
-            return Hotkey.getInstance().actionHotkey;
+            return this.actionHotkey;
+
+            // satus hotkey
         case 2:
-            return Hotkey.getInstance().statusHotkey;
+            return this.statusHotkey;
+
+            // theoretical never reached
         default:
             return null;
         }
@@ -134,10 +196,10 @@ public class Hotkey implements HotkeyListener {
     /**
      * Returns a list of all available hotkeys.
      * 
-     * @return
+     * @return hotkeys
      */
-    public static ArrayList<HotkeyContainer> getHotkeys() {
-        return Hotkey.getInstance().hotkeys;
+    public ArrayList<HotkeyContainer> getHotkeys() {
+        return this.hotkeys;
     }
 
     /**
@@ -145,9 +207,9 @@ public class Hotkey implements HotkeyListener {
      */
     //TODO: increase number of hotkeys
     private void initHotkeys() {
-        hotkeys = new ArrayList<HotkeyContainer>();
-        hotkeys.add(new HotkeyContainer(JIntellitype.MOD_WIN, (int) 'A', "WIN + A"));
-        hotkeys.add(new HotkeyContainer(JIntellitype.MOD_WIN, (int) 'C', "WIN + C"));
-        hotkeys.add(new HotkeyContainer(JIntellitype.MOD_WIN, (int) 'H', "WIN + H"));
+        this.hotkeys = new ArrayList<HotkeyContainer>();
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'A', "WIN + A"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'C', "WIN + C"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'H', "WIN + H"));
     }
 }
