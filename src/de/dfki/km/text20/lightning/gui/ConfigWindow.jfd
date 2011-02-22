@@ -63,7 +63,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>show images</string> 
+             <string>Show Images</string> 
             </void> 
             <void property="name"> 
              <string>label1</string> 
@@ -101,7 +101,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>dimesnion</string> 
+             <string>Dimension</string> 
             </void> 
             <void property="name"> 
              <string>label2</string> 
@@ -156,7 +156,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>output directory</string> 
+             <string>Output Directory</string> 
             </void> 
             <void property="name"> 
              <string>label3</string> 
@@ -233,7 +233,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>action hotkey</string> 
+             <string>Action Hotkey</string> 
             </void> 
             <void property="name"> 
              <string>label4</string> 
@@ -287,7 +287,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>status hotkey</string> 
+             <string>Status Hotkey</string> 
             </void> 
             <void property="name"> 
              <string>label5</string> 
@@ -341,7 +341,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>search method</string> 
+             <string>Search Method</string> 
             </void> 
             <void property="name"> 
              <string>label6</string> 
@@ -395,7 +395,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>learn method</string> 
+             <string>Learn Method</string> 
             </void> 
             <void property="name"> 
              <string>label7</string> 

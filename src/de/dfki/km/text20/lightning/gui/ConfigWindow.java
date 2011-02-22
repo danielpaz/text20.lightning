@@ -285,15 +285,17 @@ public class ConfigWindow extends JFrame {
 
             //======== contentPanel ========
             {
-                this.contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 8*(default, $lcgap), default", "19*(default, $lgap), default"));
+                this.contentPanel.setLayout(new FormLayout(
+                    "4*(30dlu, $lcgap), 8*(default, $lcgap), default",
+                    "19*(default, $lgap), default"));
 
                 //---- label1 ----
-                this.label1.setText("show images");
+                this.label1.setText("Show Images");
                 this.contentPanel.add(this.label1, cc.xywh(1, 1, 3, 1));
                 this.contentPanel.add(this.checkBoxShowPictures, cc.xywh(5, 1, 3, 1));
 
                 //---- label2 ----
-                this.label2.setText("dimesnion");
+                this.label2.setText("Dimension");
                 this.contentPanel.add(this.label2, cc.xywh(1, 3, 3, 1));
 
                 //---- spinnerDimension ----
@@ -301,13 +303,12 @@ public class ConfigWindow extends JFrame {
                 this.contentPanel.add(this.spinnerDimension, cc.xywh(5, 3, 3, 1));
 
                 //---- label3 ----
-                this.label3.setText("output directory");
+                this.label3.setText("Output Directory");
                 this.contentPanel.add(this.label3, cc.xywh(1, 5, 3, 1));
 
                 //---- buttonSelect ----
                 this.buttonSelect.setText("Select");
                 this.buttonSelect.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonSelectActionPerformed(e);
@@ -317,7 +318,7 @@ public class ConfigWindow extends JFrame {
                 this.contentPanel.add(this.textFieldOutputPath, cc.xywh(1, 7, 7, 1));
 
                 //---- label4 ----
-                this.label4.setText("action hotkey");
+                this.label4.setText("Action Hotkey");
                 this.contentPanel.add(this.label4, cc.xywh(1, 9, 3, 1));
 
                 //---- comboBoxActionHotkey ----
@@ -330,12 +331,11 @@ public class ConfigWindow extends JFrame {
                 this.contentPanel.add(this.comboBoxActionHotkey, cc.xywh(5, 9, 3, 1));
 
                 //---- label5 ----
-                this.label5.setText("status hotkey");
+                this.label5.setText("Status Hotkey");
                 this.contentPanel.add(this.label5, cc.xywh(1, 11, 3, 1));
 
                 //---- comboBoxStatusHotkey ----
                 this.comboBoxStatusHotkey.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxStatusHotkeyActionPerformed(e);
@@ -344,12 +344,11 @@ public class ConfigWindow extends JFrame {
                 this.contentPanel.add(this.comboBoxStatusHotkey, cc.xywh(5, 11, 3, 1));
 
                 //---- label6 ----
-                this.label6.setText("search method");
+                this.label6.setText("Search Method");
                 this.contentPanel.add(this.label6, cc.xywh(1, 13, 3, 1));
 
                 //---- comboBoxSearchMethod ----
                 this.comboBoxSearchMethod.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxSearchMethodActionPerformed(e);
@@ -358,12 +357,11 @@ public class ConfigWindow extends JFrame {
                 this.contentPanel.add(this.comboBoxSearchMethod, cc.xywh(5, 13, 3, 1));
 
                 //---- label7 ----
-                this.label7.setText("learn method");
+                this.label7.setText("Learn Method");
                 this.contentPanel.add(this.label7, cc.xywh(1, 15, 3, 1));
 
                 //---- comboBoxLearnMethod ----
                 this.comboBoxLearnMethod.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxLearnMethodActionPerformed(e);
@@ -374,7 +372,6 @@ public class ConfigWindow extends JFrame {
                 //---- buttonOK ----
                 this.buttonOK.setText("OK");
                 this.buttonOK.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonOKActionPerformed(e);
@@ -385,7 +382,6 @@ public class ConfigWindow extends JFrame {
                 //---- buttonCancel ----
                 this.buttonCancel.setText("Cancel");
                 this.buttonCancel.addActionListener(new ActionListener() {
-                    @SuppressWarnings("synthetic-access")
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonCancelActionPerformed(e);
