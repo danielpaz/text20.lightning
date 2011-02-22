@@ -1,7 +1,7 @@
 /*
  * TraySymbol.java
  *
- * Copyright (c) 2011, Christoph K�ding, DFKI. All rights reserved.
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,20 +33,10 @@ import de.dfki.km.text20.lightning.plugins.MethodManager;
 /**
  * The icon which is shown in the system tray.
  * 
- * @author Christoph K�ding
+ * @author Christoph Käding
  *
  */
 public class TraySymbol {
-
-    /** */
-    //TODO: delete me
-    private String iconPath;
-    
-    /** path to the active icon gif */
-    private String activeIconPath;
-    
-    /** path to the inactive icon gif*/
-    private String inactiveIconPath;
     
     /** */
     private TrayIcon trayIcon;
@@ -64,17 +54,9 @@ public class TraySymbol {
      * necessary to show and activate plugins by the gui
      */
     public TraySymbol(MethodManager manager) {
-        
-        // TODO: delete me
-        this.iconPath = "D:" + File.separator + "Daten" + File.separator + "DFKI" + File.separator + "Workspace" + File.separator + "Click2Sight" + File.separator + "dependencies";
-        //        this.iconPath = ".";
-
-        this.methodManager = manager;
-        this.activeIconPath = this.iconPath + File.separator + "TrayIconActive.gif";
-        this.inactiveIconPath = this.iconPath + File.separator + "TrayIconInactive.gif";
-        
+                
         // initialize tray icon and add it to tray
-        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(this.activeIconPath), "Click2Sight");
+        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")), "Project Lightning (Desktop)");
         this.trayIcon.setImageAutoSize(true);
 
         if (SystemTray.isSupported()) {
@@ -95,9 +77,7 @@ public class TraySymbol {
      */
     public boolean setActivatedIcon() {
         if (SystemTray.isSupported()) {
-             = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif"));
-            
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(this.activeIconPath));
+            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")));
         } else {
             return false;
         }
@@ -111,7 +91,7 @@ public class TraySymbol {
      */
     public boolean setDeactivatedIcon() {
         if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(this.inactiveIconPath));
+            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconInactive.gif")));
         } else {
             return false;
         }
