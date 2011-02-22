@@ -72,9 +72,9 @@ public class Properties implements Serializable {
      */
     public Properties() {
 
-        // TODO: delete
-        String propertiesPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2Sight" + File.separator + "properties";
-        //        String propertiesPath = "." + File.separator + "properties";
+        // TODO: change path
+        //        String propertiesPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2Sight" + File.separator + "properties";
+        String propertiesPath = "." + File.separator + "properties";
 
         // creates properties file
         this.propertiesFile = new File(propertiesPath);

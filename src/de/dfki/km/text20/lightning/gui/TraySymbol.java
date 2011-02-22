@@ -22,11 +22,9 @@
 package de.dfki.km.text20.lightning.gui;
 
 import java.awt.AWTException;
-import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.io.File;
 
 import de.dfki.km.text20.lightning.plugins.MethodManager;
 
