@@ -27,6 +27,7 @@ import org.simpleframework.xml.Attribute;
 
 /**
  * Container which stores all needed information for one hotkey.
+ * For documentation see: http://melloware.com/products/jintellitype/index.html
  * 
  * @author Christoph Käding
  * 
@@ -34,13 +35,17 @@ import org.simpleframework.xml.Attribute;
 @SuppressWarnings("serial")
 public class HotkeyContainer implements Serializable {
 
-    /** Integer constant of the modificator key */
+    /** Integer constant of the modificator key, this is an jIntelliType own constant*/
     @Attribute
     public int modificator;
     
-    /** Integer constant of the hotkey button */
+    /** Integer constant of the hotkey button, this is the normal ASCII code */
     @Attribute
-    public int button;
+    public int buttonCode;
+    
+    /** String of the used key combination */
+    @Attribute
+    public String buttonString;
     
     /** the description of the hotkey which is shown in the comboboxes of the gui */
     @Attribute
@@ -55,7 +60,21 @@ public class HotkeyContainer implements Serializable {
      */
     public HotkeyContainer(int modificator, int button, String description) {
         this.modificator = modificator;
-        this.button = button;
+        this.buttonCode = button;
+        this.buttonString = "";
+        this.description = description;
+    }
+    
+    /**
+     * creates a new hotkey with all needed components
+     * 
+     * @param buttonString
+     * @param description
+     */
+    public HotkeyContainer(String buttonString, String description){
+        this.modificator = -1;
+        this.buttonCode = -1;
+        this.buttonString = buttonString;
         this.description = description;
     }
     
