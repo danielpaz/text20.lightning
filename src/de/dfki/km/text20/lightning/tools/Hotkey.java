@@ -72,8 +72,18 @@ public class Hotkey implements HotkeyListener {
         }
 
         // add hotkeys to listener
-        JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.modificator, this.actionHotkey.button);
-        JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.modificator, this.statusHotkey.button);
+        if (this.actionHotkey.buttonCode > 0) {
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.modificator, this.actionHotkey.buttonCode);
+        } else {
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.buttonString);
+        }
+        if (this.statusHotkey.buttonCode > 0) {
+            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.modificator, this.statusHotkey.buttonCode);
+        } else {
+            JIntellitype.getInstance().registerHotKey(1, this.statusHotkey.buttonString);
+        }
+
+        // enable hotkey listener
         JIntellitype.getInstance().addHotKeyListener(this);
     }
 
@@ -163,7 +173,11 @@ public class Hotkey implements HotkeyListener {
 
         // change listener
         JIntellitype.getInstance().unregisterHotKey(index);
-        JIntellitype.getInstance().registerHotKey(index, hotkey.modificator, hotkey.button);
+        if (hotkey.buttonCode > 0) {
+            JIntellitype.getInstance().registerHotKey(index, hotkey.modificator, hotkey.buttonCode);
+        } else {
+            JIntellitype.getInstance().registerHotKey(index, hotkey.buttonString);
+        }
     }
 
     /**
@@ -211,5 +225,10 @@ public class Hotkey implements HotkeyListener {
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'A', "WIN + A"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'C', "WIN + C"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'H', "WIN + H"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 37, "CTRL + LEFT"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 38, "CTRL + UP"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 39, "CTRL + RIGHT"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 40, "CTRL + DOWN"));
+
     }
 }
