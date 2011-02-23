@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.tools;
 
+import java.awt.RenderingHints.Key;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import com.melloware.jintellitype.HotkeyListener;
@@ -80,7 +82,7 @@ public class Hotkey implements HotkeyListener {
         if (this.statusHotkey.buttonCode > 0) {
             JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.modificator, this.statusHotkey.buttonCode);
         } else {
-            JIntellitype.getInstance().registerHotKey(1, this.statusHotkey.buttonString);
+            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.buttonString);
         }
 
         // enable hotkey listener
@@ -222,13 +224,23 @@ public class Hotkey implements HotkeyListener {
     //TODO: increase number of hotkeys
     private void initHotkeys() {
         this.hotkeys = new ArrayList<HotkeyContainer>();
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'A', "WIN + A"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'C', "WIN + C"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, 'H', "WIN + H"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 37, "CTRL + LEFT"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 38, "CTRL + UP"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 39, "CTRL + RIGHT"));
-        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, 40, "CTRL + DOWN"));
-
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_A, "WIN + A"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_C, "WIN + C"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_H, "WIN + H"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_LEFT, "CTRL + LEFT"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_UP, "CTRL + UP"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_RIGHT, "CTRL + RIGHT"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_DOWN, "CTRL + DOWN"));
+        this.hotkeys.add(new HotkeyContainer("F7", "F7"));
+        this.hotkeys.add(new HotkeyContainer("F8", "F8"));
+        this.hotkeys.add(new HotkeyContainer("F9", "F9"));
+        this.hotkeys.add(new HotkeyContainer("F12", "F12"));
+        
+//        do not work... don't know why?!?
+//        this.hotkeys.add(new HotkeyContainer("^", "^"));
+//        this.hotkeys.add(new HotkeyContainer("<", "<"));
+//        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_MINUS, "CTRL + -"));
+//        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_PERIOD, "CTRL + ."));
+//        this.hotkeys.add(new HotkeyContainer("CTRL + /", "CTRL + /"));
     }
 }
