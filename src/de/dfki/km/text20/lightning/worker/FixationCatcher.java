@@ -75,6 +75,12 @@ public class FixationCatcher {
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
         GazeEvaluatorManager evaluatorManager = MainClass.getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
+        
+        if(device == null) {
+            MainClass.showTrayMessage("Project Lightning (Desktop)", "Trackingserver was not found! Please start it and restart this tool.");
+        } else {
+            MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing successful.");
+        }
     }
 
     /**
