@@ -51,6 +51,9 @@ public class FixationCatcher {
     
     /** this is needed for trainings mode */
     private PrecisionTrainer precisionTrainer;
+    
+    /** indicates if the tracking device is working probably */
+    private boolean status;
 
     /**
      * create fixation catcher
@@ -61,6 +64,9 @@ public class FixationCatcher {
     public FixationCatcher(FixationEvaluator evaluator, PrecisionTrainer trainer) {
         this.fixationEvaluator = evaluator;
         this.precisionTrainer = trainer;
+        
+        // initialize hotkeys
+        Hotkey.getInstance();
         
         // add plugins at classpath
         try {
@@ -78,11 +84,21 @@ public class FixationCatcher {
         
         if(device == null) {
             MainClass.showTrayMessage("Project Lightning (Desktop)", "Trackingserver was not found! Please start it and restart this tool.");
+            this.status = false;
         } else {
-            MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing successful.");
+            this.status = true;
         }
     }
 
+    /**
+     * shows status of tracking device
+     * 
+     * @return true if it is working probably
+     */
+    public boolean getStatus() {
+        return this.status;
+    }
+    
     /**
      * The whole algorithm for fixation catching and its processing is started by a call of this method.
      */

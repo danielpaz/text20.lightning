@@ -30,6 +30,7 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.tools.Tools;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
@@ -59,6 +60,9 @@ public class MainClass {
     /** global properties of the tool which will be stored between session*/
     private static Properties properties;
 
+    /** indicates if the JIntellytype.dll is there */
+    private static boolean dllStatus;
+
     /**
      * Starts the main application.
      * 
@@ -81,6 +85,9 @@ public class MainClass {
         methodManager = new MethodManager();
         trayIcon = new TraySymbol(methodManager);
 
+        // check JIntellytypes.dll
+        dllStatus = Tools.checkJIntellyTypeDLL();
+
         // Creates classes which are needed for the two parts (clicking and training) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator(methodManager);
         PrecisionTrainer precisionTrainer = new PrecisionTrainer(methodManager);
@@ -88,8 +95,15 @@ public class MainClass {
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, precisionTrainer);
 
-        // start listening
-        fixationCatcher.startCatching();
+        // check if all things are fine
+        if (fixationCatcher.getStatus() && dllStatus) {
+
+            // start listening
+            fixationCatcher.startCatching();
+
+            // indicate success
+            MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing successful.");
+        }
     }
 
     /**
@@ -106,22 +120,22 @@ public class MainClass {
      */
     public static void toggleStatus() {
         if (isActivated) {
-            
+
             // show change in tray and console
             System.out.println("Status changed to: inactive");
             trayIcon.showMessage("status", "tool is now deactivated");
             trayIcon.setDeactivatedIcon();
-            
+
             // change status
             isActivated = false;
 
         } else {
-            
+
             // show change in tray and console
             System.out.println("Status changed to: active");
             trayIcon.showMessage("status", "tool is now activated");
             trayIcon.setActivatedIcon();
-            
+
             // change status
             isActivated = true;
         }
@@ -131,21 +145,22 @@ public class MainClass {
      * Shuts down the application
      */
     public static void exit() {
-        
+
         // store properties to a file
         properties.writeProperties();
-        
+
         // deactivate the hotkeys
-        JIntellitype.getInstance().cleanUp();
-        
+        if (dllStatus)
+            JIntellitype.getInstance().cleanUp();
+
         // removes icon from system tray
         trayIcon.remove();
-        
+
         // disables plugins
         pluginManager.shutdown();
-        
+
         System.out.println("Session closed.");
-        
+
         // close the tool
         System.exit(0);
     }
@@ -164,25 +179,25 @@ public class MainClass {
      */
     public static void toggleMode() {
         if (isNormalMode) {
-            
+
             // shows change in tray and console
             System.out.println("Modus changed to: training");
             trayIcon.showMessage("modus", "trainings mode activated");
-            
+
             // change mode
             isNormalMode = false;
-            
+
         } else {
-            
+
             // shows change in tray and console
             System.out.println("Modus changed to: normal");
             trayIcon.showMessage("modus", "normal mode activated");
-            
+
             // change mode
             isNormalMode = true;
         }
     }
-    
+
     /**
      * shows the given text as popup on the tray icon
      * 

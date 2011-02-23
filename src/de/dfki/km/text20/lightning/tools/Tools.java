@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.FileChannel;
 
 import javax.imageio.ImageIO;
 
@@ -113,6 +115,54 @@ public class Tools {
             e.printStackTrace();
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Checks if the required JIntellitype.dll is placed in the windows directory.
+     * If it is not there it tries to copy it into the System32 directory.
+     * 
+     * @return true if it is there or the copy was successful 
+     */
+    // FIXME: works only with admin rights
+    public static boolean checkJIntellyTypeDLL() {
+        File destination = new File(System.getenv("SYSTEMROOT") + "/System32/JIntellitype.dll");
+        
+        // check if it is already there
+        if (!destination.exists()) {
+            
+            try {
+                
+                // set necessary variables
+                // nio is used here because the os organizes the process
+                File source = new File("./JIntellitype.dll");
+                long overallBytesTransfered = 0;
+                long bytesTransfered = 0;
+                FileInputStream fileInputStream = new FileInputStream(source);
+                FileOutputStream fileOutputStream = new FileOutputStream(destination);
+                FileChannel inputChannel = fileInputStream.getChannel();
+                ByteChannel outputChannel = fileOutputStream.getChannel();
+
+                // copy file
+                while (overallBytesTransfered < source.length()) {
+                    bytesTransfered = inputChannel.transferTo(overallBytesTransfered, Math.min(1024 * 1024, source.length() - overallBytesTransfered), outputChannel);
+                    overallBytesTransfered += bytesTransfered;
+                }
+
+                // cleanup
+                fileInputStream.close();
+                fileOutputStream.close();
+
+                // set last modified
+                destination.setLastModified(source.lastModified());
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+                return false;
+            }
+        }
+        
         return true;
     }
 }
