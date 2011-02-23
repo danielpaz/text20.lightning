@@ -114,17 +114,25 @@ public class ConfigWindow extends JFrame {
         
         // adds all hotkeys to the specific comboboxes which are not selected by the other function
         for (int i = 0; i < Hotkey.getInstance().getHotkeys().size(); i++) {
-            if (!Hotkey.getInstance().getHotkeys().get(i).equals(Hotkey.getInstance().getCurrentHotkey(2)))
+            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(2).toString()))
                 this.comboBoxActionHotkey.addItem(Hotkey.getInstance().getHotkeys().get(i));
         }
         for (int i = 0; i < Hotkey.getInstance().getHotkeys().size(); i++) {
-            if (!Hotkey.getInstance().getHotkeys().get(i).equals(Hotkey.getInstance().getCurrentHotkey(1)))
+            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(1).toString()))
                 this.comboBoxStatusHotkey.addItem(Hotkey.getInstance().getHotkeys().get(i));
         }
         
         // preselect property values
-        this.comboBoxActionHotkey.setSelectedItem(Hotkey.getInstance().getCurrentHotkey(1));
-        this.comboBoxStatusHotkey.setSelectedItem(Hotkey.getInstance().getCurrentHotkey(2));
+        for(int i = 0; i < this.comboBoxActionHotkey.getItemCount();i++) {
+            if(Hotkey.getInstance().getCurrentHotkey(1).toString().equals(this.comboBoxActionHotkey.getItemAt(i).toString())) {
+                this.comboBoxActionHotkey.setSelectedIndex(i);
+            }
+        }
+        for(int i = 0; i < this.comboBoxStatusHotkey.getItemCount();i++) {
+            if(Hotkey.getInstance().getCurrentHotkey(2).toString().equals(this.comboBoxStatusHotkey.getItemAt(i).toString())) {
+                this.comboBoxStatusHotkey.setSelectedIndex(i);
+            }
+        }
         
         this.autoSelect = false;
     }
