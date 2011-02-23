@@ -44,7 +44,7 @@ public interface SaliencyDetector extends Plugin {
     /**
      * Returns some information about the plugin.
      * 
-     * @return ??
+     * @return saliency plugin informations
      */
     public SaliencyPluginInformation getInformation();
 }

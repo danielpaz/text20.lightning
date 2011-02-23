@@ -131,7 +131,7 @@ public class FixationEvaluator {
         }
 
         // update the logfile
-        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getProperties().getDimension() + System.getProperty("line.separator");
+        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getProperties().getDimension() + ", Method: " + this.methodManager.getCurrentSaliencyDetector().getInformation().displayName + System.getProperty("line.separator");
         Tools.updateLogFile(logString);
         
         System.out.println("click to: (" + (this.fixation.x + this.offset.x) + "," + (this.fixation.y + this.offset.y) + ")");
