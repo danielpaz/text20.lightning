@@ -28,6 +28,7 @@ import org.simpleframework.xml.Attribute;
 /**
  * Container which stores all needed information for one hotkey.
  * For documentation see: http://melloware.com/products/jintellitype/index.html
+ * For valid windows keycodes see e.g.: http://www.sybase.com/detail?id=47760 
  * 
  * @author Christoph Käding
  * 
@@ -39,7 +40,7 @@ public class HotkeyContainer implements Serializable {
     @Attribute
     public int modificator;
     
-    /** Integer constant of the hotkey button, this is the normal ASCII code */
+    /** Integer constant of the hotkey button, this seems to be normal ASCII code */
     @Attribute
     public int buttonCode;
     
