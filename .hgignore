@@ -5,3 +5,5 @@ syntax: regexp
 ^properties$
 syntax: regexp
 ^output$
+syntax: regexp
+^diagnosis\.record$

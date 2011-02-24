@@ -21,8 +21,6 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
-import static net.jcores.CoreKeeper.$;
-
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics2D;

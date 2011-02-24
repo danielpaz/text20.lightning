@@ -21,7 +21,6 @@
  */
 package de.dfki.km.text20.lightning.tools;
 
-import java.awt.RenderingHints.Key;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
