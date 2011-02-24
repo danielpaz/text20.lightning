@@ -72,12 +72,8 @@ public class Properties implements Serializable {
      */
     public Properties() {
 
-        // TODO: change path
-        //        String propertiesPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2Sight" + File.separator + "properties";
-        String propertiesPath = "." + File.separator + "properties";
-
         // creates properties file
-        this.propertiesFile = new File(propertiesPath);
+        this.propertiesFile = new File("properties");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -118,9 +114,7 @@ public class Properties implements Serializable {
             // set default values
             this.showImages = false;
             this.dimension = 100;
-            // TODO: change path
-            //            this.outputPath = "C:" + File.separator + "Users" + File.separator + "nesti" + File.separator + "Desktop" + File.separator + "Click2SightOutput";
-            this.outputPath = "." + File.separator + "output";
+            this.outputPath = "./output";
             this.actionHotkey = null;
             this.statusHotkey = null;
             System.out.println("Properties file was not found.");

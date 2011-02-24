@@ -21,6 +21,10 @@
  */
 package de.dfki.km.text20.lightning;
 
+import static net.jcores.CoreKeeper.$;
+
+import java.io.File;
+
 import javax.swing.UIManager;
 
 import net.xeoh.plugins.base.PluginManager;
@@ -34,7 +38,6 @@ import com.melloware.jintellitype.JIntellitype;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.MethodManager;
-import de.dfki.km.text20.lightning.tools.Tools;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
@@ -102,6 +105,9 @@ public class MainClass {
         props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
 
+        // check dll
+        this.dllStatus = this.checkDll();
+
         // initialize variables
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
@@ -114,9 +120,6 @@ public class MainClass {
         // indicate start
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
-
-        // check JIntellytypes.dll
-        this.dllStatus = Tools.checkJIntellyTypeDLL();
 
         // Creates classes which are needed for the two parts (clicking and training) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator(this.methodManager);
@@ -273,5 +276,53 @@ public class MainClass {
      */
     public Properties getProperties() {
         return this.properties;
+    }
+
+    /**
+     * Checks if the required JIntellitype.dll is placed in the windows directory.
+     * If it is not there it tries to unzip it into the System32 directory.
+     * If this fails, a message is displayed and the dll is unziped into the "." directory.
+     * 
+     * @return true if it is there or the copy was successful 
+     */
+    // FIXME: works only with admin rights
+    private boolean checkDll() {
+
+        // create target file
+        File destination = new File(System.getenv("SYSTEMROOT") + "/System32/JIntellitype.dll");
+
+        // check if it is already the
+        if (!destination.exists()) {
+
+            System.out.println("JIntellytype.dll was not found.");
+
+            try {
+                // try to unzip it to the windows directory
+                $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+
+                if (destination.exists()) {
+                    System.out.println("... but is now placed.\n");
+                    // return successful
+                    return true;
+                }
+
+            } catch (Exception e) {
+                // try to unzip it to "."
+                $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+
+                // indicate error 
+                String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+                this.showTrayMessage(msg);
+                System.out.println("\n" + msg + "\n\n");
+                this.channel.status(msg);
+
+                // return not successful
+                return false;
+            }
+
+        }
+
+        // return successful
+        return true;
     }
 }

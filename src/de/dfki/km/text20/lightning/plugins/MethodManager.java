@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
@@ -45,10 +44,14 @@ public class MethodManager {
     /** current elected saliency detector */
     private SaliencyDetector currentSaliencyDetector;
     
-    /** */
+    /** a list of all saliency detectors*/
     private ArrayList<SaliencyDetector> saliencyDetectors;
 
-    /** */
+    /**
+     * creates a new MethodManager object and loads plugins
+     * 
+     * @param manager  
+     */
     //TODO: change plugins to jars
     //TODO: store current plugin in properties
     public MethodManager(PluginManager manager) {
