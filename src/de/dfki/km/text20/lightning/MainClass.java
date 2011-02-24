@@ -37,7 +37,7 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
@@ -56,7 +56,7 @@ public class MainClass {
     private boolean isNormalMode;
 
     /** pluginmanager for the different methods */
-    private MethodManager methodManager;
+    private InternalPluginManager internalPluginManager;
 
     /** icon which is shown in the system tray */
     private TraySymbol trayIcon;
@@ -111,8 +111,8 @@ public class MainClass {
         // initialize variables
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
-        this.methodManager = new MethodManager(this.pluginManager);
-        this.trayIcon = new TraySymbol(this.methodManager);
+        this.internalPluginManager = new InternalPluginManager(this.pluginManager);
+        this.trayIcon = new TraySymbol(this.internalPluginManager);
         this.properties = new Properties();
         this.isActivated = true;
         this.isNormalMode = true;
@@ -122,8 +122,8 @@ public class MainClass {
         this.channel.status("Session started.");
 
         // Creates classes which are needed for the two parts (clicking and training) of this tool.
-        FixationEvaluator fixationEvaluator = new FixationEvaluator(this.methodManager);
-        PrecisionTrainer precisionTrainer = new PrecisionTrainer(this.methodManager);
+        FixationEvaluator fixationEvaluator = new FixationEvaluator();
+        PrecisionTrainer precisionTrainer = new PrecisionTrainer();
 
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, precisionTrainer);
@@ -153,6 +153,14 @@ public class MainClass {
         return main;
     }
 
+    /**
+     * 
+     * @return
+     */
+    public InternalPluginManager getInternalPluginManager() {
+        return this.internalPluginManager;
+    }
+    
     /**
      * provides the logging channel
      * 
@@ -300,6 +308,8 @@ public class MainClass {
                 // try to unzip it to the windows directory
                 $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 
+                // FIXME: catch exception
+                
                 if (destination.exists()) {
                     System.out.println("... but is now placed.\n");
                     // return successful

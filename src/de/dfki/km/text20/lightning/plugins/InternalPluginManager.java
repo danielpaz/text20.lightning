@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper.SimpleWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
@@ -35,7 +37,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel
  * 
  * @author Christoph Käding
  */
-public class MethodManager {
+public class InternalPluginManager {
 
     
     /** utility which can create a list of all available plugins */
@@ -46,6 +48,12 @@ public class MethodManager {
     
     /** a list of all saliency detectors*/
     private ArrayList<SaliencyDetector> saliencyDetectors;
+    
+    /** a list of all mouse warpers*/
+    private ArrayList<MouseWarper> mouseWarpers;
+    
+    /** current elected mouse warper */
+    private MouseWarper currentMouseWarper;
 
     /**
      * creates a new MethodManager object and loads plugins
@@ -54,16 +62,20 @@ public class MethodManager {
      */
     //TODO: change plugins to jars
     //TODO: store current plugin in properties
-    public MethodManager(PluginManager manager) {
+    public InternalPluginManager(PluginManager manager) {
         
         // Add internal plugins
         manager.addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
-        manager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());        
+        manager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());   
+        manager.addPluginsFrom(new ClassURI(SimpleWarper.class).toURI());
         
         this.pluginManagerUtil = new PluginManagerUtil(manager);
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
         // TODO: get this from properties
         this.currentSaliencyDetector = this.saliencyDetectors.get(0);
+        
+        this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
+        this.currentMouseWarper = this.mouseWarpers.get(0);
     }
 
     /**
@@ -91,5 +103,32 @@ public class MethodManager {
      */
     public void setCurrentSaliencyDetector(SaliencyDetector choice) {
         this.currentSaliencyDetector = choice;
+    }
+    
+    /**
+     * gives the current mouse warping method back
+     * 
+     * @return currentSaliencyDetector
+     */
+    public MouseWarper getCurrentMouseWarper() {
+        return this.currentMouseWarper;
+    }
+
+    /**
+     * Returns a ArrayList of all the given plugins for mouse warping.
+     * 
+     * @return saliencyDetectors
+     */
+    public ArrayList<MouseWarper> getMouseWarpers() {
+        return this.mouseWarpers;
+    }
+
+    /**
+     * Changes the active plugin to change the used method.
+     * 
+     * @param choice
+     */
+    public void setCurrentMouseWarper(MouseWarper choice) {
+        this.currentMouseWarper = choice;
     }
 }

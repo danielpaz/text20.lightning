@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
  * A singleton of the menu which is shown by a click on the tray icon.
@@ -49,11 +49,11 @@ public class TrayMenu {
      * @return menu
      *  
      */
-    public static PopupMenu getInstance(MethodManager manager) {
+    public static PopupMenu getInstance(InternalPluginManager manager) {
 
         if (menu == null) {
             menu = new PopupMenu();
-            final MethodManager methodManager = manager;
+            final InternalPluginManager internalPluginManager = manager;
 
             // adds the title to the menu
             final MenuItem title = new MenuItem("Project Lightning (Desktop)");
@@ -68,7 +68,7 @@ public class TrayMenu {
                 @SuppressWarnings("unused")
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ConfigWindow configWindow = new ConfigWindow(methodManager);
+                    ConfigWindow configWindow = new ConfigWindow(internalPluginManager);
                 }
             });
             menu.add(configMenu);

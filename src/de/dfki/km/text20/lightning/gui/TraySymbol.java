@@ -26,7 +26,7 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
  * The icon which is shown in the system tray.
@@ -48,7 +48,7 @@ public class TraySymbol {
      * @param manager 
      * necessary to show and activate plugins by the gui
      */
-    public TraySymbol(MethodManager manager) {
+    public TraySymbol(InternalPluginManager manager) {
                 
         // initialize tray icon and add it to tray
         this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")), "Project Lightning (Desktop)");
