@@ -25,9 +25,13 @@ import javax.swing.UIManager;
 
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
+import net.xeoh.plugins.base.util.JSPFProperties;
+import net.xeoh.plugins.diagnosis.local.Diagnosis;
+import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 
 import com.melloware.jintellitype.JIntellitype;
 
+import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.MethodManager;
 import de.dfki.km.text20.lightning.tools.Tools;
@@ -43,67 +47,116 @@ import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
 public class MainClass {
 
     /** indicates if the program should react on hotkeys */
-    private static boolean isActivated;
+    private boolean isActivated;
 
     /** indicates if normal mode or trainings mode is activated */
-    private static boolean isNormalMode;
+    private boolean isNormalMode;
 
     /** pluginmanager for the different methods */
-    private static MethodManager methodManager;
+    private MethodManager methodManager;
 
     /** icon which is shown in the system tray */
-    private static TraySymbol trayIcon;
+    private TraySymbol trayIcon;
 
     /** global pluinmanager which handles all plugins */
-    private static PluginManager pluginManager;
+    private PluginManager pluginManager;
 
     /** global properties of the tool which will be stored between session*/
-    private static Properties properties;
+    private Properties properties;
 
     /** indicates if the JIntellytype.dll is there */
-    private static boolean dllStatus;
+    private boolean dllStatus;
+
+    /** logging channel */
+    private DiagnosisChannel<String> channel;
+
+    /** instance of mainclass */
+    private static MainClass main;
 
     /**
-     * Starts the main application.
+     * creates a new instance of the mainclass and initializes it
      * 
      * @param args
      */
     public static void main(String[] args) {
+        MainClass.getInstance().init();
+    }
 
+    /**
+     * all needed stuff is initialized here
+     * also the application starts 
+     */
+    private void init() {
         // Set global look and feel. 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
-            System.out.println("Unable to load native look and feel");
+            System.out.println("Unable to load native look and feel.\n");
         }
 
-        // initialize static variables
-        properties = new Properties();
-        isActivated = true;
-        isNormalMode = true;
-        pluginManager = PluginManagerFactory.createPluginManager();
-        methodManager = new MethodManager();
-        trayIcon = new TraySymbol(methodManager);
+        // set logging properties
+        final JSPFProperties props = new JSPFProperties();
+        props.setProperty(Diagnosis.class, "recording.enabled", "true");
+        props.setProperty(Diagnosis.class, "recording.file", "diagnosis.record");
+        props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
+        props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
+        props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
+
+        // initialize variables
+        this.pluginManager = PluginManagerFactory.createPluginManager(props);
+        this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
+        this.methodManager = new MethodManager(this.pluginManager);
+        this.trayIcon = new TraySymbol(this.methodManager);
+        this.properties = new Properties();
+        this.isActivated = true;
+        this.isNormalMode = true;
+
+        // indicate start
+        System.out.println("\nSession started.\n");
+        this.channel.status("Session started.");
 
         // check JIntellytypes.dll
-        dllStatus = Tools.checkJIntellyTypeDLL();
+        this.dllStatus = Tools.checkJIntellyTypeDLL();
 
         // Creates classes which are needed for the two parts (clicking and training) of this tool.
-        FixationEvaluator fixationEvaluator = new FixationEvaluator(methodManager);
-        PrecisionTrainer precisionTrainer = new PrecisionTrainer(methodManager);
+        FixationEvaluator fixationEvaluator = new FixationEvaluator(this.methodManager);
+        PrecisionTrainer precisionTrainer = new PrecisionTrainer(this.methodManager);
 
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, precisionTrainer);
 
         // check if all things are fine
-        if (fixationCatcher.getStatus() && dllStatus) {
+        if (fixationCatcher.getStatus() && this.dllStatus) {
 
             // start listening
             fixationCatcher.startCatching();
 
             // indicate success
-            MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing successful.");
+            this.showTrayMessage("Initializing successful.");
+            System.out.println("\nInitializing successful.\n");
+            this.channel.status("Initializing successful.");
         }
+    }
+
+    /**
+     * gives an object of the mainclass back
+     * 
+     * @return a singleton instance
+     */
+    public static MainClass getInstance() {
+        if (main == null) {
+            main = new MainClass();
+        }
+        return main;
+    }
+
+    /**
+     * provides the logging channel
+     * 
+     * @return the diagnosis channel
+     */
+    public DiagnosisChannel<String> getChannel() {
+        return this.channel;
     }
 
     /**
@@ -111,55 +164,53 @@ public class MainClass {
      * 
      * @return true is activated
      */
-    public static boolean isActivated() {
-        return isActivated;
+    public boolean isActivated() {
+        return this.isActivated;
     }
 
     /**
      * Toggles between active and inactive status.
      */
-    public static void toggleStatus() {
-        if (isActivated) {
+    public void toggleStatus() {
+        if (this.isActivated) {
 
-            // show change in tray and console
-            System.out.println("Status changed to: inactive");
-            trayIcon.showMessage("status", "tool is now deactivated");
-            trayIcon.setDeactivatedIcon();
+            // show change in tray
+            this.showTrayMessage("Status: tool is now deactivated");
+            this.trayIcon.setDeactivatedIcon();
 
             // change status
-            isActivated = false;
+            this.isActivated = false;
 
         } else {
 
-            // show change in tray and console
-            System.out.println("Status changed to: active");
-            trayIcon.showMessage("status", "tool is now activated");
-            trayIcon.setActivatedIcon();
+            // show change in tray
+            this.showTrayMessage("Status: tool is now activated");
+            this.trayIcon.setActivatedIcon();
 
             // change status
-            isActivated = true;
+            this.isActivated = true;
         }
     }
 
     /**
      * Shuts down the application
      */
-    public static void exit() {
+    public void exit() {
 
         // store properties to a file
-        properties.writeProperties();
+        this.properties.writeProperties();
 
         // deactivate the hotkeys
-        if (dllStatus)
-            JIntellitype.getInstance().cleanUp();
+        if (this.dllStatus) JIntellitype.getInstance().cleanUp();
 
         // removes icon from system tray
-        trayIcon.remove();
+        this.trayIcon.remove();
 
         // disables plugins
-        pluginManager.shutdown();
+        this.pluginManager.shutdown();
 
-        System.out.println("Session closed.");
+        this.channel.status("Session closed.");
+        System.out.println("\nSession closed.");
 
         // close the tool
         System.exit(0);
@@ -170,31 +221,29 @@ public class MainClass {
      * 
      * @return true if is in normal mode 
      */
-    public static boolean isNormalMode() {
-        return isNormalMode;
+    public boolean isNormalMode() {
+        return this.isNormalMode;
     }
 
     /**
      * Toggles mode between normal an trainings mode.
      */
-    public static void toggleMode() {
-        if (isNormalMode) {
+    public void toggleMode() {
+        if (this.isNormalMode) {
 
             // shows change in tray and console
-            System.out.println("Modus changed to: training");
-            trayIcon.showMessage("modus", "trainings mode activated");
+            this.showTrayMessage("Modus: trainings mode activated");
 
             // change mode
-            isNormalMode = false;
+            this.isNormalMode = false;
 
         } else {
 
             // shows change in tray and console
-            System.out.println("Modus changed to: normal");
-            trayIcon.showMessage("modus", "normal mode activated");
+            this.showTrayMessage("Modus: normal mode activated");
 
             // change mode
-            isNormalMode = true;
+            this.isNormalMode = true;
         }
     }
 
@@ -204,8 +253,8 @@ public class MainClass {
      * @param caption
      * @param text
      */
-    public static void showTrayMessage(String caption, String text) {
-        trayIcon.showMessage(caption, text);
+    public void showTrayMessage(String text) {
+        this.trayIcon.showMessage("Project Lightning (Desktop)", text);
     }
 
     /**
@@ -213,8 +262,8 @@ public class MainClass {
      * 
      * @return pluginManager
      */
-    public static PluginManager getPluginManager() {
-        return pluginManager;
+    public PluginManager getPluginManager() {
+        return this.pluginManager;
     }
 
     /**
@@ -222,7 +271,7 @@ public class MainClass {
      * 
      * @return current properties object
      */
-    public static Properties getProperties() {
-        return properties;
+    public Properties getProperties() {
+        return this.properties;
     }
 }

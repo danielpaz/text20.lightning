@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.MouseInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,20 +72,23 @@ public class FixationCatcher {
         
         // add plugins at classpath
         try {
-            MainClass.getPluginManager().addPluginsFrom(new URI("classpath://*"));
+            MainClass.getInstance().getPluginManager().addPluginsFrom(new URI("classpath://*"));
         } catch (URISyntaxException e) {
             e.printStackTrace();
-            MainClass.exit();
+            MainClass.getInstance().exit();
         }
         
         // create stuff which is needed to get eyetracking data
-        EyeTrackingDeviceProvider deviceProvider = MainClass.getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
+        EyeTrackingDeviceProvider deviceProvider = MainClass.getInstance().getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
-        GazeEvaluatorManager evaluatorManager = MainClass.getPluginManager().getPlugin(GazeEvaluatorManager.class);
+        GazeEvaluatorManager evaluatorManager = MainClass.getInstance().getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
         
         if(device == null) {
-            MainClass.showTrayMessage("Project Lightning (Desktop)", "Trackingserver was not found! Please start it and restart this tool.");
+            String msg = new String("Trackingserver was not found! Please start it and restart this tool.");
+            MainClass.getInstance().showTrayMessage(msg);
+            System.out.println(msg);
+            MainClass.getInstance().getChannel().status(msg);
             this.status = false;
         } else {
             this.status = true;
@@ -108,8 +113,8 @@ public class FixationCatcher {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             @Override
             public void newEvaluationEvent(FixationEvent event) {
-                if (MainClass.isActivated()) {
-                    if (MainClass.isNormalMode()) {
+                if (MainClass.getInstance().isActivated()) {
+                    if (MainClass.getInstance().isNormalMode()) {
                         if (event.getType() == FixationEventType.FIXATION_START) {
                             
                             // if the tool is activated and in normal mode, fixations will be stored 
@@ -134,20 +139,20 @@ public class FixationCatcher {
                             
                             // needed to hold the last fixation
                             Hotkey.getInstance().resetHotkeyTyped();
-                            MainClass.showTrayMessage("training", "fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                            MainClass.getInstance().showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
                             
                             // wait for another hotkey event to catch the mouse position
-                            while (!Hotkey.getInstance().isTyped() && !MainClass.isNormalMode()) {
+                            while (!Hotkey.getInstance().isTyped() && !MainClass.getInstance().isNormalMode()) {
                                 try {
                                     Thread.sleep(10);
                                 } catch (InterruptedException e) {}
                             }
                             
-                                if (!MainClass.isNormalMode()) {
+                                if (!MainClass.getInstance().isNormalMode()) {
                                     
                                     // set mouse position which is associated with the last stored fixation
                                     precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
-                                    MainClass.showTrayMessage("training", "mouse position recognized, now look to the next point and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                                    MainClass.getInstance().showTrayMessage("Training: mouse position recognized, now look to the next point and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
                                 }
                                 
                                 // reset hotkey status

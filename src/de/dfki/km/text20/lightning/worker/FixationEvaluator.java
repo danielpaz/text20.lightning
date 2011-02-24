@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -93,7 +95,7 @@ public class FixationEvaluator {
             this.robot = new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
-            MainClass.exit();
+            MainClass.getInstance().exit();
         }
     }
 
@@ -115,7 +117,7 @@ public class FixationEvaluator {
         this.location = MouseInfo.getPointerInfo().getLocation();
 
         // create screenshot
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getProperties().getDimension() / 2, this.fixation.y - MainClass.getProperties().getDimension() / 2, MainClass.getProperties().getDimension(), MainClass.getProperties().getDimension());
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
         this.screenShot = this.colorConverterGray.filter(this.screenShot, null);
 
@@ -125,16 +127,15 @@ public class FixationEvaluator {
         // use plugin to calculate offset
         this.offset = this.methodManager.getCurrentSaliencyDetector().analyse(this.screenShot);
 
-        if (MainClass.getProperties().isShowImages()) {
+        if (MainClass.getInstance().getProperties().isShowImages()) {
             // draw images of the current evaluation to the outputpath
             this.drawImages();
         }
 
         // update the logfile
-        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getProperties().getDimension() + ", Method: " + this.methodManager.getCurrentSaliencyDetector().getInformation().displayName + System.getProperty("line.separator");
-        Tools.updateLogFile(logString);
-        
-        System.out.println("click to: (" + (this.fixation.x + this.offset.x) + "," + (this.fixation.y + this.offset.y) + ")");
+        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + this.methodManager.getCurrentSaliencyDetector().getInformation().displayName;
+        System.out.println(logString);
+        MainClass.getInstance().getChannel().status(logString);
 
         // click to calculated target and reset mouseposition
         this.robot.mouseMove(this.fixation.x + this.offset.x, this.fixation.y + this.offset.y);
@@ -153,19 +154,19 @@ public class FixationEvaluator {
         
         // visualize provided target
         graphic.setColor(new Color(255, 255, 0, 255));
-        graphic.drawOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+        graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
         graphic.drawChars(("catched position").toCharArray(), 0, 16, 3, 10);
         graphic.setColor(new Color(255, 255, 0, 64));
-        graphic.fillOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+        graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
         
         // visualize calculated target
         graphic.setColor(new Color(255, 0, 0, 255));
-        graphic.drawOval(MainClass.getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
+        graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
         graphic.drawChars(("calculated position").toCharArray(), 0, 19, 3, 25);
         graphic.setColor(new Color(255, 0, 0, 64));
-        graphic.fillOval(MainClass.getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
+        graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
         
         // write the image
-        Tools.writeImage(this.screenShot, this.timestamp + "_screenshot.png");
+        Tools.writeImage(this.screenShot, this.timestamp + "_screenshot.png");        
     }
 }

@@ -80,8 +80,8 @@ public class TrayMenu {
                 // depending on the current state, the label for the next state is printed and the state is changed 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.toggleStatus();
-                    if (MainClass.isActivated()) {
+                    MainClass.getInstance().toggleStatus();
+                    if (MainClass.getInstance().isActivated()) {
                         changeState.setLabel("Disable");
                     } else {
                         changeState.setLabel("Enable");
@@ -97,8 +97,8 @@ public class TrayMenu {
                 // depending on the current mode, the label for the next mode is printed and the modus is changed 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.toggleMode();
-                    if (MainClass.isNormalMode()) {
+                    MainClass.getInstance().toggleMode();
+                    if (MainClass.getInstance().isNormalMode()) {
                         changeMode.setLabel("Change Modus: Training");
                     } else {
                         changeMode.setLabel("Change Modus: Normal");
@@ -114,7 +114,7 @@ public class TrayMenu {
                 // calls exit method of the main class
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.exit();
+                    MainClass.getInstance().exit();
                 }
             });
             menu.add(exit);

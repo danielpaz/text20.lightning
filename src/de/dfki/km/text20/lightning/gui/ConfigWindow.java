@@ -79,8 +79,8 @@ public class ConfigWindow extends JFrame {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             public void approveSelection() {
                 super.approveSelection();
-                MainClass.getProperties().setOutputPath(this.getSelectedFile().getAbsolutePath());
-                textFieldOutputPath.setText(MainClass.getProperties().getOutputPath());
+                MainClass.getInstance().getProperties().setOutputPath(this.getSelectedFile().getAbsolutePath());
+                textFieldOutputPath.setText(MainClass.getInstance().getProperties().getOutputPath());
             }
         };
         this.chooser.setMultiSelectionEnabled(false);
@@ -90,9 +90,9 @@ public class ConfigWindow extends JFrame {
         initComponents();
         
         // take values of global properties and preselect them
-        this.checkBoxShowPictures.setSelected(MainClass.getProperties().isShowImages());
-        this.spinnerDimension.setValue(MainClass.getProperties().getDimension());
-        this.textFieldOutputPath.setText(MainClass.getProperties().getOutputPath());
+        this.checkBoxShowPictures.setSelected(MainClass.getInstance().getProperties().isShowImages());
+        this.spinnerDimension.setValue(MainClass.getInstance().getProperties().getDimension());
+        this.textFieldOutputPath.setText(MainClass.getInstance().getProperties().getOutputPath());
         
         // manage comboboxes
         this.manageHotkeyComboBox();
@@ -179,9 +179,9 @@ public class ConfigWindow extends JFrame {
     private void buttonOKActionPerformed(ActionEvent e) {
         
         // change variables in the properties and in the method manager
-        MainClass.getProperties().setShowImages(this.checkBoxShowPictures.isSelected());
-        MainClass.getProperties().setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
-        MainClass.getProperties().setOutputPath(this.textFieldOutputPath.getText());
+        MainClass.getInstance().getProperties().setShowImages(this.checkBoxShowPictures.isSelected());
+        MainClass.getInstance().getProperties().setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
+        MainClass.getInstance().getProperties().setOutputPath(this.textFieldOutputPath.getText());
         // TODO: do these also in properties, see MethodManager class
         this.methodManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
         

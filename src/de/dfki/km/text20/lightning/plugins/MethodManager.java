@@ -23,6 +23,7 @@ package de.dfki.km.text20.lightning.plugins;
 
 import java.util.ArrayList;
 
+import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import de.dfki.km.text20.lightning.MainClass;
@@ -50,13 +51,13 @@ public class MethodManager {
     /** */
     //TODO: change plugins to jars
     //TODO: store current plugin in properties
-    public MethodManager() {
+    public MethodManager(PluginManager manager) {
         
         // Add internal plugins
-        MainClass.getPluginManager().addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
-        MainClass.getPluginManager().addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());        
+        manager.addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
+        manager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());        
         
-        this.pluginManagerUtil = new PluginManagerUtil(MainClass.getPluginManager());
+        this.pluginManagerUtil = new PluginManagerUtil(manager);
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
         // TODO: get this from properties
         this.currentSaliencyDetector = this.saliencyDetectors.get(0);
@@ -87,6 +88,5 @@ public class MethodManager {
      */
     public void setCurrentSaliencyDetector(SaliencyDetector choice) {
         this.currentSaliencyDetector = choice;
-        System.out.println("search method: " + this.currentSaliencyDetector);
     }
 }

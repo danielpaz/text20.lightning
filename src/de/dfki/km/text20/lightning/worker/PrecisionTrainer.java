@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -77,7 +79,7 @@ public class PrecisionTrainer {
             this.robot = new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
-            MainClass.exit();
+            MainClass.getInstance().exit();
         }
     }
 
@@ -99,7 +101,7 @@ public class PrecisionTrainer {
     public void setMousePosition(Point mousePosition) {
         this.mousePosition = mousePosition;
 
-        if (MainClass.getProperties().isShowImages()) {
+        if (MainClass.getInstance().getProperties().isShowImages()) {
             // draw both points to a image
             this.drawPicture();
         }
@@ -108,8 +110,9 @@ public class PrecisionTrainer {
         this.offset.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
 
         // update logfile
-        Tools.updateLogFile("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getProperties().getDimension() + System.getProperty("line.separator"));
-        System.out.println("step recognised...");
+        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension());
+        System.out.println(logString);
+        MainClass.getInstance().getChannel().status(logString);
     }
 
     /**
@@ -118,23 +121,23 @@ public class PrecisionTrainer {
     private void drawPicture() {
 
         // create screenshot
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getProperties().getDimension() / 2, this.fixation.y - MainClass.getProperties().getDimension() / 2, MainClass.getProperties().getDimension(), MainClass.getProperties().getDimension());
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
         BufferedImage screenShot = this.robot.createScreenCapture(screenShotRect);
         Graphics2D graphic = screenShot.createGraphics();
 
         // visualize fixation point 
         graphic.setColor(new Color(255, 255, 0, 255));
-        graphic.drawOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+        graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
         graphic.drawChars(("fixation point").toCharArray(), 0, 14, 3, 10);
         graphic.setColor(new Color(255, 255, 0, 32));
-        graphic.fillOval(MainClass.getProperties().getDimension() / 2 - 5, MainClass.getProperties().getDimension() / 2 - 5, 10, 10);
+        graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
 
         // visualize mouse position
         graphic.setColor(new Color(255, 0, 0, 255));
-        graphic.drawOval(this.offset.x + MainClass.getProperties().getDimension() / 2, this.offset.y + MainClass.getProperties().getDimension() / 2, 10, 10);
+        graphic.drawOval(this.offset.x + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + MainClass.getInstance().getProperties().getDimension() / 2, 10, 10);
         graphic.drawChars(("mouse position").toCharArray(), 0, 14, 3, 25);
         graphic.setColor(new Color(255, 0, 0, 32));
-        graphic.fillOval(this.offset.x + MainClass.getProperties().getDimension() / 2, this.offset.y + MainClass.getProperties().getDimension() / 2, 10, 10);
+        graphic.fillOval(this.offset.x + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + MainClass.getInstance().getProperties().getDimension() / 2, 10, 10);
 
         // write the image
         Tools.writeImage(screenShot, this.timestamp + "_training.png");
