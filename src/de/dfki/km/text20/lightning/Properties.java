@@ -125,14 +125,6 @@ public class Properties implements Serializable {
             this.statusHotkey = null;
             System.out.println("Properties file was not found.");
         }
-
-        // Create output path
-        try {
-            new File(this.outputPath).mkdirs();
-        } catch (Exception e) {
-            e.printStackTrace();
-            MainClass.exit();
-        }
     }
 
     /**
@@ -189,16 +181,10 @@ public class Properties implements Serializable {
         try {
             File outputDir = new File(choosedOutputPath);
 
-            // creates path if it not exists
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            } else {
+            if (outputDir.isDirectory()) {
 
-                if (outputDir.isDirectory()) {
-
-                    // if the choosed path is a directory, its path is the new outputpath
-                    this.outputPath = choosedOutputPath;
-                }
+                // if the choosed path is a directory, its path is the new outputpath
+                this.outputPath = choosedOutputPath;
             }
 
         } catch (Exception e) {

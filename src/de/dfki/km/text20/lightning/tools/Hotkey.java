@@ -60,17 +60,17 @@ public class Hotkey implements HotkeyListener {
         this.isHotKeyTyped = false;
         this.initHotkeys();
 
-        if ((MainClass.getProperties().getActionHotkey() != null) && (MainClass.getProperties().getStatusHotkey() != null)) {
+        if ((MainClass.getInstance().getProperties().getActionHotkey() != null) && (MainClass.getInstance().getProperties().getStatusHotkey() != null)) {
             // if already hotekeys are stored in the properties, these will be used as current hotkeys
-            this.actionHotkey = MainClass.getProperties().getActionHotkey();
-            this.statusHotkey = MainClass.getProperties().getStatusHotkey();
+            this.actionHotkey = MainClass.getInstance().getProperties().getActionHotkey();
+            this.statusHotkey = MainClass.getInstance().getProperties().getStatusHotkey();
 
         } else {
             // otherwise the default hotkeys were set and stored to properties
             this.actionHotkey = this.hotkeys.get(0);
-            MainClass.getProperties().setActionHotkey(this.actionHotkey);
+            MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
             this.statusHotkey = this.hotkeys.get(1);
-            MainClass.getProperties().setStatusHotkey(this.statusHotkey);
+            MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
         }
 
         // add hotkeys to listener
@@ -133,7 +133,7 @@ public class Hotkey implements HotkeyListener {
         // status hotkey
         case 2:
             // change status
-            MainClass.toggleStatus();
+            MainClass.getInstance().toggleStatus();
 
             // necessary if status is changed in trainings mode 
             this.isHotKeyTyped = false;
@@ -159,14 +159,14 @@ public class Hotkey implements HotkeyListener {
         // action hotkey
         case 1:
             this.actionHotkey = hotkey;
-            MainClass.getProperties().setActionHotkey(this.actionHotkey);
+            MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
             System.out.println("action hotkey changed: " + hotkey);
             break;
 
         // status hotkey
         case 2:
             this.statusHotkey = hotkey;
-            MainClass.getProperties().setStatusHotkey(this.statusHotkey);
+            MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
             System.out.println("status hotkey changed: " + hotkey);
             break;
         default:

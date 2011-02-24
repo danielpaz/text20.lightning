@@ -22,13 +22,9 @@
 package de.dfki.km.text20.lightning.tools;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
 
@@ -53,65 +49,10 @@ public class Tools {
      */
     public static boolean writeImage(BufferedImage picture, String name) {
         try {
-            File outputfile = new File(MainClass.getProperties().getOutputPath() + File.separator + name);
+            File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + name);
+            outputfile.mkdirs();
             ImageIO.write(picture, "png", outputfile);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * updates the logfile with the given logstring
-     * 
-     * @param logString
-     * @return true is successful
-     */
-    public static boolean updateLogFile(String logString) {
-        String existingLog = new String("");
-        if (new File(MainClass.getProperties().getOutputPath() + File.separator + "log.txt").exists()) {
-            existingLog = Tools.readLogFile();
-        }
-        return Tools.writeLogFile(existingLog + logString);
-    }
-
-    /**
-     * if the logfile already exists, its content is readed
-     * 
-     * @return true if successful
-     */
-    public static String readLogFile() {
-        byte[] buffer = new byte[(int) new File(MainClass.getProperties().getOutputPath() + File.separator + "log.txt").length()];
-        BufferedInputStream inputStream = null;
-        try {
-            inputStream = new BufferedInputStream(new FileInputStream(MainClass.getProperties().getOutputPath() + File.separator + "log.txt"));
-            inputStream.read(buffer);
-        } catch (FileNotFoundException e) {
-            return "";
-        } catch (IOException e) {
-            return "";
-        } finally {
-            if (inputStream != null) try {
-                inputStream.close();
-            } catch (IOException e) {
-            }
-        }
-        return new String(buffer);
-    }
-
-    /**
-     * writes the logfile to the global outputpath
-     * 
-     * @param logString
-     * @return true is successful
-     */
-    public static boolean writeLogFile(String logString) {
-        try {
-            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(MainClass.getProperties().getOutputPath() + File.separator + "log.txt"));
-            outputStream.write(logString.getBytes());
-            outputStream.close();
-        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -158,7 +99,10 @@ public class Tools {
                 
             } catch (Exception e) {
                 e.printStackTrace();
-                MainClass.showTrayMessage("Project Lightning (Desktop)", "Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+                String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+                MainClass.getInstance().showTrayMessage(msg);
+                System.out.println("\n" + msg + "\n\n");
+                MainClass.getInstance().getChannel().status(msg);
                 return false;
             }
         }
