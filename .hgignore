@@ -7,3 +7,5 @@ syntax: regexp
 ^output$
 syntax: regexp
 ^diagnosis\.record$
+syntax: regexp
+^JIntellitype\.dll$

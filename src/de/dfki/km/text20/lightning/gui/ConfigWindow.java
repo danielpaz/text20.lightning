@@ -49,7 +49,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.tools.Hotkey;
 import de.dfki.km.text20.lightning.tools.HotkeyContainer;
@@ -69,8 +69,8 @@ public class ConfigWindow extends JFrame {
      * @param manager
      * necessary to show and switch the plugins.
      */
-    public ConfigWindow(MethodManager manager) {
-        this.methodManager = manager;
+    public ConfigWindow(InternalPluginManager manager) {
+        this.internalPluginManager = manager;
 
         // create file chooser for outputpath
         this.chooser = new JFileChooser() {
@@ -144,13 +144,13 @@ public class ConfigWindow extends JFrame {
         this.autoSelect = true;
         
         // add all saliency detectors to the combobox
-        for (int i = 0; i < this.methodManager.getSaliencyDetectors().size(); i++) {
-            this.comboBoxSearchMethod.addItem(this.methodManager.getSaliencyDetectors().get(i));
+        for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
+            this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i));
         }
         
         // preselect the current one
-        if (this.methodManager.getCurrentSaliencyDetector() != null)
-            this.comboBoxSearchMethod.setSelectedItem(this.methodManager.getCurrentSaliencyDetector());
+        if (this.internalPluginManager.getCurrentSaliencyDetector() != null)
+            this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector());
 
         // the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
         // TODO: change that only a kind of identifier is added to the combobox
@@ -183,7 +183,7 @@ public class ConfigWindow extends JFrame {
         MainClass.getInstance().getProperties().setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         MainClass.getInstance().getProperties().setOutputPath(this.textFieldOutputPath.getText());
         // TODO: do these also in properties, see MethodManager class
-        this.methodManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
+        this.internalPluginManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
         
         // close the gui
         this.dispose();
@@ -447,5 +447,5 @@ public class ConfigWindow extends JFrame {
     private boolean autoSelect;
     
     /** The method manager is needed to display and change the available plugins. */
-    private MethodManager methodManager;
+    private InternalPluginManager internalPluginManager;
 }

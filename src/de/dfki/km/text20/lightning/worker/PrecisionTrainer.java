@@ -30,7 +30,7 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
@@ -58,20 +58,16 @@ public class PrecisionTrainer {
     /** actual time */
     private long timestamp;
 
-    /** for later use to add different training methods*/
-    private MethodManager methodManager;
-
     /**
      * creates the precision trainer
      * 
      * @param manager
      */
-    public PrecisionTrainer(MethodManager manager) {
+    public PrecisionTrainer() {
 
         // initialize variables
         this.fixation = new Point();
         this.offset = new Point();
-        this.methodManager = manager;
 
         try {
             this.robot = new Robot();

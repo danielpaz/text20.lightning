@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.MethodManager;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
@@ -70,19 +70,15 @@ public class FixationEvaluator {
     
     /** */
     private BufferedImage screenShot;
-        
-    /** necessary to get the current saliency detector plugin*/
-    private MethodManager methodManager;
 
     /**
      * creates the FixationEvaluator
      * 
      * @param manager
      */
-    public FixationEvaluator(MethodManager manager) {
+    public FixationEvaluator() {
         
         // initialize variables
-        this.methodManager = manager;
         this.colorConverterGray = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         this.colorConverterRGB = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_sRGB), null);
         this.fixation = new Point();
@@ -123,7 +119,7 @@ public class FixationEvaluator {
         this.timestamp = System.currentTimeMillis();
 
         // use plugin to calculate offset
-        this.offset = this.methodManager.getCurrentSaliencyDetector().analyse(this.screenShot);
+        this.offset = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().analyse(this.screenShot);
 
         if (MainClass.getInstance().getProperties().isShowImages()) {
             // draw images of the current evaluation to the outputpath
@@ -131,7 +127,7 @@ public class FixationEvaluator {
         }
 
         // update the logfile
-        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + this.methodManager.getCurrentSaliencyDetector().getInformation().displayName;
+        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().displayName;
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
 

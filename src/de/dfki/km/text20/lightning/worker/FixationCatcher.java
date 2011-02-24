@@ -22,11 +22,15 @@
 package de.dfki.km.text20.lightning.worker;
 
 import java.awt.MouseInfo;
+import java.awt.Point;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.tools.Hotkey;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
@@ -54,7 +58,7 @@ public class FixationCatcher {
     
     /** indicates if the tracking device is working probably */
     private boolean status;
-
+    
     /**
      * create fixation catcher
      * 
@@ -81,6 +85,9 @@ public class FixationCatcher {
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
         GazeEvaluatorManager evaluatorManager = MainClass.getInstance().getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
+        
+        // TODO: placeholder
+        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(10, 100, 100);
         
         if(device == null) {
             String msg = new String("Trackingserver was not found! Please start it and restart this tool.");
@@ -117,6 +124,9 @@ public class FixationCatcher {
                             
                             // if the tool is activated and in normal mode, fixations will be stored 
                             fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
+                            
+                            // TODO: placeholder
+                            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
                         }
                         
                         if (Hotkey.getInstance().isTyped()) {
@@ -127,6 +137,10 @@ public class FixationCatcher {
                             // reset the hotkey status
                             Hotkey.getInstance().resetHotkeyTyped();
                         }
+                        
+                        // TODO: placeholder                        
+                        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
+                        
                     } else {
                         if (event.getType() == FixationEventType.FIXATION_START) {
                             
