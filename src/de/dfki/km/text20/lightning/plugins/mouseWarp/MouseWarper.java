@@ -37,7 +37,7 @@ public interface MouseWarper extends Plugin {
      * @param durationThreshold
      */
     public void initValues(int angleThreshold, int distanceThreshold,
-                           long durationThreshold);
+                           long durationThreshold, int homeRadius, int setRadius);
 
     /**
      * 

@@ -85,10 +85,7 @@ public class FixationCatcher {
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
         GazeEvaluatorManager evaluatorManager = MainClass.getInstance().getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
-        
-        // TODO: placeholder
-        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(10, 100, 100);
-        
+                
         if(device == null) {
             String msg = new String("Trackingserver was not found! Please start it and restart this tool.");
             MainClass.getInstance().showTrayMessage(msg);
@@ -137,10 +134,7 @@ public class FixationCatcher {
                             // reset the hotkey status
                             Hotkey.getInstance().resetHotkeyTyped();
                         }
-                        
-                        // TODO: placeholder                        
-                        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
-                        
+
                     } else {
                         if (event.getType() == FixationEventType.FIXATION_START) {
                             
