@@ -38,9 +38,11 @@ import com.melloware.jintellitype.JIntellitype;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
+import de.dfki.km.text20.lightning.worker.WarpCommander;
 
 /**
  * Main entry point.
@@ -75,6 +77,9 @@ public class MainClass {
 
     /** instance of mainclass */
     private static MainClass main;
+    
+    /** warps mouse cursor */
+    private WarpCommander warper;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -121,9 +126,10 @@ public class MainClass {
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
 
-        // Creates classes which are needed for the two parts (clicking and training) of this tool.
+        // Creates classes which are needed for the three parts (clicking, warping and training) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
         PrecisionTrainer precisionTrainer = new PrecisionTrainer();
+        this.warper = new WarpCommander();
 
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, precisionTrainer);
@@ -133,6 +139,7 @@ public class MainClass {
 
             // start listening
             fixationCatcher.startCatching();
+            this.warper.start();
 
             // indicate success
             this.showTrayMessage("Initializing successful.");
@@ -189,6 +196,9 @@ public class MainClass {
             this.showTrayMessage("Status: tool is now deactivated");
             this.trayIcon.setDeactivatedIcon();
 
+            // deactivate warper
+            this.warper.stop();
+            
             // change status
             this.isActivated = false;
 
@@ -197,6 +207,9 @@ public class MainClass {
             // show change in tray
             this.showTrayMessage("Status: tool is now activated");
             this.trayIcon.setActivatedIcon();
+            
+            // activate warper
+            this.warper.start();
 
             // change status
             this.isActivated = true;
@@ -210,6 +223,9 @@ public class MainClass {
 
         // store properties to a file
         this.properties.writeProperties();
+        
+        // deactivate warper
+        this.warper.stop();
 
         // deactivate the hotkeys
         if (this.dllStatus) JIntellitype.getInstance().cleanUp();
