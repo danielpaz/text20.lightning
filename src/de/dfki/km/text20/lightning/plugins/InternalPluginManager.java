@@ -60,21 +60,15 @@ public class InternalPluginManager {
      * 
      * @param manager  
      */
-    //TODO: change plugins to jars
     //TODO: store current plugin in properties
     public InternalPluginManager(PluginManager manager) {
-        
-        // Add internal plugins
-        manager.addPluginsFrom(new ClassURI(FakePositionFinder.class).toURI());
-        manager.addPluginsFrom(new ClassURI(SimpleSobel.class).toURI());   
-        manager.addPluginsFrom(new ClassURI(SimpleWarper.class).toURI());
-        
+               
         this.pluginManagerUtil = new PluginManagerUtil(manager);
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
+        this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
+        
         // TODO: get this from properties
         this.currentSaliencyDetector = this.saliencyDetectors.get(0);
-        
-        this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
         this.currentMouseWarper = this.mouseWarpers.get(0);
     }
 
