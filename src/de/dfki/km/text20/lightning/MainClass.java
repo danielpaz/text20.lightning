@@ -77,10 +77,10 @@ public class MainClass {
 
     /** instance of mainclass */
     private static MainClass main;
-    
+
     /** warps mouse cursor */
     private WarpCommander warper;
-    
+
     /** statistics plugin */
     private Statistics statistics;
 
@@ -112,12 +112,9 @@ public class MainClass {
         props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
-        
+
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
-
-        // check dll
-        this.dllStatus = this.checkDll();
 
         // initialize variables
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
@@ -125,10 +122,11 @@ public class MainClass {
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
         this.trayIcon = new TraySymbol();
+        this.dllStatus = this.checkDll();
         this.properties = new Properties();
         this.isActivated = true;
         this.isNormalMode = true;
-        
+
         // indicate start
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
@@ -173,9 +171,9 @@ public class MainClass {
      * @param text
      */
     public void addToStatistic(String text) {
-//        this.statistics.
+        //        this.statistics.
     }
-    
+
     /**
      * provides internal plugin manager
      * 
@@ -184,7 +182,7 @@ public class MainClass {
     public InternalPluginManager getInternalPluginManager() {
         return this.internalPluginManager;
     }
-    
+
     /**
      * provides the logging channel
      * 
@@ -215,7 +213,7 @@ public class MainClass {
 
             // deactivate warper
             this.warper.stop();
-            
+
             // change status
             this.isActivated = false;
 
@@ -224,7 +222,7 @@ public class MainClass {
             // show change in tray
             this.showTrayMessage("Status: tool is now activated");
             this.trayIcon.setActivatedIcon();
-            
+
             // activate warper
             this.warper.start();
 
@@ -240,7 +238,7 @@ public class MainClass {
 
         // store properties to a file
         this.properties.writeProperties();
-        
+
         // deactivate warper
         this.warper.stop();
 
@@ -291,7 +289,7 @@ public class MainClass {
 
             // change mode
             this.isNormalMode = true;
-            
+
             // activate warper
             this.warper.start();
         }
@@ -343,32 +341,28 @@ public class MainClass {
 
             System.out.println("JIntellytype.dll was not found.");
 
-            try {
-                // try to unzip it to the windows directory
-                $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+            // try to unzip it to the windows directory
+            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 
-                // FIXME: catch exception
-                
-                if (destination.exists()) {
-                    System.out.println("... but is now placed.\n");
-                    // return successful
-                    return true;
-                }
+            // FIXME: catch exception
 
-            } catch (Exception e) {
-                // try to unzip it to "."
-                $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
-
-                // indicate error 
-                String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
-                this.showTrayMessage(msg);
-                System.out.println("\n" + msg + "\n\n");
-                this.channel.status(msg);
-
-                // return not successful
-                return false;
+            if (destination.exists()) {
+                System.out.println("... but is now placed.\n");
+                // return successful
+                return true;
             }
+            
+            // try to unzip it to "."
+            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 
+            // indicate error 
+            String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+            this.showTrayMessage(msg);
+            System.out.println("\n" + msg + "\n\n");
+            this.channel.status(msg);
+
+            // return not successful
+            return false;
         }
 
         // return successful
