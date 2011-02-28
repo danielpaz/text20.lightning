@@ -61,12 +61,35 @@ public class Properties implements Serializable {
     @Element
     private HotkeyContainer statusHotkey;
 
+    @Attribute
+    /** angle threshold for mousewarping */
+    private int angleThreshold;
+    
+    @Attribute
+    /** distance threshold for mousewarping */
+    private int distanceThreshold;
+    
+    @Attribute
+    /** duration threshold for mousewarping */
+    private long durationThreshold;
+    
+    @Attribute
+    /** home radius for mousewarping */
+    private int homeRadius;
+    
+    @Attribute
+    /** set radius for mousewarping */
+    private int setRadius;
+    
+    /** indicates if mousewarping ins enabled */
+    private boolean useWarp;
+
     /** file where porperties are stored */
     private File propertiesFile;
 
     /** from properties file readed object */
     private Object object;
-
+    
     /**
      * creates properties, tries to load property file
      */
@@ -93,11 +116,18 @@ public class Properties implements Serializable {
                     this.outputPath = ((Properties) this.object).getOutputPath();
                     this.actionHotkey = ((Properties) this.object).getActionHotkey();
                     this.statusHotkey = ((Properties) this.object).getStatusHotkey();
+                    this.angleThreshold = ((Properties) this.object).getAngleThreshold();
+                    this.distanceThreshold = ((Properties) this.object).getDistanceThreshold();
+                    this.durationThreshold = ((Properties) this.object).getDurationThreshold();
+                    this.homeRadius = ((Properties) this.object).getHomeRadius();
+                    this.setRadius = ((Properties) this.object).getSetRadius();
+                    this.useWarp = ((Properties) this.object).isUseWarp();
 
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("showImages: " + this.showImages + ", dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
+                    System.out.println("useWarp: " + this.useWarp + ", angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
                 }
 
                 // cleanup
@@ -117,6 +147,12 @@ public class Properties implements Serializable {
             this.outputPath = "./output";
             this.actionHotkey = null;
             this.statusHotkey = null;
+            this.angleThreshold = 10;
+            this.distanceThreshold = 200;
+            this.durationThreshold = 1000;
+            this.homeRadius = 200;
+            this.setRadius = 20;
+            this.useWarp = true;
             System.out.println("Properties file was not found.");
         }
     }
@@ -220,6 +256,96 @@ public class Properties implements Serializable {
      */
     public void setStatusHotkey(HotkeyContainer statusHotkey) {
         this.statusHotkey = statusHotkey;
+    }
+
+    
+    
+    /**
+     * @return the angleThreshold
+     */
+    public int getAngleThreshold() {
+        return this.angleThreshold;
+    }
+
+    /**
+     * @param angleThreshold the angleThreshold to set
+     */
+    public void setAngleThreshold(int angleThreshold) {
+        this.angleThreshold = angleThreshold;
+    }
+
+    /**
+     * @return the distanceThreshold
+     */
+    public int getDistanceThreshold() {
+        return this.distanceThreshold;
+    }
+
+    /**
+     * @param distanceThreshold the distanceThreshold to set
+     */
+    public void setDistanceThreshold(int distanceThreshold) {
+        this.distanceThreshold = distanceThreshold;
+    }
+
+    /**
+     * @return the durationThreshold
+     */
+    public long getDurationThreshold() {
+        return this.durationThreshold;
+    }
+
+    /**
+     * @param durationThreshold the durationThreshold to set
+     */
+    public void setDurationThreshold(long durationThreshold) {
+        this.durationThreshold = durationThreshold;
+    }
+
+    /**
+     * @return the homeRadius
+     */
+    public int getHomeRadius() {
+        return this.homeRadius;
+    }
+
+    /**
+     * @param homeRadius the homeRadius to set
+     */
+    public void setHomeRadius(int homeRadius) {
+        this.homeRadius = homeRadius;
+    }
+
+    
+    
+    /**
+     * @return the setRadius
+     */
+    public int getSetRadius() {
+        return this.setRadius;
+    }
+
+    /**
+     * @param setRadius the setRadius to set
+     */
+    public void setSetRadius(int setRadius) {
+        this.setRadius = setRadius;
+    }
+
+    
+    
+    /**
+     * @return the useWarp
+     */
+    public boolean isUseWarp() {
+        return this.useWarp;
+    }
+
+    /**
+     * @param useWarp the useWarp to set
+     */
+    public void setUseWarp(boolean useWarp) {
+        this.useWarp = useWarp;
     }
 
     /**

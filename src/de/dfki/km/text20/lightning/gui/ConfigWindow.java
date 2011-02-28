@@ -24,12 +24,10 @@
  */
 package de.dfki.km.text20.lightning.gui;
 
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.*;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -50,6 +48,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.tools.Hotkey;
 import de.dfki.km.text20.lightning.tools.HotkeyContainer;
@@ -69,8 +68,8 @@ public class ConfigWindow extends JFrame {
      * @param manager
      * necessary to show and switch the plugins.
      */
-    public ConfigWindow(InternalPluginManager manager) {
-        this.internalPluginManager = manager;
+    public ConfigWindow() {
+        this.internalPluginManager = MainClass.getInstance().getInternalPluginManager();
 
         // create file chooser for outputpath
         this.chooser = new JFileChooser() {
@@ -88,16 +87,19 @@ public class ConfigWindow extends JFrame {
 
         // build basic components
         initComponents();
-        
+
         // take values of global properties and preselect them
         this.checkBoxShowPictures.setSelected(MainClass.getInstance().getProperties().isShowImages());
         this.spinnerDimension.setValue(MainClass.getInstance().getProperties().getDimension());
         this.textFieldOutputPath.setText(MainClass.getInstance().getProperties().getOutputPath());
-        
+
         // manage comboboxes
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
-        
+
+        // manage warp config
+        this.manageWarpConfig();
+
         // show the gui
         setVisible(true);
     }
@@ -107,11 +109,11 @@ public class ConfigWindow extends JFrame {
      */
     private void manageHotkeyComboBox() {
         this.autoSelect = true;
-        
+
         // clean comboboxes
         this.comboBoxActionHotkey.removeAllItems();
         this.comboBoxStatusHotkey.removeAllItems();
-        
+
         // adds all hotkeys to the specific comboboxes which are not selected by the other function
         for (int i = 0; i < Hotkey.getInstance().getHotkeys().size(); i++) {
             if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(2).toString()))
@@ -121,19 +123,19 @@ public class ConfigWindow extends JFrame {
             if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(1).toString()))
                 this.comboBoxStatusHotkey.addItem(Hotkey.getInstance().getHotkeys().get(i));
         }
-        
+
         // preselect property values
-        for(int i = 0; i < this.comboBoxActionHotkey.getItemCount();i++) {
-            if(Hotkey.getInstance().getCurrentHotkey(1).toString().equals(this.comboBoxActionHotkey.getItemAt(i).toString())) {
+        for (int i = 0; i < this.comboBoxActionHotkey.getItemCount(); i++) {
+            if (Hotkey.getInstance().getCurrentHotkey(1).toString().equals(this.comboBoxActionHotkey.getItemAt(i).toString())) {
                 this.comboBoxActionHotkey.setSelectedIndex(i);
             }
         }
-        for(int i = 0; i < this.comboBoxStatusHotkey.getItemCount();i++) {
-            if(Hotkey.getInstance().getCurrentHotkey(2).toString().equals(this.comboBoxStatusHotkey.getItemAt(i).toString())) {
+        for (int i = 0; i < this.comboBoxStatusHotkey.getItemCount(); i++) {
+            if (Hotkey.getInstance().getCurrentHotkey(2).toString().equals(this.comboBoxStatusHotkey.getItemAt(i).toString())) {
                 this.comboBoxStatusHotkey.setSelectedIndex(i);
             }
         }
-        
+
         this.autoSelect = false;
     }
 
@@ -142,12 +144,12 @@ public class ConfigWindow extends JFrame {
      */
     private void manageComboBoxSaliencyDetector() {
         this.autoSelect = true;
-        
+
         // add all saliency detectors to the combobox
         for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
             this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i));
         }
-        
+
         // preselect the current one
         if (this.internalPluginManager.getCurrentSaliencyDetector() != null)
             this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector());
@@ -167,8 +169,56 @@ public class ConfigWindow extends JFrame {
                 return this;
             }
         });
-        
+
         this.autoSelect = false;
+    }
+
+    /**
+     * manages values of the spinners and comboBox which are used to configure the mouse warping
+     */
+    private void manageWarpConfig() {
+        // preselect values
+        this.spinnerAngle.setValue(MainClass.getInstance().getProperties().getAngleThreshold());
+        this.spinnerDistance.setValue(MainClass.getInstance().getProperties().getDistanceThreshold());
+        this.spinnerDuration.setValue(MainClass.getInstance().getProperties().getDurationThreshold());
+        this.spinnerHomeRadius.setValue(MainClass.getInstance().getProperties().getHomeRadius());
+        this.spinnerSetRadius.setValue(MainClass.getInstance().getProperties().getSetRadius());
+        this.checkBoxUseWarp.setSelected(MainClass.getInstance().getProperties().isUseWarp());
+
+        // manage combobox
+        for (MouseWarper warper : this.internalPluginManager.getMouseWarpers())
+            this.comboBoxWarpMethod.addItem(warper);
+
+        // the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+        // TODO: change that only a kind of identifier is added to the combobox
+        this.comboBoxWarpMethod.setRenderer(new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value,
+                                                          int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof MouseWarper) {
+                    setText(((MouseWarper) value).getInformation().displayName);
+                }
+                return this;
+            }
+        });
+
+        // set enabled
+        this.enableWarpConfig();
+    }
+
+    /**
+     * if mouse warp is used the configuration is enabled, otherwise not
+     */
+    private void enableWarpConfig() {
+        // set enabled
+        this.spinnerAngle.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.spinnerDistance.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.spinnerDuration.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.spinnerHomeRadius.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.spinnerSetRadius.setEnabled(this.checkBoxUseWarp.isSelected());
     }
 
     /**
@@ -177,14 +227,30 @@ public class ConfigWindow extends JFrame {
      * @param e
      */
     private void buttonOKActionPerformed(ActionEvent e) {
-        
+        // initialize variables with gui values
+        int angle = Integer.parseInt(this.spinnerAngle.getValue().toString());
+        int distance = Integer.parseInt(this.spinnerDistance.getValue().toString());
+        long duration = Long.parseLong(this.spinnerDuration.getValue().toString());
+        int home = Integer.parseInt(this.spinnerHomeRadius.getValue().toString());
+        int set = Integer.parseInt(this.spinnerSetRadius.getValue().toString());
+
         // change variables in the properties and in the method manager
         MainClass.getInstance().getProperties().setShowImages(this.checkBoxShowPictures.isSelected());
         MainClass.getInstance().getProperties().setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         MainClass.getInstance().getProperties().setOutputPath(this.textFieldOutputPath.getText());
+        MainClass.getInstance().getProperties().setAngleThreshold(angle);
+        MainClass.getInstance().getProperties().setDistanceThreshold(distance);
+        MainClass.getInstance().getProperties().setDurationThreshold(duration);
+        MainClass.getInstance().getProperties().setHomeRadius(home);
+        MainClass.getInstance().getProperties().setSetRadius(set);
+        MainClass.getInstance().getProperties().setUseWarp(this.checkBoxUseWarp.isSelected());
+
         // TODO: do these also in properties, see MethodManager class
         this.internalPluginManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
-        
+
+        // TODO: maybe do this on a other place
+        this.internalPluginManager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
+
         // close the gui
         this.dispose();
     }
@@ -195,7 +261,7 @@ public class ConfigWindow extends JFrame {
      * @param e
      */
     private void buttonCancelActionPerformed(ActionEvent e) {
-       
+
         this.dispose();
     }
 
@@ -205,7 +271,7 @@ public class ConfigWindow extends JFrame {
      * @param e
      */
     private void buttonSelectActionPerformed(ActionEvent e) {
-        
+
         this.chooser.showOpenDialog(this);
     }
 
@@ -220,7 +286,7 @@ public class ConfigWindow extends JFrame {
             this.manageHotkeyComboBox();
         }
     }
-    
+
     /**
      * Fired if something changed at the statushotkey combobox. Sets the choosed hotkey as statushotkey.
      * 
@@ -253,161 +319,246 @@ public class ConfigWindow extends JFrame {
     }
 
     /**
+     * enables or disables config
+     * 
+     * @param e
+     */
+    private void checkBoxUseWarpActionPerformed(ActionEvent e) {
+        this.enableWarpConfig();
+    }
+
+    /**
      * auto generated code, initializes gui components
      */
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
-        this.dialogPane = new JPanel();
-        this.contentPanel = new JPanel();
-        this.label1 = new JLabel();
-        this.checkBoxShowPictures = new JCheckBox();
-        this.label2 = new JLabel();
-        this.spinnerDimension = new JSpinner();
-        this.label3 = new JLabel();
-        this.buttonSelect = new JButton();
-        this.textFieldOutputPath = new JTextField();
-        this.label4 = new JLabel();
-        this.comboBoxActionHotkey = new JComboBox();
-        this.label5 = new JLabel();
-        this.comboBoxStatusHotkey = new JComboBox();
-        this.label6 = new JLabel();
-        this.comboBoxSearchMethod = new JComboBox();
-        this.label7 = new JLabel();
-        this.comboBoxLearnMethod = new JComboBox();
-        this.buttonOK = new JButton();
-        this.buttonCancel = new JButton();
-        this.buttonBar = new JPanel();
+        dialogPane = new JPanel();
+        contentPanel = new JPanel();
+        label1 = new JLabel();
+        checkBoxShowPictures = new JCheckBox();
+        separator4 = new JSeparator();
+        label3 = new JLabel();
+        buttonSelect = new JButton();
+        textFieldOutputPath = new JTextField();
+        separator5 = new JSeparator();
+        label15 = new JLabel();
+        checkBoxUseWarp = new JCheckBox();
+        label8 = new JLabel();
+        comboBoxWarpMethod = new JComboBox();
+        label9 = new JLabel();
+        spinnerAngle = new JSpinner();
+        separator1 = new JSeparator();
+        label10 = new JLabel();
+        spinnerDistance = new JSpinner();
+        label5 = new JLabel();
+        comboBoxStatusHotkey = new JComboBox();
+        label11 = new JLabel();
+        spinnerDuration = new JSpinner();
+        separator3 = new JSeparator();
+        label12 = new JLabel();
+        spinnerHomeRadius = new JSpinner();
+        label2 = new JLabel();
+        spinnerDimension = new JSpinner();
+        label13 = new JLabel();
+        spinnerSetRadius = new JSpinner();
+        label4 = new JLabel();
+        comboBoxActionHotkey = new JComboBox();
+        label6 = new JLabel();
+        comboBoxSearchMethod = new JComboBox();
+        label7 = new JLabel();
+        comboBoxLearnMethod = new JComboBox();
+        buttonOK = new JButton();
+        buttonCancel = new JButton();
+        buttonBar = new JPanel();
         CellConstraints cc = new CellConstraints();
 
         //======== this ========
-        setTitle("Click2Sight");
+        setTitle("Project Lightning (Desktop)");
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridLayout());
 
         //======== dialogPane ========
         {
-            this.dialogPane.setBorder(Borders.DIALOG_BORDER);
-            this.dialogPane.setLayout(new GridLayout());
+            dialogPane.setBorder(Borders.DIALOG_BORDER);
+            dialogPane.setLayout(new BoxLayout(dialogPane, BoxLayout.X_AXIS));
 
             //======== contentPanel ========
             {
-                this.contentPanel.setLayout(new FormLayout(
-                    "4*(30dlu, $lcgap), 8*(default, $lcgap), default",
-                    "19*(default, $lgap), default"));
+                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)", "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
 
                 //---- label1 ----
-                this.label1.setText("Show Images");
-                this.contentPanel.add(this.label1, cc.xywh(1, 1, 3, 1));
-                this.contentPanel.add(this.checkBoxShowPictures, cc.xywh(5, 1, 3, 1));
+                label1.setText("Show Images");
+                contentPanel.add(label1, cc.xywh(1, 1, 3, 1));
+                contentPanel.add(checkBoxShowPictures, cc.xywh(5, 1, 3, 1));
 
-                //---- label2 ----
-                this.label2.setText("Dimension");
-                this.contentPanel.add(this.label2, cc.xywh(1, 3, 3, 1));
-
-                //---- spinnerDimension ----
-                this.spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
-                this.contentPanel.add(this.spinnerDimension, cc.xywh(5, 3, 3, 1));
+                //---- separator4 ----
+                separator4.setOrientation(SwingConstants.VERTICAL);
+                contentPanel.add(separator4, cc.xy(9, 1));
 
                 //---- label3 ----
-                this.label3.setText("Output Directory");
-                this.contentPanel.add(this.label3, cc.xywh(1, 5, 3, 1));
+                label3.setText("Output Directory");
+                contentPanel.add(label3, cc.xywh(1, 3, 3, 1));
 
                 //---- buttonSelect ----
-                this.buttonSelect.setText("Select");
-                this.buttonSelect.addActionListener(new ActionListener() {
+                buttonSelect.setText("Select");
+                buttonSelect.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonSelectActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.buttonSelect, cc.xywh(5, 5, 3, 1));
-                this.contentPanel.add(this.textFieldOutputPath, cc.xywh(1, 7, 7, 1));
+                contentPanel.add(buttonSelect, cc.xywh(5, 3, 3, 1));
+                contentPanel.add(textFieldOutputPath, cc.xywh(1, 5, 7, 1));
 
-                //---- label4 ----
-                this.label4.setText("Action Hotkey");
-                this.contentPanel.add(this.label4, cc.xywh(1, 9, 3, 1));
+                //---- separator5 ----
+                separator5.setOrientation(SwingConstants.VERTICAL);
+                contentPanel.add(separator5, cc.xywh(9, 1, 1, 25));
 
-                //---- comboBoxActionHotkey ----
-                this.comboBoxActionHotkey.addActionListener(new ActionListener() {
+                //---- label15 ----
+                label15.setText("Enable Mouse Warp");
+                contentPanel.add(label15, cc.xywh(11, 1, 3, 1));
+
+                //---- checkBoxUseWarp ----
+                checkBoxUseWarp.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        comboBoxActionHotkeyActionPerformed(e);
+                        checkBoxUseWarpActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.comboBoxActionHotkey, cc.xywh(5, 9, 3, 1));
+                contentPanel.add(checkBoxUseWarp, cc.xy(15, 1));
+
+                //---- label8 ----
+                label8.setText("Warp Method");
+                contentPanel.add(label8, cc.xywh(11, 3, 3, 1));
+                contentPanel.add(comboBoxWarpMethod, cc.xywh(15, 3, 3, 1));
+
+                //---- label9 ----
+                label9.setText("Angle Threshold");
+                contentPanel.add(label9, cc.xywh(11, 5, 3, 1));
+
+                //---- spinnerAngle ----
+                spinnerAngle.setModel(new SpinnerNumberModel(10, 0, 180, 1));
+                contentPanel.add(spinnerAngle, cc.xywh(15, 5, 3, 1));
+                contentPanel.add(separator1, cc.xywh(1, 7, 7, 1));
+
+                //---- label10 ----
+                label10.setText("Distance Threshold");
+                contentPanel.add(label10, cc.xywh(11, 7, 3, 1));
+                contentPanel.add(spinnerDistance, cc.xywh(15, 7, 3, 1));
 
                 //---- label5 ----
-                this.label5.setText("Status Hotkey");
-                this.contentPanel.add(this.label5, cc.xywh(1, 11, 3, 1));
+                label5.setText("Status Hotkey");
+                contentPanel.add(label5, cc.xywh(1, 9, 3, 1));
 
                 //---- comboBoxStatusHotkey ----
-                this.comboBoxStatusHotkey.addActionListener(new ActionListener() {
+                comboBoxStatusHotkey.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxStatusHotkeyActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.comboBoxStatusHotkey, cc.xywh(5, 11, 3, 1));
+                contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 9, 3, 1));
+
+                //---- label11 ----
+                label11.setText("Duration Threshold");
+                contentPanel.add(label11, cc.xywh(11, 9, 3, 1));
+                contentPanel.add(spinnerDuration, cc.xywh(15, 9, 3, 1));
+                contentPanel.add(separator3, cc.xywh(1, 11, 7, 1));
+
+                //---- label12 ----
+                label12.setText("Home Radius");
+                contentPanel.add(label12, cc.xywh(11, 11, 3, 1));
+                contentPanel.add(spinnerHomeRadius, cc.xywh(15, 11, 3, 1));
+
+                //---- label2 ----
+                label2.setText("Dimension");
+                contentPanel.add(label2, cc.xywh(1, 13, 3, 1));
+
+                //---- spinnerDimension ----
+                spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+                contentPanel.add(spinnerDimension, cc.xywh(5, 13, 3, 1));
+
+                //---- label13 ----
+                label13.setText("Set Radius");
+                label13.setToolTipText("sdfgsd,g");
+                contentPanel.add(label13, cc.xywh(11, 13, 3, 1));
+
+                //---- spinnerSetRadius ----
+                spinnerSetRadius.setModel(new SpinnerNumberModel(20, null, null, 1));
+                contentPanel.add(spinnerSetRadius, cc.xywh(15, 13, 3, 1));
+
+                //---- label4 ----
+                label4.setText("Action Hotkey");
+                contentPanel.add(label4, cc.xywh(1, 15, 3, 1));
+
+                //---- comboBoxActionHotkey ----
+                comboBoxActionHotkey.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        comboBoxActionHotkeyActionPerformed(e);
+                    }
+                });
+                contentPanel.add(comboBoxActionHotkey, cc.xywh(5, 15, 3, 1));
 
                 //---- label6 ----
-                this.label6.setText("Search Method");
-                this.contentPanel.add(this.label6, cc.xywh(1, 13, 3, 1));
+                label6.setText("Search Method");
+                contentPanel.add(label6, cc.xywh(1, 17, 3, 1));
 
                 //---- comboBoxSearchMethod ----
-                this.comboBoxSearchMethod.addActionListener(new ActionListener() {
+                comboBoxSearchMethod.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxSearchMethodActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.comboBoxSearchMethod, cc.xywh(5, 13, 3, 1));
+                contentPanel.add(comboBoxSearchMethod, cc.xywh(5, 17, 3, 1));
 
                 //---- label7 ----
-                this.label7.setText("Learn Method");
-                this.contentPanel.add(this.label7, cc.xywh(1, 15, 3, 1));
+                label7.setText("Learn Method");
+                contentPanel.add(label7, cc.xywh(1, 19, 3, 1));
 
                 //---- comboBoxLearnMethod ----
-                this.comboBoxLearnMethod.addActionListener(new ActionListener() {
+                comboBoxLearnMethod.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxLearnMethodActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.comboBoxLearnMethod, cc.xywh(5, 15, 3, 1));
+                contentPanel.add(comboBoxLearnMethod, cc.xywh(5, 19, 3, 1));
 
                 //---- buttonOK ----
-                this.buttonOK.setText("OK");
-                this.buttonOK.addActionListener(new ActionListener() {
+                buttonOK.setText("OK");
+                buttonOK.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonOKActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.buttonOK, cc.xywh(1, 17, 3, 1));
+                contentPanel.add(buttonOK, cc.xywh(11, 19, 3, 1));
 
                 //---- buttonCancel ----
-                this.buttonCancel.setText("Cancel");
-                this.buttonCancel.addActionListener(new ActionListener() {
+                buttonCancel.setText("Cancel");
+                buttonCancel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         buttonCancelActionPerformed(e);
                     }
                 });
-                this.contentPanel.add(this.buttonCancel, cc.xywh(5, 17, 3, 1));
+                contentPanel.add(buttonCancel, cc.xywh(15, 19, 3, 1));
 
                 //======== buttonBar ========
                 {
-                    this.buttonBar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
-                    this.buttonBar.setLayout(new CardLayout());
+                    buttonBar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
+                    buttonBar.setLayout(new CardLayout());
                 }
-                this.contentPanel.add(this.buttonBar, cc.xy(11, 23));
+                contentPanel.add(buttonBar, cc.xy(13, 31));
             }
-            this.dialogPane.add(this.contentPanel);
+            dialogPane.add(contentPanel);
         }
-        contentPane.add(this.dialogPane);
-        setSize(295, 345);
+        contentPane.add(dialogPane);
+        setSize(435, 305);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -418,15 +569,33 @@ public class ConfigWindow extends JFrame {
     private JPanel contentPanel;
     private JLabel label1;
     private JCheckBox checkBoxShowPictures;
-    private JLabel label2;
-    private JSpinner spinnerDimension;
+    private JSeparator separator4;
     private JLabel label3;
     private JButton buttonSelect;
     private JTextField textFieldOutputPath;
-    private JLabel label4;
-    private JComboBox comboBoxActionHotkey;
+    private JSeparator separator5;
+    private JLabel label15;
+    private JCheckBox checkBoxUseWarp;
+    private JLabel label8;
+    private JComboBox comboBoxWarpMethod;
+    private JLabel label9;
+    private JSpinner spinnerAngle;
+    private JSeparator separator1;
+    private JLabel label10;
+    private JSpinner spinnerDistance;
     private JLabel label5;
     private JComboBox comboBoxStatusHotkey;
+    private JLabel label11;
+    private JSpinner spinnerDuration;
+    private JSeparator separator3;
+    private JLabel label12;
+    private JSpinner spinnerHomeRadius;
+    private JLabel label2;
+    private JSpinner spinnerDimension;
+    private JLabel label13;
+    private JSpinner spinnerSetRadius;
+    private JLabel label4;
+    private JComboBox comboBoxActionHotkey;
     private JLabel label6;
     private JComboBox comboBoxSearchMethod;
     private JLabel label7;
@@ -438,14 +607,14 @@ public class ConfigWindow extends JFrame {
 
     /** filechooser for outputpath */
     private JFileChooser chooser;
-    
+
     /**
      * manageHotkeyComboBox() changes the items and selection of the actionHotkey and the statusHotkey comboboxes.
      * These two boxes have thier own actionlisteners which call manageHotkeyComboBox(). So an endless ring of calls is created when anything is changed.
      * This boolean shows if the action event is fired by an automatic or manual selection of these comboboxes.
      */
     private boolean autoSelect;
-    
+
     /** The method manager is needed to display and change the available plugins. */
     private InternalPluginManager internalPluginManager;
 }

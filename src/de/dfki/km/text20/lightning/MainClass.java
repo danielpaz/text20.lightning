@@ -35,10 +35,10 @@ import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 
 import com.melloware.jintellitype.JIntellitype;
 
+import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
@@ -46,7 +46,7 @@ import de.dfki.km.text20.lightning.worker.WarpCommander;
 
 /**
  * Main entry point.
- * 
+ * serv-4100
  * @author Christoph Käding
  */
 public class MainClass {
@@ -80,6 +80,9 @@ public class MainClass {
     
     /** warps mouse cursor */
     private WarpCommander warper;
+    
+    /** statistics plugin */
+    private Statistics statistics;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -109,19 +112,23 @@ public class MainClass {
         props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
+        
+        // set statistic properties
+        props.setProperty(Statistics.class, "application.id", "StatisticsTest");
 
         // check dll
         this.dllStatus = this.checkDll();
 
         // initialize variables
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
+        this.statistics = this.pluginManager.getPlugin(Statistics.class);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
-        this.trayIcon = new TraySymbol(this.internalPluginManager);
+        this.trayIcon = new TraySymbol();
         this.properties = new Properties();
         this.isActivated = true;
         this.isNormalMode = true;
-
+        
         // indicate start
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
@@ -161,8 +168,18 @@ public class MainClass {
     }
 
     /**
+     * adds the given text to the statistics which are provided by plugin
      * 
-     * @return
+     * @param text
+     */
+    public void addToStatistic(String text) {
+//        this.statistics.
+    }
+    
+    /**
+     * provides internal plugin manager
+     * 
+     * @return internal plugin manager
      */
     public InternalPluginManager getInternalPluginManager() {
         return this.internalPluginManager;
@@ -264,6 +281,9 @@ public class MainClass {
             // change mode
             this.isNormalMode = false;
 
+            // deactivate warper
+            this.warper.stop();
+
         } else {
 
             // shows change in tray and console
@@ -271,6 +291,9 @@ public class MainClass {
 
             // change mode
             this.isNormalMode = true;
+            
+            // activate warper
+            this.warper.start();
         }
     }
 

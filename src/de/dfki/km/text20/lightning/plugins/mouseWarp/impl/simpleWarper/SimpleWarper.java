@@ -22,12 +22,12 @@ package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper;
 
 import java.awt.Point;
 import java.awt.Robot;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.WarpPluginInformation;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
  * @author Christoph Käding
@@ -43,7 +43,7 @@ public class SimpleWarper implements MouseWarper {
     private long durationThres;
 
     private int homeR;
-    
+
     private int setR;
 
     private long currentTimeStamp;
@@ -97,82 +97,87 @@ public class SimpleWarper implements MouseWarper {
     @SuppressWarnings("boxing")
     @Override
     public void addMousePosition(Point position) {
-        /*      this.mousePositions.add(new WarpContainer(position));
-         *
-         *        if (this.mousePositions.size() > 10) {
-         *            this.mousePositions.remove(0);
-         *        }
-         *
-         *        if (this.fixation == null) return;
-         *
-         *        for (int i = 0; i < this.mousePositions.size(); i++) {
-         *            if ((this.mousePositions.get(this.mousePositions.size() - 1).getTimeStamp() - this.mousePositions.get(i).getTimeStamp()) < this.durationThres) {
-         *                if (calculateAngle(this.mousePositions.get(0).getPosition(), this.mousePositions.get(i).getPosition()) <= this.angleThres) {
-         *                    if (this.mousePositions.get(0).getPosition().distance(this.mousePositions.get(i).getPosition()) >= this.distanceThres) {
-         *                        this.robot.mouseMove(this.fixation.x, this.fixation.y);
-         *                    }
-         *                }
-         *            }
-         *        }
-         */
+
+        // timestamp
         this.currentTimeStamp = System.currentTimeMillis();
 
+        // add to map
         this.mousePositions.put(this.currentTimeStamp, position);
 
+        // check if fixation is placed
         if (this.fixation == null) return;
 
-        if (this.mousePositions.size() > 100)
+        // cut the array to the needed size, 100 is the rate of mouse updates
+        if (this.mousePositions.size() * 100 > this.durationThres)
             this.mousePositions.remove(this.mousePositions.firstEntry().getKey());
 
+        // check if the cursor is already in home radius
         if (this.mousePositions.lastEntry().getValue().distance(this.fixation) < this.homeR)
             return;
 
-        System.out.println("radius");
-
-        long key = this.currentTimeStamp - this.durationThres;
-
-        if (!this.mousePositions.containsKey(key)) return;
-
-        System.out.println("key");
-
-        if (this.mousePositions.lastEntry().getValue().distance(this.mousePositions.get(key)) < this.distanceThres)
+        // check the distance which the mouse has traveled within the time that is represented by the tree map
+        // TODO: change to mouse acceleration
+        if (this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) < this.distanceThres)
             return;
 
-        System.out.println("distance");
-
-        if (calculateAngle(this.mousePositions.get(key), this.mousePositions.lastEntry().getValue()) > this.angleThres)
+        // checks the angle between mouse movement and vector between start of the mouse movement and fixation point
+        if (calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue()) > this.angleThres)
             return;
 
-        System.out.println("angle");
-
-        if (this.fixation.distance(this.mousePositions.get(key)) < this.fixation.distance(this.mousePositions.lastEntry().getValue()))
-            return;
-        
-        System.out.println("direction");
-        
+        // moves fixation point a given distance to the mouse
         calculateSetPoint();
-        
+
+        // places mouse cursor at the fixation point
         this.robot.mouseMove(this.fixation.x, this.fixation.y);
-        
+
+        // resets variables
         this.fixation = null;
-        
-        System.out.println("warp");
+        this.mousePositions.clear();
     }
 
+    /**
+     * cartesian
+     * 
+     * @param start
+     * @param stop
+     * @return
+     */
     private double calculateAngle(Point start, Point stop) {
+        // angle in radian measure between x-axis and moving vector of the mouse
+        double mouseTraceAngle = Math.atan2(start.y - stop.y, start.x - stop.x);
+        
+        // angle in radian measure between the x-axis and the vector from start point of the current mouse vector and the fixation point 
+        double gazeVectorAngle = Math.atan2(start.y - this.fixation.y, start.x - this.fixation.x);
+        
+        // angle between this two ones in degrees
+        double angle = (gazeVectorAngle - mouseTraceAngle) * 180 / Math.PI;
 
-        double a = start.distance(stop);
-        double b = stop.distance(this.fixation);
-        double c = this.fixation.distance(start);
-
-        return Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
+        return Math.abs(angle);
     }
-    
+
+    /**
+     * screen
+     */
     private void calculateSetPoint() {
+        // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
+        double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.y);
         
-        int dy = this.fixation.y - this.mousePositions.lastEntry().getValue().y;
-        int dx = (int)Math.sqrt(Math.pow(dy, 2) + Math.pow(this.setR, 2));
+        // calculate x and y by their polar coordinates
+        int x = (int) (this.setR * Math.cos(phi));
+        int y = (int) (this.setR * Math.sin(phi));
+
+        // move fixation point 
+        this.fixation.translate(x, y);
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
+     */
+    @Override
+    public WarpPluginInformation getInformation() {
+        final WarpPluginInformation information = new WarpPluginInformation();
+        information.displayName = "Simple Warper";
         
-        this.fixation.translate(dx, dy);
+        return information;
     }
 }
