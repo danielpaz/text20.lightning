@@ -31,23 +31,36 @@ import net.xeoh.plugins.base.Plugin;
 public interface MouseWarper extends Plugin {
     
     /**
+     * initializes necessary values 
      * 
      * @param angleThreshold
      * @param distanceThreshold
      * @param durationThreshold
+     * @param homeRadius 
+     * @param setRadius 
      */
     public void initValues(int angleThreshold, int distanceThreshold,
                            long durationThreshold, int homeRadius, int setRadius);
 
     /**
+     * sets current fixation point
      * 
      * @param fixation
      */
     public void setFixationPoint(Point fixation);
 
     /**
+     * adds current mouse position
      * 
      * @param position
      */
+    // TODO: maybe add interval (see WarpCommander ~ 100ms)
     public void addMousePosition(Point position);
+    
+    /**
+     * some information about this plugin
+     * 
+     * @return information
+     */
+    public WarpPluginInformation getInformation();
 }

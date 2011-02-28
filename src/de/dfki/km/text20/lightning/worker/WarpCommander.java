@@ -29,32 +29,55 @@ import javax.swing.Timer;
 import de.dfki.km.text20.lightning.MainClass;
 
 /**
- * @author Christoph Käding
- *
+ * This class tracks the position of the mouse pointer every 100ms. 
+ * This timer can be started ore stopped by this class. 
+ * By stopping the timer mouse warping is disabled.
+ * 
+ * changing the 100ms means also change this value in gui and the plugins.
+ * 
+ * @author Christoph Käding 
+ * 
  */
 public class WarpCommander {
 
+    /** timer which clocks the mouse position tracking */
     private Timer timer;
-    
+
+    /**
+     * creates a new WarpCommander and initializes the timer and the currently used warp plugin.
+     */
     public WarpCommander() {
-        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(10, 50, 100, 200, 20);
-        
+        // initialize current warp plugin
+        int angle = MainClass.getInstance().getProperties().getAngleThreshold();
+        int distance = MainClass.getInstance().getProperties().getDistanceThreshold();
+        long duration = MainClass.getInstance().getProperties().getDurationThreshold();
+        int home = MainClass.getInstance().getProperties().getHomeRadius();
+        int set = MainClass.getInstance().getProperties().getSetRadius();
+        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
+
+        // initialize timer
         this.timer = new Timer(100, new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                
+
                 MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
             }
         });
     }
- 
+
+    /**
+     * starts the timer
+     */
     public void start() {
-        this.timer.start();
+        if (MainClass.getInstance().getProperties().isUseWarp()) this.timer.start();
     }
-    
+
+    /**
+     * stops the timer
+     */
     public void stop() {
         this.timer.stop();
     }
-    
+
 }

@@ -49,11 +49,10 @@ public class TrayMenu {
      * @return menu
      *  
      */
-    public static PopupMenu getInstance(InternalPluginManager manager) {
+    public static PopupMenu getInstance() {
 
         if (menu == null) {
             menu = new PopupMenu();
-            final InternalPluginManager internalPluginManager = manager;
 
             // adds the title to the menu
             final MenuItem title = new MenuItem("Project Lightning (Desktop)");
@@ -68,7 +67,7 @@ public class TrayMenu {
                 @SuppressWarnings("unused")
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ConfigWindow configWindow = new ConfigWindow(internalPluginManager);
+                    ConfigWindow configWindow = new ConfigWindow();
                 }
             });
             menu.add(configMenu);

@@ -48,7 +48,7 @@ public class TraySymbol {
      * @param manager 
      * necessary to show and activate plugins by the gui
      */
-    public TraySymbol(InternalPluginManager manager) {
+    public TraySymbol() {
                 
         // initialize tray icon and add it to tray
         this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")), "Project Lightning (Desktop)");
@@ -57,7 +57,7 @@ public class TraySymbol {
         if (SystemTray.isSupported()) {
             this.systemTray = SystemTray.getSystemTray();
             try {
-                this.trayIcon.setPopupMenu(TrayMenu.getInstance(manager));
+                this.trayIcon.setPopupMenu(TrayMenu.getInstance());
                 this.systemTray.add(this.trayIcon);
             } catch (AWTException e) {
                 e.printStackTrace();
