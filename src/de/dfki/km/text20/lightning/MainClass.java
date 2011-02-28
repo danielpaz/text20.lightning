@@ -24,6 +24,8 @@ package de.dfki.km.text20.lightning;
 import static net.jcores.CoreKeeper.$;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.UIManager;
 
@@ -39,6 +41,7 @@ import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
+import de.dfki.km.text20.lightning.tools.Hotkey;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
@@ -115,9 +118,18 @@ public class MainClass {
 
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
-
-        // initialize variables
+        
+        // initialize plugin manager
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
+        
+        // add plugins at classpath
+        try {
+            this.pluginManager.addPluginsFrom(new URI("classpath://*"));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        
+        // initialize other variables
         this.statistics = this.pluginManager.getPlugin(Statistics.class);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
@@ -126,6 +138,9 @@ public class MainClass {
         this.properties = new Properties();
         this.isActivated = true;
         this.isNormalMode = true;
+        
+        // initialize hotkeys
+        Hotkey.getInstance();
 
         // indicate start
         System.out.println("\nSession started.\n");

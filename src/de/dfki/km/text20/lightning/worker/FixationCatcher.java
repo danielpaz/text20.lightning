@@ -65,17 +65,6 @@ public class FixationCatcher {
         this.fixationEvaluator = evaluator;
         this.precisionTrainer = trainer;
         
-        // initialize hotkeys
-        Hotkey.getInstance();
-        
-        // add plugins at classpath
-        try {
-            MainClass.getInstance().getPluginManager().addPluginsFrom(new URI("classpath://*"));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            MainClass.getInstance().exit();
-        }
-        
         // create stuff which is needed to get eyetracking data
         EyeTrackingDeviceProvider deviceProvider = MainClass.getInstance().getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");

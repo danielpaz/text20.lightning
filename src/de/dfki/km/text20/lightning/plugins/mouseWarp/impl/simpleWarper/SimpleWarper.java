@@ -156,7 +156,7 @@ public class SimpleWarper implements MouseWarper {
 
     /**
      * Calculates the angle between mouse-move-vector and start of movement to fixation.
-     * This calculation is threaded like it is placed in a cartesian coordinate system.
+     * This calculation is treated like it is placed in a cartesian coordinate system.
      * 
      * @param start point
      * @param stop point
