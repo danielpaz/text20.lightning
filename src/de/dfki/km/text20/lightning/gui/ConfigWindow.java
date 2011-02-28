@@ -52,11 +52,11 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.hotkey.Hotkey;
+import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.tools.Hotkey;
-import de.dfki.km.text20.lightning.tools.HotkeyContainer;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 

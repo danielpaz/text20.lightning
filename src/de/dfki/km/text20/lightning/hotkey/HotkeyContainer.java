@@ -19,7 +19,7 @@
  * MA 02110-1301  USA
  *
  */
-package de.dfki.km.text20.lightning.tools;
+package de.dfki.km.text20.lightning.hotkey;
 
 import java.io.Serializable;
 

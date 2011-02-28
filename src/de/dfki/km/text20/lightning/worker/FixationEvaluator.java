@@ -32,9 +32,11 @@ import java.awt.color.ColorSpace;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
  * Takes a screenshot with in properties stored dimensions around the gaze point 
@@ -160,6 +162,12 @@ public class FixationEvaluator {
         graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
         
         // write the image
-        Tools.writeImage(this.screenShot, this.timestamp + "_screenshot.png");        
+        try {
+            File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + this.timestamp + "_screenshot.png");
+            outputfile.mkdirs();
+            ImageIO.write(this.screenShot, "png", outputfile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
