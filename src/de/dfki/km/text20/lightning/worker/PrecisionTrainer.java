@@ -28,9 +28,11 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
  * The precision trainer is used in trainings mode. Here the collected data is handeled.
@@ -133,6 +135,12 @@ public class PrecisionTrainer {
         graphic.fillOval(this.offset.x + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + MainClass.getInstance().getProperties().getDimension() / 2, 10, 10);
 
         // write the image
-        Tools.writeImage(screenShot, this.timestamp + "_training.png");
+        try {
+            File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + this.timestamp + "_training.png");
+            outputfile.mkdirs();
+            ImageIO.write(screenShot, "png", outputfile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

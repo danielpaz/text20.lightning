@@ -30,7 +30,7 @@ import java.io.Serializable;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
-import de.dfki.km.text20.lightning.tools.HotkeyContainer;
+import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 
 /**
  * stores configurations, write them to a file on exit and tries to load them on startup 
