@@ -27,33 +27,52 @@ import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.WarpPluginInformation;
-import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
+ * Simple version of mouse warper which checks angle between mouse-move-vector and start of movement to fixation,
+ * distance from start to endpoint of movement, duration of movement and how close is the cursor to the fixation.
+ * If all premises are fulfilled the cursor is moved to the fixation point 
+ * (with the distance of setR to the startpoint of movement).
+ * 
  * @author Christoph Käding
  *
  */
 @PluginImplementation
 public class SimpleWarper implements MouseWarper {
 
+    /** threshold for the angle */
     private int angleThres;
 
+    /** threshold for the distance */
     private int distanceThres;
 
+    /** threshold for the duration */
     private long durationThres;
 
+    /** radius around the fixation within the mouse cursor won't be moved */
     private int homeR;
 
+    /** 
+     * Distance from the fixation to the point where the cursor will be set.
+     * This is used to allow the user to move the mouse by himself to the target.
+     */
     private int setR;
 
-    private long currentTimeStamp;
+    /** time stamp */
+    private long timeStamp;
 
+    /** a list of all mouseposition within the durationThreshold */
     private TreeMap<Long, Point> mousePositions;
 
+    /** last fixation */
     private Point fixation;
 
+    /** necessary to move the mouse */
     private Robot robot;
 
+    /**
+     * creates a new SimpleWarper and initializes some variables
+     */
     public SimpleWarper() {
         this.angleThres = 0;
         this.distanceThres = 0;
@@ -99,10 +118,10 @@ public class SimpleWarper implements MouseWarper {
     public void addMousePosition(Point position) {
 
         // timestamp
-        this.currentTimeStamp = System.currentTimeMillis();
+        this.timeStamp = System.currentTimeMillis();
 
         // add to map
-        this.mousePositions.put(this.currentTimeStamp, position);
+        this.mousePositions.put(this.timeStamp, position);
 
         // check if fixation is placed
         if (this.fixation == null) return;
@@ -136,11 +155,12 @@ public class SimpleWarper implements MouseWarper {
     }
 
     /**
-     * cartesian
+     * Calculates the angle between mouse-move-vector and start of movement to fixation.
+     * This calculation is threaded like it is placed in a cartesian coordinate system.
      * 
-     * @param start
-     * @param stop
-     * @return
+     * @param start point
+     * @param stop point
+     * @return the angle
      */
     private double calculateAngle(Point start, Point stop) {
         // angle in radian measure between x-axis and moving vector of the mouse
@@ -156,7 +176,8 @@ public class SimpleWarper implements MouseWarper {
     }
 
     /**
-     * screen
+     * Moves the fixation point in direction to the mouse vector. The distance is given by setR.
+     * The coordinate system is the screen coordinate system.
      */
     private void calculateSetPoint() {
         // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point

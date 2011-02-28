@@ -24,11 +24,14 @@
  */
 package de.dfki.km.text20.lightning.gui;
 
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,9 +41,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -55,7 +60,7 @@ import de.dfki.km.text20.lightning.tools.HotkeyContainer;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
- * Here are all the things shown, which are important an should be changeable.
+ * Here are all the things shown, which are important and should be changeable.
  * 
  * @author Christoph Käding
  */
@@ -219,6 +224,7 @@ public class ConfigWindow extends JFrame {
         this.spinnerDuration.setEnabled(this.checkBoxUseWarp.isSelected());
         this.spinnerHomeRadius.setEnabled(this.checkBoxUseWarp.isSelected());
         this.spinnerSetRadius.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.comboBoxWarpMethod.setEnabled(this.checkBoxUseWarp.isSelected());
     }
 
     /**

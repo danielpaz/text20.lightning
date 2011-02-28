@@ -26,8 +26,6 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 
-import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
-
 /**
  * The icon which is shown in the system tray.
  * 

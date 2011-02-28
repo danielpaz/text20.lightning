@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.tools.Tools;
 
 /**

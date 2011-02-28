@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
  * A singleton of the menu which is shown by a click on the tray icon.

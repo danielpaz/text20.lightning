@@ -22,15 +22,11 @@
 package de.dfki.km.text20.lightning.worker;
 
 import java.awt.MouseInfo;
-import java.awt.Point;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.tools.Hotkey;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
