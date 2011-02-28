@@ -30,7 +30,6 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.tools.Tools;
 
 /**
