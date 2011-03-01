@@ -28,6 +28,8 @@ import java.net.URISyntaxException;
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
+import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
+import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEvent;

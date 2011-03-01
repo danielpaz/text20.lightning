@@ -57,6 +57,7 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.plugins.training.Trainer;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
@@ -98,7 +99,11 @@ public class ConfigWindow extends JFrame {
         this.spinnerDimension.setValue(MainClass.getInstance().getProperties().getDimension());
         this.textFieldOutputPath.setText(MainClass.getInstance().getProperties().getOutputPath());
 
+        // initialize renderer of comboboxes
+        this.renderer = initRenderer();
+
         // manage comboboxes
+        this.manageTrainerComboBox();
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
 
@@ -145,11 +150,25 @@ public class ConfigWindow extends JFrame {
     }
 
     /**
+     * manages content of trainer combobox
+     */
+    private void manageTrainerComboBox() {
+        // add alls trainer to combobox
+        for (Trainer trainer : this.internalPluginManager.getTrainer()) 
+            this.comboBoxLearnMethod.addItem(trainer);
+
+        // preselect current trainer
+        if (this.internalPluginManager.getCurrentTrainer() != null)
+            this.comboBoxLearnMethod.setSelectedItem(this.internalPluginManager.getCurrentTrainer());
+
+        // set renderer
+        this.comboBoxLearnMethod.setRenderer(this.renderer);
+    }
+
+    /**
      * Takes the list of available plugins and shows them in the combobox.
      */
     private void manageComboBoxSaliencyDetector() {
-        this.autoSelect = true;
-
         // add all saliency detectors to the combobox
         for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
             this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i));
@@ -159,23 +178,8 @@ public class ConfigWindow extends JFrame {
         if (this.internalPluginManager.getCurrentSaliencyDetector() != null)
             this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector());
 
-        // the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
-        // TODO: change that only a kind of identifier is added to the combobox
-        this.comboBoxSearchMethod.setRenderer(new DefaultListCellRenderer() {
-
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value,
-                                                          int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof SaliencyDetector) {
-                    setText(((SaliencyDetector) value).getInformation().displayName);
-                }
-                return this;
-            }
-        });
-
-        this.autoSelect = false;
+        // set renderer
+        this.comboBoxSearchMethod.setRenderer(this.renderer);
     }
 
     /**
@@ -194,24 +198,46 @@ public class ConfigWindow extends JFrame {
         for (MouseWarper warper : this.internalPluginManager.getMouseWarpers())
             this.comboBoxWarpMethod.addItem(warper);
 
-        // the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+        // preselect current mouse warper
+        if (this.internalPluginManager.getCurrentMouseWarper() != null)
+            this.comboBoxWarpMethod.setSelectedItem(this.internalPluginManager.getCurrentMouseWarper());
+
+        // set renderer
+        this.comboBoxWarpMethod.setRenderer(this.renderer);
+
+        // set enabled
+        this.enableWarpConfig();
+    }
+
+    /**
+     * the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * 
+     * @return a changed default renderer
+     */
+    private DefaultListCellRenderer initRenderer() {
         // TODO: change that only a kind of identifier is added to the combobox
-        this.comboBoxWarpMethod.setRenderer(new DefaultListCellRenderer() {
+        return new DefaultListCellRenderer() {
 
             @Override
             public Component getListCellRendererComponent(JList list, Object value,
                                                           int index, boolean isSelected,
                                                           boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                
+                // set new displayed attribute
                 if (value instanceof MouseWarper) {
                     setText(((MouseWarper) value).getInformation().displayName);
                 }
+                if (value instanceof Trainer) {
+                    setText(((Trainer) value).getInformation().displayName);
+                }
+                if (value instanceof SaliencyDetector) {
+                    setText(((SaliencyDetector) value).getInformation().displayName);
+                }
+                
                 return this;
             }
-        });
-
-        // set enabled
-        this.enableWarpConfig();
+        };
     }
 
     /**
@@ -253,6 +279,8 @@ public class ConfigWindow extends JFrame {
 
         // TODO: do these also in properties, see MethodManager class
         this.internalPluginManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
+        this.internalPluginManager.setCurrentMouseWarper((MouseWarper) this.comboBoxWarpMethod.getSelectedItem());
+        this.internalPluginManager.setCurrentTrainer((Trainer) this.comboBoxLearnMethod.getSelectedItem());
 
         // TODO: maybe do this on a other place
         this.internalPluginManager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
@@ -392,7 +420,9 @@ public class ConfigWindow extends JFrame {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)", "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
+                contentPanel.setLayout(new FormLayout(
+                    "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)",
+                    "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("Show Images");
@@ -452,6 +482,9 @@ public class ConfigWindow extends JFrame {
                 //---- label10 ----
                 label10.setText("Distance Threshold");
                 contentPanel.add(label10, cc.xywh(11, 7, 3, 1));
+
+                //---- spinnerDistance ----
+                spinnerDistance.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
                 contentPanel.add(spinnerDistance, cc.xywh(15, 7, 3, 1));
 
                 //---- label5 ----
@@ -470,12 +503,18 @@ public class ConfigWindow extends JFrame {
                 //---- label11 ----
                 label11.setText("Duration Threshold");
                 contentPanel.add(label11, cc.xywh(11, 9, 3, 1));
+
+                //---- spinnerDuration ----
+                spinnerDuration.setModel(new SpinnerNumberModel(300, 300, 2147483647, 100));
                 contentPanel.add(spinnerDuration, cc.xywh(15, 9, 3, 1));
                 contentPanel.add(separator3, cc.xywh(1, 11, 7, 1));
 
                 //---- label12 ----
                 label12.setText("Home Radius");
                 contentPanel.add(label12, cc.xywh(11, 11, 3, 1));
+
+                //---- spinnerHomeRadius ----
+                spinnerHomeRadius.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
                 contentPanel.add(spinnerHomeRadius, cc.xywh(15, 11, 3, 1));
 
                 //---- label2 ----
@@ -492,7 +531,7 @@ public class ConfigWindow extends JFrame {
                 contentPanel.add(label13, cc.xywh(11, 13, 3, 1));
 
                 //---- spinnerSetRadius ----
-                spinnerSetRadius.setModel(new SpinnerNumberModel(20, null, null, 1));
+                spinnerSetRadius.setModel(new SpinnerNumberModel(20, 0, 2147483647, 1));
                 contentPanel.add(spinnerSetRadius, cc.xywh(15, 13, 3, 1));
 
                 //---- label4 ----
@@ -623,4 +662,7 @@ public class ConfigWindow extends JFrame {
 
     /** The method manager is needed to display and change the available plugins. */
     private InternalPluginManager internalPluginManager;
+
+    /** renderer to show displaynames in comboboxes */
+    private DefaultListCellRenderer renderer;
 }

@@ -1,7 +1,7 @@
 /*
  * SaliencyPluginInformation.java
  * 
- * Copyright (c) 2011, Christoph Käding All rights reserved.
+ * Copyright (c) 2011, Ralf Biedert All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -25,14 +25,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp;
+package de.dfki.km.text20.lightning.plugins;
 
 /**
- * Provides information about the given warper.
+ * Provides information about the given filter.
  * 
- * @author Christoph Käding
+ * @author Ralf Biedert
  */
-public class WarpPluginInformation {
-    /** The name to display in the interface for this warper */
+public class PluginInformation {
+    /** The name to display in the interface for this filter */
     public String displayName;
 }

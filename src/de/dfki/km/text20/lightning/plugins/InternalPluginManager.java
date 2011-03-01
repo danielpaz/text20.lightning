@@ -31,6 +31,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper.SimpleWar
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
 import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
+import de.dfki.km.text20.lightning.plugins.training.Trainer;
 
 /**
  * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
@@ -39,21 +40,26 @@ import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel
  */
 public class InternalPluginManager {
 
-    
     /** utility which can create a list of all available plugins */
     private PluginManagerUtil pluginManagerUtil;
-    
+
     /** current elected saliency detector */
     private SaliencyDetector currentSaliencyDetector;
-    
+
     /** a list of all saliency detectors*/
     private ArrayList<SaliencyDetector> saliencyDetectors;
-    
+
     /** a list of all mouse warpers*/
     private ArrayList<MouseWarper> mouseWarpers;
-    
+
     /** current elected mouse warper */
     private MouseWarper currentMouseWarper;
+
+    /** current used trainings method */
+    private Trainer currentTrainer;
+
+    /** list of all available trainings methods */
+    private ArrayList<Trainer> trainer;
 
     /**
      * creates a new MethodManager object and loads plugins
@@ -62,14 +68,19 @@ public class InternalPluginManager {
      */
     //TODO: store current plugin in properties
     public InternalPluginManager(PluginManager manager) {
-               
+
+        // initialize plugin lists
         this.pluginManagerUtil = new PluginManagerUtil(manager);
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
         this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
-        
+        this.trainer = new ArrayList<Trainer>(this.pluginManagerUtil.getPlugins(Trainer.class));
+
         // TODO: get this from properties
-        this.currentSaliencyDetector = this.saliencyDetectors.get(0);
-        this.currentMouseWarper = this.mouseWarpers.get(0);
+        if (this.saliencyDetectors.size() > 0)
+            this.currentSaliencyDetector = this.saliencyDetectors.get(0);
+        if (this.mouseWarpers.size() > 0)
+            this.currentMouseWarper = this.mouseWarpers.get(0);
+        if (this.trainer.size() > 0) this.currentTrainer = this.trainer.get(0);
     }
 
     /**
@@ -98,7 +109,7 @@ public class InternalPluginManager {
     public void setCurrentSaliencyDetector(SaliencyDetector choice) {
         this.currentSaliencyDetector = choice;
     }
-    
+
     /**
      * gives the current mouse warping method back
      * 
@@ -124,5 +135,32 @@ public class InternalPluginManager {
      */
     public void setCurrentMouseWarper(MouseWarper choice) {
         this.currentMouseWarper = choice;
+    }
+
+    /**
+     * Returns a ArrayList of all the given plugins for training.
+     * 
+     * @return saliencyDetectors
+     */
+    public ArrayList<Trainer> getTrainer() {
+        return this.trainer;
+    }
+
+    /**
+     * Changes the active plugin to change the used method.
+     * 
+     * @param choice
+     */
+    public void setCurrentTrainer(Trainer choice) {
+        this.currentTrainer = choice;
+    }
+
+    /**
+     * gives the current trainings method back
+     * 
+     * @return currentSaliencyDetector
+     */
+    public Trainer getCurrentTrainer() {
+        return this.currentTrainer;
     }
 }

@@ -427,6 +427,15 @@
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
             <string>javax.swing.JSpinner</string> 
+            <void method="setProperty"> 
+             <string>model</string> 
+             <object class="javax.swing.SpinnerNumberModel"> 
+              <int>0</int> 
+              <int>0</int> 
+              <int>2147483647</int> 
+              <int>1</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>spinnerDistance</string> 
             </void> 
@@ -531,6 +540,15 @@
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
             <string>javax.swing.JSpinner</string> 
+            <void method="setProperty"> 
+             <string>model</string> 
+             <object class="javax.swing.SpinnerNumberModel"> 
+              <int>300</int> 
+              <int>300</int> 
+              <int>2147483647</int> 
+              <int>100</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>spinnerDuration</string> 
             </void> 
@@ -600,6 +618,15 @@
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
             <string>javax.swing.JSpinner</string> 
+            <void method="setProperty"> 
+             <string>model</string> 
+             <object class="javax.swing.SpinnerNumberModel"> 
+              <int>0</int> 
+              <int>0</int> 
+              <int>2147483647</int> 
+              <int>1</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>spinnerHomeRadius</string> 
             </void> 
@@ -712,9 +739,10 @@
             <void method="setProperty"> 
              <string>model</string> 
              <object class="javax.swing.SpinnerNumberModel"> 
-              <void property="value"> 
-               <int>20</int> 
-              </void> 
+              <int>20</int> 
+              <int>0</int> 
+              <int>2147483647</int> 
+              <int>1</int> 
              </object> 
             </void> 
             <void property="name"> 

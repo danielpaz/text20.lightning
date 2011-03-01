@@ -25,8 +25,8 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.plugins.saliency.SaliencyPluginInformation;
 
 /**
  * Simple implementation of the algorithm to search sth. interesting around the provided point on the screen.
@@ -60,6 +60,7 @@ public class SimpleSobel implements SaliencyDetector {
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#analyse(java.awt.image.BufferedImage)
      */
+    // TODO: add comments
     @Override
     public Point analyse(BufferedImage screenShot) {
         int direction = 0;
@@ -123,8 +124,8 @@ public class SimpleSobel implements SaliencyDetector {
      * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#getInformation()
      */
     @Override
-    public SaliencyPluginInformation getInformation() {
-        final SaliencyPluginInformation information = new SaliencyPluginInformation();
+    public PluginInformation getInformation() {
+        final PluginInformation information = new PluginInformation();
         information.displayName = "Simple Sobel";
         
         return information;

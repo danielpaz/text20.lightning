@@ -1,6 +1,6 @@
 /*
- * SaliencyDetector.java
- *
+ * Trainer.java
+ * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -17,9 +17,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *
  */
-package de.dfki.km.text20.lightning.plugins.saliency;
+package de.dfki.km.text20.lightning.plugins.training;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -28,24 +27,15 @@ import net.xeoh.plugins.base.Plugin;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
- * Interface for different algorithms for screen analyzing.
- * 
  * @author Christoph Käding
+ *
  */
-public interface SaliencyDetector extends Plugin {
+// TODO: add comments
+public interface Trainer extends Plugin {
 
-    /**
-     * Analyzes the given processed screenshot and calculates an offset which is added to the fixation point.
-     * 
-     * @param derivatedScreenShot
-     * @return offset of the next position which is realized as the real target
-     */
-    public Point analyse(BufferedImage derivatedScreenShot);
-
-    /**
-     * Returns some information about the plugin.
-     * 
-     * @return saliency plugin informations
-     */
+    public void setFixation(BufferedImage screenShot);
+    
+    public void setTarget(Point target);
+    
     public PluginInformation getInformation();
 }

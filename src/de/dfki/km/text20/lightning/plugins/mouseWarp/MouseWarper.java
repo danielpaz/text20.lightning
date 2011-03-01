@@ -23,6 +23,7 @@ package de.dfki.km.text20.lightning.plugins.mouseWarp;
 import java.awt.Point;
 
 import net.xeoh.plugins.base.Plugin;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
  * @author Christoph Käding
@@ -62,5 +63,5 @@ public interface MouseWarper extends Plugin {
      * 
      * @return information
      */
-    public WarpPluginInformation getInformation();
+    public PluginInformation getInformation();
 }

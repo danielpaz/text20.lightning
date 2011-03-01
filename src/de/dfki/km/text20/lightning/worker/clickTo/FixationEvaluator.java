@@ -19,7 +19,7 @@
  * MA 02110-1301  USA
  *
  */
-package de.dfki.km.text20.lightning.worker;
+package de.dfki.km.text20.lightning.worker.clickTo;
 
 import java.awt.AWTException;
 import java.awt.Color;
