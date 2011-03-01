@@ -50,25 +50,25 @@ public class FixationEvaluator {
 
     /** Point of fixation which is provided by the eyetracker */
     private Point fixation;
-    
+
     /** previous mouse position */
     private Point location;
-    
+
     /** calculated offset from fixation point to processed target */
     private Point offset;
-    
+
     /** robot for mouse movement and clicking, creating screenshots*/
     private Robot robot;
-    
+
     /** converter to color the screenshot in grayscale */
     private ColorConvertOp colorConverterGray;
-    
+
     /** converter to recolor the screenshot in rgb */
     private ColorConvertOp colorConverterRGB;
-    
+
     /** current time */
     private long timestamp;
-    
+
     /** */
     private BufferedImage screenShot;
 
@@ -78,7 +78,7 @@ public class FixationEvaluator {
      * @param manager
      */
     public FixationEvaluator() {
-        
+
         // initialize variables
         this.colorConverterGray = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         this.colorConverterRGB = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_sRGB), null);
@@ -107,7 +107,7 @@ public class FixationEvaluator {
      * At the end a mouseclick were taken to the calculated point.
      */
     public void evaluateLocation() {
-        
+
         // store current mouse position to reset is later 
         this.location = MouseInfo.getPointerInfo().getLocation();
 
@@ -120,7 +120,8 @@ public class FixationEvaluator {
         this.timestamp = System.currentTimeMillis();
 
         // use plugin to calculate offset
-        this.offset = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().analyse(this.screenShot);
+        if (MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector() != null)
+            this.offset = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().analyse(this.screenShot);
 
         if (MainClass.getInstance().getProperties().isShowImages()) {
             // draw images of the current evaluation to the outputpath
@@ -146,21 +147,21 @@ public class FixationEvaluator {
         // recolor the screenshot
         this.screenShot = this.colorConverterRGB.filter(this.screenShot, null);
         Graphics2D graphic = this.screenShot.createGraphics();
-        
+
         // visualize provided target
         graphic.setColor(new Color(255, 255, 0, 255));
         graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
         graphic.drawChars(("catched position").toCharArray(), 0, 16, 3, 10);
         graphic.setColor(new Color(255, 255, 0, 64));
         graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-        
+
         // visualize calculated target
         graphic.setColor(new Color(255, 0, 0, 255));
         graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
         graphic.drawChars(("calculated position").toCharArray(), 0, 19, 3, 25);
         graphic.setColor(new Color(255, 0, 0, 64));
         graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
-        
+
         // write the image
         try {
             File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + this.timestamp + "_screenshot.png");

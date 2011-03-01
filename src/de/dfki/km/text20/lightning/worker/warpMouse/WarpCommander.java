@@ -61,7 +61,8 @@ public class WarpCommander {
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
-                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
+                if (MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null)
+                    MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
             }
         });
     }
