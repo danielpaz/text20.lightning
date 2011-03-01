@@ -196,8 +196,7 @@ public class SimpleWarper implements MouseWarper {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Simple Warper";
+        final PluginInformation information = new PluginInformation("Simple Warper","Simple Warper");
         
         return information;
     }

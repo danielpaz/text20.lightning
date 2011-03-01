@@ -68,8 +68,7 @@ public class FakeWarper implements MouseWarper {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Fake Warper";
+        final PluginInformation information = new PluginInformation("Fake Warper","Fake Warper");
         
         return information;
     }

@@ -140,23 +140,29 @@ public class Properties implements Serializable {
 
         // if reading was not successful or properties file was not found
         if (!status) {
-
-            // set default values
-            this.showImages = false;
-            this.dimension = 100;
-            this.outputPath = "./output";
-            this.actionHotkey = null;
-            this.statusHotkey = null;
-            this.angleThreshold = 10;
-            this.distanceThreshold = 200;
-            this.durationThreshold = 1000;
-            this.homeRadius = 200;
-            this.setRadius = 20;
-            this.useWarp = true;
+            this.restoreDefault();
             System.out.println("Properties file was not found.");
         }
     }
 
+    /**
+     * restores default values
+     */
+    public void restoreDefault() {        
+        // set default values
+        this.showImages = false;
+        this.dimension = 100;
+        this.outputPath = "./output";
+        this.actionHotkey = null;
+        this.statusHotkey = null;
+        this.angleThreshold = 10;
+        this.distanceThreshold = 200;
+        this.durationThreshold = 1000;
+        this.homeRadius = 200;
+        this.setRadius = 20;
+        this.useWarp = true;
+    }
+    
     /**
      * indicates if images should be shown
      * 

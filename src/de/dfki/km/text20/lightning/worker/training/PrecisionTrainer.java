@@ -24,7 +24,6 @@ package de.dfki.km.text20.lightning.worker.training;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -41,8 +40,6 @@ import de.dfki.km.text20.lightning.MainClass;
  * @author Christoph Käding
  *
  */
-//TODO: do sth with the trainingsdata
-//TODO: use plugin for trainings method
 public class PrecisionTrainer {
 
     /** last fixation point */
@@ -116,7 +113,7 @@ public class PrecisionTrainer {
         }
         
         // update logfile
-        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension());
+        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + MainClass.getInstance().getInternalPluginManager().getCurrentTrainer().getInformation().getDisplayName());
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
     }
@@ -153,17 +150,8 @@ public class PrecisionTrainer {
         }
     }
 
+    // TODO: rename and show shaped window
     private void doSth() {
-        System.out.println("called");
-        if (AWTUtilitiesWrapper.isTranslucencySupported(AWTUtilitiesWrapper.TRANSLUCENT))
-            return;
-        System.out.println("translucent");
-        if (AWTUtilitiesWrapper.isTranslucencySupported(AWTUtilitiesWrapper.PERPIXEL_TRANSLUCENT))
-            return;
-        System.out.println("perpixel");
-        if (AWTUtilitiesWrapper.isTranslucencyCapable(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()))
-            return;
-        System.out.println("graphicsconfig");
         
     }
 }
