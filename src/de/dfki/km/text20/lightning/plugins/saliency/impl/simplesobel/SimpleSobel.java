@@ -43,7 +43,7 @@ public class SimpleSobel implements SaliencyDetector {
      * All the other ones will be colored black.
      */
     private BufferedImage derivate(BufferedImage screenShot) {
-        
+
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 
         // Go through each pixel position in the derivate image ... 
@@ -65,7 +65,7 @@ public class SimpleSobel implements SaliencyDetector {
     public Point analyse(BufferedImage screenShot) {
         int direction = 0;
         int size = 1;
-        
+
         //encoding for direction:
         // 0 = down
         // 1 = left
@@ -74,7 +74,7 @@ public class SimpleSobel implements SaliencyDetector {
         final BufferedImage derivatedScreenShot = derivate(screenShot);
         final Point point = new Point(derivatedScreenShot.getHeight() / 2, derivatedScreenShot.getHeight() / 2);
         final Point offset = new Point(0, 0);
-        
+
         while ((size < derivatedScreenShot.getHeight()) && (Math.abs(offset.x) < derivatedScreenShot.getHeight() / 2) && (Math.abs(offset.y) < derivatedScreenShot.getHeight() / 2)) {
             switch (direction) {
             case 0:
@@ -125,10 +125,9 @@ public class SimpleSobel implements SaliencyDetector {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Simple Sobel";
-        
+        final PluginInformation information = new PluginInformation("Simple Sobel", "Simple Sobel");
+
         return information;
     }
-    
+
 }

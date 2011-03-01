@@ -107,8 +107,8 @@ public class FixationCatcher {
                             // if the tool is activated and in normal mode, fixations will be stored 
                             fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
 
-                            // TODO: placeholder
-                            if (MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null)
+                            // add fixation to mouse warpe
+                            if ((MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null) && MainClass.getInstance().getProperties().isUseWarp())
                                 MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
                         }
 

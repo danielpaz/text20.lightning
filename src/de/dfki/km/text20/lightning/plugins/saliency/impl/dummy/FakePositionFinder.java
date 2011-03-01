@@ -57,8 +57,8 @@ public class FakePositionFinder implements SaliencyDetector {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Dummy Filter (returns always 0,0)";
+        final PluginInformation information = new PluginInformation("Dummy Filter","returns always 0,0");
+
         return information;
     }
 }

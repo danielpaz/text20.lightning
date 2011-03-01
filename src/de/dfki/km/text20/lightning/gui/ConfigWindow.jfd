@@ -226,6 +226,10 @@
              <string>text</string> 
              <string>Enable Mouse Warp</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Enables/Disables the mouse warp permanently.</string> 
+            </void> 
             <void property="name"> 
              <string>label15</string> 
             </void> 
@@ -276,6 +280,10 @@
              <string>text</string> 
              <string>Warp Method</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Method which is used to warp the mouse.</string> 
+            </void> 
             <void property="name"> 
              <string>label8</string> 
             </void> 
@@ -325,6 +333,10 @@
             <void method="setProperty"> 
              <string>text</string> 
              <string>Angle Threshold</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>If you move your mouse to your fixation point, you must do this in an angle within this threshold to activate the mouse warp. The lower this value the more exact you must move your mouse.</string> 
             </void> 
             <void property="name"> 
              <string>label9</string> 
@@ -404,6 +416,10 @@
              <string>text</string> 
              <string>Distance Threshold</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>If you move your mouse to your fixation point, you must move minimal this way in pixels to activate the mouse warp. The higher this value the more pixels you have to pass. This means you have to move faster.</string> 
+            </void> 
             <void property="name"> 
              <string>label10</string> 
             </void> 
@@ -463,6 +479,10 @@
              <string>text</string> 
              <string>Status Hotkey</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Enables/Disables the hotkeys and the mousewarp.</string> 
+            </void> 
             <void property="name"> 
              <string>label5</string> 
             </void> 
@@ -516,6 +536,10 @@
             <void method="setProperty"> 
              <string>text</string> 
              <string>Duration Threshold</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>If you move your mouse to your fixation point, you must move minimal this time in ms to activate the mouse warp. The higher this value the more exact the calculation can be done and the mouse only warps when you really want it.</string> 
             </void> 
             <void property="name"> 
              <string>label11</string> 
@@ -595,6 +619,10 @@
              <string>text</string> 
              <string>Home Radius</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>If you move your mouse to your fixation point and your cursor is within this radius, your mousecursor will not be warped.</string> 
+            </void> 
             <void property="name"> 
              <string>label12</string> 
             </void> 
@@ -654,6 +682,10 @@
              <string>text</string> 
              <string>Dimension</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Radius around the fixation point which is checked for something interesting to click on.</string> 
+            </void> 
             <void property="name"> 
              <string>label2</string> 
             </void> 
@@ -711,7 +743,7 @@
             </void> 
             <void method="setProperty"> 
              <string>toolTipText</string> 
-             <string>sdfgsd,g</string> 
+             <string>If you move your mouse to your fixation point and your mouse warp is activated, it will be set in the choosed distance from the fixation point to allow you to stop the movement by yourself.</string> 
             </void> 
             <void property="name"> 
              <string>label13</string> 
@@ -772,6 +804,10 @@
              <string>text</string> 
              <string>Action Hotkey</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Hotkey to click where you are looking at.</string> 
+            </void> 
             <void property="name"> 
              <string>label4</string> 
             </void> 
@@ -826,6 +862,10 @@
              <string>text</string> 
              <string>Search Method</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Method to check the radius around the fixation point.</string> 
+            </void> 
             <void property="name"> 
              <string>label6</string> 
             </void> 
@@ -875,10 +915,84 @@
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <string>Default</string> 
+            </void> 
+            <void property="name"> 
+             <string>buttonDefault</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>buttonDefaultActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridX</string> 
+             <int>11</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>17</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridWidth</string> 
+             <int>3</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <string>Submit</string> 
+            </void> 
+            <void property="name"> 
+             <string>buttonSubmit</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>buttonSubmitActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridX</string> 
+             <int>15</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>17</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridWidth</string> 
+             <int>3</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
              <string>Learn Method</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Method which is used in the trainings mode.</string> 
             </void> 
             <void property="name"> 
              <string>label7</string> 

@@ -35,17 +35,6 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
 public class SimpleTrainer implements Trainer {
 
     /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#getInformation()
-     */
-    @Override
-    public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Simple Trainer";
-        
-        return information;
-    }
-
-    /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.awt.image.BufferedImage, java.awt.Point)
      */
     @Override
@@ -59,7 +48,16 @@ public class SimpleTrainer implements Trainer {
     @Override
     public void leaveTraining() {
         // TODO Auto-generated method stub
-        
+
     }
 
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#getInformation()
+     */
+    @Override
+    public PluginInformation getInformation() {
+        final PluginInformation information = new PluginInformation("Simple Trainer", "Simple Trainer");
+
+        return information;
+    }
 }

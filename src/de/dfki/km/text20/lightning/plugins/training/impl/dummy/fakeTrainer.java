@@ -32,18 +32,7 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
  *
  */
 @PluginImplementation
-public class fakeTrainer implements Trainer{
-
-    /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#getInformation()
-     */
-    @Override
-    public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation();
-        information.displayName = "Fake Trainer";
-        
-        return information;
-    }
+public class fakeTrainer implements Trainer {
 
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.awt.image.BufferedImage, java.awt.Point)
@@ -51,7 +40,7 @@ public class fakeTrainer implements Trainer{
     @Override
     public void setStep(BufferedImage screenShot, Point target) {
         // TODO Auto-generated method stub
-        
+
     }
 
     /* (non-Javadoc)
@@ -60,7 +49,16 @@ public class fakeTrainer implements Trainer{
     @Override
     public void leaveTraining() {
         // TODO Auto-generated method stub
-        
+
     }
 
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#getInformation()
+     */
+    @Override
+    public PluginInformation getInformation() {
+        final PluginInformation information = new PluginInformation("Fake Trainer", "Fake Trainer");
+
+        return information;
+    }
 }

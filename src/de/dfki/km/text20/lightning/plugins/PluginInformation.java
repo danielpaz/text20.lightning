@@ -27,12 +27,42 @@
  */
 package de.dfki.km.text20.lightning.plugins;
 
+
 /**
  * Provides information about the given filter.
  * 
  * @author Ralf Biedert
  */
 public class PluginInformation {
+    
     /** The name to display in the interface for this filter */
-    public String displayName;
+    private String displayName;
+    
+    /** The description of the method. */
+    private String toolTip;
+    
+    /**
+     * creates new information object
+     * 
+     * @param name
+     * @param description
+     */
+    public PluginInformation(String name, String description){
+        this.displayName = name;
+        this.toolTip = description;
+    }
+
+    /**
+     * @return the displayName
+     */
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    /**
+     * @return the toolTip
+     */
+    public String getToolTip() {
+        return this.toolTip;
+    } 
 }

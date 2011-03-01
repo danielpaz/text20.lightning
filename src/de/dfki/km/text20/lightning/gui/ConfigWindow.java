@@ -154,7 +154,7 @@ public class ConfigWindow extends JFrame {
      */
     private void manageTrainerComboBox() {
         // add alls trainer to combobox
-        for (Trainer trainer : this.internalPluginManager.getTrainer()) 
+        for (Trainer trainer : this.internalPluginManager.getTrainer())
             this.comboBoxLearnMethod.addItem(trainer);
 
         // preselect current trainer
@@ -223,18 +223,23 @@ public class ConfigWindow extends JFrame {
                                                           int index, boolean isSelected,
                                                           boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                
+
                 // set new displayed attribute
                 if (value instanceof MouseWarper) {
-                    setText(((MouseWarper) value).getInformation().displayName);
-                }
-                if (value instanceof Trainer) {
-                    setText(((Trainer) value).getInformation().displayName);
-                }
-                if (value instanceof SaliencyDetector) {
-                    setText(((SaliencyDetector) value).getInformation().displayName);
+                    setText(((MouseWarper) value).getInformation().getDisplayName());
+                    setToolTipText(((MouseWarper) value).getInformation().getToolTip());
                 }
                 
+                if (value instanceof Trainer) {
+                    setText(((Trainer) value).getInformation().getDisplayName());
+                    setToolTipText(((Trainer) value).getInformation().getToolTip());
+                }
+                
+                if (value instanceof SaliencyDetector) {
+                    setText(((SaliencyDetector) value).getInformation().getDisplayName());
+                    setToolTipText(((SaliencyDetector) value).getInformation().getToolTip());
+                }
+
                 return this;
             }
         };
@@ -362,6 +367,38 @@ public class ConfigWindow extends JFrame {
     }
 
     /**
+     * restores default values
+     * 
+     * @param e
+     */
+    private void buttonDefaultActionPerformed(ActionEvent e) {
+        // restore default values 
+        MainClass.getInstance().getProperties().restoreDefault();
+
+        // take values of global properties and preselect them
+        this.checkBoxShowPictures.setSelected(MainClass.getInstance().getProperties().isShowImages());
+        this.spinnerDimension.setValue(MainClass.getInstance().getProperties().getDimension());
+        this.textFieldOutputPath.setText(MainClass.getInstance().getProperties().getOutputPath());
+
+        // manage comboboxes
+        this.manageTrainerComboBox();
+        this.manageHotkeyComboBox();
+        this.manageComboBoxSaliencyDetector();
+
+        // manage warp config
+        this.manageWarpConfig();
+    }
+
+    /**
+     * TODO: upload statistics
+     * 
+     * @param e
+     */
+    private void buttonSubmitActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
+    /**
      * auto generated code, initializes gui components
      */
     private void initComponents() {
@@ -400,6 +437,8 @@ public class ConfigWindow extends JFrame {
         comboBoxActionHotkey = new JComboBox();
         label6 = new JLabel();
         comboBoxSearchMethod = new JComboBox();
+        buttonDefault = new JButton();
+        buttonSubmit = new JButton();
         label7 = new JLabel();
         comboBoxLearnMethod = new JComboBox();
         buttonOK = new JButton();
@@ -420,9 +459,7 @@ public class ConfigWindow extends JFrame {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout(
-                    "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)",
-                    "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
+                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)", "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("Show Images");
@@ -454,6 +491,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label15 ----
                 label15.setText("Enable Mouse Warp");
+                label15.setToolTipText("Enables/Disables the mouse warp permanently.");
                 contentPanel.add(label15, cc.xywh(11, 1, 3, 1));
 
                 //---- checkBoxUseWarp ----
@@ -467,11 +505,13 @@ public class ConfigWindow extends JFrame {
 
                 //---- label8 ----
                 label8.setText("Warp Method");
+                label8.setToolTipText("Method which is used to warp the mouse.");
                 contentPanel.add(label8, cc.xywh(11, 3, 3, 1));
                 contentPanel.add(comboBoxWarpMethod, cc.xywh(15, 3, 3, 1));
 
                 //---- label9 ----
                 label9.setText("Angle Threshold");
+                label9.setToolTipText("If you move your mouse to your fixation point, you must do this in an angle within this threshold to activate the mouse warp. The lower this value the more exact you must move your mouse.");
                 contentPanel.add(label9, cc.xywh(11, 5, 3, 1));
 
                 //---- spinnerAngle ----
@@ -481,6 +521,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label10 ----
                 label10.setText("Distance Threshold");
+                label10.setToolTipText("If you move your mouse to your fixation point, you must move minimal this way in pixels to activate the mouse warp. The higher this value the more pixels you have to pass. This means you have to move faster.");
                 contentPanel.add(label10, cc.xywh(11, 7, 3, 1));
 
                 //---- spinnerDistance ----
@@ -489,6 +530,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label5 ----
                 label5.setText("Status Hotkey");
+                label5.setToolTipText("Enables/Disables the hotkeys and the mousewarp.");
                 contentPanel.add(label5, cc.xywh(1, 9, 3, 1));
 
                 //---- comboBoxStatusHotkey ----
@@ -502,6 +544,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label11 ----
                 label11.setText("Duration Threshold");
+                label11.setToolTipText("If you move your mouse to your fixation point, you must move minimal this time in ms to activate the mouse warp. The higher this value the more exact the calculation can be done and the mouse only warps when you really want it.");
                 contentPanel.add(label11, cc.xywh(11, 9, 3, 1));
 
                 //---- spinnerDuration ----
@@ -511,6 +554,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label12 ----
                 label12.setText("Home Radius");
+                label12.setToolTipText("If you move your mouse to your fixation point and your cursor is within this radius, your mousecursor will not be warped.");
                 contentPanel.add(label12, cc.xywh(11, 11, 3, 1));
 
                 //---- spinnerHomeRadius ----
@@ -519,6 +563,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label2 ----
                 label2.setText("Dimension");
+                label2.setToolTipText("Radius around the fixation point which is checked for something interesting to click on.");
                 contentPanel.add(label2, cc.xywh(1, 13, 3, 1));
 
                 //---- spinnerDimension ----
@@ -527,7 +572,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label13 ----
                 label13.setText("Set Radius");
-                label13.setToolTipText("sdfgsd,g");
+                label13.setToolTipText("If you move your mouse to your fixation point and your mouse warp is activated, it will be set in the choosed distance from the fixation point to allow you to stop the movement by yourself.");
                 contentPanel.add(label13, cc.xywh(11, 13, 3, 1));
 
                 //---- spinnerSetRadius ----
@@ -536,6 +581,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label4 ----
                 label4.setText("Action Hotkey");
+                label4.setToolTipText("Hotkey to click where you are looking at.");
                 contentPanel.add(label4, cc.xywh(1, 15, 3, 1));
 
                 //---- comboBoxActionHotkey ----
@@ -549,6 +595,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- label6 ----
                 label6.setText("Search Method");
+                label6.setToolTipText("Method to check the radius around the fixation point.");
                 contentPanel.add(label6, cc.xywh(1, 17, 3, 1));
 
                 //---- comboBoxSearchMethod ----
@@ -560,8 +607,29 @@ public class ConfigWindow extends JFrame {
                 });
                 contentPanel.add(comboBoxSearchMethod, cc.xywh(5, 17, 3, 1));
 
+                //---- buttonDefault ----
+                buttonDefault.setText("Default");
+                buttonDefault.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        buttonDefaultActionPerformed(e);
+                    }
+                });
+                contentPanel.add(buttonDefault, cc.xywh(11, 17, 3, 1));
+
+                //---- buttonSubmit ----
+                buttonSubmit.setText("Submit");
+                buttonSubmit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        buttonSubmitActionPerformed(e);
+                    }
+                });
+                contentPanel.add(buttonSubmit, cc.xywh(15, 17, 3, 1));
+
                 //---- label7 ----
                 label7.setText("Learn Method");
+                label7.setToolTipText("Method which is used in the trainings mode.");
                 contentPanel.add(label7, cc.xywh(1, 19, 3, 1));
 
                 //---- comboBoxLearnMethod ----
@@ -643,6 +711,8 @@ public class ConfigWindow extends JFrame {
     private JComboBox comboBoxActionHotkey;
     private JLabel label6;
     private JComboBox comboBoxSearchMethod;
+    private JButton buttonDefault;
+    private JButton buttonSubmit;
     private JLabel label7;
     private JComboBox comboBoxLearnMethod;
     private JButton buttonOK;
