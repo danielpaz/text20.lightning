@@ -25,8 +25,8 @@ import java.awt.Robot;
 import java.util.TreeMap;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.WarpPluginInformation;
 
 /**
  * Simple version of mouse warper which checks angle between mouse-move-vector and start of movement to fixation,
@@ -195,8 +195,8 @@ public class SimpleWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
      */
     @Override
-    public WarpPluginInformation getInformation() {
-        final WarpPluginInformation information = new WarpPluginInformation();
+    public PluginInformation getInformation() {
+        final PluginInformation information = new PluginInformation();
         information.displayName = "Simple Warper";
         
         return information;

@@ -18,12 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.fakeWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.dummy;
 
 import java.awt.Point;
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.WarpPluginInformation;
 
 /**
  * doesn't do anything
@@ -31,6 +32,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.WarpPluginInformation;
  * @author Christoph Käding
  *
  */
+@PluginImplementation
 public class FakeWarper implements MouseWarper {
 
     /* (non-Javadoc)
@@ -65,8 +67,8 @@ public class FakeWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
      */
     @Override
-    public WarpPluginInformation getInformation() {
-        final WarpPluginInformation information = new WarpPluginInformation();
+    public PluginInformation getInformation() {
+        final PluginInformation information = new PluginInformation();
         information.displayName = "Fake Warper";
         
         return information;

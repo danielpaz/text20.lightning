@@ -43,9 +43,9 @@ import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
-import de.dfki.km.text20.lightning.worker.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.PrecisionTrainer;
-import de.dfki.km.text20.lightning.worker.WarpCommander;
+import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
+import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
+import de.dfki.km.text20.lightning.worker.warpMouse.WarpCommander;
 
 /**
  * Main entry point.

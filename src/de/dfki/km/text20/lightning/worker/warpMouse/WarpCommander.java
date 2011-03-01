@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.worker;
+package de.dfki.km.text20.lightning.worker.warpMouse;
 
 import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
