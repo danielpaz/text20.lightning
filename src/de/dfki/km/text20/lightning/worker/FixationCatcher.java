@@ -22,8 +22,6 @@
 package de.dfki.km.text20.lightning.worker;
 
 import java.awt.MouseInfo;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
