@@ -256,6 +256,9 @@ public class MainClass {
 
         // deactivate warper
         this.warper.stop();
+        
+        // make the trainer known that the training is over
+        this.internalPluginManager.getCurrentTrainer().leaveTraining();
 
         // deactivate the hotkeys
         if (this.dllStatus) JIntellitype.getInstance().cleanUp();
@@ -301,6 +304,9 @@ public class MainClass {
 
             // shows change in tray and console
             this.showTrayMessage("Modus: normal mode activated");
+            
+            // make the trainer known that the training is over
+            this.internalPluginManager.getCurrentTrainer().leaveTraining();
 
             // change mode
             this.isNormalMode = true;

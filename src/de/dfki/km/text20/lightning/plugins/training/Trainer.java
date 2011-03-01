@@ -33,9 +33,9 @@ import de.dfki.km.text20.lightning.plugins.PluginInformation;
 // TODO: add comments
 public interface Trainer extends Plugin {
 
-    public void setFixation(BufferedImage screenShot);
+    public void setStep(BufferedImage screenShot, Point target);
     
-    public void setTarget(Point target);
+    public void leaveTraining();
     
     public PluginInformation getInformation();
 }

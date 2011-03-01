@@ -24,6 +24,7 @@ package de.dfki.km.text20.lightning.worker.training;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -59,6 +60,9 @@ public class PrecisionTrainer {
     /** actual time */
     private long timestamp;
 
+    /** screenshot of the target area*/
+    private BufferedImage screenShot;
+
     /**
      * creates the precision trainer
      * 
@@ -86,6 +90,7 @@ public class PrecisionTrainer {
     public void setFixationPoint(Point fixation) {
         this.fixation = fixation;
         this.timestamp = System.currentTimeMillis();
+        this.doSth();
     }
 
     /**
@@ -95,15 +100,21 @@ public class PrecisionTrainer {
      */
     public void setMousePosition(Point mousePosition) {
         this.mousePosition = mousePosition;
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
+        this.screenShot = this.robot.createScreenCapture(screenShotRect);
+
+        // calculate offset
+        this.offset.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
+        
+        // use current trainer plugin to recognize step
+        if (MainClass.getInstance().getInternalPluginManager().getCurrentTrainer() != null)
+            MainClass.getInstance().getInternalPluginManager().getCurrentTrainer().setStep(this.screenShot, this.offset);
 
         if (MainClass.getInstance().getProperties().isShowImages()) {
             // draw both points to a image
             this.drawPicture();
         }
-
-        // calculate offset
-        this.offset.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
-
+        
         // update logfile
         String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension());
         System.out.println(logString);
@@ -116,9 +127,7 @@ public class PrecisionTrainer {
     private void drawPicture() {
 
         // create screenshot
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
-        BufferedImage screenShot = this.robot.createScreenCapture(screenShotRect);
-        Graphics2D graphic = screenShot.createGraphics();
+        Graphics2D graphic = this.screenShot.createGraphics();
 
         // visualize fixation point 
         graphic.setColor(new Color(255, 255, 0, 255));
@@ -138,9 +147,23 @@ public class PrecisionTrainer {
         try {
             File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + this.timestamp + "_training.png");
             outputfile.mkdirs();
-            ImageIO.write(screenShot, "png", outputfile);
+            ImageIO.write(this.screenShot, "png", outputfile);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void doSth() {
+        System.out.println("called");
+        if (AWTUtilitiesWrapper.isTranslucencySupported(AWTUtilitiesWrapper.TRANSLUCENT))
+            return;
+        System.out.println("translucent");
+        if (AWTUtilitiesWrapper.isTranslucencySupported(AWTUtilitiesWrapper.PERPIXEL_TRANSLUCENT))
+            return;
+        System.out.println("perpixel");
+        if (AWTUtilitiesWrapper.isTranslucencyCapable(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()))
+            return;
+        System.out.println("graphicsconfig");
+        
     }
 }

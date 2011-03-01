@@ -1,5 +1,5 @@
 /*
- * MethodManager.java
+ * InternalPluginManager.java
  *
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -25,12 +25,8 @@ import java.util.ArrayList;
 
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
-import net.xeoh.plugins.base.util.uri.ClassURI;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper.SimpleWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.plugins.saliency.impl.dummy.FakePositionFinder;
-import de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel.SimpleSobel;
 import de.dfki.km.text20.lightning.plugins.training.Trainer;
 
 /**

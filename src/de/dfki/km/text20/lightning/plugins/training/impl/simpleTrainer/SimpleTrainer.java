@@ -35,24 +35,6 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
 public class SimpleTrainer implements Trainer {
 
     /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setFixation(java.awt.image.BufferedImage)
-     */
-    @Override
-    public void setFixation(BufferedImage screenShot) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setTarget(java.awt.Point)
-     */
-    @Override
-    public void setTarget(Point target) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.training.Trainer#getInformation()
      */
     @Override
@@ -61,6 +43,23 @@ public class SimpleTrainer implements Trainer {
         information.displayName = "Simple Trainer";
         
         return information;
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.awt.image.BufferedImage, java.awt.Point)
+     */
+    @Override
+    public void setStep(BufferedImage screenShot, Point target) {
+        // blubb
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#leaveTraing()
+     */
+    @Override
+    public void leaveTraining() {
+        // TODO Auto-generated method stub
+        
     }
 
 }
