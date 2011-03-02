@@ -79,6 +79,35 @@ public class HotkeyContainer implements Serializable {
         this.description = description;
     }
     
+    /**
+     * current modificator
+     * 
+     * @return modificator
+     */
+    public int getModificator() {
+        return this.modificator;
+    }
+    
+    /**
+     * current button code
+     * 
+     * @return button code
+     */
+    @Attribute
+    public int getButtonCode() {
+        return this.buttonCode;
+    }
+    
+    /**
+     * current button string
+     * 
+     * @return button string
+     */
+    @Attribute
+    public String getButtonString() {
+        return this.buttonString;
+    }
+    
     /** 
      * to show the description in the comboboxes
      */

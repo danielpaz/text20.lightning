@@ -73,15 +73,15 @@ public class Hotkey implements HotkeyListener {
         }
 
         // add hotkeys to listener
-        if (this.actionHotkey.buttonCode > 0) {
-            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.modificator, this.actionHotkey.buttonCode);
+        if (this.actionHotkey.getButtonCode() > 0) {
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getModificator(), this.actionHotkey.getButtonCode());
         } else {
-            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.buttonString);
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getButtonString());
         }
-        if (this.statusHotkey.buttonCode > 0) {
-            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.modificator, this.statusHotkey.buttonCode);
+        if (this.statusHotkey.getButtonCode() > 0) {
+            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getModificator(), this.statusHotkey.getButtonCode());
         } else {
-            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.buttonString);
+            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getButtonString());
         }
 
         // enable hotkey listener
@@ -174,10 +174,10 @@ public class Hotkey implements HotkeyListener {
 
         // change listener
         JIntellitype.getInstance().unregisterHotKey(index);
-        if (hotkey.buttonCode > 0) {
-            JIntellitype.getInstance().registerHotKey(index, hotkey.modificator, hotkey.buttonCode);
+        if (hotkey.getButtonCode() > 0) {
+            JIntellitype.getInstance().registerHotKey(index, hotkey.getModificator(), hotkey.getButtonCode());
         } else {
-            JIntellitype.getInstance().registerHotKey(index, hotkey.buttonString);
+            JIntellitype.getInstance().registerHotKey(index, hotkey.getButtonString());
         }
     }
 
