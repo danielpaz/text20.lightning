@@ -66,7 +66,7 @@ public class TrayMenu {
                 @SuppressWarnings("unused")
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    new ConfigWindow();
+                    new ConfigWindowImpl();
                 }
             });
             menu.add(configMenu);

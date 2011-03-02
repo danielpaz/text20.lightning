@@ -66,7 +66,13 @@
              <string>Show Images</string> 
             </void> 
             <void property="name"> 
-             <string>label1</string> 
+             <string>labelShowImages</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -82,6 +88,12 @@
             <string>javax.swing.JCheckBox</string> 
             <void property="name"> 
              <string>checkBoxShowPictures</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -127,7 +139,13 @@
              <string>Output Directory</string> 
             </void> 
             <void property="name"> 
-             <string>label3</string> 
+             <string>labelOutputDirectory</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -151,6 +169,12 @@
             </void> 
             <void property="name"> 
              <string>buttonSelect</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -182,6 +206,12 @@
             <string>javax.swing.JTextField</string> 
             <void property="name"> 
              <string>textFieldOutputPath</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -226,12 +256,14 @@
              <string>text</string> 
              <string>Enable Mouse Warp</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Enables/Disables the mouse warp permanently.</string> 
-            </void> 
             <void property="name"> 
-             <string>label15</string> 
+             <string>labelEnableMouseWarp</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -252,6 +284,12 @@
             <void property="name"> 
              <string>checkBoxUseWarp</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ActionListener</string> 
@@ -268,8 +306,8 @@
              <int>15</int> 
             </void> 
             <void method="setProperty"> 
-             <string>gridY</string> 
-             <int>1</int> 
+             <string>gridWidth</string> 
+             <int>3</int> 
             </void> 
            </object> 
           </void> 
@@ -280,12 +318,14 @@
              <string>text</string> 
              <string>Warp Method</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Method which is used to warp the mouse.</string> 
-            </void> 
             <void property="name"> 
-             <string>label8</string> 
+             <string>labelWarpMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -309,6 +349,12 @@
             <string>javax.swing.JComboBox</string> 
             <void property="name"> 
              <string>comboBoxWarpMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -334,12 +380,14 @@
              <string>text</string> 
              <string>Angle Threshold</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>If you move your mouse to your fixation point, you must do this in an angle within this threshold to activate the mouse warp. The lower this value the more exact you must move your mouse.</string> 
-            </void> 
             <void property="name"> 
-             <string>label9</string> 
+             <string>labelAngleThreshold</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -372,6 +420,12 @@
             </void> 
             <void property="name"> 
              <string>spinnerAngle</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -416,12 +470,14 @@
              <string>text</string> 
              <string>Distance Threshold</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>If you move your mouse to your fixation point, you must move minimal this way in pixels to activate the mouse warp. The higher this value the more pixels you have to pass. This means you have to move faster.</string> 
-            </void> 
             <void property="name"> 
-             <string>label10</string> 
+             <string>labelDistanceThreshold</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -455,6 +511,12 @@
             <void property="name"> 
              <string>spinnerDistance</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -479,12 +541,14 @@
              <string>text</string> 
              <string>Status Hotkey</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Enables/Disables the hotkeys and the mousewarp.</string> 
-            </void> 
             <void property="name"> 
-             <string>label5</string> 
+             <string>labelStatusHotkey</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -504,6 +568,12 @@
             <string>javax.swing.JComboBox</string> 
             <void property="name"> 
              <string>comboBoxStatusHotkey</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -537,12 +607,14 @@
              <string>text</string> 
              <string>Duration Threshold</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>If you move your mouse to your fixation point, you must move minimal this time in ms to activate the mouse warp. The higher this value the more exact the calculation can be done and the mouse only warps when you really want it.</string> 
-            </void> 
             <void property="name"> 
-             <string>label11</string> 
+             <string>labelDurationThreshold</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -575,6 +647,12 @@
             </void> 
             <void property="name"> 
              <string>spinnerDuration</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -619,12 +697,14 @@
              <string>text</string> 
              <string>Home Radius</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>If you move your mouse to your fixation point and your cursor is within this radius, your mousecursor will not be warped.</string> 
-            </void> 
             <void property="name"> 
-             <string>label12</string> 
+             <string>labelHomeRadius</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -658,6 +738,12 @@
             <void property="name"> 
              <string>spinnerHomeRadius</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -683,11 +769,17 @@
              <string>Dimension</string> 
             </void> 
             <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Radius around the fixation point which is checked for something interesting to click on.</string> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
             </void> 
             <void property="name"> 
-             <string>label2</string> 
+             <string>labelDimension</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -717,6 +809,12 @@
             <void property="name"> 
              <string>spinnerDimension</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -741,12 +839,14 @@
              <string>text</string> 
              <string>Set Radius</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>If you move your mouse to your fixation point and your mouse warp is activated, it will be set in the choosed distance from the fixation point to allow you to stop the movement by yourself.</string> 
-            </void> 
             <void property="name"> 
-             <string>label13</string> 
+             <string>labelSetRadius</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -780,6 +880,12 @@
             <void property="name"> 
              <string>spinnerSetRadius</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -805,11 +911,17 @@
              <string>Action Hotkey</string> 
             </void> 
             <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Hotkey to click where you are looking at.</string> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
             </void> 
             <void property="name"> 
-             <string>label4</string> 
+             <string>labelActionHotkey</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -829,6 +941,12 @@
             <string>javax.swing.JComboBox</string> 
             <void property="name"> 
              <string>comboBoxActionHotkey</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -862,12 +980,14 @@
              <string>text</string> 
              <string>Search Method</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Method to check the radius around the fixation point.</string> 
-            </void> 
             <void property="name"> 
-             <string>label6</string> 
+             <string>labelSearchMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -887,6 +1007,12 @@
             <string>javax.swing.JComboBox</string> 
             <void property="name"> 
              <string>comboBoxSearchMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -923,6 +1049,12 @@
             <void property="name"> 
              <string>buttonDefault</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ActionListener</string> 
@@ -958,6 +1090,12 @@
             <void property="name"> 
              <string>buttonSubmit</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ActionListener</string> 
@@ -990,12 +1128,14 @@
              <string>text</string> 
              <string>Learn Method</string> 
             </void> 
-            <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Method which is used in the trainings mode.</string> 
-            </void> 
             <void property="name"> 
-             <string>label7</string> 
+             <string>labelLearnMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1015,6 +1155,12 @@
             <string>javax.swing.JComboBox</string> 
             <void property="name"> 
              <string>comboBoxLearnMethod</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -1051,6 +1197,12 @@
             <void property="name"> 
              <string>buttonOK</string> 
             </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
+            </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ActionListener</string> 
@@ -1085,6 +1237,12 @@
             </void> 
             <void property="name"> 
              <string>buttonCancel</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>4</int> 
+             </void> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
