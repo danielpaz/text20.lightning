@@ -459,7 +459,9 @@ public class ConfigWindow extends JFrame {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)", "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
+                contentPanel.setLayout(new FormLayout(
+                    "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)",
+                    "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("Show Images");

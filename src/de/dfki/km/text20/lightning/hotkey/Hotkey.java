@@ -66,9 +66,9 @@ public class Hotkey implements HotkeyListener {
 
         } else {
             // otherwise the default hotkeys were set and stored to properties
-            this.actionHotkey = this.hotkeys.get(0);
+            this.getCurrentHotkey(1);
             MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
-            this.statusHotkey = this.hotkeys.get(1);
+            this.getCurrentHotkey(2);
             MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
         }
 
@@ -196,10 +196,16 @@ public class Hotkey implements HotkeyListener {
 
         // action hotkey 
         case 1:
+            // set default if it is needed
+            if ((this.actionHotkey == null) || MainClass.getInstance().getProperties().getActionHotkey() == null)
+                this.actionHotkey = this.hotkeys.get(0);
             return this.actionHotkey;
 
             // satus hotkey
         case 2:
+            // set default if it is needed
+            if ((this.statusHotkey == null) || MainClass.getInstance().getProperties().getStatusHotkey() == null)
+                this.statusHotkey = this.hotkeys.get(1);
             return this.statusHotkey;
 
             // theoretical never reached
@@ -234,12 +240,12 @@ public class Hotkey implements HotkeyListener {
         this.hotkeys.add(new HotkeyContainer("F8", "F8"));
         this.hotkeys.add(new HotkeyContainer("F9", "F9"));
         this.hotkeys.add(new HotkeyContainer("F12", "F12"));
-        
-//        do not work... don't know why?!?
-//        this.hotkeys.add(new HotkeyContainer("^", "^"));
-//        this.hotkeys.add(new HotkeyContainer("<", "<"));
-//        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_MINUS, "CTRL + -"));
-//        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_PERIOD, "CTRL + ."));
-//        this.hotkeys.add(new HotkeyContainer("CTRL + /", "CTRL + /"));
+
+        //        do not work... don't know why?!?
+        //        this.hotkeys.add(new HotkeyContainer("^", "^"));
+        //        this.hotkeys.add(new HotkeyContainer("<", "<"));
+        //        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_MINUS, "CTRL + -"));
+        //        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_PERIOD, "CTRL + ."));
+        //        this.hotkeys.add(new HotkeyContainer("CTRL + /", "CTRL + /"));
     }
 }
