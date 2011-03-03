@@ -64,23 +64,36 @@ public class Properties implements Serializable {
     @Attribute
     /** angle threshold for mousewarping */
     private int angleThreshold;
-    
+
     @Attribute
     /** distance threshold for mousewarping */
     private int distanceThreshold;
-    
+
     @Attribute
     /** duration threshold for mousewarping */
     private long durationThreshold;
-    
+
     @Attribute
     /** home radius for mousewarping */
     private int homeRadius;
-    
+
     @Attribute
     /** set radius for mousewarping */
     private int setRadius;
-    
+
+    @Attribute
+    /** name of currently used trainer*/
+    private String trainerName;
+
+    @Attribute
+    /** name of currently used warper */
+    private String warperName;
+
+    @Attribute
+    /** name of currently used detector */
+    private String detectorName;
+
+    @Attribute
     /** indicates if mousewarping ins enabled */
     private boolean useWarp;
 
@@ -89,7 +102,7 @@ public class Properties implements Serializable {
 
     /** from properties file readed object */
     private Object object;
-    
+
     /**
      * creates properties, tries to load property file
      */
@@ -122,12 +135,16 @@ public class Properties implements Serializable {
                     this.homeRadius = ((Properties) this.object).getHomeRadius();
                     this.setRadius = ((Properties) this.object).getSetRadius();
                     this.useWarp = ((Properties) this.object).isUseWarp();
+                    this.trainerName = ((Properties) this.object).getTrainerName();
+                    this.warperName = ((Properties) this.object).getWarperName();
+                    this.detectorName = ((Properties) this.object).getDetectorName();
 
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("showImages: " + this.showImages + ", dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("useWarp: " + this.useWarp + ", angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
+                    System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName + ", Trainer: " + this.trainerName);
                 }
 
                 // cleanup
@@ -148,7 +165,7 @@ public class Properties implements Serializable {
     /**
      * restores default values
      */
-    public void restoreDefault() {        
+    public void restoreDefault() {
         // set default values
         this.showImages = false;
         this.dimension = 100;
@@ -161,8 +178,11 @@ public class Properties implements Serializable {
         this.homeRadius = 200;
         this.setRadius = 20;
         this.useWarp = true;
+        this.trainerName = "";
+        this.warperName = "";
+        this.detectorName = "";
     }
-    
+
     /**
      * indicates if images should be shown
      * 
@@ -264,8 +284,6 @@ public class Properties implements Serializable {
         this.statusHotkey = statusHotkey;
     }
 
-    
-    
     /**
      * @return the angleThreshold
      */
@@ -322,8 +340,6 @@ public class Properties implements Serializable {
         this.homeRadius = homeRadius;
     }
 
-    
-    
     /**
      * @return the setRadius
      */
@@ -338,8 +354,6 @@ public class Properties implements Serializable {
         this.setRadius = setRadius;
     }
 
-    
-    
     /**
      * @return the useWarp
      */
@@ -352,6 +366,48 @@ public class Properties implements Serializable {
      */
     public void setUseWarp(boolean useWarp) {
         this.useWarp = useWarp;
+    }
+
+    /**
+     * @return the currentTrainerName
+     */
+    public String getTrainerName() {
+        return this.trainerName;
+    }
+
+    /**
+     * @param currentTrainerName the currentTrainerName to set
+     */
+    public void setTrainerName(String currentTrainerName) {
+        this.trainerName = currentTrainerName;
+    }
+
+    /**
+     * @return the currentWarperName
+     */
+    public String getWarperName() {
+        return this.warperName;
+    }
+
+    /**
+     * @param currentWarperName the currentWarperName to set
+     */
+    public void setWarperName(String currentWarperName) {
+        this.warperName = currentWarperName;
+    }
+
+    /**
+     * @return the currentDetectorName
+     */
+    public String getDetectorName() {
+        return this.detectorName;
+    }
+
+    /**
+     * @param currentDetectorName the currentDetectorName to set
+     */
+    public void setDetectorName(String currentDetectorName) {
+        this.detectorName = currentDetectorName;
     }
 
     /**

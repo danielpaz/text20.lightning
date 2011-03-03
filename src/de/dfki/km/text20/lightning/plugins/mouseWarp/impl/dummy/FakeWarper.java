@@ -34,6 +34,9 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
  */
 @PluginImplementation
 public class FakeWarper implements MouseWarper {
+    
+
+    private PluginInformation information = new PluginInformation("Fake Warper","Fake Warper");
 
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int, int, long, int, int)
@@ -67,10 +70,8 @@ public class FakeWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
      */
     @Override
-    public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation("Fake Warper","Fake Warper");
-        
-        return information;
+    public PluginInformation getInformation() {        
+        return this.information;
     }
 
 }

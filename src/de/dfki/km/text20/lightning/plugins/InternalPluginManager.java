@@ -25,6 +25,8 @@ import java.util.ArrayList;
 
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
+import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.training.Trainer;
@@ -39,31 +41,35 @@ public class InternalPluginManager {
     /** utility which can create a list of all available plugins */
     private PluginManagerUtil pluginManagerUtil;
 
-    /** current elected saliency detector */
-    private SaliencyDetector currentSaliencyDetector;
+    /** global properties */
+    private Properties properties;
 
     /** a list of all saliency detectors*/
     private ArrayList<SaliencyDetector> saliencyDetectors;
 
     /** a list of all mouse warpers*/
     private ArrayList<MouseWarper> mouseWarpers;
-
-    /** current elected mouse warper */
-    private MouseWarper currentMouseWarper;
-
-    /** current used trainings method */
-    private Trainer currentTrainer;
-
+    
     /** list of all available trainings methods */
     private ArrayList<Trainer> trainer;
+    
+    /** current elected saliency detector */
+    private int currentSaliencyDetectorId;
+    
+    /** current elected mouse warper */
+    private int currentMouseWarperId;
+
+    /** current used trainings method */
+    private int currentTrainerId;
 
     /**
      * creates a new MethodManager object and loads plugins
      * 
      * @param manager  
      */
-    //TODO: store current plugin in properties
     public InternalPluginManager(PluginManager manager) {
+        this.properties = MainClass.getInstance().getProperties();
+        boolean found = false;
 
         // initialize plugin lists
         this.pluginManagerUtil = new PluginManagerUtil(manager);
@@ -71,12 +77,40 @@ public class InternalPluginManager {
         this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
         this.trainer = new ArrayList<Trainer>(this.pluginManagerUtil.getPlugins(Trainer.class));
 
-        // TODO: get this from properties
-        if (this.saliencyDetectors.size() > 0)
-            this.currentSaliencyDetector = this.saliencyDetectors.get(0);
-        if (this.mouseWarpers.size() > 0)
-            this.currentMouseWarper = this.mouseWarpers.get(0);
-        if (this.trainer.size() > 0) this.currentTrainer = this.trainer.get(0);
+        // generate id and set former used plugin if this is available or set default value ,if it is needed, for ...
+        // ...saliency detectors
+        for (int i = 0; i < this.saliencyDetectors.size(); i++) {
+            this.saliencyDetectors.get(i).getInformation().setId(i);
+            if (this.properties.getDetectorName().equals(this.saliencyDetectors.get(i).getInformation().getDisplayName())) {
+                this.setCurrentSaliencyDetector(i);
+                found = true;
+            }
+        }
+        if ((this.saliencyDetectors.size() > 0) && !found)
+            this.setCurrentSaliencyDetector(0);
+
+        // ...mouse warpers
+        found = false;
+        for (int i = 0; i < this.mouseWarpers.size(); i++) {
+            this.mouseWarpers.get(i).getInformation().setId(i);
+            if (this.properties.getWarperName().equals(this.mouseWarpers.get(i).getInformation().getDisplayName())) {
+                this.setCurrentMouseWarper(i);
+                found = true;
+            }
+        }
+        if ((this.mouseWarpers.size() > 0) && !found) this.setCurrentMouseWarper(0);
+
+        // ... trainer
+        found = false;
+        for (int i = 0; i < this.trainer.size(); i++) {
+            this.trainer.get(i).getInformation().setId(i);
+            if (this.properties.getTrainerName().equals(this.trainer.get(i).getInformation().getDisplayName())) {
+                this.setCurrentTrainer(i);
+                found = true;
+            }
+        }
+        if ((this.trainer.size() > 0) && !found) this.setCurrentTrainer(0);
+
     }
 
     /**
@@ -85,7 +119,7 @@ public class InternalPluginManager {
      * @return currentSaliencyDetector
      */
     public SaliencyDetector getCurrentSaliencyDetector() {
-        return this.currentSaliencyDetector;
+        return this.saliencyDetectors.get(this.currentSaliencyDetectorId);
     }
 
     /**
@@ -102,8 +136,9 @@ public class InternalPluginManager {
      * 
      * @param choice
      */
-    public void setCurrentSaliencyDetector(SaliencyDetector choice) {
-        this.currentSaliencyDetector = choice;
+    public void setCurrentSaliencyDetector(int choice) {
+        this.currentSaliencyDetectorId = choice;
+        this.properties.setDetectorName(this.saliencyDetectors.get(choice).getInformation().getDisplayName());
     }
 
     /**
@@ -112,7 +147,7 @@ public class InternalPluginManager {
      * @return currentSaliencyDetector
      */
     public MouseWarper getCurrentMouseWarper() {
-        return this.currentMouseWarper;
+        return this.mouseWarpers.get(this.currentMouseWarperId);
     }
 
     /**
@@ -129,9 +164,10 @@ public class InternalPluginManager {
      * 
      * @param choice
      */
-    public void setCurrentMouseWarper(MouseWarper choice) {
-        this.currentMouseWarper = choice;
-    }
+    public void setCurrentMouseWarper(int choice) {
+        this.currentMouseWarperId = choice;
+        this.properties.setWarperName(this.mouseWarpers.get(choice).getInformation().getDisplayName());
+          }
 
     /**
      * Returns a ArrayList of all the given plugins for training.
@@ -147,8 +183,9 @@ public class InternalPluginManager {
      * 
      * @param choice
      */
-    public void setCurrentTrainer(Trainer choice) {
-        this.currentTrainer = choice;
+    public void setCurrentTrainer(int choice) {
+        this.currentTrainerId = choice;
+        this.properties.setTrainerName(this.trainer.get(choice).getInformation().getDisplayName());
     }
 
     /**
@@ -157,6 +194,6 @@ public class InternalPluginManager {
      * @return currentSaliencyDetector
      */
     public Trainer getCurrentTrainer() {
-        return this.currentTrainer;
+        return this.trainer.get(this.currentTrainerId);
     }
 }

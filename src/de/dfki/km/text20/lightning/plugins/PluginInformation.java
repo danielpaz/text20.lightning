@@ -41,8 +41,12 @@ public class PluginInformation {
     /** The description of the method. */
     private String toolTip;
     
+    /** number to identify the plugin */
+    private int id;
+    
     /**
-     * creates new information object
+     * returns a information object
+     * be sure you always return the same object, because it will be set a id in it!
      * 
      * @param name
      * @param description
@@ -64,5 +68,22 @@ public class PluginInformation {
      */
     public String getToolTip() {
         return this.toolTip;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+        //System.out.println("id " + this.id);
     } 
+    
+    
 }

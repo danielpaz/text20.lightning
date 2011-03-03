@@ -37,6 +37,9 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 @PluginImplementation
 public class FakePositionFinder implements SaliencyDetector {
 
+
+    private PluginInformation information = new PluginInformation("Dummy Filter","returns always 0,0");
+    
     /** */
     public FakePositionFinder() {}
 
@@ -57,8 +60,6 @@ public class FakePositionFinder implements SaliencyDetector {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation("Dummy Filter","returns always 0,0");
-
-        return information;
+        return this.information;
     }
 }

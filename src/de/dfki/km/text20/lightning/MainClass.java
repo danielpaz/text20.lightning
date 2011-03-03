@@ -132,10 +132,10 @@ public class MainClass {
         // initialize other variables
         this.statistics = this.pluginManager.getPlugin(Statistics.class);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
+        this.properties = new Properties();
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
         this.trayIcon = new TraySymbol();
         this.dllStatus = this.checkDll();
-        this.properties = new Properties();
         this.isActivated = true;
         this.isNormalMode = true;
         

@@ -44,6 +44,7 @@ public interface SaliencyDetector extends Plugin {
 
     /**
      * Returns some information about the plugin.
+     * Make sure you always return the same object, because a id will be set in it!!
      * 
      * @return saliency plugin informations
      */
