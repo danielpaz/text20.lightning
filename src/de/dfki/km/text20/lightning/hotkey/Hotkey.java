@@ -159,14 +159,12 @@ public class Hotkey implements HotkeyListener {
         case 1:
             this.actionHotkey = hotkey;
             MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
-            System.out.println("action hotkey changed: " + hotkey);
             break;
 
         // status hotkey
         case 2:
             this.statusHotkey = hotkey;
             MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
-            System.out.println("status hotkey changed: " + hotkey);
             break;
         default:
             return;
