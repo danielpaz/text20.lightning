@@ -28,11 +28,14 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.training.Trainer;
@@ -193,12 +196,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.properties.setSetRadius(set);
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
 
-        // TODO: do these also in properties, see MethodManager class
-        this.internalPluginManager.setCurrentSaliencyDetector((SaliencyDetector) this.comboBoxSearchMethod.getSelectedItem());
-        this.internalPluginManager.setCurrentMouseWarper((MouseWarper) this.comboBoxWarpMethod.getSelectedItem());
-        this.internalPluginManager.setCurrentTrainer((Trainer) this.comboBoxLearnMethod.getSelectedItem());
-
-        // TODO: maybe do this on a other place
+        // set new plugins
+        this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());
+        this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
+        this.internalPluginManager.setCurrentTrainer(((PluginInformation) this.comboBoxLearnMethod.getSelectedItem()).getId());
         this.internalPluginManager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
 
         // close the gui
@@ -276,7 +277,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * @return a changed default renderer
      */
     private DefaultListCellRenderer initRenderer() {
-        // TODO: change that only a kind of identifier is added to the combobox
         return new DefaultListCellRenderer() {
 
             @Override
@@ -286,20 +286,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                 // set new displayed attribute
-                if (value instanceof MouseWarper) {
-                    setText(((MouseWarper) value).getInformation().getDisplayName());
-                    setToolTipText(((MouseWarper) value).getInformation().getToolTip());
+                if (value instanceof PluginInformation) {
+                    setText(((PluginInformation) value).getDisplayName());
+                    setToolTipText(((PluginInformation) value).getToolTip());
                 }
-
-                if (value instanceof Trainer) {
-                    setText(((Trainer) value).getInformation().getDisplayName());
-                    setToolTipText(((Trainer) value).getInformation().getToolTip());
-                }
-
-                if (value instanceof SaliencyDetector) {
-                    setText(((SaliencyDetector) value).getInformation().getDisplayName());
-                    setToolTipText(((SaliencyDetector) value).getInformation().getToolTip());
-                }
+                
 
                 return this;
             }
@@ -347,11 +338,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void manageTrainerComboBox() {
         // add alls trainer to combobox
         for (Trainer trainer : this.internalPluginManager.getTrainer())
-            this.comboBoxLearnMethod.addItem(trainer);
+            this.comboBoxLearnMethod.addItem(trainer.getInformation());
 
         // preselect current trainer
         if (this.internalPluginManager.getCurrentTrainer() != null)
-            this.comboBoxLearnMethod.setSelectedItem(this.internalPluginManager.getCurrentTrainer());
+            this.comboBoxLearnMethod.setSelectedItem(this.internalPluginManager.getCurrentTrainer().getInformation());
 
         // set renderer
         this.comboBoxLearnMethod.setRenderer(this.renderer);
@@ -363,12 +354,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void manageComboBoxSaliencyDetector() {
         // add all saliency detectors to the combobox
         for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
-            this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i));
+            this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i).getInformation());
         }
 
         // preselect the current one
         if (this.internalPluginManager.getCurrentSaliencyDetector() != null)
-            this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector());
+            this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector().getInformation());
 
         // set renderer
         this.comboBoxSearchMethod.setRenderer(this.renderer);
@@ -388,11 +379,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // manage combobox
         for (MouseWarper warper : this.internalPluginManager.getMouseWarpers())
-            this.comboBoxWarpMethod.addItem(warper);
+            this.comboBoxWarpMethod.addItem(warper.getInformation());
 
         // preselect current mouse warper
         if (this.internalPluginManager.getCurrentMouseWarper() != null)
-            this.comboBoxWarpMethod.setSelectedItem(this.internalPluginManager.getCurrentMouseWarper());
+            this.comboBoxWarpMethod.setSelectedItem(this.internalPluginManager.getCurrentMouseWarper().getInformation());
 
         // set renderer
         this.comboBoxWarpMethod.setRenderer(this.renderer);
@@ -418,6 +409,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * adds tool tips to the components
      */
     private void manageToolTips() {
+        // create tool tip texts
         String labelStatusHotkeyTT = "<HTML><body>Enables/Disables the hotkeys and the mousewarp.</body></HTML>";
         String labelDimensionTT = "<HTML><body>Radius around the fixation point which is checked<br>for something interesting to click on.</body></HTML>";
         String labelActionHotkeyTT = "<HTML><body>Hotkey to click where you are looking at.</body></HTML>";
@@ -431,6 +423,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         String labelHomeRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your cursor is within this radius, your<br>mousecursor will not be warped.</body></HTML>";
         String labelSetRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your mouse warp is activated, it will be set<br>in the choosed distance from the fixation point<br>to allow you to stop the movement by<br>yourself.</body></HTML>";
 
+        // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
         this.labelDimension.setToolTipText(labelDimensionTT);
         this.labelActionHotkey.setToolTipText(labelActionHotkeyTT);

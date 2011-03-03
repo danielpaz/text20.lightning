@@ -34,6 +34,8 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
 @PluginImplementation
 public class SimpleTrainer implements Trainer {
 
+    private PluginInformation information = new PluginInformation("Simple Trainer", "Simple Trainer");
+
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.awt.image.BufferedImage, java.awt.Point)
      */
@@ -56,8 +58,6 @@ public class SimpleTrainer implements Trainer {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation("Simple Trainer", "Simple Trainer");
-
-        return information;
+        return this.information;
     }
 }

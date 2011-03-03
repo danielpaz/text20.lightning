@@ -60,6 +60,7 @@ public interface MouseWarper extends Plugin {
     
     /**
      * some information about this plugin
+     * Make sure you always return the same object, because a id will be set in it!!
      * 
      * @return information
      */

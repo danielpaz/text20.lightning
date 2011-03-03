@@ -37,6 +37,16 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 @PluginImplementation
 public class SimpleSobel implements SaliencyDetector {
 
+    /** information object*/
+    private PluginInformation information;
+
+    /**
+     * creates new simple sobel object
+     */
+    public SimpleSobel() {
+        this.information = new PluginInformation("Simple Sobel", "Simple Sobel");
+    }
+    
     /**
      * Derivates the given screenshot in y-direction. 
      * This painted pixels which have any different color as their following ones in white or grey color.
@@ -125,9 +135,7 @@ public class SimpleSobel implements SaliencyDetector {
      */
     @Override
     public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation("Simple Sobel", "Simple Sobel");
-
-        return information;
+        return this.information;
     }
 
 }

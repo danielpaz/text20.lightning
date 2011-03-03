@@ -53,7 +53,8 @@ public class WarpCommander {
         long duration = MainClass.getInstance().getProperties().getDurationThreshold();
         int home = MainClass.getInstance().getProperties().getHomeRadius();
         int set = MainClass.getInstance().getProperties().getSetRadius();
-        MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
+        if (MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null)
+            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
 
         // initialize timer
         this.timer = new Timer(100, new ActionListener() {

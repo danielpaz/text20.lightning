@@ -69,6 +69,9 @@ public class SimpleWarper implements MouseWarper {
 
     /** necessary to move the mouse */
     private Robot robot;
+    
+    /** information object */
+    private PluginInformation information;
 
     /**
      * creates a new SimpleWarper and initializes some variables
@@ -80,6 +83,7 @@ public class SimpleWarper implements MouseWarper {
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
+        this.information = new PluginInformation("Simple Warper","Simple Warper");
 
         try {
             this.robot = new Robot();
@@ -195,9 +199,7 @@ public class SimpleWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
      */
     @Override
-    public PluginInformation getInformation() {
-        final PluginInformation information = new PluginInformation("Simple Warper","Simple Warper");
-        
-        return information;
+    public PluginInformation getInformation() {        
+        return this.information;
     }
 }
