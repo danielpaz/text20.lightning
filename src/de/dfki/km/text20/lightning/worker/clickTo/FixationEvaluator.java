@@ -151,14 +151,14 @@ public class FixationEvaluator {
         // visualize provided target
         graphic.setColor(new Color(255, 255, 0, 255));
         graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-        graphic.drawChars(("catched position").toCharArray(), 0, 16, 3, 10);
+        graphic.drawChars(("catched position").toCharArray(), 0, 16, 12 + MainClass.getInstance().getProperties().getDimension() / 2, 12 + MainClass.getInstance().getProperties().getDimension() / 2);
         graphic.setColor(new Color(255, 255, 0, 64));
         graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
 
         // visualize calculated target
         graphic.setColor(new Color(255, 0, 0, 255));
         graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
-        graphic.drawChars(("calculated position").toCharArray(), 0, 19, 3, 25);
+        graphic.drawChars(("calculated position").toCharArray(), 0, 19, this.offset.x + 12 + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + 12 + MainClass.getInstance().getProperties().getDimension() / 2);
         graphic.setColor(new Color(255, 0, 0, 64));
         graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.x - 5, MainClass.getInstance().getProperties().getDimension() / 2 + this.offset.y - 5, 10, 10);
 

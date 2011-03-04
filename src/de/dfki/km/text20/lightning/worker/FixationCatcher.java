@@ -100,59 +100,61 @@ public class FixationCatcher {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             @Override
             public void newEvaluationEvent(FixationEvent event) {
-                if (MainClass.getInstance().isActivated()) {
-                    if (MainClass.getInstance().isNormalMode()) {
-                        if (event.getType() == FixationEventType.FIXATION_START) {
+                if (!MainClass.getInstance().isActivated()) return;
+                
+                // if the tool is activated
+                if (MainClass.getInstance().isNormalMode()) {
+                    if (event.getType() == FixationEventType.FIXATION_START) {
 
-                            // if the tool is activated and in normal mode, fixations will be stored 
-                            fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
+                        // if the tool is activated and in normal mode, fixations will be stored 
+                        fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
 
-                            // add fixation to mouse warpe
-                            if ((MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null) && MainClass.getInstance().getProperties().isUseWarp())
-                                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
-                        }
+                        // add fixation to mouse warpe
+                        if ((MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null) && MainClass.getInstance().getProperties().isUseWarp())
+                            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
+                    }
 
-                        if (Hotkey.getInstance().isTyped()) {
+                    if (Hotkey.getInstance().isTyped()) {
 
-                            // if the hotkey is typed, the stored fixation will be evaluated
-                            fixationEvaluator.evaluateLocation();
+                        // if the hotkey is typed, the stored fixation will be evaluated
+                        fixationEvaluator.evaluateLocation();
 
-                            // reset the hotkey status
-                            Hotkey.getInstance().resetHotkeyTyped();
-                        }
+                        // reset the hotkey status
+                        Hotkey.getInstance().resetHotkeyTyped();
+                    }
 
-                    } else {
-                        if (event.getType() == FixationEventType.FIXATION_START) {
+                } else {
+                    if (event.getType() == FixationEventType.FIXATION_START) {
 
-                            // if the tool is activated and in trainings mode, fixations will be stored 
-                            precisionTrainer.setFixationPoint(event.getFixation().getCenter());
-                        }
-                        if (Hotkey.getInstance().isTyped()) {
+                        // if the tool is activated and in trainings mode, fixations will be stored 
+                        precisionTrainer.setFixationPoint(event.getFixation().getCenter());
+                    }
+                    if (Hotkey.getInstance().isTyped()) {
 
-                            // needed to hold the last fixation
-                            Hotkey.getInstance().resetHotkeyTyped();
-                            MainClass.getInstance().showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                        // needed to hold the last fixation
+                        Hotkey.getInstance().resetHotkeyTyped();
+                        MainClass.getInstance().showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
 
-                            // wait for another hotkey event to catch the mouse position
-                            while (!Hotkey.getInstance().isTyped() && !MainClass.getInstance().isNormalMode()) {
-                                try {
-                                    Thread.sleep(10);
-                                } catch (InterruptedException e) {
-                                }
+                        // wait for another hotkey event to catch the mouse position
+                        while (!Hotkey.getInstance().isTyped() && !MainClass.getInstance().isNormalMode()) {
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
                             }
-
-                            if (!MainClass.getInstance().isNormalMode()) {
-
-                                // set mouse position which is associated with the last stored fixation
-                                precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
-                                MainClass.getInstance().showTrayMessage("Training: mouse position recognized, now look to the next point and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
-                            }
-
-                            // reset hotkey status
-                            Hotkey.getInstance().resetHotkeyTyped();
                         }
+
+                        if (!MainClass.getInstance().isNormalMode()) {
+
+                            // set mouse position which is associated with the last stored fixation
+                            precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
+                            MainClass.getInstance().showTrayMessage("Training: mouse position recognized, now look to the next point and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                        }
+
+                        // reset hotkey status
+                        Hotkey.getInstance().resetHotkeyTyped();
                     }
                 }
+
             }
         });
     }

@@ -21,7 +21,7 @@
 package de.dfki.km.text20.lightning.plugins.training.impl.dummy;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -35,15 +35,6 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
 public class fakeTrainer implements Trainer {
 
     private PluginInformation information = new PluginInformation("Fake Trainer", "Fake Trainer");
-
-    /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.awt.image.BufferedImage, java.awt.Point)
-     */
-    @Override
-    public void setStep(BufferedImage screenShot, Point target) {
-        // TODO Auto-generated method stub
-
-    }
 
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.training.Trainer#leaveTraing()
@@ -60,5 +51,14 @@ public class fakeTrainer implements Trainer {
     @Override
     public PluginInformation getInformation() {
         return this.information;
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.training.Trainer#setStep(java.util.Map, java.awt.Point, java.awt.Point)
+     */
+    @Override
+    public void setStep(Map<String, Point> calculations, Point fixation, Point mouseOffset) {
+        // TODO Auto-generated method stub
+        
     }
 }

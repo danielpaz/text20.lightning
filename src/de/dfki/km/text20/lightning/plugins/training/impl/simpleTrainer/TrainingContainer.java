@@ -1,5 +1,5 @@
 /*
- * Trainer.java
+ * TrainingContainer.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,39 +18,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.training;
+package de.dfki.km.text20.lightning.plugins.training.impl.simpleTrainer;
 
 import java.awt.Point;
 import java.util.Map;
-
-import net.xeoh.plugins.base.Plugin;
-import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
  * @author Christoph Käding
  *
  */
-// TODO: add comments
-public interface Trainer extends Plugin {
+public class TrainingContainer {
+
+    private Map<String, Point> calculations;
+
+    private Point mouseOffset;
 
     /**
      * 
      * @param calculations
      * @param fixation
-     * @param mouseOffset 
+     * @param mouseOffset
      */
-    public void setStep(Map<String, Point> calculations, Point fixation, Point mouseOffset);
-    
+    public TrainingContainer(Map<String, Point> calculations, Point mouseOffset) {
+        this.calculations = calculations;
+        this.mouseOffset = mouseOffset;
+    }
+
     /**
-     * 
+     * @return the calculations
      */
-    public void leaveTraining();
-    
+    public Map<String, Point> getCalculations() {
+        return this.calculations;
+    }
+
     /**
-     * ... some information about this plugin ...
-     * Make sure you always return the same object, because a id will be set in it!!
-     * 
-     * @return information
+     * @return the mouseOffset
      */
-    public PluginInformation getInformation();
+    public Point getMouseOffset() {
+        return this.mouseOffset;
+    }
+
 }
