@@ -29,11 +29,8 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
