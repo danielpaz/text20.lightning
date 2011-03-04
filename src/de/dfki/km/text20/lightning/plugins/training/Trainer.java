@@ -27,13 +27,16 @@ import net.xeoh.plugins.base.Plugin;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
+ * Trainer evaluates the different detectors and give an overview about their results. 
+ * 
  * @author Christoph Käding
  *
  */
-// TODO: add comments
 public interface Trainer extends Plugin {
 
     /**
+     * A trainings step consists of the fixation and its related real target which is caught by showing with the mouse cursor on it.
+     * These data will be processed by the different detectors. All these results will be given to this method. 
      * 
      * @param calculations
      * @param fixation
@@ -42,7 +45,7 @@ public interface Trainer extends Plugin {
     public void setStep(Map<String, Point> calculations, Point fixation, Point mouseOffset);
     
     /**
-     * 
+     * When trainings mode is leaved or the program is closed, this method will be called.
      */
     public void leaveTraining();
     

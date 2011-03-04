@@ -130,7 +130,7 @@ public class MainClass {
         }
         
         // initialize other variables
-        this.statistics = this.pluginManager.getPlugin(Statistics.class);
+        this.statistics = this.pluginManager.getPlugin(Statistics.class); // FIXME: sth strange with statistic
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.properties = new Properties();
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
@@ -364,8 +364,6 @@ public class MainClass {
 
             // try to unzip it to the windows directory
             $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
-
-            // FIXME: catch exception
 
             if (destination.exists()) {
                 System.out.println("... but is now placed.\n");

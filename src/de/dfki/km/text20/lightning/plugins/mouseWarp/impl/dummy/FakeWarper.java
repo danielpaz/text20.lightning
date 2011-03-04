@@ -34,9 +34,8 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
  */
 @PluginImplementation
 public class FakeWarper implements MouseWarper {
-    
 
-    private PluginInformation information = new PluginInformation("Fake Warper","Fake Warper");
+    private PluginInformation information = new PluginInformation("Fake Warper", "Fake Warper");
 
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int, int, long, int, int)
@@ -44,8 +43,6 @@ public class FakeWarper implements MouseWarper {
     @Override
     public void initValues(int angleThreshold, int distanceThreshold,
                            long durationThreshold, int homeRadius, int setRadius) {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -53,8 +50,6 @@ public class FakeWarper implements MouseWarper {
      */
     @Override
     public void setFixationPoint(Point fixation) {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -62,15 +57,13 @@ public class FakeWarper implements MouseWarper {
      */
     @Override
     public void addMousePosition(Point position) {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation()
      */
     @Override
-    public PluginInformation getInformation() {        
+    public PluginInformation getInformation() {
         return this.information;
     }
 

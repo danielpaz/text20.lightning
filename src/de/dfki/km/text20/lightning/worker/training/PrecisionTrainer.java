@@ -94,7 +94,6 @@ public class PrecisionTrainer {
     public void setFixationPoint(Point fixation) {
         this.fixation = fixation;
         this.timestamp = System.currentTimeMillis();
-        this.doSth();
     }
 
     /**
@@ -172,10 +171,5 @@ public class PrecisionTrainer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    // TODO: rename and show shaped window
-    private void doSth() {
-
     }
 }
