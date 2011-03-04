@@ -114,6 +114,9 @@ public class SimpleTrainer implements Trainer {
             }
         }
         $("training.log").file().append(bestResultName + " achived the best results.\n\n");
+        
+        // reset data array
+        this.allData.clear();
     }
 
     /* (non-Javadoc)
