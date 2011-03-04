@@ -26,6 +26,9 @@ import net.xeoh.plugins.base.Plugin;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
+ * A mouse warper moves the cursor to a fixation point.
+ * This action starts when the cursor moves to the fixation point and fulfills the given restrictions.
+ * 
  * @author Christoph Käding
  *
  */
@@ -59,7 +62,7 @@ public interface MouseWarper extends Plugin {
     public void addMousePosition(Point position);
     
     /**
-     * some information about this plugin
+     * ... some information about this plugin ...
      * Make sure you always return the same object, because a id will be set in it!!
      * 
      * @return information
