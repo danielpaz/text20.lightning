@@ -57,43 +57,33 @@ public class ConfigWindow extends JFrame {
     }
 
     private void buttonSelectActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void checkBoxUseWarpActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void comboBoxStatusHotkeyActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void comboBoxActionHotkeyActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void comboBoxSearchMethodActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void buttonDefaultActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void buttonSubmitActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void comboBoxLearnMethodActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void buttonOKActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void buttonCancelActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void initComponents() {
@@ -154,9 +144,7 @@ public class ConfigWindow extends JFrame {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout(
-                    "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)",
-                    "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
+                contentPanel.setLayout(new FormLayout("4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu), 5*($lcgap, default)", "3*(default, $lgap), [7dlu,default], 20*($lgap, default)"));
 
                 //---- labelShowImages ----
                 labelShowImages.setText("Show Images");

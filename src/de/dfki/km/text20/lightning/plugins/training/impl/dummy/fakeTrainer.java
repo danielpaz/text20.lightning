@@ -41,8 +41,6 @@ public class fakeTrainer implements Trainer {
      */
     @Override
     public void leaveTraining() {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -58,7 +56,5 @@ public class fakeTrainer implements Trainer {
      */
     @Override
     public void setStep(Map<String, Point> calculations, Point fixation, Point mouseOffset) {
-        // TODO Auto-generated method stub
-        
     }
 }
