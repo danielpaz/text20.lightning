@@ -1,6 +1,6 @@
 /*
- * SaliencyDetector.java
- *
+ * TrainingsContainer.java
+ * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -17,36 +17,57 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *
  */
-package de.dfki.km.text20.lightning.plugins.saliency;
+package de.dfki.km.text20.lightning.worker.training;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
-import net.xeoh.plugins.base.Plugin;
-import de.dfki.km.text20.lightning.plugins.PluginInformation;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 
 /**
- * Interface for different algorithms for screen analyzing.
- * 
  * @author Christoph Käding
+ *
  */
-public interface SaliencyDetector extends Plugin {
+public class DataContainer implements Serializable {
+    
+    @Element
+    private Point mouseOffset;
+    
+    @Attribute
+    private String user;
+    
+    @Attribute
+    private long timestamp;
+    
+    public DataContainer(String user, long timestamp, Point mouseOffset){
+        this.user = user;
+        this.timestamp = timestamp;
+        this.mouseOffset = mouseOffset;
+    }
 
     /**
-     * Analyzes the given processed screenshot and calculates an offset which is added to the fixation point.
-     * 
-     * @param screenShot
-     * @return offset of the next position which is realized as the real target
+     * @return the mouseOffset
      */
-    public Point analyse(BufferedImage screenShot);
+    public Point getMouseOffset() {
+        return this.mouseOffset;
+    }
 
     /**
-     * Returns some information about the plugin.
-     * Make sure you always return the same object, because a id will be set in it!!
-     * 
-     * @return saliency plugin informations
+     * @return the user
      */
-    public PluginInformation getInformation();
+    public String getUser() {
+        return this.user;
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public long getTimestamp() {
+        return this.timestamp;
+    }
+    
+    
 }

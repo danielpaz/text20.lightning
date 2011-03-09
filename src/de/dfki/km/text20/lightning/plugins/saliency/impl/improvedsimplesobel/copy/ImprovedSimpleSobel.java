@@ -22,7 +22,9 @@
 package de.dfki.km.text20.lightning.plugins.saliency.impl.improvedsimplesobel.copy;
 
 import java.awt.Point;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -53,9 +55,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      * All the other ones will be colored black.
      */
     private BufferedImage derivate(BufferedImage screenShot) {
-
+        
+        ColorConvertOp converter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        screenShot = converter.filter(screenShot, null);
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-
+        
         // Go through each pixel position in the derivate image ... 
         for (int x = 0; x < screenShot.getHeight(); x++) {
             for (int y = 0; y < screenShot.getHeight() - 1; y++) {

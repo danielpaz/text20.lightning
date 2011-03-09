@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 
 import de.dfki.km.text20.lightning.MainClass;
@@ -35,7 +34,6 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.training.Trainer;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
@@ -46,9 +44,6 @@ import de.dfki.km.text20.lightning.plugins.training.Trainer;
  */
 @SuppressWarnings({ "serial", "boxing" })
 public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
-
-    /** filechooser for outputpath */
-    private JFileChooser chooser;
 
     /**
      * manageHotkeyComboBox() changes the items and selection of the actionHotkey and the statusHotkey comboboxes.
@@ -76,30 +71,13 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.internalPluginManager = MainClass.getInstance().getInternalPluginManager();
         this.properties = MainClass.getInstance().getProperties();
 
-        // create file chooser for outputpath
-        this.chooser = new JFileChooser() {
-
-            // react on selection
-            @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
-            public void approveSelection() {
-                super.approveSelection();
-                properties.setOutputPath(this.getSelectedFile().getAbsolutePath());
-                textFieldOutputPath.setText(properties.getOutputPath());
-            }
-        };
-        this.chooser.setMultiSelectionEnabled(false);
-        this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
         // take values of global properties and preselect them
-        this.checkBoxShowPictures.setSelected(this.properties.isShowImages());
         this.spinnerDimension.setValue(this.properties.getDimension());
-        this.textFieldOutputPath.setText(this.properties.getOutputPath());
 
         // initialize renderer of comboboxes
         this.renderer = initRenderer();
 
         // manage comboboxes
-        this.manageTrainerComboBox();
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
 
@@ -111,12 +89,19 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.buttonCancel.addActionListener(this);
         this.buttonDefault.addActionListener(this);
         this.buttonSubmit.addActionListener(this);
-        this.buttonSelect.addActionListener(this);
         this.comboBoxActionHotkey.addActionListener(this);
         this.comboBoxStatusHotkey.addActionListener(this);
         this.checkBoxUseWarp.addActionListener(this);
+        this.checkBoxTraining.addActionListener(this);
 
+        // initialize checkbox
+        this.checkBoxTraining.setSelected(!MainClass.getInstance().isNormalMode());
+
+        // initializes tooltips
         this.manageToolTips();
+
+        this.textFieldName.setText(MainClass.getInstance().getCurrentUser());
+
         // show the gui
         setVisible(true);
     }
@@ -128,45 +113,45 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * catches the action events from gui and starts the associated action
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent event) {
         // check which source occurs the action event and start a handle function
-        if (e.getSource() == this.buttonOK) {
+        if (event.getSource() == this.buttonOK) {
             this.buttonOKActionPerformed();
             return;
         }
 
-        if (e.getSource() == this.buttonCancel) {
+        if (event.getSource() == this.buttonCancel) {
             this.buttonCancelActionPerformed();
             return;
         }
 
-        if (e.getSource() == this.buttonDefault) {
+        if (event.getSource() == this.buttonDefault) {
             this.buttonDefaultActionPerformed();
             return;
         }
 
-        if (e.getSource() == this.buttonSubmit) {
+        if (event.getSource() == this.buttonSubmit) {
             // TODO: add method
             return;
         }
 
-        if (e.getSource() == this.buttonSelect) {
-            this.buttonSelectActionPerformed();
-            return;
-        }
-
-        if (e.getSource() == this.comboBoxActionHotkey) {
+        if (event.getSource() == this.comboBoxActionHotkey) {
             this.comboBoxActionHotkeyActionPerformed();
             return;
         }
 
-        if (e.getSource() == this.comboBoxStatusHotkey) {
+        if (event.getSource() == this.comboBoxStatusHotkey) {
             this.comboBoxStatusHotkeyActionPerformed();
             return;
         }
 
-        if (e.getSource() == this.checkBoxUseWarp) {
+        if (event.getSource() == this.checkBoxUseWarp) {
             this.checkBoxUseWarpActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.checkBoxTraining) {
+            this.checkBockTrainingActionPerformed();
             return;
         }
     }
@@ -175,7 +160,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
-        // initialize variables with gui values
+        // initialize variables with gui values, used to initialize warper
         int angle = Integer.parseInt(this.spinnerAngle.getValue().toString());
         int distance = Integer.parseInt(this.spinnerDistance.getValue().toString());
         long duration = Long.parseLong(this.spinnerDuration.getValue().toString());
@@ -183,9 +168,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         int set = Integer.parseInt(this.spinnerSetRadius.getValue().toString());
 
         // change variables in the properties and in the method manager
-        this.properties.setShowImages(this.checkBoxShowPictures.isSelected());
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
-        this.properties.setOutputPath(this.textFieldOutputPath.getText());
         this.properties.setAngleThreshold(angle);
         this.properties.setDistanceThreshold(distance);
         this.properties.setDurationThreshold(duration);
@@ -196,8 +179,17 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
-        this.internalPluginManager.setCurrentTrainer(((PluginInformation) this.comboBoxLearnMethod.getSelectedItem()).getId());
         this.internalPluginManager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
+
+        // set user name
+        MainClass.getInstance().setCurrentUser(this.textFieldName.getText());
+
+        // set mode
+        if (MainClass.getInstance().isNormalMode() && this.checkBoxTraining.isSelected())
+            MainClass.getInstance().toggleMode();
+        if (!MainClass.getInstance().isNormalMode() && !this.checkBoxTraining.isSelected())
+            MainClass.getInstance().toggleMode();
+        MainClass.getInstance().resetTrainer(this.textFieldName.getText());
 
         // close the gui
         this.dispose();
@@ -219,12 +211,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.properties.restoreDefault();
 
         // take values of global properties and preselect them
-        this.checkBoxShowPictures.setSelected(this.properties.isShowImages());
         this.spinnerDimension.setValue(this.properties.getDimension());
-        this.textFieldOutputPath.setText(this.properties.getOutputPath());
 
         // manage comboboxes
-        this.manageTrainerComboBox();
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
 
@@ -233,21 +222,21 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     }
 
     /**
-     * Fired if the Select button is clicked. Opens the filechooser.
-     */
-    private void buttonSelectActionPerformed() {
-
-        this.chooser.showOpenDialog(this);
-    }
-
-    /**
      * Fired if something changed at the actionhotkey combobox. Sets the choosed hotkey as actionhotkey.
      */
-    void comboBoxActionHotkeyActionPerformed() {
+    private void comboBoxActionHotkeyActionPerformed() {
         if (!this.autoSelect) {
             Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()));
             this.manageHotkeyComboBox();
         }
+    }
+
+    /**
+     * fired if the checkbock training is selected
+     */
+    private void checkBockTrainingActionPerformed() {
+        this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
+        this.enableWarpConfig(!this.checkBoxTraining.isSelected());
     }
 
     /**
@@ -265,7 +254,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * enables or disables config
      */
     private void checkBoxUseWarpActionPerformed() {
-        this.enableWarpConfig();
+        this.enableWarpConfig(this.checkBoxUseWarp.isSelected());
     }
 
     /**
@@ -287,7 +276,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
                     setText(((PluginInformation) value).getDisplayName());
                     setToolTipText(((PluginInformation) value).getToolTip());
                 }
-                
 
                 return this;
             }
@@ -327,22 +315,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         }
 
         this.autoSelect = false;
-    }
-
-    /**
-     * manages content of trainer combobox
-     */
-    private void manageTrainerComboBox() {
-        // add alls trainer to combobox
-        for (Trainer trainer : this.internalPluginManager.getTrainer())
-            this.comboBoxLearnMethod.addItem(trainer.getInformation());
-
-        // preselect current trainer
-        if (this.internalPluginManager.getCurrentTrainer() != null)
-            this.comboBoxLearnMethod.setSelectedItem(this.internalPluginManager.getCurrentTrainer().getInformation());
-
-        // set renderer
-        this.comboBoxLearnMethod.setRenderer(this.renderer);
     }
 
     /**
@@ -386,20 +358,20 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.comboBoxWarpMethod.setRenderer(this.renderer);
 
         // set enabled
-        this.enableWarpConfig();
+        this.enableWarpConfig(this.checkBoxUseWarp.isSelected());
     }
 
     /**
      * if mouse warp is used the configuration is enabled, otherwise not
      */
-    private void enableWarpConfig() {
+    private void enableWarpConfig(boolean enable) {
         // set enabled
-        this.spinnerAngle.setEnabled(this.checkBoxUseWarp.isSelected());
-        this.spinnerDistance.setEnabled(this.checkBoxUseWarp.isSelected());
-        this.spinnerDuration.setEnabled(this.checkBoxUseWarp.isSelected());
-        this.spinnerHomeRadius.setEnabled(this.checkBoxUseWarp.isSelected());
-        this.spinnerSetRadius.setEnabled(this.checkBoxUseWarp.isSelected());
-        this.comboBoxWarpMethod.setEnabled(this.checkBoxUseWarp.isSelected());
+        this.spinnerAngle.setEnabled(enable);
+        this.spinnerDistance.setEnabled(enable);
+        this.spinnerDuration.setEnabled(enable);
+        this.spinnerHomeRadius.setEnabled(enable);
+        this.spinnerSetRadius.setEnabled(enable);
+        this.comboBoxWarpMethod.setEnabled(enable);
     }
 
     /**
@@ -411,7 +383,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         String labelDimensionTT = "<HTML><body>Radius around the fixation point which is checked<br>for something interesting to click on.</body></HTML>";
         String labelActionHotkeyTT = "<HTML><body>Hotkey to click where you are looking at.</body></HTML>";
         String labelSearchMethodTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
-        String labelLearnMethodTT = "<HTML><body>Method which is used in the trainings mode.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
         String labelAngleThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must do this in an angle within this<br>threshold to activate the mouse warp.<br>The lower this value the more exact you must<br>move your mouse.</body></HTML>";
@@ -425,7 +396,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.labelDimension.setToolTipText(labelDimensionTT);
         this.labelActionHotkey.setToolTipText(labelActionHotkeyTT);
         this.labelSearchMethod.setToolTipText(labelSearchMethodTT);
-        this.labelLearnMethod.setToolTipText(labelLearnMethodTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
