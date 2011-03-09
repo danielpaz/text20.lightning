@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Fri Mar 04 14:58:19 CET 2011
  */
 
-package de.dfki.km.text20.lightning.evaluator;
+package de.dfki.km.text20.lightning.evaluator.gui;
 
 import java.awt.*;
 import javax.swing.*;
