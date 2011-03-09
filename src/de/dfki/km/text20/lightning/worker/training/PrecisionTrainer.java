@@ -22,23 +22,21 @@
 package de.dfki.km.text20.lightning.worker.training;
 
 import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Hashtable;
-import java.util.Map;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
- * The precision trainer is used in trainings mode. Here the collected data is handeled.
+ * The precision trainer is used in trainings mode. Here the collected data is handled.
  * 
  * @author Christoph Käding
  *
@@ -63,8 +61,7 @@ public class PrecisionTrainer {
     /** screenshot of the target area*/
     private BufferedImage screenShot;
 
-    /** stores result of every saliency detector */
-    private Map<String, Point> calculations;
+    private ArrayList<DataContainer> allData;
 
     /**
      * creates the precision trainer
@@ -76,7 +73,7 @@ public class PrecisionTrainer {
         // initialize variables
         this.fixation = new Point();
         this.offset = new Point();
-        this.calculations = new Hashtable<String, Point>();
+        this.allData = new ArrayList<DataContainer>();
 
         try {
             this.robot = new Robot();
@@ -101,75 +98,56 @@ public class PrecisionTrainer {
      * 
      * @param mousePosition
      */
+    @SuppressWarnings("boxing")
     public void setMousePosition(Point mousePosition) {
         this.mousePosition = mousePosition;
         Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.offset.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
+        this.offset.setLocation(this.mousePosition.x - this.fixation.x + MainClass.getInstance().getProperties().getDimension() /2, this.mousePosition.y - this.fixation.y + MainClass.getInstance().getProperties().getDimension() /2);
 
-        // run through all detectors
-        for (SaliencyDetector detector : MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors())
-            this.calculations.put(detector.getInformation().getDisplayName(), detector.analyse(this.screenShot));
+        // collect data
+        this.allData.add(new DataContainer(MainClass.getInstance().getCurrentUser(), new Long(this.timestamp), new Point(this.offset)));
 
-        // use current trainer plugin to recognize step
-        if ((MainClass.getInstance().getInternalPluginManager().getCurrentTrainer() != null) && (MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector() != null))
-            MainClass.getInstance().getInternalPluginManager().getCurrentTrainer().setStep(this.calculations, this.fixation, this.offset);
-
-        // draw all points to a image
-        if (MainClass.getInstance().getProperties().isShowImages()) this.drawPicture();
-
-        // update logfile
-        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + MainClass.getInstance().getInternalPluginManager().getCurrentTrainer().getInformation().getDisplayName());
-        System.out.println(logString);
-        MainClass.getInstance().getChannel().status(logString);
-    }
-
-    /**
-     * draw image to global output path
-     */
-    private void drawPicture() {
-        // initialize variables
-        int color = 0;
-        Point point = new Point();
-
-        // create screenshot graphic
-        Graphics2D graphic = this.screenShot.createGraphics();
-        graphic.setFont(graphic.getFont().deriveFont(5));
-
-        // visualize fixation point 
-        graphic.setColor(new Color(255, 255, 0, 255));
-        graphic.drawOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-        graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + MainClass.getInstance().getProperties().getDimension() / 2, 12 + MainClass.getInstance().getProperties().getDimension() / 2);
-        graphic.setColor(new Color(255, 255, 0, 32));
-        graphic.fillOval(MainClass.getInstance().getProperties().getDimension() / 2 - 5, MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-
-        // visualize mouse position
-        graphic.setColor(new Color(255, 0, 0, 255));
-        graphic.drawOval(this.offset.x + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + MainClass.getInstance().getProperties().getDimension() / 2, 10, 10);
-        graphic.drawChars(("mouse position").toCharArray(), 0, 14, this.offset.x + 12 + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + 12 + MainClass.getInstance().getProperties().getDimension() / 2);
-        graphic.setColor(new Color(255, 0, 0, 32));
-        graphic.fillOval(this.offset.x + MainClass.getInstance().getProperties().getDimension() / 2, this.offset.y + MainClass.getInstance().getProperties().getDimension() / 2, 10, 10);
-
-        // visualize calculations
-        for (SaliencyDetector detector : MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors()) {
-            point = this.calculations.get(detector.getInformation().getDisplayName());
-            color = (50 + color) % 256;
-            graphic.setColor(new Color(0, 255 - color, color, 255));
-            graphic.drawOval(point.x + MainClass.getInstance().getProperties().getDimension() / 2 - 5, point.y + MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-            graphic.drawChars(detector.getInformation().getDisplayName().toCharArray(), 0, detector.getInformation().getDisplayName().toCharArray().length, point.x + 12 + MainClass.getInstance().getProperties().getDimension() / 2, point.y + 12 + MainClass.getInstance().getProperties().getDimension() / 2);
-            graphic.setColor(new Color(0, 255 - color, color, 32));
-            graphic.fillOval(point.x + MainClass.getInstance().getProperties().getDimension() / 2 - 5, point.y + MainClass.getInstance().getProperties().getDimension() / 2 - 5, 10, 10);
-        }
-
-        // write the image
+        // write image
         try {
-            File outputfile = new File(MainClass.getInstance().getProperties().getOutputPath() + File.separator + this.timestamp + "_training.png");
+            File outputfile = new File("./training/data/" + MainClass.getInstance().getCurrentUser() + "/" + MainClass.getInstance().getCurrentUser() + "_" + this.timestamp + ".png");
             outputfile.mkdirs();
             ImageIO.write(this.screenShot, "png", outputfile);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // update logfile
+        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension());
+        System.out.println(logString);
+        MainClass.getInstance().getChannel().status(logString);
+    }
+
+    /**
+     * called when training ends
+     * writes training data into a file
+     */
+    public void leaveTraining() {
+        // only write file if there is some data
+        if (this.allData.size() == 0) return;
+
+        // create file
+        File logfile = new File("./training/data/" + MainClass.getInstance().getCurrentUser() + "/" + MainClass.getInstance().getCurrentUser() + "_" + System.currentTimeMillis() + ".training");
+
+        // try to write file
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(logfile));
+            for (DataContainer temp : this.allData) {
+                outputStream.writeObject(temp);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // reset data
+        this.allData.clear();
     }
 }

@@ -41,17 +41,9 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 @SuppressWarnings("serial")
 public class Properties implements Serializable {
 
-    /** shows if screenshots etc are written to the outputpath */
-    @Attribute
-    private boolean showImages;
-
     /** dimension for the screenshots */
     @Attribute
     private int dimension;
-
-    /** global output path */
-    @Attribute
-    private String outputPath;
 
     /** action hotkey */
     @Element
@@ -124,9 +116,7 @@ public class Properties implements Serializable {
                 if (this.object instanceof Properties) {
 
                     // store readed configurations
-                    this.showImages = ((Properties) this.object).isShowImages();
                     this.dimension = ((Properties) this.object).getDimension();
-                    this.outputPath = ((Properties) this.object).getOutputPath();
                     this.actionHotkey = ((Properties) this.object).getActionHotkey();
                     this.statusHotkey = ((Properties) this.object).getStatusHotkey();
                     this.angleThreshold = ((Properties) this.object).getAngleThreshold();
@@ -142,7 +132,7 @@ public class Properties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
-                    System.out.println("showImages: " + this.showImages + ", dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
+                    System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("useWarp: " + this.useWarp + ", angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
                     System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName + ", Trainer: " + this.trainerName);
                 }
@@ -167,9 +157,7 @@ public class Properties implements Serializable {
      */
     public void restoreDefault() {
         // set default values
-        this.showImages = false;
         this.dimension = 100;
-        this.outputPath = "./output";
         this.actionHotkey = null;
         this.statusHotkey = null;
         this.angleThreshold = 10;
@@ -181,24 +169,6 @@ public class Properties implements Serializable {
         this.trainerName = "";
         this.warperName = "";
         this.detectorName = "";
-    }
-
-    /**
-     * indicates if images should be shown
-     * 
-     * @return true if images should be written to files
-     */
-    public boolean isShowImages() {
-        return this.showImages;
-    }
-
-    /**
-     * set the boolean if images should be written to files
-     * 
-     * @param showImages
-     */
-    public void setShowImages(boolean showImages) {
-        this.showImages = showImages;
     }
 
     /**
@@ -217,35 +187,6 @@ public class Properties implements Serializable {
      */
     public void setDimension(int dimension) {
         this.dimension = dimension;
-    }
-
-    /**
-     * global output path
-     * 
-     * @return outputPath
-     */
-    public String getOutputPath() {
-        return this.outputPath;
-    }
-
-    /**
-     * sets the outputpath to choosed directory
-     * 
-     * @param choosedOutputPath 
-     */
-    public void setOutputPath(String choosedOutputPath) {
-        try {
-            File outputDir = new File(choosedOutputPath);
-
-            if (outputDir.isDirectory()) {
-
-                // if the choosed path is a directory, its path is the new outputpath
-                this.outputPath = choosedOutputPath;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

@@ -49,7 +49,7 @@ import de.dfki.km.text20.lightning.worker.warpMouse.WarpCommander;
 
 /**
  * Main entry point.
- * serv-4100
+ * 
  * @author Christoph Käding
  */
 public class MainClass {
@@ -87,6 +87,12 @@ public class MainClass {
     /** statistics plugin */
     private Statistics statistics;
 
+    /** necessary to identify the training data */
+    private String currentUser;
+
+    /** collects training data */
+    private PrecisionTrainer trainer;
+
     /**
      * creates a new instance of the mainclass and initializes it
      * 
@@ -118,17 +124,17 @@ public class MainClass {
 
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
-        
+
         // initialize plugin manager
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
-        
+
         // add plugins at classpath
         try {
             this.pluginManager.addPluginsFrom(new URI("classpath://*"));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        
+
         // initialize other variables
         this.statistics = this.pluginManager.getPlugin(Statistics.class); // FIXME: sth strange with statistic
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
@@ -138,7 +144,7 @@ public class MainClass {
         this.dllStatus = this.checkDll();
         this.isActivated = true;
         this.isNormalMode = true;
-        
+
         // initialize hotkeys
         Hotkey.getInstance();
 
@@ -148,11 +154,11 @@ public class MainClass {
 
         // Creates classes which are needed for the three parts (clicking, warping and training) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
-        PrecisionTrainer precisionTrainer = new PrecisionTrainer();
+        this.trainer = new PrecisionTrainer();
         this.warper = new WarpCommander();
 
         // main component which listen on trackingevents
-        FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, precisionTrainer);
+        FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);
 
         // check if all things are fine
         if (fixationCatcher.getStatus() && this.dllStatus) {
@@ -256,9 +262,9 @@ public class MainClass {
 
         // deactivate warper
         this.warper.stop();
-        
+
         // make the trainer known that the training is over
-        this.internalPluginManager.getCurrentTrainer().leaveTraining();
+        this.trainer.leaveTraining();
 
         // deactivate the hotkeys
         if (this.dllStatus) JIntellitype.getInstance().cleanUp();
@@ -304,9 +310,9 @@ public class MainClass {
 
             // shows change in tray and console
             this.showTrayMessage("Modus: normal mode activated");
-            
+
             // make the trainer known that the training is over
-            this.internalPluginManager.getCurrentTrainer().leaveTraining();
+            this.trainer.leaveTraining();
 
             // change mode
             this.isNormalMode = true;
@@ -336,12 +342,36 @@ public class MainClass {
     }
 
     /**
+     * resets trainer, used to notify new user names
+     * 
+     * @param name
+     */
+    public void resetTrainer(String name) {
+        this.trainer.leaveTraining();
+    }
+    
+    /**
      * returns the actual properties which includes all configurations which can be changed in the gui
      * 
      * @return current properties object
      */
     public Properties getProperties() {
         return this.properties;
+    }
+
+    /**
+     * @return the currentUser
+     */
+    public String getCurrentUser() {
+        if (this.currentUser == null) this.currentUser = "DefaultUser";
+        return this.currentUser;
+    }
+
+    /**
+     * @param currentUser the currentUser to set
+     */
+    public void setCurrentUser(String currentUser) {
+        this.currentUser = currentUser;
     }
 
     /**
@@ -370,7 +400,7 @@ public class MainClass {
                 // return successful
                 return true;
             }
-            
+
             // try to unzip it to "."
             $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 

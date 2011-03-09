@@ -22,7 +22,9 @@
 package de.dfki.km.text20.lightning.plugins.saliency.impl.simplesobel;
 
 import java.awt.Point;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -134,7 +136,7 @@ public class SimpleSobel implements SaliencyDetector {
                 // change direction
                 direction++;
                 direction = direction % 4;
-                
+
                 // increase size
                 size++;
                 break;
@@ -173,7 +175,7 @@ public class SimpleSobel implements SaliencyDetector {
                 // change direction
                 direction++;
                 direction = direction % 4;
-                
+
                 // increase size
                 size++;
                 break;
