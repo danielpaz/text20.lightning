@@ -342,7 +342,7 @@ public class ConfigWindow extends JFrame {
     // Generated using JFormDesigner non-commercial license
     private JPanel dialogPane;
     private JPanel contentPanel;
-    private JLabel labelName;
+    protected JLabel labelName;
     protected JTextField textFieldName;
     private JSeparator separator4;
     private JSeparator separator5;

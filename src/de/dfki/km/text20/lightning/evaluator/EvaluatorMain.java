@@ -43,6 +43,8 @@ import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
+import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
+import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.training.DataContainer;
@@ -71,7 +73,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
     private boolean running;
 
     private boolean finished;
-    
+
     private long currentTimeStamp;
 
     /**
@@ -112,13 +114,16 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
         this.buttonStart.setText("Start");
 
         this.labelDescription.setText("Step 1: Select *.training files.");
+        this.checkBoxImages.setSelected(true);
+        this.checkBoxSummary.setSelected(true);
+        this.buttonStart.setEnabled(false);
+        this.listDetectors.setEnabled(false);
 
         this.running = false;
         this.finished = false;
 
         this.currentTimeStamp = System.currentTimeMillis();
         this.worker = new EvaluatorWorker(this.currentTimeStamp);
-        
 
         // set logging properties
         final JSPFProperties props = new JSPFProperties();
@@ -177,8 +182,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
     private void buttonSelectActionPerformed() {
         JFileChooser chooser = initChooser();
         chooser.showOpenDialog(null);
-        this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
-        this.buttonStart.setEnabled(true);
     }
 
     private void buttonStartActionPerformed() {
@@ -205,7 +208,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             this.listFiles.setEnabled(true);
             this.checkBoxImages.setEnabled(true);
             this.checkBoxSummary.setEnabled(true);
-            this.worker.stop();
         }
     }
 
@@ -226,6 +228,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
                 super.approveSelection();
                 files.addAll(Arrays.asList(getSelectedFiles()));
                 listFiles.setListData(files.toArray());
+                labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
+                listDetectors.setEnabled(true);
+                buttonStart.setEnabled(true);
             }
         };
         chooser.setMultiSelectionEnabled(true);
@@ -282,6 +287,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
     }
 
     private void startEvaluation() {
+        String bestResult = "";
+
         for (Object selected : this.listDetectors.getSelectedValues()) {
             if (selected instanceof PluginInformation) {
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
@@ -292,7 +299,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             for (DataContainer container : this.readFile(file)) {
                 for (SaliencyDetector detector : this.selectedDetectors) {
 
-                    this.worker.start(detector, container, this.checkBoxSummary.isSelected(), this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+                    this.worker.evaluate(detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
                     if (!this.running) break;
                 }
@@ -300,7 +307,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             }
             if (!this.running) break;
         }
-        this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult() + " achived the best results.");
+        bestResult = this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors);
+        this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
         this.selectedDetectors.clear();
         this.finished = true;
         this.buttonStart.setText("Exit");

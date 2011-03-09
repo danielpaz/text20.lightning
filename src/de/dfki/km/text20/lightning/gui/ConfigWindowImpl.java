@@ -96,6 +96,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // initialize checkbox
         this.checkBoxTraining.setSelected(!MainClass.getInstance().isNormalMode());
+        this.checkBockTrainingActionPerformed();
 
         // initializes tooltips
         this.manageToolTips();
@@ -237,6 +238,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void checkBockTrainingActionPerformed() {
         this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
         this.enableWarpConfig(!this.checkBoxTraining.isSelected());
+        this.labelSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
+        this.comboBoxSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
+        this.labelName.setEnabled(this.checkBoxTraining.isSelected());
+        this.textFieldName.setEnabled(this.checkBoxTraining.isSelected());
+        this.labelEnableMouseWarp.setEnabled(!this.checkBoxTraining.isSelected());
     }
 
     /**
@@ -372,6 +378,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.spinnerHomeRadius.setEnabled(enable);
         this.spinnerSetRadius.setEnabled(enable);
         this.comboBoxWarpMethod.setEnabled(enable);
+        this.labelAngleThreshold.setEnabled(enable);
+        this.labelDistanceThreshold.setEnabled(enable);
+        this.labelDurationThreshold.setEnabled(enable);
+        this.labelHomeRadius.setEnabled(enable);
+        this.labelSetRadius.setEnabled(enable);
+        this.labelWarpMethod.setEnabled(enable);
     }
 
     /**
