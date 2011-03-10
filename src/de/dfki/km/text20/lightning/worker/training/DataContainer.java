@@ -21,27 +21,39 @@
 package de.dfki.km.text20.lightning.worker.training;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
 /**
+ * Container which stores collected trainings data.
+ * 
  * @author Christoph Käding
  *
  */
+@SuppressWarnings("serial")
 public class DataContainer implements Serializable {
     
+    /** offset from fixation to mouse position */
     @Element
     private Point mouseOffset;
     
+    /** user name */
     @Attribute
     private String user;
     
+    /** timestamp of the trainings step */
     @Attribute
     private long timestamp;
     
+    /**
+     * Creates new container an initializes its values.
+     * 
+     * @param user
+     * @param timestamp
+     * @param mouseOffset
+     */
     public DataContainer(String user, long timestamp, Point mouseOffset){
         this.user = user;
         this.timestamp = timestamp;

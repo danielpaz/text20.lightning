@@ -101,6 +101,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // initializes tooltips
         this.manageToolTips();
 
+        // initialize current user
         this.textFieldName.setText(MainClass.getInstance().getCurrentUser());
 
         // show the gui
@@ -200,7 +201,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Fired if the Cancel button is clicked. Closes the window.
      */
     private void buttonCancelActionPerformed() {
-
+        // close the window
         this.dispose();
     }
 
@@ -236,6 +237,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * fired if the checkbock training is selected
      */
     private void checkBockTrainingActionPerformed() {
+        // change enable status of some components
         this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
         this.enableWarpConfig(!this.checkBoxTraining.isSelected());
         this.labelSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
@@ -264,7 +266,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     }
 
     /**
-     * the whole plugin is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * the whole plugin information is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
      * 
      * @return a changed default renderer
      */
@@ -371,7 +373,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * if mouse warp is used the configuration is enabled, otherwise not
      */
     private void enableWarpConfig(boolean enable) {
-        // set enabled
+        // change enable status of some components
         this.spinnerAngle.setEnabled(enable);
         this.spinnerDistance.setEnabled(enable);
         this.spinnerDuration.setEnabled(enable);
