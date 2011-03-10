@@ -147,6 +147,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
         }
 
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(new PluginManagerUtil(this.pluginManager).getPlugins(SaliencyDetector.class));
+        for(int i = 0; i < this.saliencyDetectors.size(); i++)
+            this.saliencyDetectors.get(i).getInformation().setId(i);
+        
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
         this.files = new ArrayList<File>();
 
@@ -299,7 +302,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             for (DataContainer container : this.readFile(file)) {
                 for (SaliencyDetector detector : this.selectedDetectors) {
 
-                    this.worker.evaluate(detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+                    this.worker.evaluate(file.getName(), detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
                     if (!this.running) break;
                 }
