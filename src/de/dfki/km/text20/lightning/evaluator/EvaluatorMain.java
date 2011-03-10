@@ -20,8 +20,11 @@
  */
 package de.dfki.km.text20.lightning.evaluator;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -33,7 +36,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
@@ -54,29 +59,42 @@ import de.dfki.km.text20.lightning.worker.training.DataContainer;
  *
  */
 @SuppressWarnings("serial")
-public class EvaluatorMain extends EvaluationWindow implements ActionListener {
+public class EvaluatorMain extends EvaluationWindow implements ActionListener,
+        WindowListener {
 
+    /** singleton instance of this main */
     private static EvaluatorMain evaluatorMain;
 
+    /** selected *.training files */
     private ArrayList<File> files;
 
+    /** manager which handles the detector plugins, statitic plugin, logging plugin .... */
     private PluginManager pluginManager;
 
+    /** list of available detectors */
     private ArrayList<SaliencyDetector> saliencyDetectors;
 
+    /** list of plugin information of the available detectors */
     private ArrayList<PluginInformation> information;
 
+    /** list of the from listDetectors selected detectors */
     private ArrayList<SaliencyDetector> selectedDetectors;
 
+    /** evaluation worker which runs the detectors */
     private EvaluatorWorker worker;
 
+    /** indicates if the tool is running */
     private boolean running;
 
+    /** indicates id the tool is finished */
     private boolean finished;
 
+    /** timestamp from the start of this tool */
     private long currentTimeStamp;
 
     /**
+     * main entry point
+     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -87,10 +105,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             System.out.println("Unable to load native look and feel.\n");
         }
 
+        // create and initialize singleton
         EvaluatorMain.getInstance().init();
     }
 
     /**
+     * creates the singleton instance
      * 
      * @return singleton instance
      */
@@ -100,29 +120,38 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
     }
 
     /**
-     * 
+     * Initializes all necessary variables and sets the window visible.
      */
     private void init() {
+        // initialize arraylists
         this.files = new ArrayList<File>();
         this.information = new ArrayList<PluginInformation>();
+        this.selectedDetectors = new ArrayList<SaliencyDetector>();
 
+        // add action listeners
         this.buttonSelect.addActionListener(this);
         this.buttonStart.addActionListener(this);
         this.buttonRemove.addActionListener(this);
+        this.mainFrame.addWindowListener(this);
 
+        // set enable/disable and text to some components
         this.buttonStart.setEnabled(false);
         this.buttonStart.setText("Start");
-
         this.labelDescription.setText("Step 1: Select *.training files.");
         this.checkBoxImages.setSelected(true);
         this.checkBoxSummary.setSelected(true);
         this.buttonStart.setEnabled(false);
         this.listDetectors.setEnabled(false);
+        this.progressBar.setEnabled(false);
 
+        // initialize status
         this.running = false;
         this.finished = false;
 
+        // get timestamp
         this.currentTimeStamp = System.currentTimeMillis();
+
+        // create new worker
         this.worker = new EvaluatorWorker(this.currentTimeStamp);
 
         // set logging properties
@@ -146,21 +175,18 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             e.printStackTrace();
         }
 
+        // initialize list of detectors
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(new PluginManagerUtil(this.pluginManager).getPlugins(SaliencyDetector.class));
-        for(int i = 0; i < this.saliencyDetectors.size(); i++)
-            this.saliencyDetectors.get(i).getInformation().setId(i);
-        
-        this.selectedDetectors = new ArrayList<SaliencyDetector>();
-        this.files = new ArrayList<File>();
-
         for (int i = 0; i < this.saliencyDetectors.size(); i++) {
             this.saliencyDetectors.get(i).getInformation().setId(i);
             this.information.add(this.saliencyDetectors.get(i).getInformation());
         }
 
+        // initialize listDetectors
         this.listDetectors.setListData(this.information.toArray());
+        this.listDetectors.setCellRenderer(this.initRenderer());
 
-        setVisible(true);
+        this.mainFrame.setVisible(true);
     }
 
     /* (non-Javadoc)
@@ -168,29 +194,46 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
+        // check which source occurs the action event and start a handle function
         if (event.getSource() == this.buttonSelect) {
             this.buttonSelectActionPerformed();
             return;
         }
+
         if (event.getSource() == this.buttonStart) {
             this.buttonStartActionPerformed();
             return;
         }
+
         if (event.getSource() == this.buttonRemove) {
             this.buttonRemoveActionPerformed();
             return;
         }
     }
 
+    /**
+     * fired when the buttonSelect is clicked
+     * opens the file chooser
+     */
     private void buttonSelectActionPerformed() {
         JFileChooser chooser = initChooser();
         chooser.showOpenDialog(null);
     }
 
+    /**
+     * fired when the buttonStart is clicked
+     * reacts on the current status of this tool and starts a handle for it
+     */
     private void buttonStartActionPerformed() {
+        // if the work is finished, ecit the tool
         if (this.finished) this.exit();
+
+        // if the tool ist not running ...
         if (!this.running) {
+            // ... and if some detectors are selected ...
             if (this.listDetectors.getSelectedValues().length == 0) return;
+
+            // ... set some gui components enable/disable and start the evaluation
             this.running = true;
             this.labelDescription.setText("Step 3: Wait for the results.");
             this.buttonStart.setText("Stop");
@@ -200,8 +243,13 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             this.listFiles.setEnabled(false);
             this.checkBoxImages.setEnabled(false);
             this.checkBoxSummary.setEnabled(false);
+            this.mainFrame.repaint();
             this.startEvaluation();
+
+            // or if the tool is running ...
         } else {
+
+            // ... reset to startable state
             this.running = false;
             this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
             this.buttonStart.setText("Start");
@@ -214,14 +262,28 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
         }
     }
 
+    /**
+     * fired when the buttonRemove is clicked
+     * removes selected files from array list and listFiles
+     */
     private void buttonRemoveActionPerformed() {
+        // for every selected file ...
         for (Object selected : this.listFiles.getSelectedValues()) {
+
+            // ... remove it from array list
             if (selected instanceof File) this.files.remove(selected);
         }
+
+        // clear listFiles and add all in files included files
         this.listFiles.removeAll();
         this.listFiles.setListData(this.files.toArray());
     }
 
+    /**
+     * initializes filechooser
+     * 
+     * @return
+     */
     private JFileChooser initChooser() {
         JFileChooser chooser = new JFileChooser() {
 
@@ -229,16 +291,27 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             public void approveSelection() {
                 super.approveSelection();
+
+                // add selected files to array list ...
                 files.addAll(Arrays.asList(getSelectedFiles()));
+
+                // ... and to the listFiles
                 listFiles.setListData(files.toArray());
+
+                // enable some gui components and change label text
                 labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
                 listDetectors.setEnabled(true);
                 buttonStart.setEnabled(true);
+                progressBar.setEnabled(true);
             }
         };
+
+        // set behavior of this chooser
         chooser.setMultiSelectionEnabled(true);
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(new FileFilter() {
+
+            // filter string, only files with this extension and directories will be shown
             private String extension = ".training";
 
             @Override
@@ -246,6 +319,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
                 return this.extension;
             }
 
+            // set filter
             @Override
             public boolean accept(File file) {
                 if (file == null) return false;
@@ -256,26 +330,68 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             }
         });
 
+        // return the created chooser
         return chooser;
     }
 
+    /**
+     * the whole plugin information is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * 
+     * @return a changed default renderer
+     */
+    private DefaultListCellRenderer initRenderer() {
+        return new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value,
+                                                          int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                // set new displayed attribute
+                if (value instanceof PluginInformation) {
+                    setText(((PluginInformation) value).getDisplayName());
+                    setToolTipText(((PluginInformation) value).getToolTip());
+                }
+
+                return this;
+            }
+        };
+    }
+
+    /**
+     * reads DataContainers from given file
+     * 
+     * @param file
+     * @return readed DataContainers
+     */
     private ArrayList<DataContainer> readFile(File file) {
+        // initialize some variables
         ObjectInputStream inputStream = null;
         Object object;
         ArrayList<DataContainer> container = new ArrayList<DataContainer>();
+
         try {
+
+            // read from file till eof
             inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             while ((object = inputStream.readObject()) != null) {
                 if (object instanceof DataContainer) {
                     container.add((DataContainer) object);
                 }
             }
+
+            // close stream and return readed content
             inputStream.close();
             return container;
+
         } catch (EOFException eofe) {
             try {
+
+                // close stream and return readed content
                 if (inputStream != null) inputStream.close();
                 return container;
+
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 return null;
@@ -289,20 +405,43 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
         }
     }
 
+    /**
+     * starts evaluation process
+     */
     private void startEvaluation() {
+        // initialize variables
         String bestResult = "";
+        ArrayList<DataContainer> containers = new ArrayList<DataContainer>();
+        int i = 1;
 
-        for (Object selected : this.listDetectors.getSelectedValues()) {
-            if (selected instanceof PluginInformation) {
+        // add selected detectors to array list 
+        for (Object selected : this.listDetectors.getSelectedValues())
+            if (selected instanceof PluginInformation)
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
-            }
-        }
 
+        // read container to get thier number
+        for (File file : this.files)
+            containers.addAll(this.readFile(file));
+
+        // initialize progress bar
+        this.progressBar.setMaximum(containers.size() * this.selectedDetectors.size());
+        this.progressBar.setStringPainted(true);
+
+        // run through every file ...
         for (File file : this.files) {
+            
+            // ... and through every container in it ...
             for (DataContainer container : this.readFile(file)) {
+                
+                // ... and evry detector
                 for (SaliencyDetector detector : this.selectedDetectors) {
-
+                    
+                    // process evaluation
                     this.worker.evaluate(file.getName(), detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+
+                    // update progress bar
+                    this.progressBar.setValue(i++);
+                    this.progressBar.paint(this.progressBar.getGraphics());
 
                     if (!this.running) break;
                 }
@@ -310,17 +449,86 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener {
             }
             if (!this.running) break;
         }
+        
+        // show best result
         bestResult = this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors);
         this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
+        
+        // inidicate finish
         this.selectedDetectors.clear();
         this.finished = true;
         this.buttonStart.setText("Exit");
     }
 
-    // TODO: catch window closing event
+    /**
+     * closes tool cleanly
+     */
     private void exit() {
         this.pluginManager.shutdown();
-        dispose();
+        this.mainFrame.dispose();
         System.exit(0);
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowActivated(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowClosed(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowClosing(WindowEvent arg0) {
+        this.pluginManager.shutdown();
+        System.exit(0);
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowDeactivated(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowDeiconified(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowIconified(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowOpened(WindowEvent arg0) {
+        // TODO Auto-generated method stub
+
     }
 }

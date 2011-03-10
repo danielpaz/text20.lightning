@@ -145,9 +145,6 @@ public class MainClass {
         this.isActivated = true;
         this.isNormalMode = true;
 
-        // initialize hotkeys
-        Hotkey.getInstance();
-
         // indicate start
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
@@ -163,6 +160,9 @@ public class MainClass {
         // check if all things are fine
         if (fixationCatcher.getStatus() && this.dllStatus) {
 
+            // initialize hotkeys
+            Hotkey.getInstance();
+            
             // start listening
             fixationCatcher.startCatching();
             this.warper.start();
@@ -260,14 +260,16 @@ public class MainClass {
         // store properties to a file
         this.properties.writeProperties();
 
-        // deactivate warper
-        this.warper.stop();
-
         // make the trainer known that the training is over
         this.trainer.leaveTraining();
 
-        // deactivate the hotkeys
-        if (this.dllStatus) JIntellitype.getInstance().cleanUp();
+        if (this.dllStatus) {
+            // deactivate the hotkeys
+            JIntellitype.getInstance().cleanUp();
+
+            // deactivate warper
+            this.warper.stop();
+        }
 
         // removes icon from system tray
         this.trayIcon.remove();
@@ -349,7 +351,7 @@ public class MainClass {
     public void resetTrainer(String name) {
         this.trainer.leaveTraining();
     }
-    
+
     /**
      * returns the actual properties which includes all configurations which can be changed in the gui
      * 
@@ -390,7 +392,7 @@ public class MainClass {
         // check if it is already the
         if (!destination.exists()) {
 
-            System.out.println("JIntellytype.dll was not found.");
+            System.out.println("\nJIntellytype.dll was not found.");
 
             // try to unzip it to the windows directory
             $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
@@ -402,12 +404,12 @@ public class MainClass {
             }
 
             // try to unzip it to "."
-            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+            //$(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 
             // indicate error 
             String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
             this.showTrayMessage(msg);
-            System.out.println("\n" + msg + "\n\n");
+            System.out.println("\n" + msg + "\n");
             this.channel.status(msg);
 
             // return not successful
