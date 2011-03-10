@@ -25,63 +25,140 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
+ * Container which stores the calculated results for each method.
+ * 
  * @author Christoph Käding
  *
  */
 public class EvaluationContainer {
 
+    /** map with stored results as value and method id as key */
     private Map<Integer, Double> results;
 
-    private int keyKey;
+    /** id wich is counted to get the number of 'adds' */
+    private int keyId;
 
+    /** number of 'adds' */
     private int size;
 
+    /** temp for calculations */
     private double temp;
 
-    private ArrayList<Integer> keys;
-    
+    /** list of ids */
+    private ArrayList<Integer> ids;
+
+    /** absolute name of the logfile */
     private String log;
-    
+
+    /** timestamp of the start of the evaluation */
     private long timeStamp;
-    
+
+    /** username */
     private String name;
 
-    public EvaluationContainer(int key, double value, String log, String name, long timeStamp) {
+    /**
+     * Creates a new container and initializes all necessary variables.
+     * Also adds the first id with its value.
+     * 
+     * @param id 
+     *      of the method
+     * @param value
+     *      distance between mouse position and calculated result 
+     * @param log
+     *      absolute path of the logfile
+     * @param name
+     *      name of the current evaluated user
+     * @param timeStamp
+     *      start of the evaluation session
+     */
+    public EvaluationContainer(int id, double value, String log, String name,
+                               long timeStamp) {
+        // initialize variables
         this.results = new Hashtable<Integer, Double>();
-        this.keys = new ArrayList<Integer>();
-        this.keyKey = key;
+        this.ids = new ArrayList<Integer>();
+        this.keyId = id;
         this.size = 0;
         this.log = log;
         this.name = name;
         this.timeStamp = timeStamp;
-        this.add(key, value);
+
+        // add first value
+        this.add(id, value);
     }
 
-    public void add(int key, double value) {
-        if (this.keyKey == key) this.size++;
-        if (this.results.containsKey(key)) this.temp = this.results.get(key);
-        this.results.put(key, this.temp + value);
-        if (!this.keys.contains(key)) this.keys.add(key);
+    /**
+     * Adds given distance by name to the storing map. 
+     * If the key already is in the map, the value will be added to it.
+     * 
+     * @param id 
+     *      of the method
+     * @param value
+     *      distance between mouse position and calculated result 
+     */
+    @SuppressWarnings("boxing")
+    public void add(int id, double value) {
+        // if the given id is the key id, increase size
+        if (this.keyId == id) this.size++;
+
+        // if the map contains already the given id, store value in temp
+        if (this.results.containsKey(id)) this.temp = this.results.get(id);
+
+        // put temp + given value by given id to the map
+        this.results.put(id, this.temp + value);
+
+        // add id to the list of ids if it is not already there
+        if (!this.ids.contains(id)) this.ids.add(id);
+
+        // System.out.println("id: " + id + " value: " + value + " size: " + this.size + " keyId: " + this.keyId);
+
+        // reset temp
+        this.temp = 0;
     }
 
-    public double getAverage(int key) {
-        if (this.results.containsKey(key)) return this.results.get(key) / this.size;
-        else
-            return 0;
+    /**
+     * Returns averaged distance for the given id.
+     * 
+     * @param id
+     * @return averaged distance
+     */
+    @SuppressWarnings("boxing")
+    public double getAverage(int id) {
+        if (this.results.containsKey(id)) return (this.results.get(id) / this.size);
+        return 0;
     }
 
-    public ArrayList<Integer> getKeys() {
-        return this.keys;
+    /**
+     * returns a list of recognized ids
+     * 
+     * @return ids
+     */
+    public ArrayList<Integer> getIds() {
+        return this.ids;
     }
-    
+
+    /**
+     * returns the absolute file name of the logfile
+     * 
+     * @return absolute file name
+     */
     public String getLogPath() {
         return this.log;
     }
-    
+
+    /**
+     * returns the name of the current evaluated user
+     * 
+     * @return user name
+     */
     public String getName() {
         return this.name;
     }
-    
+
+    /**
+     * returns the timestamp of the start of this evaluation session
+     * 
+     * @return timestamp
+     */
     public long getTimeStamp() {
         return this.timeStamp;
     }
