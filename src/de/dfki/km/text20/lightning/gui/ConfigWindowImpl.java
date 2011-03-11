@@ -105,6 +105,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.textFieldName.setText(MainClass.getInstance().getCurrentUser());
 
         // show the gui
+        repaint();
         setVisible(true);
     }
 
@@ -239,12 +240,15 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void checkBockTrainingActionPerformed() {
         // change enable status of some components
         this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
-        this.enableWarpConfig(!this.checkBoxTraining.isSelected());
         this.labelSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
         this.comboBoxSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
         this.labelName.setEnabled(this.checkBoxTraining.isSelected());
         this.textFieldName.setEnabled(this.checkBoxTraining.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxTraining.isSelected());
+        this.checkBoxUseWarpActionPerformed();
+        if (!this.checkBoxTraining.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
+        else
+            this.enableWarpConfig(false);
     }
 
     /**
@@ -366,7 +370,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.comboBoxWarpMethod.setRenderer(this.renderer);
 
         // set enabled
-        this.enableWarpConfig(this.checkBoxUseWarp.isSelected());
+        this.checkBoxUseWarpActionPerformed();
     }
 
     /**
