@@ -29,6 +29,7 @@ import com.melloware.jintellitype.JIntellitype;
 import com.melloware.jintellitype.JIntellitypeConstants;
 
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.Properties;
 
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys are linked with thier functions or removed from the listener by this class.
@@ -53,23 +54,27 @@ public class Hotkey implements HotkeyListener {
     /** a list of all available hotkeys */
     private ArrayList<HotkeyContainer> hotkeys;
 
+    /** global used properties */
+    private Properties properties;
+
     /** */
     private Hotkey() {
 
+        this.properties = MainClass.getInstance().getProperties();
         this.isHotKeyTyped = false;
         this.initHotkeys();
-
-        if ((MainClass.getInstance().getProperties().getActionHotkey() != null) && (MainClass.getInstance().getProperties().getStatusHotkey() != null)) {
+        
+        if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {
             // if already hotekeys are stored in the properties, these will be used as current hotkeys
-            this.actionHotkey = MainClass.getInstance().getProperties().getActionHotkey();
-            this.statusHotkey = MainClass.getInstance().getProperties().getStatusHotkey();
+            this.actionHotkey = this.properties.getActionHotkey();
+            this.statusHotkey = this.properties.getStatusHotkey();
 
         } else {
             // otherwise the default hotkeys were set and stored to properties
             this.getCurrentHotkey(1);
-            MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
+            this.properties.setActionHotkey(this.actionHotkey);
             this.getCurrentHotkey(2);
-            MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
+            this.properties.setStatusHotkey(this.statusHotkey);
         }
 
         // add hotkeys to listener
@@ -158,13 +163,13 @@ public class Hotkey implements HotkeyListener {
         // action hotkey
         case 1:
             this.actionHotkey = hotkey;
-            MainClass.getInstance().getProperties().setActionHotkey(this.actionHotkey);
+            this.properties.setActionHotkey(this.actionHotkey);
             break;
 
         // status hotkey
         case 2:
             this.statusHotkey = hotkey;
-            MainClass.getInstance().getProperties().setStatusHotkey(this.statusHotkey);
+            this.properties.setStatusHotkey(this.statusHotkey);
             break;
         default:
             return;
@@ -195,14 +200,14 @@ public class Hotkey implements HotkeyListener {
         // action hotkey 
         case 1:
             // set default if it is needed
-            if ((this.actionHotkey == null) || MainClass.getInstance().getProperties().getActionHotkey() == null)
+            if ((this.actionHotkey == null) || this.properties.getActionHotkey() == null)
                 this.actionHotkey = this.hotkeys.get(0);
             return this.actionHotkey;
 
             // satus hotkey
         case 2:
             // set default if it is needed
-            if ((this.statusHotkey == null) || MainClass.getInstance().getProperties().getStatusHotkey() == null)
+            if ((this.statusHotkey == null) || this.properties.getStatusHotkey() == null)
                 this.statusHotkey = this.hotkeys.get(1);
             return this.statusHotkey;
 

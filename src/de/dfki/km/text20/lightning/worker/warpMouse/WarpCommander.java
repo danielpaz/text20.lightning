@@ -27,6 +27,8 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.Properties;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
  * This class tracks the position of the mouse pointer every 100ms. 
@@ -43,27 +45,38 @@ public class WarpCommander {
     /** timer which clocks the mouse position tracking */
     private Timer timer;
 
+    /** internal used plugin manager */
+    private InternalPluginManager manager;
+
+    /** global used properties */
+    private Properties properties;
+    
     /**
      * creates a new WarpCommander and initializes the timer and the currently used warp plugin.
      */
     public WarpCommander() {
+        // initialize variables
+        this.properties = MainClass.getInstance().getProperties();
+        this.manager = MainClass.getInstance().getInternalPluginManager();
+        
         // initialize current warp plugin
-        int angle = MainClass.getInstance().getProperties().getAngleThreshold();
-        int distance = MainClass.getInstance().getProperties().getDistanceThreshold();
-        long duration = MainClass.getInstance().getProperties().getDurationThreshold();
-        int home = MainClass.getInstance().getProperties().getHomeRadius();
-        int set = MainClass.getInstance().getProperties().getSetRadius();
-        if (MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null)
-            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
+        int angle = this.properties.getAngleThreshold();
+        int distance = this.properties.getDistanceThreshold();
+        long duration = this.properties.getDurationThreshold();
+        int home = this.properties.getHomeRadius();
+        int set = this.properties.getSetRadius();
+        if (this.manager.getCurrentMouseWarper() != null)
+            this.manager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
 
         // initialize timer
         this.timer = new Timer(100, new ActionListener() {
 
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
-                if (MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null)
-                    MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
+                if (manager.getCurrentMouseWarper() != null)
+                    manager.getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
             }
         });
     }
@@ -72,7 +85,7 @@ public class WarpCommander {
      * starts the timer
      */
     public void start() {
-        if (MainClass.getInstance().getProperties().isUseWarp()) this.timer.start();
+        if (this.properties.isUseWarp()) this.timer.start();
     }
 
     /**

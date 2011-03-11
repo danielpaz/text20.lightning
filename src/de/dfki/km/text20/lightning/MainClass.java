@@ -131,6 +131,7 @@ public class MainClass {
         // add plugins at classpath
         try {
             this.pluginManager.addPluginsFrom(new URI("classpath://*"));
+            this.pluginManager.addPluginsFrom(new File("plugins/").toURI());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -162,7 +163,7 @@ public class MainClass {
 
             // initialize hotkeys
             Hotkey.getInstance();
-            
+
             // start listening
             fixationCatcher.startCatching();
             this.warper.start();
@@ -395,7 +396,7 @@ public class MainClass {
             System.out.println("\nJIntellytype.dll was not found.");
 
             // try to unzip it to the windows directory
-            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
 
             if (destination.exists()) {
                 System.out.println("... but is now placed.\n");
@@ -404,10 +405,10 @@ public class MainClass {
             }
 
             // try to unzip it to "."
-            //$(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
 
             // indicate error 
-            String msg = new String("Initializing failed. A necessary DLL-file could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
+            String msg = new String("Initializing failed. A necessary DLL-file, 'JIntellitype.dll', could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
             this.showTrayMessage(msg);
             System.out.println("\n" + msg + "\n");
             this.channel.status(msg);

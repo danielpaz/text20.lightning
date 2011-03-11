@@ -1,7 +1,7 @@
 /*
- * SaliencyPluginInformation.java
+ * PluginInformation.java
  * 
- * Copyright (c) 2011, Ralf Biedert All rights reserved.
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ package de.dfki.km.text20.lightning.plugins;
 /**
  * Provides information about the given filter.
  * 
- * @author Ralf Biedert
+ * @author Christoph Käding
  */
 public class PluginInformation {
     
