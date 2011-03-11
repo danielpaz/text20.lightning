@@ -29,7 +29,6 @@ import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.plugins.training.Trainer;
 
 /**
  * All the given plugins were added and provided for use. Also switching of the active plugin is handeled. 
@@ -49,18 +48,12 @@ public class InternalPluginManager {
 
     /** a list of all mouse warpers*/
     private ArrayList<MouseWarper> mouseWarpers;
-    
-    /** list of all available trainings methods */
-    private ArrayList<Trainer> trainer;
-    
+
     /** current elected saliency detector */
     private int currentSaliencyDetectorId;
-    
+
     /** current elected mouse warper */
     private int currentMouseWarperId;
-
-    /** current used trainings method */
-    private int currentTrainerId;
 
     /**
      * creates a new MethodManager object and loads plugins
@@ -75,7 +68,6 @@ public class InternalPluginManager {
         this.pluginManagerUtil = new PluginManagerUtil(manager);
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
         this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
-        this.trainer = new ArrayList<Trainer>(this.pluginManagerUtil.getPlugins(Trainer.class));
 
         // generate id and set former used plugin if this is available or set default value ,if it is needed, for ...
         // ...saliency detectors
@@ -99,18 +91,6 @@ public class InternalPluginManager {
             }
         }
         if ((this.mouseWarpers.size() > 0) && !found) this.setCurrentMouseWarper(0);
-
-        // ... trainer
-        found = false;
-        for (int i = 0; i < this.trainer.size(); i++) {
-            this.trainer.get(i).getInformation().setId(i);
-            if (this.properties.getTrainerName().equals(this.trainer.get(i).getInformation().getDisplayName())) {
-                this.setCurrentTrainer(i);
-                found = true;
-            }
-        }
-        if ((this.trainer.size() > 0) && !found) this.setCurrentTrainer(0);
-
     }
 
     /**
@@ -167,33 +147,5 @@ public class InternalPluginManager {
     public void setCurrentMouseWarper(int choice) {
         this.currentMouseWarperId = choice;
         this.properties.setWarperName(this.mouseWarpers.get(choice).getInformation().getDisplayName());
-          }
-
-    /**
-     * Returns a ArrayList of all the given plugins for training.
-     * 
-     * @return saliencyDetectors
-     */
-    public ArrayList<Trainer> getTrainer() {
-        return this.trainer;
-    }
-
-    /**
-     * Changes the active plugin to change the used method.
-     * 
-     * @param choice
-     */
-    public void setCurrentTrainer(int choice) {
-        this.currentTrainerId = choice;
-        this.properties.setTrainerName(this.trainer.get(choice).getInformation().getDisplayName());
-    }
-
-    /**
-     * gives the current trainings method back
-     * 
-     * @return currentSaliencyDetector
-     */
-    public Trainer getCurrentTrainer() {
-        return this.trainer.get(this.currentTrainerId);
     }
 }

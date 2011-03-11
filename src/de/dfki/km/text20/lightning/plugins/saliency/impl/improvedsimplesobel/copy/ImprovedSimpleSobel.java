@@ -1,5 +1,5 @@
 /*
- * SimpleSobel.java
+ * ImprovedSimpleSobel.java
  *
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *

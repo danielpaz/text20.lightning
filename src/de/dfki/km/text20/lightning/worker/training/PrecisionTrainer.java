@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.Properties;
 
 /**
  * The precision trainer is used in trainings mode. Here the collected data is handled.
@@ -61,7 +62,14 @@ public class PrecisionTrainer {
     /** screenshot of the target area*/
     private BufferedImage screenShot;
 
-    private ArrayList<DataContainer> allData;
+    /** a list of all catched data */
+    private ArrayList<DataContainer> allData;    
+
+    /** global used properties */
+    private Properties properties;
+    
+    /** name of current registered user */
+    private String user;
 
     /**
      * creates the precision trainer
@@ -74,6 +82,8 @@ public class PrecisionTrainer {
         this.fixation = new Point();
         this.offset = new Point();
         this.allData = new ArrayList<DataContainer>();
+        this.properties = MainClass.getInstance().getProperties();
+        this.user = MainClass.getInstance().getCurrentUser();
 
         try {
             this.robot = new Robot();
@@ -101,18 +111,18 @@ public class PrecisionTrainer {
     @SuppressWarnings("boxing")
     public void setMousePosition(Point mousePosition) {
         this.mousePosition = mousePosition;
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.offset.setLocation(this.mousePosition.x - this.fixation.x + MainClass.getInstance().getProperties().getDimension() /2, this.mousePosition.y - this.fixation.y + MainClass.getInstance().getProperties().getDimension() /2);
+        this.offset.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() /2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() /2);
 
         // collect data
-        this.allData.add(new DataContainer(MainClass.getInstance().getCurrentUser(), new Long(this.timestamp), new Point(this.offset)));
+        this.allData.add(new DataContainer(this.user, new Long(this.timestamp), new Point(this.offset)));
 
         // write image
         try {
-            File outputfile = new File("./training/data/" + MainClass.getInstance().getCurrentUser() + "/" + MainClass.getInstance().getCurrentUser() + "_" + this.timestamp + ".png");
+            File outputfile = new File("./training/data/" + this.user + "/" + this.user + "_" + this.timestamp + ".png");
             outputfile.mkdirs();
             ImageIO.write(this.screenShot, "png", outputfile);
         } catch (Exception e) {
@@ -120,7 +130,7 @@ public class PrecisionTrainer {
         }
 
         // update logfile
-        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension());
+        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension());
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
     }
@@ -134,7 +144,7 @@ public class PrecisionTrainer {
         if (this.allData.size() == 0) return;
 
         // create file
-        File logfile = new File("./training/data/" + MainClass.getInstance().getCurrentUser() + "/" + MainClass.getInstance().getCurrentUser() + "_" + System.currentTimeMillis() + ".training");
+        File logfile = new File("./training/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".training");
 
         // try to write file
         try {

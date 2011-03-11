@@ -26,6 +26,7 @@ import java.awt.MouseInfo;
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
@@ -54,6 +55,15 @@ public class FixationCatcher {
 
     /** indicates if the tracking device is working probably */
     private boolean status;
+    
+    /** internal used plugin manager */
+    private InternalPluginManager manager;
+    
+    /** singleton instance of the main class */
+    private MainClass main;
+    
+    /** current used hotkey */
+    private Hotkey hotkey;
 
     /**
      * create fixation catcher
@@ -64,18 +74,21 @@ public class FixationCatcher {
     public FixationCatcher(FixationEvaluator evaluator, PrecisionTrainer trainer) {
         this.fixationEvaluator = evaluator;
         this.precisionTrainer = trainer;
+        this.main = MainClass.getInstance();
+        this.hotkey = Hotkey.getInstance();
+        this.manager = MainClass.getInstance().getInternalPluginManager();
 
         // create stuff which is needed to get eyetracking data
-        EyeTrackingDeviceProvider deviceProvider = MainClass.getInstance().getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
+        EyeTrackingDeviceProvider deviceProvider = this.main.getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
-        GazeEvaluatorManager evaluatorManager = MainClass.getInstance().getPluginManager().getPlugin(GazeEvaluatorManager.class);
+        GazeEvaluatorManager evaluatorManager = this.main.getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
 
         if (device == null) {
             String msg = new String("Trackingserver was not found! Please start it and restart this tool.");
-            MainClass.getInstance().showTrayMessage(msg);
+            this.main.showTrayMessage(msg);
             System.out.println(msg);
-            MainClass.getInstance().getChannel().status(msg);
+            this.main.getChannel().status(msg);
             this.status = false;
         } else {
             this.status = true;
@@ -100,27 +113,27 @@ public class FixationCatcher {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             @Override
             public void newEvaluationEvent(FixationEvent event) {
-                if (!MainClass.getInstance().isActivated()) return;
+                if (!main.isActivated()) return;
                 
                 // if the tool is activated
-                if (MainClass.getInstance().isNormalMode()) {
+                if (main.isNormalMode()) {
                     if (event.getType() == FixationEventType.FIXATION_START) {
 
                         // if the tool is activated and in normal mode, fixations will be stored 
                         fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
 
                         // add fixation to mouse warpe
-                        if ((MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper() != null) && MainClass.getInstance().getProperties().isUseWarp())
-                            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
+                        if ((manager.getCurrentMouseWarper() != null) && main.getProperties().isUseWarp())
+                            manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
                     }
 
-                    if (Hotkey.getInstance().isTyped()) {
+                    if (hotkey.isTyped()) {
 
                         // if the hotkey is typed, the stored fixation will be evaluated
                         fixationEvaluator.evaluateLocation();
 
                         // reset the hotkey status
-                        Hotkey.getInstance().resetHotkeyTyped();
+                        hotkey.resetHotkeyTyped();
                     }
 
                 } else {
@@ -129,29 +142,29 @@ public class FixationCatcher {
                         // if the tool is activated and in trainings mode, fixations will be stored 
                         precisionTrainer.setFixationPoint(event.getFixation().getCenter());
                     }
-                    if (Hotkey.getInstance().isTyped()) {
+                    if (hotkey.isTyped()) {
 
                         // needed to hold the last fixation
-                        Hotkey.getInstance().resetHotkeyTyped();
-                        MainClass.getInstance().showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                        hotkey.resetHotkeyTyped();
+                        main.showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + hotkey.getCurrentHotkey(1) + " again...");
 
                         // wait for another hotkey event to catch the mouse position
-                        while (!Hotkey.getInstance().isTyped() && !MainClass.getInstance().isNormalMode()) {
+                        while (!hotkey.isTyped() && !main.isNormalMode()) {
                             try {
                                 Thread.sleep(10);
                             } catch (InterruptedException e) {
                             }
                         }
 
-                        if (!MainClass.getInstance().isNormalMode()) {
+                        if (!main.isNormalMode()) {
 
                             // set mouse position which is associated with the last stored fixation
                             precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
-                            MainClass.getInstance().showTrayMessage("Training: mouse position recognized, now look to the next point and press " + Hotkey.getInstance().getCurrentHotkey(1) + " again...");
+                            main.showTrayMessage("Training: mouse position recognized, now look to the next point and press " + hotkey.getCurrentHotkey(1) + " again...");
                         }
 
                         // reset hotkey status
-                        Hotkey.getInstance().resetHotkeyTyped();
+                        hotkey.resetHotkeyTyped();
                     }
                 }
 

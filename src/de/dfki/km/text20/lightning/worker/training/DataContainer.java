@@ -1,5 +1,5 @@
 /*
- * TrainingsContainer.java
+ * DataContainer.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *

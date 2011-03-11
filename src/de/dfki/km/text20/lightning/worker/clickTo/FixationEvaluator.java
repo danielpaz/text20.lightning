@@ -30,6 +30,8 @@ import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 
 import de.dfki.km.text20.lightning.MainClass;
+import de.dfki.km.text20.lightning.Properties;
+import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
  * Takes a screenshot with in properties stored dimensions around the gaze point 
@@ -59,6 +61,12 @@ public class FixationEvaluator {
     /** */
     private BufferedImage screenShot;
 
+    /** global used properties */
+    private Properties properties;
+    
+    /** internal used plugin manager */
+    private InternalPluginManager manager;
+
     /**
      * creates the FixationEvaluator
      * 
@@ -70,6 +78,8 @@ public class FixationEvaluator {
         this.fixation = new Point();
         this.location = new Point();
         this.offset = new Point();
+        this.properties = MainClass.getInstance().getProperties();
+        this.manager = MainClass.getInstance().getInternalPluginManager();
 
         try {
             this.robot = new Robot();
@@ -97,18 +107,18 @@ public class FixationEvaluator {
         this.location = MouseInfo.getPointerInfo().getLocation();
 
         // create screenshot
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - MainClass.getInstance().getProperties().getDimension() / 2, this.fixation.y - MainClass.getInstance().getProperties().getDimension() / 2, MainClass.getInstance().getProperties().getDimension(), MainClass.getInstance().getProperties().getDimension());
+        Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // create timestamp
         this.timestamp = System.currentTimeMillis();
 
         // use plugin to calculate offset
-        if (MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector() != null)
-            this.offset = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().analyse(this.screenShot);
+        if (this.manager.getCurrentSaliencyDetector() != null)
+            this.offset = this.manager.getCurrentSaliencyDetector().analyse(this.screenShot);
 
         // update the logfile
-        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + MainClass.getInstance().getProperties().getDimension() + ", Method: " + MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().getDisplayName();
+        String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
 
