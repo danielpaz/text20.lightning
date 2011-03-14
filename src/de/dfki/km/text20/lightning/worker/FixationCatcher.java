@@ -55,15 +55,12 @@ public class FixationCatcher {
 
     /** indicates if the tracking device is working probably */
     private boolean status;
-    
+
     /** internal used plugin manager */
     private InternalPluginManager manager;
-    
+
     /** singleton instance of the main class */
     private MainClass main;
-    
-    /** current used hotkey */
-    private Hotkey hotkey;
 
     /**
      * create fixation catcher
@@ -75,7 +72,6 @@ public class FixationCatcher {
         this.fixationEvaluator = evaluator;
         this.precisionTrainer = trainer;
         this.main = MainClass.getInstance();
-        this.hotkey = Hotkey.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
 
         // create stuff which is needed to get eyetracking data
@@ -114,60 +110,13 @@ public class FixationCatcher {
             @Override
             public void newEvaluationEvent(FixationEvent event) {
                 if (!main.isActivated()) return;
-                
-                // if the tool is activated
-                if (main.isNormalMode()) {
-                    if (event.getType() == FixationEventType.FIXATION_START) {
+                if (event.getType() != FixationEventType.FIXATION_START) return;
 
-                        // if the tool is activated and in normal mode, fixations will be stored 
-                        fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-
-                        // add fixation to mouse warpe
-                        if ((manager.getCurrentMouseWarper() != null) && main.getProperties().isUseWarp())
-                            manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
-                    }
-
-                    if (hotkey.isTyped()) {
-
-                        // if the hotkey is typed, the stored fixation will be evaluated
-                        fixationEvaluator.evaluateLocation();
-
-                        // reset the hotkey status
-                        hotkey.resetHotkeyTyped();
-                    }
-
-                } else {
-                    if (event.getType() == FixationEventType.FIXATION_START) {
-
-                        // if the tool is activated and in trainings mode, fixations will be stored 
-                        precisionTrainer.setFixationPoint(event.getFixation().getCenter());
-                    }
-                    if (hotkey.isTyped()) {
-
-                        // needed to hold the last fixation
-                        hotkey.resetHotkeyTyped();
-                        main.showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + hotkey.getCurrentHotkey(1) + " again...");
-
-                        // wait for another hotkey event to catch the mouse position
-                        while (!hotkey.isTyped() && !main.isNormalMode()) {
-                            try {
-                                Thread.sleep(10); // TODO: find another way
-                            } catch (InterruptedException e) {
-                            }
-                        }
-
-                        if (!main.isNormalMode()) {
-
-                            // set mouse position which is associated with the last stored fixation
-                            precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
-                            main.showTrayMessage("Training: mouse position recognized, now look to the next point and press " + hotkey.getCurrentHotkey(1) + " again...");
-                        }
-
-                        // reset hotkey status
-                        hotkey.resetHotkeyTyped();
-                    }
-                }
-
+                // if the tool is activated and a fixation occurs, it will be stored 
+                fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
+                precisionTrainer.setFixationPoint(event.getFixation().getCenter());
+                if (manager.getCurrentMouseWarper() != null)
+                    manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
             }
         });
     }

@@ -21,6 +21,7 @@
  */
 package de.dfki.km.text20.lightning.hotkey;
 
+import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -30,6 +31,8 @@ import com.melloware.jintellitype.JIntellitypeConstants;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
+import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
+import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
 
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys are linked with thier functions or removed from the listener by this class.
@@ -41,9 +44,6 @@ public class Hotkey implements HotkeyListener {
 
     /** instance of singleton */
     private static Hotkey instance = null;
-
-    /** indicates if the action hotkey is typed */
-    private boolean isHotKeyTyped;
 
     /** the active hotkey to start the mouse click */
     private HotkeyContainer actionHotkey;
@@ -57,13 +57,31 @@ public class Hotkey implements HotkeyListener {
     /** global used properties */
     private Properties properties;
 
-    /** */
-    private Hotkey() {
+    /** this is necessary for move the mouse and click in normal mode */
+    FixationEvaluator fixationEvaluator;
 
+    /** this is needed for trainings mode */
+    private PrecisionTrainer precisionTrainer;
+
+    /** singleton instance of the main class */
+    private MainClass main;
+
+    /**
+     * indicates status of trainingsstep
+     * true = catch fixation
+     * false = catch mouse position
+     */
+    private boolean trainingsStatus;
+
+    /** */
+    private Hotkey(FixationEvaluator evaluator, PrecisionTrainer trainer) {
+        this.fixationEvaluator = evaluator;
+        this.precisionTrainer = trainer;
         this.properties = MainClass.getInstance().getProperties();
-        this.isHotKeyTyped = false;
+        this.main = MainClass.getInstance();
+        this.trainingsStatus = true;
         this.initHotkeys();
-        
+
         if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {
             // if already hotekeys are stored in the properties, these will be used as current hotkeys
             this.actionHotkey = this.properties.getActionHotkey();
@@ -94,32 +112,23 @@ public class Hotkey implements HotkeyListener {
     }
 
     /**
-     * Returns the singleton. This method should be used before every call of any hotkey function.   
+     * Returns the singleton.  
      * 
      * @return instance 
-     * the only instance of Hotkey
+     *      the only instance of Hotkey
      */
     public static Hotkey getInstance() {
-        if (instance == null) {
-            instance = new Hotkey();
-        }
         return instance;
     }
-
+    
     /**
-     * Indicates if the action hotkey is typed.
+     * Initializes the hotkeys. This method should be used before every call of any hotkey function. 
      * 
-     * @return isHotKeyTyped
+     * @param evaluator
+     * @param trainer
      */
-    public boolean isTyped() {
-        return this.isHotKeyTyped;
-    }
-
-    /**
-     * If the hotkey is typed and the algorithm which have to be processed after is finished, the boolean have to be reseted with this function.
-     */
-    public void resetHotkeyTyped() {
-        this.isHotKeyTyped = false;
+    public static void init(FixationEvaluator evaluator, PrecisionTrainer trainer) {
+        instance = new Hotkey(evaluator, trainer);
     }
 
     /**
@@ -131,16 +140,34 @@ public class Hotkey implements HotkeyListener {
 
         // action hotkey
         case 1:
-            this.isHotKeyTyped = true;
+            if (this.main.isNormalMode())
+
+            // if the hotkey is typed, the stored fixation will be evaluated
+            this.fixationEvaluator.evaluateLocation();
+
+            else {
+                if (this.trainingsStatus) {
+                    
+                    // store last fixation point
+                    this.precisionTrainer.storeFixation();
+                    this.main.showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + this.getCurrentHotkey(1) + " again...");
+                
+                } else {
+                
+                    // set mouse position which is associated with the last stored fixation
+                    this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
+                    this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
+                }
+                
+                // toggle status
+                this.trainingsStatus = !(this.trainingsStatus);
+            }
             break;
 
         // status hotkey
         case 2:
             // change status
             MainClass.getInstance().toggleStatus();
-
-            // necessary if status is changed in trainings mode 
-            this.isHotKeyTyped = false;
             break;
         default:
             return;
