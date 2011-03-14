@@ -81,7 +81,7 @@ public class EvaluatorWorker {
 
         // initialize variables
         BufferedImage screenShot = null;
-        Point offset = new Point();
+        Point point = new Point();
 
         // test if associated screenshot is available
         File screenFile = new File(path + "/data/" + container.getUser() + "/" + container.getUser() + "_" + container.getTimestamp() + ".png");
@@ -95,21 +95,22 @@ public class EvaluatorWorker {
             return;
         }
         // calculate offset by running the detector
-        offset = detector.analyse(screenShot);
+        point = detector.analyse(screenShot);
+        point.translate(screenShot.getHeight() / 2, screenShot.getWidth() / 2);
 
         // write the png-file
         if (drawImage)
-            this.drawPicture(detector, offset, path + "/evaluation/" + container.getUser() + "_" + this.currentTimeStamp + "/" + container.getUser() + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMouseOffset());
+            this.drawPicture(detector, point, path + "/evaluation/" + container.getUser() + "_" + this.currentTimeStamp + "/" + container.getUser() + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMousePoint());
 
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
 
             // add distance to the already existing identifier
-            this.results.get(identifier).add(detector.getInformation().getId(), offset.distance(container.getMouseOffset()));
+            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(container.getMousePoint()));
         } else {
 
             // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), offset.distance(container.getMouseOffset()), path + "/evaluation/evaluation.log", container.getUser(), this.currentTimeStamp));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", container.getUser(), this.currentTimeStamp));
         }
 
     }
@@ -167,7 +168,7 @@ public class EvaluatorWorker {
             bestValue = Double.MAX_VALUE;
             bestKey = -1;
         }
-        
+
         // return the name of the very best detector
         return veryBestName;
     }
@@ -184,11 +185,11 @@ public class EvaluatorWorker {
      * @param screenShot
      *      screenshot where the data will be written in,
      *      maybe it will be not used when the screenshot is already drawn to a file
-     * @param mouseOffset
+     * @param mousePoint
      *      target that is pointed by the mouse
      */
     private void drawPicture(SaliencyDetector detector, Point point, String path,
-                             BufferedImage screenShot, Point mouseOffset) {
+                             BufferedImage screenShot, Point mousePoint) {
         // initialize variables
         int color = (int) (Math.random() * 255);
         int dimension = screenShot.getHeight();
@@ -213,19 +214,19 @@ public class EvaluatorWorker {
 
                 // visualize mouse point 
                 graphic.setColor(new Color(255, 0, 0, 255));
-                graphic.drawOval(mouseOffset.x - 5, mouseOffset.y - 5, 10, 10);
-                graphic.drawChars(("mouse target").toCharArray(), 0, 12, 12 + mouseOffset.x, 12 + mouseOffset.y);
+                graphic.drawOval(mousePoint.x - 5, mousePoint.y - 5, 10, 10);
+                graphic.drawChars(("mouse target").toCharArray(), 0, 12, 12 + mousePoint.x, 12 + mousePoint.y);
                 graphic.setColor(new Color(255, 0, 0, 32));
-                graphic.fillOval(mouseOffset.x - 5, mouseOffset.y - 5, 10, 10);
+                graphic.fillOval(mousePoint.x - 5, mousePoint.y - 5, 10, 10);
             }
 
             // visualize calculations
             color = (50 + color) % 256;
             graphic.setColor(new Color(0, 255 - color, color, 255));
-            graphic.drawOval(point.x + dimension / 2 - 5, point.y + dimension / 2 - 5, 10, 10);
-            graphic.drawChars(detector.getInformation().getDisplayName().toCharArray(), 0, detector.getInformation().getDisplayName().toCharArray().length, point.x + 12 + dimension / 2, point.y + 12 + dimension / 2);
+            graphic.drawOval(point.x - 5, point.y - 5, 10, 10);
+            graphic.drawChars(detector.getInformation().getDisplayName().toCharArray(), 0, detector.getInformation().getDisplayName().toCharArray().length, point.x + 12, point.y + 12);
             graphic.setColor(new Color(0, 255 - color, color, 32));
-            graphic.fillOval(point.x + dimension / 2 - 5, point.y + dimension / 2 - 5, 10, 10);
+            graphic.fillOval(point.x - 5, point.y - 5, 10, 10);
 
             // write the image
             file.mkdirs();
