@@ -74,10 +74,6 @@ public class Properties implements Serializable {
     private int setRadius;
 
     @Attribute
-    /** name of currently used trainer*/
-    private String trainerName;
-
-    @Attribute
     /** name of currently used warper */
     private String warperName;
 
@@ -125,7 +121,6 @@ public class Properties implements Serializable {
                     this.homeRadius = ((Properties) this.object).getHomeRadius();
                     this.setRadius = ((Properties) this.object).getSetRadius();
                     this.useWarp = ((Properties) this.object).isUseWarp();
-                    this.trainerName = ((Properties) this.object).getTrainerName();
                     this.warperName = ((Properties) this.object).getWarperName();
                     this.detectorName = ((Properties) this.object).getDetectorName();
 
@@ -134,7 +129,7 @@ public class Properties implements Serializable {
                     System.out.println("Properties file was found.");
                     System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("useWarp: " + this.useWarp + ", angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
-                    System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName + ", Trainer: " + this.trainerName);
+                    System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName);
                 }
 
                 // cleanup
@@ -166,7 +161,6 @@ public class Properties implements Serializable {
         this.homeRadius = 200;
         this.setRadius = 20;
         this.useWarp = true;
-        this.trainerName = "";
         this.warperName = "";
         this.detectorName = "";
     }
@@ -307,20 +301,6 @@ public class Properties implements Serializable {
      */
     public void setUseWarp(boolean useWarp) {
         this.useWarp = useWarp;
-    }
-
-    /**
-     * @return the currentTrainerName
-     */
-    public String getTrainerName() {
-        return this.trainerName;
-    }
-
-    /**
-     * @param currentTrainerName the currentTrainerName to set
-     */
-    public void setTrainerName(String currentTrainerName) {
-        this.trainerName = currentTrainerName;
     }
 
     /**

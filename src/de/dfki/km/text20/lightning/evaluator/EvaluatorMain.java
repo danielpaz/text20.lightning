@@ -171,6 +171,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // add plugins at classpath
         try {
             this.pluginManager.addPluginsFrom(new URI("classpath://*"));
+            this.pluginManager.addPluginsFrom(new File("plugins/").toURI());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
