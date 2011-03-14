@@ -35,7 +35,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.training.DataContainer;
+import de.dfki.km.text20.lightning.worker.training.StorageContainer;
 
 /**
  * The EvaluationWorker runs the given plugin with the given container, collects the data,
@@ -77,7 +77,7 @@ public class EvaluatorWorker {
      *      path were the data-directory is located, where the container-file and the screenshots are
      */
     public void evaluate(String identifier, SaliencyDetector detector,
-                         DataContainer container, boolean drawImage, String path) {
+                         StorageContainer container, boolean drawImage, String path) {
 
         // initialize variables
         BufferedImage screenShot = null;
