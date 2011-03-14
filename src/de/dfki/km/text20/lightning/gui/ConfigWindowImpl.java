@@ -187,6 +187,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // set user name
         MainClass.getInstance().setCurrentUser(this.textFieldName.getText());
 
+        // refresh warper
+        MainClass.getInstance().honkWarper();
+        
         // set mode
         if (MainClass.getInstance().isNormalMode() && this.checkBoxTraining.isSelected())
             MainClass.getInstance().toggleMode();

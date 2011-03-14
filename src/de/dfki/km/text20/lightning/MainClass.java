@@ -162,7 +162,7 @@ public class MainClass {
         if (fixationCatcher.getStatus() && this.dllStatus) {
 
             // initialize hotkeys
-            Hotkey.getInstance();
+            Hotkey.init(fixationEvaluator, this.trainer);
 
             // start listening
             fixationCatcher.startCatching();
@@ -223,6 +223,14 @@ public class MainClass {
         return this.isActivated;
     }
 
+    /**
+     * refreshes warper
+     */
+    public void honkWarper() {
+        this.warper.stop();
+        this.warper.start();
+    }
+    
     /**
      * Toggles between active and inactive status.
      */

@@ -45,6 +45,9 @@ import de.dfki.km.text20.lightning.Properties;
 public class PrecisionTrainer {
 
     /** last fixation point */
+    private Point fixationTmp;
+    
+    /** stored fixation point */
     private Point fixation;
 
     /** associated mouse position which shows the real target*/
@@ -80,6 +83,7 @@ public class PrecisionTrainer {
 
         // initialize variables
         this.fixation = new Point();
+        this.fixationTmp = new Point();
         this.offset = new Point();
         this.allData = new ArrayList<DataContainer>();
         this.properties = MainClass.getInstance().getProperties();
@@ -98,10 +102,17 @@ public class PrecisionTrainer {
      * @param fixation
      */
     public void setFixationPoint(Point fixation) {
-        this.fixation = fixation;
+        this.fixationTmp = fixation;
         this.timestamp = System.currentTimeMillis();
     }
-
+    
+    /**
+     * stores last fixation so that it can be used to create a trainingsstep
+     */
+    public void storeFixation() {
+        this.fixation = new Point(this.fixationTmp);
+    }
+    
     /**
      * sets the mouseposition to associate it with the stored fixation
      * 
