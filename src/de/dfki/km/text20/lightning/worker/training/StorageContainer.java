@@ -1,5 +1,5 @@
 /*
- * DataContainer.java
+ * StorageContainer.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -32,9 +32,12 @@ import org.simpleframework.xml.Element;
  * @author Christoph Käding
  *
  */
-@SuppressWarnings("serial")
-public class DataContainer implements Serializable {
+public class StorageContainer implements Serializable {
     
+    /** generated serial id */
+    private static final long serialVersionUID = 1135235125761821153L;
+
+
     /** offset from fixation to mouse position */
     @Element
     private Point mousePoint;
@@ -54,7 +57,7 @@ public class DataContainer implements Serializable {
      * @param timestamp
      * @param mousePoint
      */
-    public DataContainer(String user, long timestamp, Point mousePoint){
+    public StorageContainer(String user, long timestamp, Point mousePoint){
         this.user = user;
         this.timestamp = timestamp;
         this.mousePoint = mousePoint;

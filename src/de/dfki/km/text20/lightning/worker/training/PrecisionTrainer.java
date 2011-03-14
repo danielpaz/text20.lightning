@@ -66,7 +66,7 @@ public class PrecisionTrainer {
     private BufferedImage screenShot;
 
     /** a list of all catched data */
-    private ArrayList<DataContainer> allData;    
+    private ArrayList<StorageContainer> allData;    
 
     /** global used properties */
     private Properties properties;
@@ -85,7 +85,7 @@ public class PrecisionTrainer {
         this.fixation = new Point();
         this.fixationTmp = new Point();
         this.mousePoint = new Point();
-        this.allData = new ArrayList<DataContainer>();
+        this.allData = new ArrayList<StorageContainer>();
         this.properties = MainClass.getInstance().getProperties();
 
         try {
@@ -129,7 +129,7 @@ public class PrecisionTrainer {
         this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() /2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() /2);
        
         // collect data
-        this.allData.add(new DataContainer(this.user, new Long(this.timestamp), new Point(this.mousePoint)));
+        this.allData.add(new StorageContainer(this.user, new Long(this.timestamp), new Point(this.mousePoint)));
 
         // write image
         try {
@@ -160,7 +160,7 @@ public class PrecisionTrainer {
         // try to write file
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(logfile));
-            for (DataContainer temp : this.allData) {
+            for (StorageContainer temp : this.allData) {
                 outputStream.writeObject(temp);
             }
 

@@ -51,7 +51,7 @@ import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.training.DataContainer;
+import de.dfki.km.text20.lightning.worker.training.StorageContainer;
 
 /**
  * @author Christoph Käding
@@ -414,19 +414,19 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * @param file
      * @return readed DataContainers
      */
-    private ArrayList<DataContainer> readFile(File file) {
+    private ArrayList<StorageContainer> readFile(File file) {
         // initialize some variables
         ObjectInputStream inputStream = null;
         Object object;
-        ArrayList<DataContainer> container = new ArrayList<DataContainer>();
+        ArrayList<StorageContainer> container = new ArrayList<StorageContainer>();
 
         try {
 
             // read from file till eof
             inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             while ((object = inputStream.readObject()) != null) {
-                if (object instanceof DataContainer) {
-                    container.add((DataContainer) object);
+                if (object instanceof StorageContainer) {
+                    container.add((StorageContainer) object);
                 }
             }
 
@@ -460,7 +460,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void startEvaluation() {
         // initialize variables
         String bestResult = "";
-        ArrayList<DataContainer> containers = new ArrayList<DataContainer>();
+        ArrayList<StorageContainer> containers = new ArrayList<StorageContainer>();
         int i = 1;
 
         // add selected detectors to array list 
@@ -480,7 +480,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         for (File file : this.files) {
 
             // ... and through every container in it ...
-            for (DataContainer container : this.readFile(file)) {
+            for (StorageContainer container : this.readFile(file)) {
 
                 // ... and evry detector
                 for (SaliencyDetector detector : this.selectedDetectors) {
