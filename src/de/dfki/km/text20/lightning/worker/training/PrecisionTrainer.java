@@ -54,7 +54,7 @@ public class PrecisionTrainer {
     private Point mousePosition;
 
     /** offset between fixation point and mouse position */
-    private Point offset;
+    private Point mousePoint;
 
     /** robot for creating screenshots */
     private Robot robot;
@@ -84,7 +84,7 @@ public class PrecisionTrainer {
         // initialize variables
         this.fixation = new Point();
         this.fixationTmp = new Point();
-        this.offset = new Point();
+        this.mousePoint = new Point();
         this.allData = new ArrayList<DataContainer>();
         this.properties = MainClass.getInstance().getProperties();
 
@@ -126,10 +126,10 @@ public class PrecisionTrainer {
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.offset.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() /2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() /2);
-
+        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() /2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() /2);
+       
         // collect data
-        this.allData.add(new DataContainer(this.user, new Long(this.timestamp), new Point(this.offset)));
+        this.allData.add(new DataContainer(this.user, new Long(this.timestamp), new Point(this.mousePoint)));
 
         // write image
         try {

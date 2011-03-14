@@ -37,7 +37,7 @@ public class DataContainer implements Serializable {
     
     /** offset from fixation to mouse position */
     @Element
-    private Point mouseOffset;
+    private Point mousePoint;
     
     /** user name */
     @Attribute
@@ -52,19 +52,19 @@ public class DataContainer implements Serializable {
      * 
      * @param user
      * @param timestamp
-     * @param mouseOffset
+     * @param mousePoint
      */
-    public DataContainer(String user, long timestamp, Point mouseOffset){
+    public DataContainer(String user, long timestamp, Point mousePoint){
         this.user = user;
         this.timestamp = timestamp;
-        this.mouseOffset = mouseOffset;
+        this.mousePoint = mousePoint;
     }
 
     /**
      * @return the mouseOffset
      */
-    public Point getMouseOffset() {
-        return this.mouseOffset;
+    public Point getMousePoint() {
+        return this.mousePoint;
     }
 
     /**

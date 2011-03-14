@@ -122,7 +122,7 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
                         
                         // check if the point is closer than the current offset
-                        if (point.distance(temp) < point.distance(offset)) {
+                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
                             
                             // set new offset
                             offset.setLocation(temp);
@@ -153,7 +153,7 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
                         
                         // check if the point is closer than the current offset
-                        if (point.distance(temp) < point.distance(offset)) {
+                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
                             
                             // set new offset
                             offset.setLocation(temp);
@@ -187,7 +187,7 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
                         
                         // check if the point is closer than the current offset
-                        if (point.distance(temp) < point.distance(offset)) {
+                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
                             
                             // set new offset
                             offset.setLocation(temp);
@@ -218,7 +218,7 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
                         
                         // check if the point is closer than the current offset
-                        if (point.distance(temp) < point.distance(offset)) {
+                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
                             
                             // set new offset
                             offset.setLocation(temp);

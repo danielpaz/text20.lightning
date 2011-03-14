@@ -34,7 +34,6 @@ import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
@@ -234,17 +233,27 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             // ... and if some detectors are selected ...
             if (this.listDetectors.getSelectedValues().length == 0) return;
 
-            // ... set some gui components enable/disable and start the evaluation
+            // ... set some gui components enable/disable and rebaint the gui
             this.running = true;
             this.labelDescription.setText("Step 3: Wait for the results.");
+            this.labelDescription.repaint();
             this.buttonStart.setText("Stop");
+            this.buttonStart.repaint();
             this.buttonRemove.setEnabled(false);
+            this.buttonRemove.repaint();
             this.buttonSelect.setEnabled(false);
+            this.buttonSelect.repaint();
             this.listDetectors.setEnabled(false);
+            this.listDetectors.repaint();
             this.listFiles.setEnabled(false);
+            this.listFiles.repaint();
             this.checkBoxImages.setEnabled(false);
+            this.checkBoxImages.repaint();
             this.checkBoxSummary.setEnabled(false);
+            this.checkBoxSummary.repaint();
             this.mainFrame.repaint();
+
+            // start evaluation
             this.startEvaluation();
 
             // or if the tool is running ...
@@ -294,7 +303,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 super.approveSelection();
 
                 // add selected files to array list ...
-                files.addAll(Arrays.asList(getSelectedFiles()));
+                for (File file : getSelectedFiles())
+                    files.addAll(getAllTrainingFiles(file));
 
                 // ... and to the listFiles
                 listFiles.setListData(files.toArray());
@@ -310,6 +320,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // set behavior of this chooser
         chooser.setMultiSelectionEnabled(true);
         chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         chooser.setFileFilter(new FileFilter() {
 
             // filter string, only files with this extension and directories will be shown
@@ -333,6 +344,43 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // return the created chooser
         return chooser;
+    }
+
+    /**
+     * return all *.training-files within a directory
+     * 
+     * @param file
+     * @return arraylist of files
+     */
+    private ArrayList<File> getAllTrainingFiles(File file) {
+        // initialize list
+        ArrayList<File> result = new ArrayList<File>();
+
+        // if given file is a file ...
+        if (file.isFile()) {
+
+            // ... and ends with '.training' ....
+            if (file.getName().endsWith(".training")) {
+
+                // return it
+                result.add(file);
+                return result;
+            }
+
+            // or if given file is a directory ...
+        } else if (file.isDirectory()) {
+
+            // ... check all included files
+            for (File includedFiles : file.listFiles()) {
+                result.addAll(this.getAllTrainingFiles(includedFiles));
+            }
+
+            // return results
+            return result;
+        }
+
+        // if file is either a file nor a directory, return a empty list
+        return result;
     }
 
     /**
@@ -430,13 +478,13 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // run through every file ...
         for (File file : this.files) {
-            
+
             // ... and through every container in it ...
             for (DataContainer container : this.readFile(file)) {
-                
+
                 // ... and evry detector
                 for (SaliencyDetector detector : this.selectedDetectors) {
-                    
+
                     // process evaluation
                     this.worker.evaluate(file.getName(), detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
@@ -450,11 +498,11 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             }
             if (!this.running) break;
         }
-        
+
         // show best result
         bestResult = this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors);
         this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
-        
+
         // inidicate finish
         this.selectedDetectors.clear();
         this.finished = true;
