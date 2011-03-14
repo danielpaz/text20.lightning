@@ -78,6 +78,8 @@ public class InternalPluginManager {
                 found = true;
             }
         }
+        if (!this.properties.getDetectorName().equals("") && !found)
+            System.out.println("former used detector couldn't be found...");
         if ((this.saliencyDetectors.size() > 0) && !found)
             this.setCurrentSaliencyDetector(0);
 
@@ -90,6 +92,8 @@ public class InternalPluginManager {
                 found = true;
             }
         }
+        if (!this.properties.getWarperName().equals("") && !found)
+            System.out.println("former used warper couldn't be found...");
         if ((this.mouseWarpers.size() > 0) && !found) this.setCurrentMouseWarper(0);
     }
 

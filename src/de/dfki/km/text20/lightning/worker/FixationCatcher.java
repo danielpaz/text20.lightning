@@ -151,7 +151,7 @@ public class FixationCatcher {
                         // wait for another hotkey event to catch the mouse position
                         while (!hotkey.isTyped() && !main.isNormalMode()) {
                             try {
-                                Thread.sleep(10);
+                                Thread.sleep(10); // TODO: find another way
                             } catch (InterruptedException e) {
                             }
                         }

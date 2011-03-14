@@ -83,7 +83,6 @@ public class PrecisionTrainer {
         this.offset = new Point();
         this.allData = new ArrayList<DataContainer>();
         this.properties = MainClass.getInstance().getProperties();
-        this.user = MainClass.getInstance().getCurrentUser();
 
         try {
             this.robot = new Robot();
@@ -110,6 +109,7 @@ public class PrecisionTrainer {
      */
     @SuppressWarnings("boxing")
     public void setMousePosition(Point mousePosition) {
+        this.user = MainClass.getInstance().getCurrentUser();
         this.mousePosition = mousePosition;
         Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
