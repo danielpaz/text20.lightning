@@ -41,11 +41,7 @@ public class StorageContainer implements Serializable {
     /** offset from fixation to mouse position */
     @Element
     private Point mousePoint;
-    
-    /** user name */
-    @Attribute
-    private String user;
-    
+        
     /** timestamp of the trainings step */
     @Attribute
     private long timestamp;
@@ -57,8 +53,7 @@ public class StorageContainer implements Serializable {
      * @param timestamp
      * @param mousePoint
      */
-    public StorageContainer(String user, long timestamp, Point mousePoint){
-        this.user = user;
+    public StorageContainer(long timestamp, Point mousePoint){
         this.timestamp = timestamp;
         this.mousePoint = mousePoint;
     }
@@ -68,13 +63,6 @@ public class StorageContainer implements Serializable {
      */
     public Point getMousePoint() {
         return this.mousePoint;
-    }
-
-    /**
-     * @return the user
-     */
-    public String getUser() {
-        return this.user;
     }
 
     /**

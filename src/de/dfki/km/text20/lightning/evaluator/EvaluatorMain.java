@@ -25,12 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -49,6 +44,7 @@ import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
+import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.training.StorageContainer;
@@ -90,6 +86,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** timestamp from the start of this tool */
     private long currentTimeStamp;
+
+    /** parses storage data */
+    private XMLParser parser;
 
     /**
      * main entry point
@@ -150,8 +149,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // get timestamp
         this.currentTimeStamp = System.currentTimeMillis();
 
-        // create new worker
+        // create new worker and parser
         this.worker = new EvaluatorWorker(this.currentTimeStamp);
+        this.parser = new XMLParser();
 
         // set logging properties
         final JSPFProperties props = new JSPFProperties();
@@ -252,9 +252,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.checkBoxSummary.setEnabled(false);
             this.checkBoxSummary.revalidate();
             this.mainFrame.repaint();
-            
+
             // FIXME: update gui
-            
+
             // start evaluation
             this.startEvaluation();
 
@@ -263,6 +263,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
             // ... reset to startable state
             this.running = false;
+            this.progressBar.setValue(0);
             this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
             this.buttonStart.setText("Start");
             this.buttonRemove.setEnabled(true);
@@ -326,7 +327,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         chooser.setFileFilter(new FileFilter() {
 
             // filter string, only files with this extension and directories will be shown
-            private String extension = ".training";
+            private String extension = ".xml";
 
             @Override
             public String getDescription() {
@@ -362,7 +363,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         if (file.isFile()) {
 
             // ... and ends with '.training' ....
-            if (file.getName().endsWith(".training")) {
+            if (file.getName().endsWith(".xml")) {
 
                 // return it
                 result.add(file);
@@ -411,58 +412,13 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * reads DataContainers from given file
-     * 
-     * @param file
-     * @return readed DataContainers
-     */
-    private ArrayList<StorageContainer> readFile(File file) {
-        // initialize some variables
-        ObjectInputStream inputStream = null;
-        Object object;
-        ArrayList<StorageContainer> container = new ArrayList<StorageContainer>();
-
-        try {
-
-            // read from file till eof
-            inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-            while ((object = inputStream.readObject()) != null) {
-                if (object instanceof StorageContainer) {
-                    container.add((StorageContainer) object);
-                }
-            }
-
-            // close stream and return readed content
-            inputStream.close();
-            return container;
-
-        } catch (EOFException eofe) {
-            try {
-
-                // close stream and return readed content
-                if (inputStream != null) inputStream.close();
-                return container;
-
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * starts evaluation process
      */
     private void startEvaluation() {
         // initialize variables
         String bestResult = "";
-        ArrayList<StorageContainer> containers = new ArrayList<StorageContainer>();
+        String user = "";
+        int size = 0;
         int i = 1;
 
         // add selected detectors to array list 
@@ -470,35 +426,43 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             if (selected instanceof PluginInformation)
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
 
-        // read container to get thier number
+        // count container 
         for (File file : this.files)
-            containers.addAll(this.readFile(file));
+            size = size + this.parser.count(file);
 
         // initialize progress bar
-        this.progressBar.setMaximum(containers.size() * this.selectedDetectors.size());
+        this.progressBar.setMaximum(size * this.selectedDetectors.size());
         this.progressBar.setStringPainted(true);
 
-        // run through every file ...
-        for (File file : this.files) {
+        try {
+            // run through every file ...
+            for (File file : this.files) {
 
-            // ... and through every container in it ...
-            for (StorageContainer container : this.readFile(file)) {
+                // create name from filename 
+                user = file.getName().substring(0, file.getName().lastIndexOf("_"));
 
-                // ... and evry detector
-                for (SaliencyDetector detector : this.selectedDetectors) {
+                // ... and through every container in it ...
+                for (StorageContainer container : this.parser.readFile(file)) {
 
-                    // process evaluation
-                    this.worker.evaluate(file.getName(), detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+                    // ... and evry detector
+                    for (SaliencyDetector detector : this.selectedDetectors) {
 
-                    // update progress bar
-                    this.progressBar.setValue(i++);
-                    this.progressBar.paint(this.progressBar.getGraphics());
+                        // process evaluation
+                        this.worker.evaluate(file.getName(), user, detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
+                        // update progress bar
+                        this.progressBar.setValue(i++);
+                        this.progressBar.paint(this.progressBar.getGraphics());
+
+                        if (!this.running) break;
+                    }
                     if (!this.running) break;
                 }
                 if (!this.running) break;
             }
-            if (!this.running) break;
+        } catch (NullPointerException e) {
+            this.buttonStartActionPerformed();
+            return;
         }
 
         // show best result

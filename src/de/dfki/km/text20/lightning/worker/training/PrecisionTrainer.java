@@ -27,11 +27,15 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
@@ -46,7 +50,7 @@ public class PrecisionTrainer {
 
     /** last fixation point */
     private Point fixationTmp;
-    
+
     /** stored fixation point */
     private Point fixation;
 
@@ -66,11 +70,11 @@ public class PrecisionTrainer {
     private BufferedImage screenShot;
 
     /** a list of all catched data */
-    private ArrayList<StorageContainer> allData;    
+    private ArrayList<StorageContainer> allData;
 
     /** global used properties */
     private Properties properties;
-    
+
     /** name of current registered user */
     private String user;
 
@@ -105,14 +109,14 @@ public class PrecisionTrainer {
         this.fixationTmp = fixation;
         this.timestamp = System.currentTimeMillis();
     }
-    
+
     /**
      * stores last fixation so that it can be used to create a trainingsstep
      */
     public void storeFixation() {
         this.fixation = new Point(this.fixationTmp);
     }
-    
+
     /**
      * sets the mouseposition to associate it with the stored fixation
      * 
@@ -126,10 +130,10 @@ public class PrecisionTrainer {
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() /2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() /2);
-       
+        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
+
         // collect data
-        this.allData.add(new StorageContainer(this.user, new Long(this.timestamp), new Point(this.mousePoint)));
+        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.mousePoint)));
 
         // write image
         try {
@@ -155,10 +159,83 @@ public class PrecisionTrainer {
         if (this.allData.size() == 0) return;
 
         // create file
-        File logfile = new File("./training/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".training");
+        File logfile = new File("./training/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".xml");
+
+        try {
+            // Create an XML stream writer
+            FileOutputStream outputStream = new FileOutputStream(logfile);
+            XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, "UTF-8");
+
+            // Write XML prologue
+            writer.writeStartDocument();
+            writer.writeCharacters("\n");
+
+            // TODO: add a dtd, encodingtag, namespace, ...            
+
+            // set identifier
+            writer.writeComment("Project Lightning (Desktop) - trainingsdata");
+            writer.writeCharacters("\n");
+            
+            // Now start with root element
+            writer.writeStartElement("alldata");
+            writer.writeCharacters("\n");
+
+            // run through all data
+            for (StorageContainer data : this.allData) {
+                
+                // write datatag
+                writer.writeCharacters("\t");
+                writer.writeStartElement("step");
+                writer.writeCharacters("\n");
+                
+                // write timestamp
+                writer.writeCharacters("\t\t");
+                writer.writeStartElement("timestamp");
+                writer.writeCharacters("" + data.getTimestamp());
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                
+                // writemouse position
+                writer.writeCharacters("\t\t");
+                writer.writeStartElement("mouseposition");
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("x");
+                writer.writeCharacters("" + data.getMousePoint().x);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("y");
+                writer.writeCharacters("" + data.getMousePoint().y);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t");
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                // close datatag
+                writer.writeCharacters("\t");
+                writer.writeEndElement();  
+                writer.writeCharacters("\n");              
+            }
+
+            // Write document end. This closes all open structures
+            writer.writeEndDocument();
+            
+            // Close the writer to flush the output
+            outputStream.close();
+            writer.close();
+
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // try to write file
-        try {
+        /*try {
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(logfile));
             for (StorageContainer temp : this.allData) {
                 outputStream.writeObject(temp);
@@ -166,7 +243,7 @@ public class PrecisionTrainer {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         // reset data
         this.allData.clear();
