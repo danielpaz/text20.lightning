@@ -67,6 +67,8 @@ public class EvaluatorWorker {
      * 
      * @param identifier
      *      for the map where the results are stored
+     * @param user
+     *      which should be used
      * @param detector
      *      which should be used
      * @param container
@@ -76,7 +78,7 @@ public class EvaluatorWorker {
      * @param path
      *      path were the data-directory is located, where the container-file and the screenshots are
      */
-    public void evaluate(String identifier, SaliencyDetector detector,
+    public void evaluate(String identifier, String user, SaliencyDetector detector,
                          StorageContainer container, boolean drawImage, String path) {
 
         // initialize variables
@@ -84,7 +86,7 @@ public class EvaluatorWorker {
         Point point = new Point();
 
         // test if associated screenshot is available
-        File screenFile = new File(path + "/data/" + container.getUser() + "/" + container.getUser() + "_" + container.getTimestamp() + ".png");
+        File screenFile = new File(path + "/data/" + user + "/" + user + "_" + container.getTimestamp() + ".png");
         if (!screenFile.exists()) return;
 
         // read screenshot
@@ -100,7 +102,7 @@ public class EvaluatorWorker {
 
         // write the png-file
         if (drawImage)
-            this.drawPicture(detector, point, path + "/evaluation/" + container.getUser() + "_" + this.currentTimeStamp + "/" + container.getUser() + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMousePoint());
+            this.drawPicture(detector, point, path + "/evaluation/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMousePoint());
 
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
@@ -110,7 +112,7 @@ public class EvaluatorWorker {
         } else {
 
             // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", container.getUser(), this.currentTimeStamp));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", user, this.currentTimeStamp));
         }
 
     }
