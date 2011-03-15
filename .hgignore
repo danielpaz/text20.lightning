@@ -11,3 +11,5 @@ syntax: regexp
 ^JIntellitype\.dll$
 syntax: regexp
 ^training$
+syntax: regexp
+^trackerconfig\.xcfg$
