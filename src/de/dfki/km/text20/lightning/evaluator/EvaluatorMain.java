@@ -225,7 +225,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * reacts on the current status of this tool and starts a handle for it
      */
     private void buttonStartActionPerformed() {
-        // if the work is finished, ecit the tool
+        // if the work is finished, exit the tool
         if (this.finished) this.exit();
 
         // if the tool ist not running ...
@@ -233,26 +233,28 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             // ... and if some detectors are selected ...
             if (this.listDetectors.getSelectedValues().length == 0) return;
 
-            // ... set some gui components enable/disable and rebaint the gui
+            // ... set some gui components disable and repaint the gui
             this.running = true;
             this.labelDescription.setText("Step 3: Wait for the results.");
-            this.labelDescription.repaint();
+            this.labelDescription.revalidate();
             this.buttonStart.setText("Stop");
-            this.buttonStart.repaint();
+            this.buttonStart.revalidate();
             this.buttonRemove.setEnabled(false);
-            this.buttonRemove.repaint();
+            this.buttonRemove.revalidate();
             this.buttonSelect.setEnabled(false);
-            this.buttonSelect.repaint();
+            this.buttonSelect.revalidate();
             this.listDetectors.setEnabled(false);
-            this.listDetectors.repaint();
+            this.listDetectors.revalidate();
             this.listFiles.setEnabled(false);
-            this.listFiles.repaint();
+            this.listFiles.revalidate();
             this.checkBoxImages.setEnabled(false);
-            this.checkBoxImages.repaint();
+            this.checkBoxImages.revalidate();
             this.checkBoxSummary.setEnabled(false);
-            this.checkBoxSummary.repaint();
+            this.checkBoxSummary.revalidate();
             this.mainFrame.repaint();
-
+            
+            // FIXME: update gui
+            
             // start evaluation
             this.startEvaluation();
 
@@ -541,6 +543,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowClosing(WindowEvent arg0) {
+        this.running = false;
         this.pluginManager.shutdown();
         System.exit(0);
     }
