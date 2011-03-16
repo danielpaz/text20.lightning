@@ -52,6 +52,9 @@ public class EvaluatorWorker {
     /** timestamp of the start of this evaluation session */
     private long currentTimeStamp;
 
+    /** stores over all results */
+    private EvaluationContainer overAllResults;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
@@ -60,6 +63,7 @@ public class EvaluatorWorker {
     public EvaluatorWorker(long currentTimeStamp) {
         this.results = new Hashtable<String, EvaluationContainer>();
         this.currentTimeStamp = currentTimeStamp;
+        this.overAllResults = null;
     }
 
     /**
@@ -104,6 +108,11 @@ public class EvaluatorWorker {
         if (drawImage)
             this.drawPicture(detector, point, path + "/evaluation/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMousePoint());
 
+        // add results to over all storage
+        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", user, this.currentTimeStamp);
+        else
+            this.overAllResults.add(detector.getInformation().getId(), point.distance(container.getMousePoint()));
+
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
 
@@ -132,7 +141,7 @@ public class EvaluatorWorker {
         double bestValue = Double.MAX_VALUE;
         int bestKey = -1;
         double veryBestValue = Double.MAX_VALUE;
-        String veryBestName = "";
+        int veryBestKey = -1;
 
         // run through the keyset of the result map
         for (String key : this.results.keySet()) {
@@ -148,19 +157,11 @@ public class EvaluatorWorker {
                     bestValue = this.results.get(key).getAverage(this.results.get(key).getIds().get(i));
                 }
 
-                // check if the current value is better then the very best value, the very best value is for all identifier and is shown in the gui 
-                if (veryBestValue > this.results.get(key).getAverage(this.results.get(key).getIds().get(i))) {
-
-                    // store new very best value
-                    veryBestValue = this.results.get(key).getAverage(this.results.get(key).getIds().get(i));
-                    veryBestName = detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName();
-                }
-
                 // write the evaluation.log
                 if (writeLog) {
                     if (i == 0)
-                        $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + ", Timestamp: " + this.results.get(key).getTimeStamp() + "\n");
-                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double)Math.round(this.results.get(key).getAverage(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
+                        $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + ", Timestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\n");
+                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAverage(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
                     if (i == this.results.get(key).getIds().size() - 1)
                         $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey).getInformation().getDisplayName() + "\n\n");
                 }
@@ -171,8 +172,29 @@ public class EvaluatorWorker {
             bestKey = -1;
         }
 
+        if (writeLog)
+            $(this.overAllResults.getLogPath()).file().append("- over all results for the session above -\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
+
+        // run through all included ids
+        for (int id : this.overAllResults.getIds()) {
+
+            // write result to log
+            if (writeLog)
+                $(this.overAllResults.getLogPath()).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAverage(id) * 100) / 100) + " Pixel distance averaged.\n");
+
+            // check if the current value is better then the best value
+            if (veryBestValue > this.overAllResults.getAverage(id)) {
+
+                // store new best value
+                veryBestKey = id;
+                veryBestValue = this.overAllResults.getAverage(id);
+            }
+        }
+        if (writeLog)
+            $(this.overAllResults.getLogPath()).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n------------------------------------------------------\n\n\n");
+
         // return the name of the very best detector
-        return veryBestName;
+        return detectors.get(veryBestKey).getInformation().getDisplayName();
     }
 
     /**
