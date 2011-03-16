@@ -21,11 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
-import java.awt.MouseInfo;
-
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;

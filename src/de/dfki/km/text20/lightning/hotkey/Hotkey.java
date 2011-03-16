@@ -65,10 +65,7 @@ public class Hotkey implements HotkeyListener {
 
     /** singleton instance of the main class */
     private MainClass main;
-    
-    /** indicates if the mouseposition is inside of dimension, for training */
-    private boolean fine;
-
+   
     /**
      * indicates status of trainingsstep
      * true = catch fixation
@@ -83,7 +80,6 @@ public class Hotkey implements HotkeyListener {
         this.properties = MainClass.getInstance().getProperties();
         this.main = MainClass.getInstance();
         this.trainingsStatus = true;
-        this.fine = true;
         this.initHotkeys();
 
         if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {

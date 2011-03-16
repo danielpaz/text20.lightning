@@ -125,6 +125,7 @@ public class PrecisionTrainer {
      * sets the mouseposition to associate it with the stored fixation
      * 
      * @param mousePosition
+     * @return true if the position is valid
      */
     @SuppressWarnings("boxing")
     public boolean setMousePosition(Point mousePosition) {

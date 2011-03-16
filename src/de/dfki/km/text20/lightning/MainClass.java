@@ -159,23 +159,23 @@ public class MainClass {
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);
 
         // check if all things are fine
-        if (this.dllStatus)
+        if (this.dllStatus) {
 
-        // initialize hotkeys
+            // initialize hotkeys
             Hotkey.init(fixationEvaluator, this.trainer);
 
-        if (fixationCatcher.getStatus()) {
+            if (fixationCatcher.getStatus()) {
 
-            // start listening
-            fixationCatcher.startCatching();
-            this.warper.start();
+                // start listening
+                fixationCatcher.startCatching();
+                this.warper.start();
 
-            // indicate success
-            this.showTrayMessage("Initializing successful.");
-            System.out.println("\nInitializing successful.\n");
-            this.channel.status("Initializing successful.");
+                // indicate success
+                this.showTrayMessage("Initializing successful.");
+                System.out.println("\nInitializing successful.\n");
+                this.channel.status("Initializing successful.");
+            }
         }
-
     }
 
     /**
