@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.evaluator;
+package de.dfki.km.text20.lightning.tools;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;

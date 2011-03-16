@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
@@ -43,11 +44,11 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
+import de.dfki.km.text20.lightning.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.training.StorageContainer;
 
 /**
  * @author Christoph Käding
@@ -86,9 +87,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** timestamp from the start of this tool */
     private long currentTimeStamp;
-
-    /** parses storage data */
-    private XMLParser parser;
+    
+    /** t
+     * hread in which the evaluation runs */
+    private EvaluationThread evaluationThread;
 
     /**
      * main entry point
@@ -149,9 +151,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // get timestamp
         this.currentTimeStamp = System.currentTimeMillis();
 
-        // create new worker and parser
+        // create new worker
         this.worker = new EvaluatorWorker(this.currentTimeStamp);
-        this.parser = new XMLParser();
 
         // set logging properties
         final JSPFProperties props = new JSPFProperties();
@@ -185,7 +186,11 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize listDetectors
         this.listDetectors.setListData(this.information.toArray());
         this.listDetectors.setCellRenderer(this.initRenderer());
-
+        
+        // initialize evaluation evaluationThread
+        this.evaluationThread = new EvaluationThread();
+        
+        // set the window visible
         this.mainFrame.setVisible(true);
     }
 
@@ -236,33 +241,14 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             // ... set some gui components disable and repaint the gui
             this.running = true;
             this.labelDescription.setText("Step 3: Wait for the results.");
-            this.labelDescription.revalidate();
-            this.labelDescription.repaint();
             this.buttonStart.setText("Stop");
-            this.buttonStart.revalidate();
-            this.buttonStart.repaint();
             this.buttonRemove.setEnabled(false);
-            this.buttonRemove.revalidate();
-            this.buttonRemove.repaint();
             this.buttonSelect.setEnabled(false);
-            this.buttonSelect.revalidate();
-            this.buttonSelect.repaint();
             this.listDetectors.setEnabled(false);
-            this.listDetectors.revalidate();
-            this.listDetectors.repaint();
             this.listFiles.setEnabled(false);
-            this.listFiles.revalidate();
-            this.listFiles.repaint();
             this.checkBoxImages.setEnabled(false);
-            this.checkBoxImages.revalidate();
-            this.checkBoxImages.repaint();
             this.checkBoxSummary.setEnabled(false);
-            this.checkBoxSummary.revalidate();
-            this.checkBoxSummary.repaint();
-            this.mainFrame.repaint();
-
-            // FIXME: update gui
-
+            
             // start evaluation
             this.startEvaluation();
 
@@ -270,6 +256,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         } else {
 
             // ... reset to startable state
+            this.evaluationThread.stop();
             this.running = false;
             this.progressBar.setValue(0);
             this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
@@ -424,10 +411,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     private void startEvaluation() {
         // initialize variables
-        String bestResult = "";
-        String user = "";
+        XMLParser parser = new XMLParser();
         int size = 0;
-        int i = 1;
 
         // add selected detectors to array list 
         for (Object selected : this.listDetectors.getSelectedValues())
@@ -436,46 +421,24 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // count container 
         for (File file : this.files)
-            size = size + this.parser.count(file);
+            size = size + parser.count(file);
 
         // initialize progress bar
         this.progressBar.setMaximum(size * this.selectedDetectors.size());
         this.progressBar.setStringPainted(true);
 
-        try {
-            // run through every file ...
-            for (File file : this.files) {
-
-                // create name from filename 
-                user = file.getName().substring(0, file.getName().lastIndexOf("_"));
-
-                // ... and through every container in it ...
-                for (StorageContainer container : this.parser.readFile(file)) {
-
-                    // ... and every detector
-                    for (SaliencyDetector detector : this.selectedDetectors) {
-
-                        // process evaluation
-                        this.worker.evaluate(file.getName(), user, detector, container, this.checkBoxImages.isSelected(), file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
-
-                        // update progress bar
-                        this.progressBar.setValue(i++);
-                        this.progressBar.paint(this.progressBar.getGraphics());
-
-                        if (!this.running) break;
-                    }
-                    if (!this.running) break;
-                }
-                if (!this.running) break;
-            }
-        } catch (NullPointerException e) {
-            this.buttonStartActionPerformed();
-            return;
-        }
-
+        // initialize and start evaluationThread
+        this.evaluationThread.init(this);
+        Thread thread = new Thread(this.evaluationThread);
+        thread.start();
+    }
+    
+    /**
+     * finishes the evaluation
+     */
+    public void finish() {
         // show best result
-        bestResult = this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors);
-        this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
+        this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors) + " achived the best results.");
 
         // inidicate finish
         this.selectedDetectors.clear();
@@ -488,6 +451,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     private void exit() {
         this.pluginManager.shutdown();
+        this.evaluationThread.stop();
         this.mainFrame.dispose();
         System.exit(0);
     }
@@ -554,5 +518,40 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public void windowOpened(WindowEvent arg0) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @return the files
+     */
+    public ArrayList<File> getFiles() {
+        return this.files;
+    }
+
+    /**
+     * @return the selectedDetectors
+     */
+    public ArrayList<SaliencyDetector> getSelectedDetectors() {
+        return this.selectedDetectors;
+    }
+
+    /**      
+     * @return the progressBar
+     */
+    public JProgressBar getProgressBar() {
+        return this.progressBar;
+    }
+
+    /**
+     * @return the worker
+     */
+    public EvaluatorWorker getWorker() {
+        return this.worker;
+    }
+    
+    /**    
+     * @return true if they should be written
+     */
+    public boolean writeImages() {
+        return this.checkBoxImages.isSelected();
     }
 }

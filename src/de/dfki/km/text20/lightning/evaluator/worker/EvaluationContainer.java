@@ -162,4 +162,11 @@ public class EvaluationContainer {
     public long getTimeStamp() {
         return this.timeStamp;
     }
+    
+    /**
+     * @return the number of datasets
+     */
+    public int getSize() {
+        return this.size;
+    }
 }
