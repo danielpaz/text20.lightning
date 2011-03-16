@@ -159,10 +159,12 @@ public class MainClass {
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);
 
         // check if all things are fine
-        if (fixationCatcher.getStatus() && this.dllStatus) {
+        if (this.dllStatus)
 
-            // initialize hotkeys
+        // initialize hotkeys
             Hotkey.init(fixationEvaluator, this.trainer);
+
+        if (fixationCatcher.getStatus()) {
 
             // start listening
             fixationCatcher.startCatching();
@@ -173,6 +175,7 @@ public class MainClass {
             System.out.println("\nInitializing successful.\n");
             this.channel.status("Initializing successful.");
         }
+
     }
 
     /**

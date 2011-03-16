@@ -160,7 +160,7 @@ public class EvaluatorWorker {
                 if (writeLog) {
                     if (i == 0)
                         $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + ", Timestamp: " + this.results.get(key).getTimeStamp() + "\n");
-                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + this.results.get(key).getAverage(this.results.get(key).getIds().get(i)) + " Pixel distance averaged.\n");
+                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double)Math.round(this.results.get(key).getAverage(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
                     if (i == this.results.get(key).getIds().size() - 1)
                         $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey).getInformation().getDisplayName() + "\n\n");
                 }
