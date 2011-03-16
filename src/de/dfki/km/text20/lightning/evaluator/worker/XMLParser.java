@@ -54,6 +54,9 @@ public class XMLParser {
     /** indicates if the next tag should be the y coordinate of the mouseposition */
     private boolean y;
 
+    /** indicates if the next tag should be the dimension of the screenshots */
+    private boolean dimension;
+
     /** temporary stored timestamp */
     private long timastampTmp;
 
@@ -62,6 +65,9 @@ public class XMLParser {
 
     /** name of the actual file */
     private String fileName;
+
+    /** stores used dimension */
+    private int dimensionTmp;
 
     /**
      * tries to read the included StorageContainer of the given XML-file
@@ -77,8 +83,10 @@ public class XMLParser {
         this.fileName = file.getName();
         this.x = false;
         this.y = false;
+        this.dimension = false;
         this.timastampTmp = 0;
         this.xTmp = 0;
+        this.dimensionTmp = 0;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -95,17 +103,19 @@ public class XMLParser {
                 // if a starttag is found
                 case XMLStreamConstants.START_ELEMENT:
                     if (!handleStartElement(reader.getName().toString().trim()))
-                        return null;
+                        return new ArrayList<StorageContainer>();
                     break;
 
                 // if some characters are found    
                 case XMLStreamConstants.CHARACTERS:
-                    if (!handleCharacters(reader.getText().trim())) return null;
+                    if (!handleCharacters(reader.getText().trim()))
+                        return new ArrayList<StorageContainer>();
                     break;
 
                 // if a comment is found
                 case XMLStreamConstants.COMMENT:
-                    if (!handleComment(reader.getText().trim())) return null;
+                    if (!handleComment(reader.getText().trim()))
+                        return new ArrayList<StorageContainer>();
                     break;
 
                 // all other things
@@ -126,7 +136,7 @@ public class XMLParser {
             } catch (Exception ioe) {
                 ioe.printStackTrace();
             }
-            return null;
+            return new ArrayList<StorageContainer>();
         }
 
         // return readed data
@@ -151,6 +161,10 @@ public class XMLParser {
 
             //            System.out.println(this.data.get(this.data.size() - 1).getTimestamp() + " " + this.timastampTmp + " | " + this.data.get(this.data.size() - 1).getMousePoint() + " " + this.xTmp + " " + value);
 
+            // indicate warning
+            if (Integer.parseInt(value) > this.dimensionTmp)
+                System.out.println("WARNING: " + value + " is out of dimension! File: " + this.fileName);
+
             // reset all variables
             this.timestamp = false;
             this.x = false;
@@ -168,6 +182,10 @@ public class XMLParser {
             // ... store it
             this.xTmp = Integer.parseInt(value);
 
+            // indicate warning
+            if (this.xTmp > this.dimensionTmp)
+                System.out.println("WARNING: " + value + " is out of dimension! File: " + this.fileName);
+
             // return success
             return true;
         }
@@ -177,6 +195,16 @@ public class XMLParser {
 
             // ... store it
             this.timastampTmp = Long.parseLong(value);
+
+            // return success
+            return true;
+        }
+
+        // if the readed should be the dimension ...
+        if (this.dimension) {
+
+            // ... store it
+            this.dimensionTmp = Integer.parseInt(value);
 
             // return success
             return true;
@@ -194,27 +222,38 @@ public class XMLParser {
      * @return true if successful
      */
     private boolean handleStartElement(String value) {
-        // start of any step or container
-        if ((value.equals("alldata") || value.equals("step")) && !this.timestamp && !this.x && !this.y)
+        // start of container
+        if (value.equals("alldata") && !this.timestamp && !this.x && !this.y && !this.dimension)
+            return true;
+
+        // dimension tag 
+        if (value.equals("dimension") && !this.timestamp && !this.x && !this.y && !this.dimension) {
+            this.dimension = true;
+            return true;
+        }
+
+        // start of each step-container
+        if (value.equals("step") && !this.timestamp && !this.x && !this.y && this.dimension)
             return true;
 
         // timestamp
-        if (value.equals("timestamp")) {
+        if (value.equals("timestamp") && !this.timestamp && !this.x && !this.y && this.dimension) {
             this.timestamp = true;
             return true;
         }
 
         // mouseposition after timestamp
-        if (value.equals("mouseposition") && this.timestamp) return true;
+        if (value.equals("mouseposition") && this.timestamp && !this.x && !this.y && this.dimension)
+            return true;
 
         // x after mouseposition and timestamp
-        if (value.equals("x") && this.timestamp) {
+        if (value.equals("x") && this.timestamp && !this.x && !this.y && this.dimension) {
             this.x = true;
             return true;
         }
 
         // y after x, mouseposition and timestamp
-        if (value.equals("y") && this.timestamp && this.x) {
+        if (value.equals("y") && this.timestamp && this.x && !this.y && this.dimension) {
             this.y = true;
             return true;
         }

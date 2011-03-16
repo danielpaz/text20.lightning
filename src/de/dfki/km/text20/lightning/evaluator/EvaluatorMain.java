@@ -237,20 +237,28 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.running = true;
             this.labelDescription.setText("Step 3: Wait for the results.");
             this.labelDescription.revalidate();
+            this.labelDescription.repaint();
             this.buttonStart.setText("Stop");
             this.buttonStart.revalidate();
+            this.buttonStart.repaint();
             this.buttonRemove.setEnabled(false);
             this.buttonRemove.revalidate();
+            this.buttonRemove.repaint();
             this.buttonSelect.setEnabled(false);
             this.buttonSelect.revalidate();
+            this.buttonSelect.repaint();
             this.listDetectors.setEnabled(false);
             this.listDetectors.revalidate();
+            this.listDetectors.repaint();
             this.listFiles.setEnabled(false);
             this.listFiles.revalidate();
+            this.listFiles.repaint();
             this.checkBoxImages.setEnabled(false);
             this.checkBoxImages.revalidate();
+            this.checkBoxImages.repaint();
             this.checkBoxSummary.setEnabled(false);
             this.checkBoxSummary.revalidate();
+            this.checkBoxSummary.repaint();
             this.mainFrame.repaint();
 
             // FIXME: update gui
@@ -444,7 +452,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 // ... and through every container in it ...
                 for (StorageContainer container : this.parser.readFile(file)) {
 
-                    // ... and evry detector
+                    // ... and every detector
                     for (SaliencyDetector detector : this.selectedDetectors) {
 
                         // process evaluation

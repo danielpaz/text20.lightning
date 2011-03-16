@@ -65,6 +65,9 @@ public class Hotkey implements HotkeyListener {
 
     /** singleton instance of the main class */
     private MainClass main;
+    
+    /** indicates if the mouseposition is inside of dimension, for training */
+    private boolean fine;
 
     /**
      * indicates status of trainingsstep
@@ -80,6 +83,7 @@ public class Hotkey implements HotkeyListener {
         this.properties = MainClass.getInstance().getProperties();
         this.main = MainClass.getInstance();
         this.trainingsStatus = true;
+        this.fine = true;
         this.initHotkeys();
 
         if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {
@@ -155,8 +159,10 @@ public class Hotkey implements HotkeyListener {
                 } else {
                 
                     // set mouse position which is associated with the last stored fixation
-                    this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation());
+                    if(this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())                    )
                     this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
+                    else
+                        this.main.showTrayMessage("Training: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
                 }
                 
                 // toggle status

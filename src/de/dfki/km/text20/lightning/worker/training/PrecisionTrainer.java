@@ -78,6 +78,9 @@ public class PrecisionTrainer {
     /** name of current registered user */
     private String user;
 
+    /** indicates if the mouseposition was anytime out of dimension */
+    private boolean warning;
+
     /**
      * creates the precision trainer
      * 
@@ -91,6 +94,7 @@ public class PrecisionTrainer {
         this.mousePoint = new Point();
         this.allData = new ArrayList<StorageContainer>();
         this.properties = MainClass.getInstance().getProperties();
+        this.warning = false;
 
         try {
             this.robot = new Robot();
@@ -123,7 +127,7 @@ public class PrecisionTrainer {
      * @param mousePosition
      */
     @SuppressWarnings("boxing")
-    public void setMousePosition(Point mousePosition) {
+    public boolean setMousePosition(Point mousePosition) {
         this.user = MainClass.getInstance().getCurrentUser();
         this.mousePosition = mousePosition;
         Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
@@ -148,6 +152,17 @@ public class PrecisionTrainer {
         String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension());
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
+        
+        // indicate error
+        if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
+            this.warning = true;
+            
+            // return failure
+            return false;
+        }
+        
+        // return success
+        return true;
     }
 
     /**
@@ -175,26 +190,41 @@ public class PrecisionTrainer {
             // set identifier
             writer.writeComment("Project Lightning (Desktop) - trainingsdata");
             writer.writeCharacters("\n");
-            
+
             // Now start with root element
             writer.writeStartElement("alldata");
             writer.writeCharacters("\n");
 
+            // write dimension
+            writer.writeCharacters("\t");
+            writer.writeStartElement("dimension");
+            writer.writeCharacters("" + MainClass.getInstance().getProperties().getDimension());
+            writer.writeEndElement();
+            writer.writeCharacters("\n");
+            
+            // if mouseposition was anytime out of dimension
+            if(this.warning) {
+                writer.writeCharacters("\t");
+                writer.writeComment("mouseposition was anytime out of dimension");
+                writer.writeCharacters("\n");
+                this.warning = false;
+            }
+
             // run through all data
             for (StorageContainer data : this.allData) {
-                
+
                 // write datatag
                 writer.writeCharacters("\t");
                 writer.writeStartElement("step");
                 writer.writeCharacters("\n");
-                
+
                 // write timestamp
                 writer.writeCharacters("\t\t");
                 writer.writeStartElement("timestamp");
                 writer.writeCharacters("" + data.getTimestamp());
                 writer.writeEndElement();
                 writer.writeCharacters("\n");
-                
+
                 // writemouse position
                 writer.writeCharacters("\t\t");
                 writer.writeStartElement("mouseposition");
@@ -215,13 +245,13 @@ public class PrecisionTrainer {
 
                 // close datatag
                 writer.writeCharacters("\t");
-                writer.writeEndElement();  
-                writer.writeCharacters("\n");              
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
             }
 
             // Write document end. This closes all open structures
             writer.writeEndDocument();
-            
+
             // Close the writer to flush the output
             outputStream.close();
             writer.close();

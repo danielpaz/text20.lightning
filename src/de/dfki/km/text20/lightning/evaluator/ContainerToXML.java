@@ -53,7 +53,13 @@ public class ContainerToXML {
      * @param args
      */
     public static void main(String[] args) {
-        ContainerToXML.getInstance().start(args);
+        
+        String[] tmp = new String[3];
+        tmp[0] = "C:/Users/nesti/Desktop/robby01/robby01_1300182576108.training";
+        tmp[1] = "C:/Users/nesti/Desktop/text01/text01_1300179408828.training";
+        tmp[2] = "C:/Users/nesti/Desktop/all01/all01_1300179795843.training";
+        
+        ContainerToXML.getInstance().start(tmp);
     }
 
     /**
@@ -159,17 +165,25 @@ public class ContainerToXML {
 
             // Write XML prologue
             writer.writeStartDocument();
+            writer.writeCharacters("\n");
 
             // TODO: add a dtd, encodingtag, namespace, ...
             
             // set identifier
             writer.writeComment("Project Lightning (Desktop) - trainingsdata");
+            writer.writeCharacters("\n");
 
             // Now start with root element
-            writer.writeCharacters("\n");
             writer.writeStartElement("alldata");
             writer.writeCharacters("\n");
 
+            // write dimension
+            writer.writeCharacters("\t");
+            writer.writeStartElement("dimension");
+            writer.writeCharacters("100");
+            writer.writeEndElement();
+            writer.writeCharacters("\n");            
+            
             // run through all data
             for (StorageContainer data : allData) {
 
