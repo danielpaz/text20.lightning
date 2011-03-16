@@ -1,0 +1,15 @@
+
+syntax: regexp
+^dist$
+syntax: regexp
+^properties$
+syntax: regexp
+^output$
+syntax: regexp
+^diagnosis\.record$
+syntax: regexp
+^JIntellitype\.dll$
+syntax: regexp
+^training$
+syntax: regexp
+^trackerconfig\.xcfg$
