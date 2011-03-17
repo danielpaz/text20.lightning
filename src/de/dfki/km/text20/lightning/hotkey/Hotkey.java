@@ -65,7 +65,7 @@ public class Hotkey implements HotkeyListener {
 
     /** singleton instance of the main class */
     private MainClass main;
-   
+
     /**
      * indicates status of trainingsstep
      * true = catch fixation
@@ -120,7 +120,7 @@ public class Hotkey implements HotkeyListener {
     public static Hotkey getInstance() {
         return instance;
     }
-    
+
     /**
      * Initializes the hotkeys. This method should be used before every call of any hotkey function. 
      * 
@@ -140,6 +140,13 @@ public class Hotkey implements HotkeyListener {
 
         // action hotkey
         case 1:
+            // check if trackingdevice provides correct data
+            if (!this.main.isTrackingValid()) {
+                this.main.playError();
+                return;
+            }
+
+            // decide which mode
             if (this.main.isNormalMode())
 
             // if the hotkey is typed, the stored fixation will be evaluated
@@ -147,20 +154,19 @@ public class Hotkey implements HotkeyListener {
 
             else {
                 if (this.trainingsStatus) {
-                    
+
                     // store last fixation point
                     this.precisionTrainer.storeFixation();
                     this.main.showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press " + this.getCurrentHotkey(1) + " again...");
-                
+
                 } else {
-                
+
                     // set mouse position which is associated with the last stored fixation
-                    if(this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())                    )
-                    this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
+                    if (this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())) this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
                     else
                         this.main.showTrayMessage("Training: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
                 }
-                
+
                 // toggle status
                 this.trainingsStatus = !(this.trainingsStatus);
             }

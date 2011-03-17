@@ -157,7 +157,7 @@ public class Properties implements Serializable {
         this.statusHotkey = null;
         this.angleThreshold = 10;
         this.distanceThreshold = 200;
-        this.durationThreshold = 1000;
+        this.durationThreshold = 200;
         this.homeRadius = 200;
         this.setRadius = 20;
         this.useWarp = true;

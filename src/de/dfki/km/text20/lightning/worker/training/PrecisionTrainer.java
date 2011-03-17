@@ -134,6 +134,9 @@ public class PrecisionTrainer {
         Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
+        // play the sound
+        MainClass.getInstance().playDing();
+        
         // calculate offset
         this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
 

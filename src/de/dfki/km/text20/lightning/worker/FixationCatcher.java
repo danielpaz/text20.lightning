@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker;
 
+import java.util.ArrayList;
+
 import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
@@ -31,8 +33,11 @@ import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEvent;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEventType;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationListener;
+import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataEvent;
+import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataListener;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDevice;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDeviceProvider;
+import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingEventValidity;
 
 /**
  * Central class were catching of fixations is done and its processing depending on the modus is started.
@@ -59,6 +64,12 @@ public class FixationCatcher {
     /** singleton instance of the main class */
     private MainClass main;
 
+    private boolean isValid;
+
+    private ArrayList<RawDataEvent> lastEvents;
+
+    private EyeTrackingEventValidity[] eventValidity;
+
     /**
      * create fixation catcher
      * 
@@ -66,10 +77,20 @@ public class FixationCatcher {
      * @param trainer
      */
     public FixationCatcher(FixationEvaluator evaluator, PrecisionTrainer trainer) {
+        // initialize variables
         this.fixationEvaluator = evaluator;
         this.precisionTrainer = trainer;
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
+        this.isValid = true;
+        this.lastEvents = new ArrayList<RawDataEvent>();
+        this.eventValidity = new EyeTrackingEventValidity[6];
+        this.eventValidity[0] = EyeTrackingEventValidity.CENTER_POSITION_VALID;
+        this.eventValidity[1] = EyeTrackingEventValidity.HEAD_POSITION_VALID;
+        this.eventValidity[2] = EyeTrackingEventValidity.LEFT_EYE_POSITION_VALID;
+        this.eventValidity[3] = EyeTrackingEventValidity.LEFT_GAZE_POSITION_VALID;
+        this.eventValidity[4] = EyeTrackingEventValidity.RIGHT_EYE_POSITION_VALID;
+        this.eventValidity[5] = EyeTrackingEventValidity.RIGHT_GAZE_POSITION_VALID;
 
         // create stuff which is needed to get eyetracking data
         EyeTrackingDeviceProvider deviceProvider = this.main.getPluginManager().getPlugin(EyeTrackingDeviceProvider.class, new OptionCapabilities("eyetrackingdevice:trackingserver"));
@@ -101,19 +122,56 @@ public class FixationCatcher {
      * The whole algorithm for fixation catching and its processing is started by a call of this method.
      */
     public void startCatching() {
+        // add fixation listener
         this.evaluator.addEvaluationListener(new FixationListener() {
 
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             @Override
             public void newEvaluationEvent(FixationEvent event) {
+                // check if the fixation should be stored
                 if (!main.isActivated()) return;
                 if (event.getType() != FixationEventType.FIXATION_START) return;
+                if (!isValid) return;
 
                 // if the tool is activated and a fixation occurs, it will be stored 
                 fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
                 precisionTrainer.setFixationPoint(event.getFixation().getCenter());
                 if (manager.getCurrentMouseWarper() != null)
                     manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
+            }
+        });
+
+        //add rawdata listener
+        this.evaluator.addEvaluationListener(new RawDataListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void newEvaluationEvent(RawDataEvent event) {
+                // check if the tool is running
+                if (!main.isActivated()) return;
+                
+                // reset status
+                isValid = true;
+                
+                // add current event to storage
+                lastEvents.add(event);
+                
+                // cut the storage down
+                if (lastEvents.size() > 10) lastEvents.remove(0);
+                
+                // check validity of storage
+                for (RawDataEvent storedEvent : lastEvents) {
+                    isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
+                }
+//                System.out.println(isValid);
+                
+                main.setTrackingValid(isValid);
+            }
+
+            @Override
+            public boolean requireUnfilteredEvents() {
+                // TODO Auto-generated method stub
+                return false;
             }
         });
     }

@@ -23,6 +23,8 @@ package de.dfki.km.text20.lightning;
 
 import static net.jcores.CoreKeeper.$;
 
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -92,6 +94,15 @@ public class MainClass {
 
     /** collects training data */
     private PrecisionTrainer trainer;
+    
+    /** indicates if the trackinddata is valid */
+    private boolean trackingValid;
+    
+    /** ding sound */
+    private AudioClip soundDing;
+    
+    /** error sound */
+    private AudioClip soundError;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -166,6 +177,10 @@ public class MainClass {
 
             if (fixationCatcher.getStatus()) {
 
+                // load sounds
+                this.soundDing = Applet.newAudioClip( MainClass.class.getResource("resources/ding.wav") ); 
+                this.soundError = Applet.newAudioClip( MainClass.class.getResource("resources/error.wav") ); 
+                
                 // start listening
                 fixationCatcher.startCatching();
                 this.warper.start();
@@ -387,7 +402,36 @@ public class MainClass {
     public void setCurrentUser(String currentUser) {
         this.currentUser = currentUser;
     }
+    
+    /**
+     * @return the trackingValid
+     */
+    public boolean isTrackingValid() {
+        return this.trackingValid;
+    }
 
+    /**
+     * @param trackingValid the trackingValid to set
+     */
+    public void setTrackingValid(boolean trackingValid) {
+        this.trackingValid = trackingValid;
+    }
+
+    /**
+     * plays the ding sound
+     */
+    public void playDing() {
+        this.soundDing.play();
+    }
+    
+    /**
+     * plays the error sound
+     */
+    public void playError() {
+        this.soundError.play();
+    }
+    
+    
     /**
      * Checks if the required JIntellitype.dll is placed in the windows directory.
      * If it is not there it tries to unzip it into the System32 directory.
@@ -407,7 +451,7 @@ public class MainClass {
             System.out.println("\nJIntellytype.dll was not found.");
 
             // try to unzip it to the windows directory
-            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
+            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
 
             if (destination.exists()) {
                 System.out.println("... but is now placed.\n");
@@ -416,7 +460,7 @@ public class MainClass {
             }
 
             // try to unzip it to "."
-            $(MainClass.class.getResourceAsStream("JIntellitype.zip")).zipstream().unzip(".");
+            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(".");
 
             // indicate error 
             String msg = new String("Initializing failed. A necessary DLL-file, 'JIntellitype.dll', could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");

@@ -694,7 +694,7 @@
              <string>model</string> 
              <object class="javax.swing.SpinnerNumberModel"> 
               <int>300</int> 
-              <int>300</int> 
+              <int>200</int> 
               <int>2147483647</int> 
               <int>100</int> 
              </object> 

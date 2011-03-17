@@ -244,7 +244,7 @@ public class ConfigWindow extends JFrame {
                 contentPanel.add(labelDurationThreshold, cc.xywh(11, 9, 3, 1));
 
                 //---- spinnerDuration ----
-                spinnerDuration.setModel(new SpinnerNumberModel(300, 300, 2147483647, 100));
+                spinnerDuration.setModel(new SpinnerNumberModel(300, 200, 2147483647, 100));
                 contentPanel.add(spinnerDuration, cc.xywh(15, 9, 3, 1));
                 contentPanel.add(separator3, cc.xywh(1, 11, 7, 1));
 

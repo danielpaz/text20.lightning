@@ -13,3 +13,7 @@ syntax: regexp
 ^training$
 syntax: regexp
 ^trackerconfig\.xcfg$
+syntax: regexp
+^tmp$
+syntax: regexp
+^diagnosis\.fallback\.record$

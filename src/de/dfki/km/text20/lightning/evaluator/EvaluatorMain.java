@@ -42,7 +42,9 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
+import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
+import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
@@ -86,7 +88,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private boolean finished;
 
     /** timestamp from the start of this tool */
-    private long currentTimeStamp;
+    private long currentTimeStamp;    
+
+    /** logging channel */
+    private DiagnosisChannel<String> channel;
     
     /** t
      * hread in which the evaluation runs */
@@ -151,9 +156,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // get timestamp
         this.currentTimeStamp = System.currentTimeMillis();
 
-        // create new worker
-        this.worker = new EvaluatorWorker(this.currentTimeStamp);
-
         // set logging properties
         final JSPFProperties props = new JSPFProperties();
         props.setProperty(Diagnosis.class, "recording.enabled", "true");
@@ -182,6 +184,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.saliencyDetectors.get(i).getInformation().setId(i);
             this.information.add(this.saliencyDetectors.get(i).getInformation());
         }
+        
+        // create new worker and channel
+        this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
+        this.worker = new EvaluatorWorker(this.currentTimeStamp, this.channel);
 
         // initialize listDetectors
         this.listDetectors.setListData(this.information.toArray());
@@ -189,6 +195,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         
         // initialize evaluation evaluationThread
         this.evaluationThread = new EvaluationThread();
+        
+        // log start
+        this.channel.status("Session started.");
         
         // set the window visible
         this.mainFrame.setVisible(true);

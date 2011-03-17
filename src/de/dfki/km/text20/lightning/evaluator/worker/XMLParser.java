@@ -163,7 +163,7 @@ public class XMLParser {
 
             // indicate warning
             if (Integer.parseInt(value) > this.dimensionTmp)
-                System.out.println("WARNING: " + value + " is out of dimension! File: " + this.fileName);
+                System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
 
             // reset all variables
             this.timestamp = false;
@@ -184,7 +184,7 @@ public class XMLParser {
 
             // indicate warning
             if (this.xTmp > this.dimensionTmp)
-                System.out.println("WARNING: " + value + " is out of dimension! File: " + this.fileName);
+                System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
 
             // return success
             return true;
@@ -223,7 +223,7 @@ public class XMLParser {
      */
     private boolean handleStartElement(String value) {
         // start of container
-        if (value.equals("alldata") && !this.timestamp && !this.x && !this.y && !this.dimension)
+        if (value.equals("alldata") && !this.timestamp && !this.x && !this.y && !this.dimension && !this.firstComment)
             return true;
 
         // dimension tag 
@@ -275,10 +275,11 @@ public class XMLParser {
 
             // indicate error and return failure
             System.out.println(this.fileName + " isn't a valid file");
-            this.firstComment = false;
             return false;
         }
 
+        this.firstComment = false;
+        
         // return success
         return true;
     }
@@ -293,26 +294,37 @@ public class XMLParser {
         // initialize counter
         int counter = 0;
 
+        // initialize other variables
+        this.firstComment = true;
+
         try {
             // initialize reader
             FileInputStream inputStream = new FileInputStream(file);
-            XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
+            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
 
             // read all data from file ...
-            while (xmlStreamReader.hasNext()) {
-                switch (xmlStreamReader.next()) {
+            while (reader.hasNext()) {
+                switch (reader.next()) {
 
                 // ... and if a starttag is found ...
                 case XMLStreamConstants.START_ELEMENT:
 
                     // ... and it is 'step' ...
-                    if (xmlStreamReader.getName().toString().trim().equals("step"))
+                    if (reader.getName().toString().trim().equals("step"))
 
                     // ... increase counter
                         counter++;
 
                     break;
 
+                case XMLStreamConstants.COMMENT:
+                    // unsure check if the file is valid
+                    if (this.firstComment && !reader.getText().trim().equals("Project Lightning (Desktop) - trainingsdata"))
+                        return 0;
+                    
+                    this.firstComment = false;
+                    break;
+                    
                 // all other stuff
                 default:
                     break;
@@ -321,7 +333,7 @@ public class XMLParser {
 
             // close reader
             inputStream.close();
-            xmlStreamReader.close();
+            reader.close();
 
         } catch (Exception e) {
             e.printStackTrace();
