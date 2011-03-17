@@ -69,7 +69,7 @@ public class WarpCommander {
             this.manager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
 
         // initialize timer
-        this.timer = new Timer(100, new ActionListener() {
+        this.timer = new Timer(20, new ActionListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override

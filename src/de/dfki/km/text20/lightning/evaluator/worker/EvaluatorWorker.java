@@ -34,6 +34,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
+
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.training.StorageContainer;
 
@@ -55,15 +57,20 @@ public class EvaluatorWorker {
     /** stores over all results */
     private EvaluationContainer overAllResults;
 
+    /** logging channel */
+    private DiagnosisChannel<String> channel;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
      * @param currentTimeStamp
+     * @param channel 
      */
-    public EvaluatorWorker(long currentTimeStamp) {
+    public EvaluatorWorker(long currentTimeStamp, DiagnosisChannel<String> channel) {
         this.results = new Hashtable<String, EvaluationContainer>();
         this.currentTimeStamp = currentTimeStamp;
         this.overAllResults = null;
+        this.channel = channel;
     }
 
     /**
@@ -137,6 +144,10 @@ public class EvaluatorWorker {
     @SuppressWarnings("boxing")
     public String getBestResult(boolean writeLog, ArrayList<SaliencyDetector> detectors) {
 
+        // test if some data are collected
+        if(this.results.size() == 0) 
+            return "...nothing";
+        
         // initialize variables
         double bestValue = Double.MAX_VALUE;
         int bestKey = -1;
@@ -192,6 +203,9 @@ public class EvaluatorWorker {
         }
         if (writeLog)
             $(this.overAllResults.getLogPath()).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n------------------------------------------------------\n\n\n");
+        
+        // log best result
+        this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
 
         // return the name of the very best detector
         return detectors.get(veryBestKey).getInformation().getDisplayName();
@@ -228,7 +242,7 @@ public class EvaluatorWorker {
             Graphics2D graphic = screenShot.createGraphics();
             graphic.setFont(graphic.getFont().deriveFont(5));
 
-            if (alreadyExists) {
+            if (!alreadyExists) {
                 // visualize fixation point 
                 graphic.setColor(new Color(255, 255, 0, 255));
                 graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);

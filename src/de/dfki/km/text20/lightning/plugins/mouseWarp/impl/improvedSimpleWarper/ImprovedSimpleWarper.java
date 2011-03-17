@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -40,7 +40,7 @@ import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 
 /**
- * Simple version of mouse warper which checks angle between mouse-move-vector and start of movement to fixation,
+ * Simple version of mouse warper which checks angleFirst between mouse-move-vector and start of movement to fixation,
  * distance from start to endpoint of movement, duration of movement and how close is the cursor to the fixation.
  * If all premises are fulfilled the cursor is moved to the fixation point 
  * (with the distance of setR to the startpoint of movement).
@@ -49,9 +49,9 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
  *
  */
 @PluginImplementation
-public class SimpleWarper implements MouseWarper {
+public class ImprovedSimpleWarper implements MouseWarper {
 
-    /** threshold for the angle */
+    /** threshold for the angleFirst */
     private int angleThres;
 
     /** threshold for the distance */
@@ -83,22 +83,27 @@ public class SimpleWarper implements MouseWarper {
 
     /** information object */
     private PluginInformation information;
-    
+
     /** angle between mouse vector and start-fixation-vector */
-    private double angle;
+    private double angleFirst;
+
+    private double angleSecLast;
+
+    private long tmp;
 
     /**
      * creates a new ImprovedSimpleWarper and initializes some variables
      */
-    public SimpleWarper() {
+    public ImprovedSimpleWarper() {
         this.angleThres = 0;
         this.distanceThres = 0;
         this.durationThres = 0;
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Simple Warper", "Simple Warper");
-        this.angle = 0;
+        this.information = new PluginInformation("Improved Simple Warper", "Improved Simple Warper");
+        this.angleFirst = 0;
+        this.angleSecLast = 0;
 
         try {
             this.robot = new Robot();
@@ -137,7 +142,11 @@ public class SimpleWarper implements MouseWarper {
     public void addMousePosition(Point position) {
         double distanceStartFix;
         double distanceStopFix;
+        double distanceSecLastFix;
 
+        // key of the second last
+        this.tmp = this.timeStamp;
+        
         // timestamp
         this.timeStamp = System.currentTimeMillis();
 
@@ -145,7 +154,7 @@ public class SimpleWarper implements MouseWarper {
         this.mousePositions.put(this.timeStamp, position);
 
         // check if fixation is placed and if there are enough positions stored, 20 is the rate of mouse updates
-        if ((this.fixation == null) && (this.mousePositions.size() < this.durationThres * 20))
+        if ((this.fixation == null) || (this.mousePositions.size() < this.durationThres * 20))
             return;
 
         // cut the array to the needed size, 20 is the rate of mouse updates
@@ -155,28 +164,31 @@ public class SimpleWarper implements MouseWarper {
         // store distance
         distanceStartFix = this.mousePositions.firstEntry().getValue().distance(this.fixation);
         distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
+        distanceSecLastFix = this.mousePositions.get(this.tmp).distance(this.fixation);
 
         // check if the cursor is already in home radius
         if (distanceStopFix < this.homeR) return;
 
         // check the direction of movement
-        if (distanceStartFix <= distanceStopFix) return;
+        if ((distanceStartFix <= distanceStopFix) && (distanceStartFix <= distanceSecLastFix))
+            return;
 
         // check the distance which the mouse has traveled within the time that is represented by the tree map
         // TODO: change to mouse acceleration
         if (this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) < this.distanceThres)
             return;
 
-        // checks the angle between mouse movement and vector between start of the mouse movement and fixation point
-        this.angle = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
-        if (this.angle > this.angleThres)
-            return;
+        // checks the angleFirst between mouse movement and vector between start of the mouse movement and fixation point
+        this.angleFirst = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
+        if ((this.angleFirst > this.angleThres)) return;
+        this.angleSecLast = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.get(this.tmp));
+        if ((this.angleSecLast > this.angleThres)) return;
 
         // moves fixation point a given distance to the mouse
         //        calculateSetPoint(); TODO: uncomment this 
 
         // debugging
-//        this.drawPicture();
+        this.drawPicture();
 
         // places mouse cursor at the fixation point
         this.robot.mouseMove(this.fixation.x, this.fixation.y);
@@ -187,21 +199,21 @@ public class SimpleWarper implements MouseWarper {
     }
 
     /**
-     * Calculates the angle between mouse-move-vector and start of movement to fixation.
+     * Calculates the angleFirst between mouse-move-vector and start of movement to fixation.
      * This calculation is treated like it is placed in a cartesian coordinate system.
      * 
      * @param start point
      * @param stop point
-     * @return the angle
+     * @return the angleFirst
      */
     private double calculateAngle(Point start, Point stop) {
-        // angle in radian measure between x-axis and moving vector of the mouse
+        // angleFirst in radian measure between x-axis and moving vector of the mouse
         double mouseTraceAngle = Math.atan2(start.y - stop.y, start.x - stop.x);
 
-        // angle in radian measure between the x-axis and the vector from start point of the current mouse vector and the fixation point 
+        // angleFirst in radian measure between the x-axis and the vector from start point of the current mouse vector and the fixation point 
         double gazeVectorAngle = Math.atan2(start.y - this.fixation.y, start.x - this.fixation.x);
 
-        // angle between this two ones in degrees
+        // angleFirst between this two ones in degrees
         double angleTmp = (gazeVectorAngle - mouseTraceAngle) * 180 / Math.PI;
 
         return Math.abs(angleTmp);
@@ -212,7 +224,7 @@ public class SimpleWarper implements MouseWarper {
      * The coordinate system is the screen coordinate system.
      */
     private void calculateSetPoint() {
-        // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
+        // angleFirst in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
         double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.y);
 
         // calculate x and y by their polar coordinates
@@ -261,7 +273,8 @@ public class SimpleWarper implements MouseWarper {
             graphic.setColor(new Color(255, 0, 0, 255));
             graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
             graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + this.fixation.x, 12 + this.fixation.y);
-            graphic.drawChars(("" + this.angle).toCharArray(), 0, ("" + this.angle).toCharArray().length, 12 + this.fixation.x, 24 + this.fixation.y);
+            graphic.drawChars(("" + this.angleFirst).toCharArray(), 0, ("" + this.angleFirst).toCharArray().length, 12 + this.fixation.x, 24 + this.fixation.y);
+            graphic.drawChars(("" + this.angleSecLast).toCharArray(), 0, ("" + this.angleSecLast).toCharArray().length, 12 + this.fixation.x, 36 + this.fixation.y);
             graphic.setColor(new Color(255, 0, 0, 32));
             graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
 
@@ -281,7 +294,7 @@ public class SimpleWarper implements MouseWarper {
             graphic.fillOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
 
             // calculate and visualize setpoint
-//            this.calculateSetPoint();
+            this.calculateSetPoint();
             graphic.setColor(new Color(0, 255, 0, 255));
             graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
             graphic.drawChars(("set point").toCharArray(), 0, 9, 12 + this.fixation.x, 12 + this.fixation.y);
