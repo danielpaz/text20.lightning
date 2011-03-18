@@ -31,6 +31,8 @@ import java.net.URISyntaxException;
 
 import javax.swing.UIManager;
 
+import org.simpleframework.xml.ElementArray;
+
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
@@ -94,15 +96,21 @@ public class MainClass {
 
     /** collects training data */
     private PrecisionTrainer trainer;
-    
+
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
-    
+
     /** ding sound */
     private AudioClip soundDing;
-    
+
     /** error sound */
     private AudioClip soundError;
+
+    /** current size of pupils
+     *  0 = left
+     *  1 = right
+     */
+    private float[] pupils;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -178,9 +186,9 @@ public class MainClass {
             if (fixationCatcher.getStatus()) {
 
                 // load sounds
-                this.soundDing = Applet.newAudioClip( MainClass.class.getResource("resources/ding.wav") ); 
-                this.soundError = Applet.newAudioClip( MainClass.class.getResource("resources/error.wav") ); 
-                
+                this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
+                this.soundError = Applet.newAudioClip(MainClass.class.getResource("resources/error.wav"));
+
                 // start listening
                 fixationCatcher.startCatching();
                 this.warper.start();
@@ -402,7 +410,7 @@ public class MainClass {
     public void setCurrentUser(String currentUser) {
         this.currentUser = currentUser;
     }
-    
+
     /**
      * @return the trackingValid
      */
@@ -418,20 +426,39 @@ public class MainClass {
     }
 
     /**
+     * @return the pupilsize
+     *  0 = left
+     *  1 = right
+     */
+    public float[] getPupils() {
+        return this.pupils;
+    }
+
+    /**
+     * the pupilsize to set
+     * 0 = left
+     * 1 = right
+     * 
+     * @param pupils 
+     */
+    public void setPupils(float[] pupils) {
+        this.pupils = pupils;
+    }
+
+    /**
      * plays the ding sound
      */
     public void playDing() {
         this.soundDing.play();
     }
-    
+
     /**
      * plays the error sound
      */
     public void playError() {
         this.soundError.play();
     }
-    
-    
+
     /**
      * Checks if the required JIntellitype.dll is placed in the windows directory.
      * If it is not there it tries to unzip it into the System32 directory.

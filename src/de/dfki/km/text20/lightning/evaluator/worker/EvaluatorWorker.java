@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
-
+import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.training.StorageContainer;
 
@@ -60,17 +61,27 @@ public class EvaluatorWorker {
     /** logging channel */
     private DiagnosisChannel<String> channel;
 
+    /** list of different paths where the overallresults should be shown */
+    private ArrayList<String> overAllPath;
+
+    /** current main class */
+    private EvaluatorMain main;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
+     * @param main      
      * @param currentTimeStamp
      * @param channel 
      */
-    public EvaluatorWorker(long currentTimeStamp, DiagnosisChannel<String> channel) {
+    public EvaluatorWorker(EvaluatorMain main, long currentTimeStamp,
+                           DiagnosisChannel<String> channel) {
         this.results = new Hashtable<String, EvaluationContainer>();
         this.currentTimeStamp = currentTimeStamp;
         this.overAllResults = null;
         this.channel = channel;
+        this.overAllPath = new ArrayList<String>();
+        this.main = main;
     }
 
     /**
@@ -90,11 +101,16 @@ public class EvaluatorWorker {
      *      path were the data-directory is located, where the container-file and the screenshots are
      */
     public void evaluate(String identifier, String user, SaliencyDetector detector,
-                         StorageContainer container, boolean drawImage, String path) {
+                         StorageContainer container, String path) {
 
         // initialize variables
         BufferedImage screenShot = null;
         Point point = new Point();
+        Point translatedMousePoint = new Point(container.getMousePoint().x - container.getFixation().x + this.main.getDimension() / 2, container.getMousePoint().y - container.getFixation().y + this.main.getDimension() / 2);
+
+        // test if the path is already known
+        if (!this.overAllPath.contains(path + "/evaluation/evaluation.log"))
+            this.overAllPath.add(path + "/evaluation/evaluation.log");
 
         // test if associated screenshot is available
         File screenFile = new File(path + "/data/" + user + "/" + user + "_" + container.getTimestamp() + ".png");
@@ -107,28 +123,36 @@ public class EvaluatorWorker {
             e.printStackTrace();
             return;
         }
+
+        // transform screenshot
+        try {
+            screenShot = screenShot.getSubimage(container.getFixation().x, container.getFixation().y, this.main.getDimension(), this.main.getDimension());
+        } catch (RasterFormatException e) {
+            System.out.println("ERROR: raster out of format at file: " + screenFile.getName());
+            return;
+        }
+
         // calculate offset by running the detector
         point = detector.analyse(screenShot);
         point.translate(screenShot.getHeight() / 2, screenShot.getWidth() / 2);
 
         // write the png-file
-        if (drawImage)
-            this.drawPicture(detector, point, path + "/evaluation/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, container.getMousePoint());
-
+        if (this.main.writeImages())
+            this.drawPicture(detector, point, path + "/evaluation/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
         // add results to over all storage
-        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", user, this.currentTimeStamp);
+        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), "", user, this.currentTimeStamp);
         else
-            this.overAllResults.add(detector.getInformation().getId(), point.distance(container.getMousePoint()));
+            this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint));
 
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
 
             // add distance to the already existing identifier
-            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(container.getMousePoint()));
+            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(translatedMousePoint));
         } else {
 
             // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(container.getMousePoint()), path + "/evaluation/evaluation.log", user, this.currentTimeStamp));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), path + "/evaluation/evaluation.log", user, this.currentTimeStamp));
         }
 
     }
@@ -142,12 +166,11 @@ public class EvaluatorWorker {
      * @return name of best ranked detector 
      */
     @SuppressWarnings("boxing")
-    public String getBestResult(boolean writeLog, ArrayList<SaliencyDetector> detectors) {
+    public String getBestResult(ArrayList<SaliencyDetector> detectors) {
 
         // test if some data are collected
-        if(this.results.size() == 0) 
-            return "...nothing";
-        
+        if (this.results.size() == 0) return "...nothing";
+
         // initialize variables
         double bestValue = Double.MAX_VALUE;
         int bestKey = -1;
@@ -169,7 +192,7 @@ public class EvaluatorWorker {
                 }
 
                 // write the evaluation.log
-                if (writeLog) {
+                if (this.main.writeLog()) {
                     if (i == 0)
                         $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + ", Timestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\n");
                     $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAverage(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
@@ -183,29 +206,31 @@ public class EvaluatorWorker {
             bestKey = -1;
         }
 
-        if (writeLog)
-            $(this.overAllResults.getLogPath()).file().append("- over all results for the session above -\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
+        for (String path : this.overAllPath) {
+            if (this.main.writeLog())
+                $(path).file().append("- over all results for the session above -\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
 
-        // run through all included ids
-        for (int id : this.overAllResults.getIds()) {
+            // run through all included ids
+            for (int id : this.overAllResults.getIds()) {
 
-            // write result to log
-            if (writeLog)
-                $(this.overAllResults.getLogPath()).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAverage(id) * 100) / 100) + " Pixel distance averaged.\n");
+                // write result to log
+                if (this.main.writeLog())
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAverage(id) * 100) / 100) + " Pixel distance averaged.\n");
 
-            // check if the current value is better then the best value
-            if (veryBestValue > this.overAllResults.getAverage(id)) {
+                // check if the current value is better then the best value
+                if (veryBestValue > this.overAllResults.getAverage(id)) {
 
-                // store new best value
-                veryBestKey = id;
-                veryBestValue = this.overAllResults.getAverage(id);
+                    // store new best value
+                    veryBestKey = id;
+                    veryBestValue = this.overAllResults.getAverage(id);
+                }
             }
+            if (this.main.writeLog())
+                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n------------------------------------------------------\n\n\n");
+
+            // log best result
+            this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
         }
-        if (writeLog)
-            $(this.overAllResults.getLogPath()).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n------------------------------------------------------\n\n\n");
-        
-        // log best result
-        this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
 
         // return the name of the very best detector
         return detectors.get(veryBestKey).getInformation().getDisplayName();

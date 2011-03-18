@@ -25,6 +25,7 @@ import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementArray;
 
 /**
  * Container which stores collected trainings data.
@@ -33,19 +34,29 @@ import org.simpleframework.xml.Element;
  *
  */
 public class StorageContainer implements Serializable {
-    
+
     /** generated serial id */
     private static final long serialVersionUID = 1135235125761821153L;
 
+    /** fixation point */
+    @Element
+    private Point fixation;
 
-    /** offset from fixation to mouse position */
+    /** mouse position */
     @Element
     private Point mousePoint;
-        
+
     /** timestamp of the trainings step */
     @Attribute
     private long timestamp;
-    
+
+    /** size of pupils
+     *  0 = left
+     *  1 = right
+     */
+    @ElementArray
+    private float[] pupils;
+
     /**
      * Creates new container an initializes its values.
      * 
@@ -53,13 +64,16 @@ public class StorageContainer implements Serializable {
      * @param timestamp
      * @param mousePoint
      */
-    public StorageContainer(long timestamp, Point mousePoint){
+    public StorageContainer(long timestamp, Point fixation, Point mousePoint,
+                            float[] pubils) {
         this.timestamp = timestamp;
         this.mousePoint = mousePoint;
+        this.fixation = fixation;
+        this.pupils = pubils;
     }
 
     /**
-     * @return the mouseOffset
+     * @return the mousePoint
      */
     public Point getMousePoint() {
         return this.mousePoint;
@@ -71,6 +85,32 @@ public class StorageContainer implements Serializable {
     public long getTimestamp() {
         return this.timestamp;
     }
-    
-    
+
+    /**
+     * @return the fixation point
+     */
+    public Point getFixation() {
+        return this.fixation;
+    }
+
+    /**
+     * @return the pupilsize
+     *  0 = left
+     *  1 = right
+     */
+    public float[] getPupils() {
+        return this.pupils;
+    }
+
+    /**
+     * the pupilsize to set
+     * 0 = left
+     * 1 = right
+     * 
+     * @param pupils 
+     */
+    public void setPupils(float[] pupils) {
+        this.pupils[0] = pupils[0];
+        this.pupils[1] = pupils[1];
+    }
 }

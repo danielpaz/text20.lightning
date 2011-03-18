@@ -88,13 +88,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private boolean finished;
 
     /** timestamp from the start of this tool */
-    private long currentTimeStamp;    
+    private long currentTimeStamp;
 
     /** logging channel */
     private DiagnosisChannel<String> channel;
-    
-    /** t
-     * hread in which the evaluation runs */
+
+    /** thread in which the evaluation runs */
     private EvaluationThread evaluationThread;
 
     /**
@@ -184,21 +183,21 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.saliencyDetectors.get(i).getInformation().setId(i);
             this.information.add(this.saliencyDetectors.get(i).getInformation());
         }
-        
+
         // create new worker and channel
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
-        this.worker = new EvaluatorWorker(this.currentTimeStamp, this.channel);
+        this.worker = new EvaluatorWorker(this, this.currentTimeStamp, this.channel);
 
         // initialize listDetectors
         this.listDetectors.setListData(this.information.toArray());
         this.listDetectors.setCellRenderer(this.initRenderer());
-        
+
         // initialize evaluation evaluationThread
         this.evaluationThread = new EvaluationThread();
-        
+
         // log start
         this.channel.status("Session started.");
-        
+
         // set the window visible
         this.mainFrame.setVisible(true);
     }
@@ -257,7 +256,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.listFiles.setEnabled(false);
             this.checkBoxImages.setEnabled(false);
             this.checkBoxSummary.setEnabled(false);
-            
+            this.labelDimension.setEnabled(false);
+            this.spinnerDimension.setEnabled(false);
+
             // start evaluation
             this.startEvaluation();
 
@@ -276,6 +277,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.listFiles.setEnabled(true);
             this.checkBoxImages.setEnabled(true);
             this.checkBoxSummary.setEnabled(true);
+            this.labelDimension.setEnabled(true);
+            this.spinnerDimension.setEnabled(true);
         }
     }
 
@@ -441,13 +444,13 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         Thread thread = new Thread(this.evaluationThread);
         thread.start();
     }
-    
+
     /**
      * finishes the evaluation
      */
     public void finish() {
         // show best result
-        this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult(this.checkBoxSummary.isSelected(), this.saliencyDetectors) + " achived the best results.");
+        this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult(this.saliencyDetectors) + " achived the best results.");
 
         // inidicate finish
         this.selectedDetectors.clear();
@@ -556,11 +559,25 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public EvaluatorWorker getWorker() {
         return this.worker;
     }
-    
+
     /**    
      * @return true if they should be written
      */
     public boolean writeImages() {
         return this.checkBoxImages.isSelected();
+    }
+
+    /**    
+     * @return true if it should be written
+     */
+    public boolean writeLog() {
+        return this.checkBoxSummary.isSelected();
+    }
+
+    /**      
+     * @return the dimension
+     */
+    public int getDimension() {
+        return Integer.parseInt(this.spinnerDimension.getValue().toString());
     }
 }

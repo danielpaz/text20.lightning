@@ -25,6 +25,7 @@ import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -131,17 +132,14 @@ public class PrecisionTrainer {
     public boolean setMousePosition(Point mousePosition) {
         this.user = MainClass.getInstance().getCurrentUser();
         this.mousePosition = mousePosition;
-        Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
+        Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
-        // play the sound
-        MainClass.getInstance().playDing();
-        
         // calculate offset
         this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
 
         // collect data
-        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.mousePoint)));
+        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.mousePosition), MainClass.getInstance().getPupils()));
 
         // write image
         try {
@@ -156,15 +154,15 @@ public class PrecisionTrainer {
         String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension());
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
-        
+
         // indicate error
         if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
             this.warning = true;
-            
+
             // return failure
             return false;
         }
-        
+
         // return success
         return true;
     }
@@ -202,12 +200,12 @@ public class PrecisionTrainer {
             // write dimension
             writer.writeCharacters("\t");
             writer.writeStartElement("dimension");
-            writer.writeCharacters("" + MainClass.getInstance().getProperties().getDimension());
+            writer.writeCharacters("" + this.properties.getDimension());
             writer.writeEndElement();
             writer.writeCharacters("\n");
-            
+
             // if mouseposition was anytime out of dimension
-            if(this.warning) {
+            if (this.warning) {
                 writer.writeCharacters("\t");
                 writer.writeComment("mouseposition was anytime out of dimension");
                 writer.writeCharacters("\n");
@@ -229,7 +227,25 @@ public class PrecisionTrainer {
                 writer.writeEndElement();
                 writer.writeCharacters("\n");
 
-                // writemouse position
+                // write fixation
+                writer.writeCharacters("\t\t");
+                writer.writeStartElement("fixation");
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("x");
+                writer.writeCharacters("" + data.getFixation().x);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("y");
+                writer.writeCharacters("" + data.getFixation().y);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t");
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                // write mouse position
                 writer.writeCharacters("\t\t");
                 writer.writeStartElement("mouseposition");
                 writer.writeCharacters("\n");
@@ -241,6 +257,24 @@ public class PrecisionTrainer {
                 writer.writeCharacters("\t\t\t");
                 writer.writeStartElement("y");
                 writer.writeCharacters("" + data.getMousePoint().y);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t");
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                // write pupil size
+                writer.writeCharacters("\t\t");
+                writer.writeStartElement("pupils");
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("left");
+                writer.writeCharacters("" + data.getPupils()[0]);
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("right");
+                writer.writeCharacters("" + data.getPupils()[1]);
                 writer.writeEndElement();
                 writer.writeCharacters("\n");
                 writer.writeCharacters("\t\t");

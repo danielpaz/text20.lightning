@@ -26,6 +26,8 @@ public class EvaluationWindow {
         labelDescription = new JLabel();
         checkBoxSummary = new JCheckBox();
         checkBoxImages = new JCheckBox();
+        labelDimension = new JLabel();
+        spinnerDimension = new JSpinner();
         scrollPane1 = new JScrollPane();
         listFiles = new JList();
         buttonSelect = new JButton();
@@ -46,14 +48,14 @@ public class EvaluationWindow {
             {
                 dialogPane.setBorder(Borders.DIALOG_BORDER);
                 dialogPane.setLayout(new GridBagLayout());
-                ((GridBagLayout)dialogPane.getLayout()).columnWidths = new int[] {70, 10, 35, 35, 10, 70, 0};
+                ((GridBagLayout)dialogPane.getLayout()).columnWidths = new int[] {70, 10, 35, 35, 80, 10, 50, 10, 115, 0};
                 ((GridBagLayout)dialogPane.getLayout()).rowHeights = new int[] {0, 10, 20, 10, 80, 10, 0, 10, 80, 10, 0, 0};
-                ((GridBagLayout)dialogPane.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+                ((GridBagLayout)dialogPane.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
                 ((GridBagLayout)dialogPane.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
                 //---- labelDescription ----
                 labelDescription.setText("text");
-                dialogPane.add(labelDescription, new GridBagConstraints(0, 0, 6, 1, 0.0, 0.0,
+                dialogPane.add(labelDescription, new GridBagConstraints(0, 0, 9, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
 
@@ -65,7 +67,19 @@ public class EvaluationWindow {
 
                 //---- checkBoxImages ----
                 checkBoxImages.setText("write images");
-                dialogPane.add(checkBoxImages, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0,
+                dialogPane.add(checkBoxImages, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
+
+                //---- labelDimension ----
+                labelDimension.setText("Dimension");
+                dialogPane.add(labelDimension, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
+
+                //---- spinnerDimension ----
+                spinnerDimension.setModel(new SpinnerNumberModel(200, 0, 2147483647, 1));
+                dialogPane.add(spinnerDimension, new GridBagConstraints(8, 2, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
 
@@ -76,7 +90,7 @@ public class EvaluationWindow {
                     listFiles.setVisibleRowCount(3);
                     scrollPane1.setViewportView(listFiles);
                 }
-                dialogPane.add(scrollPane1, new GridBagConstraints(0, 4, 6, 1, 0.0, 0.0,
+                dialogPane.add(scrollPane1, new GridBagConstraints(0, 4, 9, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
 
@@ -96,7 +110,7 @@ public class EvaluationWindow {
                 {
                     scrollPane2.setViewportView(listDetectors);
                 }
-                dialogPane.add(scrollPane2, new GridBagConstraints(0, 8, 6, 1, 0.0, 0.0,
+                dialogPane.add(scrollPane2, new GridBagConstraints(0, 8, 9, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
 
@@ -105,12 +119,12 @@ public class EvaluationWindow {
                 dialogPane.add(buttonStart, new GridBagConstraints(0, 10, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
-                dialogPane.add(progressBar, new GridBagConstraints(2, 10, 4, 1, 0.0, 0.0,
+                dialogPane.add(progressBar, new GridBagConstraints(2, 10, 7, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
             }
             mainFrameContentPane.add(dialogPane, BorderLayout.CENTER);
-            mainFrame.setSize(375, 335);
+            mainFrame.setSize(385, 335);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -123,6 +137,8 @@ public class EvaluationWindow {
     protected JLabel labelDescription;
     protected JCheckBox checkBoxSummary;
     protected JCheckBox checkBoxImages;
+    protected JLabel labelDimension;
+    protected JSpinner spinnerDimension;
     private JScrollPane scrollPane1;
     protected JList listFiles;
     protected JButton buttonSelect;

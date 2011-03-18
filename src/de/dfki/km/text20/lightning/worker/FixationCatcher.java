@@ -64,11 +64,20 @@ public class FixationCatcher {
     /** singleton instance of the main class */
     private MainClass main;
 
+    /** indicates if the current fixation is valid */
     private boolean isValid;
 
+    /** a list of last fixation events */
     private ArrayList<RawDataEvent> lastEvents;
 
+    /** list of things which will be proved to check validity */
     private EyeTrackingEventValidity[] eventValidity;
+    
+    /** current size of pupils
+     *  0 = left
+     *  1 = right
+     */
+    private float[] pupils;
 
     /**
      * create fixation catcher
@@ -83,6 +92,7 @@ public class FixationCatcher {
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         this.isValid = true;
+        this.pupils = new float[2];
         this.lastEvents = new ArrayList<RawDataEvent>();
         this.eventValidity = new EyeTrackingEventValidity[6];
         this.eventValidity[0] = EyeTrackingEventValidity.CENTER_POSITION_VALID;
@@ -165,6 +175,12 @@ public class FixationCatcher {
                 }
 //                System.out.println(isValid);
                 
+                // set pupil size
+                pupils[0] = event.getTrackingEvent().getPupilSizeLeft();
+                pupils[1] = event.getTrackingEvent().getPupilSizeRight();
+                main.setPupils(pupils);
+                
+                // set valid
                 main.setTrackingValid(isValid);
             }
 

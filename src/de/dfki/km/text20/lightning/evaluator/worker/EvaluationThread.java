@@ -49,14 +49,14 @@ public class EvaluationThread implements Runnable {
     /** the current shown progressbar */
     private JProgressBar progressBar;
 
-    /** indicates if the resultimages should be drawn */
-    private boolean writeImages;
-    
     /** given main class */
     private EvaluatorMain mainClass;
     
     /** indicates if the thread should be stopped */
     private boolean stop;
+    
+    /** current used dimension */
+    private int dimension;
 
     /**
      * initializes necessary variables
@@ -69,8 +69,8 @@ public class EvaluationThread implements Runnable {
         this.selectedDetectors = main.getSelectedDetectors();
         this.progressBar = main.getProgressBar();
         this.worker = main.getWorker();
-        this.writeImages = main.writeImages();
         this.stop = false;
+        this.dimension = main.getDimension();
     }
 
     /**
@@ -97,13 +97,13 @@ public class EvaluationThread implements Runnable {
             user = file.getName().substring(0, file.getName().lastIndexOf("_"));
 
             // ... and through every container in it ...
-            for (StorageContainer container : parser.readFile(file)) {
+            for (StorageContainer container : parser.readFile(file, this.dimension)) {
 
                 // ... and every detector
                 for (SaliencyDetector detector : this.selectedDetectors) {
                     
                     // process evaluation
-                    this.worker.evaluate(file.getName(), user, detector, container, this.writeImages, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+                    this.worker.evaluate(file.getName(), user, detector, container,file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
                     // stops the processing if needed
                     if(this.stop) return;

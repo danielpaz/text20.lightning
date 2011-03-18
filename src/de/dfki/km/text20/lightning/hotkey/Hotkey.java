@@ -162,9 +162,18 @@ public class Hotkey implements HotkeyListener {
                 } else {
 
                     // set mouse position which is associated with the last stored fixation
-                    if (this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())) this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
-                    else
+                    if (this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())) {
+                        
+                        // indicate success
+                        MainClass.getInstance().playDing();
+                        this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
+                    }
+                    else {
+
+                        // indicate failure
+                        MainClass.getInstance().playError();
                         this.main.showTrayMessage("Training: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
+                    }
                 }
 
                 // toggle status

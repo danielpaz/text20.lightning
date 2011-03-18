@@ -41,7 +41,7 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>70, 10, 35, 35, 10, 70:1.0</string> 
+          <string>70, 10, 35, 35, 80, 10, 50, 10, 115:1.0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -84,7 +84,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>6</int> 
+           <int>9</int> 
           </void> 
          </object> 
         </void> 
@@ -142,11 +142,74 @@
           </void> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>3</int> 
+           <int>2</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridx</string> 
            <int>3</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>Dimension</string> 
+          </void> 
+          <void property="name"> 
+           <string>labelDimension</string> 
+          </void> 
+          <void method="auxiliary"> 
+           <void method="setProperty"> 
+            <string>JavaCodeGenerator.variableModifiers</string> 
+            <int>4</int> 
+           </void> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>6</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridy</string> 
+           <int>2</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JSpinner</string> 
+          <void method="setProperty"> 
+           <string>model</string> 
+           <object class="javax.swing.SpinnerNumberModel"> 
+            <int>200</int> 
+            <int>0</int> 
+            <int>2147483647</int> 
+            <int>1</int> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>spinnerDimension</string> 
+          </void> 
+          <void method="auxiliary"> 
+           <void method="setProperty"> 
+            <string>JavaCodeGenerator.variableModifiers</string> 
+            <int>4</int> 
+           </void> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>8</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridy</string> 
+           <int>2</int> 
           </void> 
          </object> 
         </void> 
@@ -186,7 +249,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>6</int> 
+           <int>9</int> 
           </void> 
          </object> 
         </void> 
@@ -280,7 +343,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>6</int> 
+           <int>9</int> 
           </void> 
          </object> 
         </void> 
@@ -334,7 +397,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>4</int> 
+           <int>7</int> 
           </void> 
          </object> 
         </void> 
@@ -363,7 +426,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>375</int> 
+        <int>385</int> 
         <int>335</int> 
        </object> 
       </void> 
