@@ -49,44 +49,84 @@ public class XMLParser {
     private boolean timestamp;
 
     /** indicates if the next tag should be the x coordinate of the mouseposition */
-    private boolean x;
+    private boolean mouseX;
 
     /** indicates if the next tag should be the y coordinate of the mouseposition */
-    private boolean y;
+    private boolean mouseY;
 
     /** indicates if the next tag should be the dimension of the screenshots */
     private boolean dimension;
 
+    /** in data stored dimension */
+    private int dimensionTmp;
+
     /** temporary stored timestamp */
     private long timastampTmp;
 
-    /** temporary stored x coordinate */
-    private int xTmp;
+    /** temporary stored mouseX coordinate */
+    private int mouseXTmp;
+
+    /** temporary stored mouseY coordinate */
+    private int mouseYTmp;
 
     /** name of the actual file */
     private String fileName;
 
     /** stores used dimension */
-    private int dimensionTmp;
+    private int usedDimension;
+
+    /** indicates if the next tag should be the x coordinate of the fixation */
+    private boolean fixX;
+
+    /** indicates if the next tag should be the y coordinate of the fixation */
+    private boolean fixY;
+
+    /** temporary stored fixX coordinate */
+    private int fixXTmp;
+
+    /** temporary stored fixY coordinate */
+    private int fixYTmp;
+
+    /** indicates if the next tag should be the size of the left pupil */
+    private boolean left;
+
+    /** indicates if the next tag should be the size of the right pupil */
+    private boolean right;
+
+    /** size of pupils
+     *  0 = left
+     *  1 = right
+     */
+    private float[] pupils;
 
     /**
      * tries to read the included StorageContainer of the given XML-file
      * 
      * @param file
+     * @param choosedDimension 
      * @return the readed container
      */
-    public ArrayList<StorageContainer> readFile(File file) {
+    public ArrayList<StorageContainer> readFile(File file, int choosedDimension) {
         // initialize variables
         this.data = new ArrayList<StorageContainer>();
         this.firstComment = true;
         this.timestamp = false;
         this.fileName = file.getName();
-        this.x = false;
-        this.y = false;
+        this.mouseX = false;
+        this.mouseY = false;
         this.dimension = false;
         this.timastampTmp = 0;
-        this.xTmp = 0;
+        this.mouseXTmp = 0;
+        this.mouseYTmp = 0;
         this.dimensionTmp = 0;
+        this.usedDimension = choosedDimension;
+        this.fixX = false;
+        this.fixY = false;
+        this.fixXTmp = 0;
+        this.fixYTmp = 0;
+        this.left = false;
+        this.right = false;
+        this.pupils = new float[2];
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -153,38 +193,88 @@ public class XMLParser {
         // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
         if (value.equals("")) return true;
 
-        // if the readed characters should be the y coordinate ...
-        if (this.y) {
+        // if the readed characters should be the size of the right pupil ...
+        if (this.right) {
 
+            // ... store it and ...
+            this.pupils[1] = Float.parseFloat(value);
+            
             // ... add a new container to the data
-            this.data.add(new StorageContainer(this.timastampTmp, new Point(this.xTmp, Integer.parseInt(value))));
-
-            //            System.out.println(this.data.get(this.data.size() - 1).getTimestamp() + " " + this.timastampTmp + " | " + this.data.get(this.data.size() - 1).getMousePoint() + " " + this.xTmp + " " + value);
-
-            // indicate warning
-            if (Integer.parseInt(value) > this.dimensionTmp)
-                System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
+            this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
 
             // reset all variables
             this.timestamp = false;
-            this.x = false;
-            this.y = false;
-            this.xTmp = 0;
+            this.mouseX = false;
+            this.mouseY = false;
+            this.fixX = false;
+            this.fixY = false;
+            this.left = false;
+            this.right = false;
+            this.pupils[0] = 0;
+            this.pupils[1] = 0;
+            this.mouseXTmp = 0;
+            this.mouseYTmp = 0;
             this.timastampTmp = 0;
+            this.fixXTmp = 0;
+            this.fixYTmp = 0;
 
             // return success
             return true;
         }
 
-        // if the readed characters should be the x coordinate ...
-        if (this.x) {
+     // if the readed characters should be the size of the left pupil ...
+        if (this.left) {
 
             // ... store it
-            this.xTmp = Integer.parseInt(value);
+            this.pupils[0] = Float.parseFloat(value);
+
+            // return success
+            return true;
+        }
+        
+        // if the readed characters should be the mouseY coordinate ...
+        if (this.mouseY) {
+
+            // ... store it
+            this.mouseYTmp = Integer.parseInt(value);
 
             // indicate warning
-            if (this.xTmp > this.dimensionTmp)
+            if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension)
+                System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
+
+            // return success
+            return true;
+        }
+
+        // if the readed characters should be the mouseX coordinate ...
+        if (this.mouseX) {
+
+            // ... store it
+            this.mouseXTmp = Integer.parseInt(value);
+
+            // indicate warning
+            if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension)
                 System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
+
+            // return success
+            return true;
+        }
+
+        // if the readed characters should be the fixX coordinate ...
+        if (this.fixY) {
+
+            // ... store it
+            this.fixYTmp = Integer.parseInt(value);
+
+            // return success
+            return true;
+        }
+
+        // if the readed characters should be the fixY coordinate ...
+        if (this.fixX) {
+
+            // ... store it
+            this.fixXTmp = Integer.parseInt(value);
 
             // return success
             return true;
@@ -206,6 +296,10 @@ public class XMLParser {
             // ... store it
             this.dimensionTmp = Integer.parseInt(value);
 
+            // test dimensions
+            if (this.usedDimension < this.dimensionTmp)
+                System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
+
             // return success
             return true;
         }
@@ -223,41 +317,72 @@ public class XMLParser {
      */
     private boolean handleStartElement(String value) {
         // start of container
-        if (value.equals("alldata") && !this.timestamp && !this.x && !this.y && !this.dimension && !this.firstComment)
+        if (value.equals("alldata") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.firstComment && !this.fixX && !this.fixY && !this.left && !this.right)
             return true;
 
         // dimension tag 
-        if (value.equals("dimension") && !this.timestamp && !this.x && !this.y && !this.dimension) {
+        if (value.equals("dimension") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
             this.dimension = true;
             return true;
         }
 
         // start of each step-container
-        if (value.equals("step") && !this.timestamp && !this.x && !this.y && this.dimension)
+        if (value.equals("step") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right)
             return true;
 
         // timestamp
-        if (value.equals("timestamp") && !this.timestamp && !this.x && !this.y && this.dimension) {
+        if (value.equals("timestamp") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
             this.timestamp = true;
             return true;
         }
 
-        // mouseposition after timestamp
-        if (value.equals("mouseposition") && this.timestamp && !this.x && !this.y && this.dimension)
+        // fixation tag
+        if (value.equals("fixation") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right)
             return true;
 
-        // x after mouseposition and timestamp
-        if (value.equals("x") && this.timestamp && !this.x && !this.y && this.dimension) {
-            this.x = true;
-            return true;
-        }
-
-        // y after x, mouseposition and timestamp
-        if (value.equals("y") && this.timestamp && this.x && !this.y && this.dimension) {
-            this.y = true;
+        // fixX 
+        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
+            this.fixX = true;
             return true;
         }
 
+        // fixY
+        if (value.equals("y") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && !this.fixY && !this.left && !this.right) {
+            this.fixY = true;
+            return true;
+        }
+
+        // mouseposition 
+        if (value.equals("mouseposition") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right)
+            return true;
+
+        // mouseX
+        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+            this.mouseX = true;
+            return true;
+        }
+
+        // mouseY 
+        if (value.equals("y") && this.timestamp && this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+            this.mouseY = true;
+            return true;
+        }
+
+        // pupils
+        if (value.equals("pupils") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right)
+            return true;
+
+        // left
+        if (value.equals("left") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+            this.left = true;
+            return true;
+        }
+
+        // right 
+        if (value.equals("right") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && this.left && !this.right) {
+            this.right = true;
+            return true;
+        }
         // indicate error and return failure
         System.out.println("parsing failed on '" + value + "' in " + this.fileName);
         return false;
@@ -279,7 +404,7 @@ public class XMLParser {
         }
 
         this.firstComment = false;
-        
+
         // return success
         return true;
     }
@@ -321,10 +446,10 @@ public class XMLParser {
                     // unsure check if the file is valid
                     if (this.firstComment && !reader.getText().trim().equals("Project Lightning (Desktop) - trainingsdata"))
                         return 0;
-                    
+
                     this.firstComment = false;
                     break;
-                    
+
                 // all other stuff
                 default:
                     break;

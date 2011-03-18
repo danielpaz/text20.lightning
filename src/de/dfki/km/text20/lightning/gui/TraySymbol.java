@@ -100,6 +100,7 @@ public class TraySymbol {
 
     /**
      * shows info messages at the taskicon
+     * 
      * @param caption 
      * @param text 
      */
