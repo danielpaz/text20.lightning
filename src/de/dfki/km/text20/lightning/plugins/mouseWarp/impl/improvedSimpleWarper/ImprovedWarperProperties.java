@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.resource;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper;
 
 import java.io.File;
 import java.io.FileInputStream;

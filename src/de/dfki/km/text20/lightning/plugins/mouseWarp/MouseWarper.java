@@ -24,7 +24,6 @@ import java.awt.Point;
 
 import net.xeoh.plugins.base.Plugin;
 import de.dfki.km.text20.lightning.plugins.CommonPluginInterface;
-import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
  * A mouse warper moves the cursor to a fixation point.
@@ -47,6 +46,6 @@ public interface MouseWarper extends Plugin, CommonPluginInterface {
      * 
      * @param position
      */
-    // TODO: maybe add interval (see WarpCommander ~ 100ms)
+    // TODO: maybe add interval (see WarpCommander ~ 20ms)
     public void addMousePosition(Point position);
 }

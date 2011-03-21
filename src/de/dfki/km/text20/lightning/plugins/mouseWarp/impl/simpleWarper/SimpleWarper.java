@@ -197,6 +197,7 @@ public class SimpleWarper implements MouseWarper {
      * Moves the fixation point in direction to the mouse vector. The distance is given by setR.
      * The coordinate system is the screen coordinate system.
      */
+    @SuppressWarnings("unused")
     private void calculateSetPoint() {
         // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
         double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.y);
@@ -221,6 +222,7 @@ public class SimpleWarper implements MouseWarper {
      * writes current movement with recognized target to a file
      * this is for debugging
      */
+    @SuppressWarnings("unused")
     private void drawPicture() {
         // initialize variables
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
