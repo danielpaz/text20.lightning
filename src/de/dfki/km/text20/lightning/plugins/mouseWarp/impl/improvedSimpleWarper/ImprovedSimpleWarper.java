@@ -38,6 +38,8 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.gui.ImprovedWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.resource.ImprovedWarperProperties;
 
 /**
  * Simple version of mouse warper which checks angleFirst between mouse-move-vector and start of movement to fixation,
@@ -90,6 +92,8 @@ public class ImprovedSimpleWarper implements MouseWarper {
     private double angleSecLast;
 
     private long tmp;
+    
+    private ImprovedWarperProperties propertie;
 
     /**
      * creates a new ImprovedSimpleWarper and initializes some variables
@@ -101,9 +105,10 @@ public class ImprovedSimpleWarper implements MouseWarper {
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Improved Simple Warper", "Improved Simple Warper");
+        this.information = new PluginInformation("Improved Simple Warper", "Improved Simple Warper", true);
         this.angleFirst = 0;
         this.angleSecLast = 0;
+        this.propertie = null;
 
         try {
             this.robot = new Robot();
@@ -116,13 +121,13 @@ public class ImprovedSimpleWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int, int, long)
      */
     @Override
-    public void initValues(int angleThreshold, int distanceThreshold,
-                           long durationThreshold, int homeRadius, int setRadius) {
-        this.angleThres = angleThreshold;
-        this.distanceThres = distanceThreshold;
-        this.durationThres = durationThreshold;
-        this.homeR = homeRadius;
-        this.setR = setRadius;
+    public void start() {
+        this.propertie = ImprovedWarperProperties.getInstance();
+        this.angleThres = this.propertie.getAngleThreshold();
+        this.distanceThres = this.propertie.getDistanceThreshold();
+        this.durationThres = this.propertie.getDurationThreshold();
+        this.homeR = this.propertie.getHomeRadius();
+        this.setR = this.propertie.getSetRadius();
 
     }
 
@@ -307,5 +312,22 @@ public class ImprovedSimpleWarper implements MouseWarper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
+     */
+    @SuppressWarnings("unused")
+    @Override
+    public void showGui() {
+        new ImprovedWarperConfigImpl();
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#shutDown()
+     */
+    @Override
+    public void stop() {
+        this.propertie.writeProperties();
     }
 }

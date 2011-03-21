@@ -140,8 +140,8 @@ public class Hotkey implements HotkeyListener {
 
         // action hotkey
         case 1:
-            // check if trackingdevice provides correct data
-            if (!this.main.isTrackingValid()) {
+            // check if trackingdevice provides correct data and if the initializing was successful
+            if (!this.main.isTrackingValid() || !this.main.isAllFine()) {
                 this.main.playError();
                 return;
             }
@@ -163,12 +163,11 @@ public class Hotkey implements HotkeyListener {
 
                     // set mouse position which is associated with the last stored fixation
                     if (this.precisionTrainer.setMousePosition(MouseInfo.getPointerInfo().getLocation())) {
-                        
+
                         // indicate success
                         MainClass.getInstance().playDing();
                         this.main.showTrayMessage("Training: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1) + " again...");
-                    }
-                    else {
+                    } else {
 
                         // indicate failure
                         MainClass.getInstance().playError();

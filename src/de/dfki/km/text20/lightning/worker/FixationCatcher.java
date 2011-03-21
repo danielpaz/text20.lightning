@@ -142,10 +142,10 @@ public class FixationCatcher {
                 if (!main.isActivated()) return;
                 if (event.getType() != FixationEventType.FIXATION_START) return;
                 if (!isValid) return;
-
+                
                 // if the tool is activated and a fixation occurs, it will be stored 
                 fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-                precisionTrainer.setFixationPoint(event.getFixation().getCenter());
+                precisionTrainer.setFixationPoint(event.getFixation().getCenter(), pupils);
                 if (manager.getCurrentMouseWarper() != null)
                     manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
             }
@@ -178,7 +178,6 @@ public class FixationCatcher {
                 // set pupil size
                 pupils[0] = event.getTrackingEvent().getPupilSizeLeft();
                 pupils[1] = event.getTrackingEvent().getPupilSizeRight();
-                main.setPupils(pupils);
                 
                 // set valid
                 main.setTrackingValid(isValid);

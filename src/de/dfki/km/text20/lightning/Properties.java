@@ -1,5 +1,5 @@
 /*
- * Properties.java
+ * ImprovedWarperProperties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -38,8 +38,10 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
  * @author Christoph Käding
  *
  */
-@SuppressWarnings("serial")
 public class Properties implements Serializable {
+
+    /** generated serial id */
+    private static final long serialVersionUID = 6929704088177718826L;
 
     /** dimension for the screenshots */
     @Attribute
@@ -52,26 +54,6 @@ public class Properties implements Serializable {
     /** status hotkey */
     @Element
     private HotkeyContainer statusHotkey;
-
-    @Attribute
-    /** angle threshold for mousewarping */
-    private int angleThreshold;
-
-    @Attribute
-    /** distance threshold for mousewarping */
-    private int distanceThreshold;
-
-    @Attribute
-    /** duration threshold for mousewarping */
-    private long durationThreshold;
-
-    @Attribute
-    /** home radius for mousewarping */
-    private int homeRadius;
-
-    @Attribute
-    /** set radius for mousewarping */
-    private int setRadius;
 
     @Attribute
     /** name of currently used warper */
@@ -97,7 +79,7 @@ public class Properties implements Serializable {
     public Properties() {
 
         // creates properties file
-        this.propertiesFile = new File("properties");
+        this.propertiesFile = new File("properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -115,11 +97,6 @@ public class Properties implements Serializable {
                     this.dimension = ((Properties) this.object).getDimension();
                     this.actionHotkey = ((Properties) this.object).getActionHotkey();
                     this.statusHotkey = ((Properties) this.object).getStatusHotkey();
-                    this.angleThreshold = ((Properties) this.object).getAngleThreshold();
-                    this.distanceThreshold = ((Properties) this.object).getDistanceThreshold();
-                    this.durationThreshold = ((Properties) this.object).getDurationThreshold();
-                    this.homeRadius = ((Properties) this.object).getHomeRadius();
-                    this.setRadius = ((Properties) this.object).getSetRadius();
                     this.useWarp = ((Properties) this.object).isUseWarp();
                     this.warperName = ((Properties) this.object).getWarperName();
                     this.detectorName = ((Properties) this.object).getDetectorName();
@@ -128,7 +105,6 @@ public class Properties implements Serializable {
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
-                    System.out.println("useWarp: " + this.useWarp + ", angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
                     System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName);
                 }
 
@@ -154,12 +130,6 @@ public class Properties implements Serializable {
         // set default values
         this.dimension = 200;
         this.actionHotkey = null;
-        this.statusHotkey = null;
-        this.angleThreshold = 10;
-        this.distanceThreshold = 200;
-        this.durationThreshold = 200;
-        this.homeRadius = 200;
-        this.setRadius = 20;
         this.useWarp = true;
         this.warperName = "";
         this.detectorName = "";
@@ -217,76 +187,6 @@ public class Properties implements Serializable {
      */
     public void setStatusHotkey(HotkeyContainer statusHotkey) {
         this.statusHotkey = statusHotkey;
-    }
-
-    /**
-     * @return the angleThreshold
-     */
-    public int getAngleThreshold() {
-        return this.angleThreshold;
-    }
-
-    /**
-     * @param angleThreshold the angleThreshold to set
-     */
-    public void setAngleThreshold(int angleThreshold) {
-        this.angleThreshold = angleThreshold;
-    }
-
-    /**
-     * @return the distanceThreshold
-     */
-    public int getDistanceThreshold() {
-        return this.distanceThreshold;
-    }
-
-    /**
-     * @param distanceThreshold the distanceThreshold to set
-     */
-    public void setDistanceThreshold(int distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
-    }
-
-    /**
-     * @return the durationThreshold
-     */
-    public long getDurationThreshold() {
-        return this.durationThreshold;
-    }
-
-    /**
-     * @param durationThreshold the durationThreshold to set
-     */
-    public void setDurationThreshold(long durationThreshold) {
-        this.durationThreshold = durationThreshold;
-    }
-
-    /**
-     * @return the homeRadius
-     */
-    public int getHomeRadius() {
-        return this.homeRadius;
-    }
-
-    /**
-     * @param homeRadius the homeRadius to set
-     */
-    public void setHomeRadius(int homeRadius) {
-        this.homeRadius = homeRadius;
-    }
-
-    /**
-     * @return the setRadius
-     */
-    public int getSetRadius() {
-        return this.setRadius;
-    }
-
-    /**
-     * @param setRadius the setRadius to set
-     */
-    public void setSetRadius(int setRadius) {
-        this.setRadius = setRadius;
     }
 
     /**

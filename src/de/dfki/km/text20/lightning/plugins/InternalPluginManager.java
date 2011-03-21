@@ -74,7 +74,8 @@ public class InternalPluginManager {
         for (int i = 0; i < this.saliencyDetectors.size(); i++) {
             this.saliencyDetectors.get(i).getInformation().setId(i);
             if (this.properties.getDetectorName().equals(this.saliencyDetectors.get(i).getInformation().getDisplayName())) {
-                this.setCurrentSaliencyDetector(i);
+                this.currentSaliencyDetectorId = i;
+                this.properties.setDetectorName(this.saliencyDetectors.get(i).getInformation().getDisplayName());
                 found = true;
             }
         }
@@ -88,13 +89,18 @@ public class InternalPluginManager {
         for (int i = 0; i < this.mouseWarpers.size(); i++) {
             this.mouseWarpers.get(i).getInformation().setId(i);
             if (this.properties.getWarperName().equals(this.mouseWarpers.get(i).getInformation().getDisplayName())) {
-                this.setCurrentMouseWarper(i);
+                this.currentMouseWarperId = i;
+                this.properties.setWarperName(this.mouseWarpers.get(i).getInformation().getDisplayName());
                 found = true;
             }
         }
         if (!this.properties.getWarperName().equals("") && !found)
             System.out.println("former used warper couldn't be found...");
         if ((this.mouseWarpers.size() > 0) && !found) this.setCurrentMouseWarper(0);
+
+        // start plugins
+        this.mouseWarpers.get(this.currentMouseWarperId).start();
+        this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();
     }
 
     /**
@@ -121,8 +127,10 @@ public class InternalPluginManager {
      * @param choice
      */
     public void setCurrentSaliencyDetector(int choice) {
+        this.saliencyDetectors.get(this.currentSaliencyDetectorId).stop();
         this.currentSaliencyDetectorId = choice;
         this.properties.setDetectorName(this.saliencyDetectors.get(choice).getInformation().getDisplayName());
+        this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();
     }
 
     /**
@@ -149,7 +157,9 @@ public class InternalPluginManager {
      * @param choice
      */
     public void setCurrentMouseWarper(int choice) {
+        this.mouseWarpers.get(this.currentMouseWarperId).stop();
         this.currentMouseWarperId = choice;
         this.properties.setWarperName(this.mouseWarpers.get(choice).getInformation().getDisplayName());
+        this.mouseWarpers.get(this.currentMouseWarperId).start();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * MouseWarper.java
+ * CommonPluginInterface.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,35 +18,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp;
-
-import java.awt.Point;
-
-import net.xeoh.plugins.base.Plugin;
-import de.dfki.km.text20.lightning.plugins.CommonPluginInterface;
-import de.dfki.km.text20.lightning.plugins.PluginInformation;
+package de.dfki.km.text20.lightning.plugins;
 
 /**
- * A mouse warper moves the cursor to a fixation point.
- * This action starts when the cursor moves to the fixation point and fulfills the given restrictions.
+ * Interface for all common functions which are necessary for any plugin. 
  * 
  * @author Christoph Käding
  *
  */
-public interface MouseWarper extends Plugin, CommonPluginInterface {
-    
-    /**
-     * sets current fixation point
-     * 
-     * @param fixation
-     */
-    public void setFixationPoint(Point fixation);
+public interface CommonPluginInterface {
+
+    /** 
+     * opens plugin specific gui for configuration 
+     */ 
+    public void showGui();
 
     /**
-     * adds current mouse position
-     * 
-     * @param position
+     * indicates that the work for this plugin starts
      */
-    // TODO: maybe add interval (see WarpCommander ~ 100ms)
-    public void addMousePosition(Point position);
+    public void start();
+
+    /**
+     * indicates that the work for this plugin is over
+     */
+    public void stop();
+
+    /**
+     * ... some information about this plugin ...
+     * Make sure you always return the same object, because a id will be set in it!!
+     * 
+     * @return information
+     */
+    public PluginInformation getInformation();
 }

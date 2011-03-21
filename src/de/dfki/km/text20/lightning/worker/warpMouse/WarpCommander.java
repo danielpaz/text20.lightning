@@ -59,15 +59,6 @@ public class WarpCommander {
         this.properties = MainClass.getInstance().getProperties();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         
-        // initialize current warp plugin
-        int angle = this.properties.getAngleThreshold();
-        int distance = this.properties.getDistanceThreshold();
-        long duration = this.properties.getDurationThreshold();
-        int home = this.properties.getHomeRadius();
-        int set = this.properties.getSetRadius();
-        if (this.manager.getCurrentMouseWarper() != null)
-            this.manager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
-
         // initialize timer
         this.timer = new Timer(20, new ActionListener() {
 

@@ -44,6 +44,9 @@ public class PluginInformation {
     /** number to identify the plugin */
     private int id;
     
+    /** indicates if a configuration gui is available*/
+    private boolean guiAvailable;
+    
     /**
      * returns a information object
      * be sure you always return the same object, because it will be set a id in it!
@@ -51,9 +54,10 @@ public class PluginInformation {
      * @param name
      * @param description
      */
-    public PluginInformation(String name, String description){
+    public PluginInformation(String name, String description, boolean guiAvailable){
         this.displayName = name;
         this.toolTip = description;
+        this.guiAvailable = guiAvailable;
     }
 
     /**
@@ -83,7 +87,12 @@ public class PluginInformation {
     public void setId(int id) {
         this.id = id;
         //System.out.println("id " + this.id);
-    } 
-    
-    
+    }
+
+    /**
+     * @return the guiAvailable
+     */
+    public boolean isGuiAvailable() {
+        return this.guiAvailable;
+    }     
 }

@@ -31,8 +31,6 @@ import java.net.URISyntaxException;
 
 import javax.swing.UIManager;
 
-import org.simpleframework.xml.ElementArray;
-
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
@@ -105,12 +103,9 @@ public class MainClass {
 
     /** error sound */
     private AudioClip soundError;
-
-    /** current size of pupils
-     *  0 = left
-     *  1 = right
-     */
-    private float[] pupils;
+    
+    /** indicates if the tool is initialized successfully */
+    private boolean allFine;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -156,6 +151,7 @@ public class MainClass {
         }
 
         // initialize other variables
+        this.allFine = false;
         this.statistics = this.pluginManager.getPlugin(Statistics.class); // FIXME: sth strange with statistic
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.properties = new Properties();
@@ -182,12 +178,12 @@ public class MainClass {
 
             // initialize hotkeys
             Hotkey.init(fixationEvaluator, this.trainer);
+            
+            // load sounds
+            this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
+            this.soundError = Applet.newAudioClip(MainClass.class.getResource("resources/error.wav"));
 
             if (fixationCatcher.getStatus()) {
-
-                // load sounds
-                this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
-                this.soundError = Applet.newAudioClip(MainClass.class.getResource("resources/error.wav"));
 
                 // start listening
                 fixationCatcher.startCatching();
@@ -197,6 +193,9 @@ public class MainClass {
                 this.showTrayMessage("Initializing successful.");
                 System.out.println("\nInitializing successful.\n");
                 this.channel.status("Initializing successful.");
+                
+                // update status
+                this.allFine = true;
             }
         }
     }
@@ -288,6 +287,13 @@ public class MainClass {
     }
 
     /**
+     * @return the status allFine
+     */
+    public boolean isAllFine() {
+        return this.allFine;
+    }
+
+    /**
      * Shuts down the application
      */
     public void exit() {
@@ -295,6 +301,10 @@ public class MainClass {
         // store properties to a file
         this.properties.writeProperties();
 
+        // close plugins
+        this.internalPluginManager.getCurrentMouseWarper().stop();
+        this.internalPluginManager.getCurrentSaliencyDetector().stop();
+        
         // make the trainer known that the training is over
         this.trainer.leaveTraining();
 
@@ -423,26 +433,6 @@ public class MainClass {
      */
     public void setTrackingValid(boolean trackingValid) {
         this.trackingValid = trackingValid;
-    }
-
-    /**
-     * @return the pupilsize
-     *  0 = left
-     *  1 = right
-     */
-    public float[] getPupils() {
-        return this.pupils;
-    }
-
-    /**
-     * the pupilsize to set
-     * 0 = left
-     * 1 = right
-     * 
-     * @param pupils 
-     */
-    public void setPupils(float[] pupils) {
-        this.pupils = pupils;
     }
 
     /**

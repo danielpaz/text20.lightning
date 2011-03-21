@@ -17,3 +17,7 @@ syntax: regexp
 ^tmp$
 syntax: regexp
 ^diagnosis\.fallback\.record$
+syntax: regexp
+^properties\.prop$
+syntax: regexp
+^plugins/improvedWarperProperties\.prop$

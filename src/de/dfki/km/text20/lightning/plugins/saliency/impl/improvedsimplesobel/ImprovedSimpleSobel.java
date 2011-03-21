@@ -19,7 +19,7 @@
  * MA 02110-1301  USA
  *
  */
-package de.dfki.km.text20.lightning.plugins.saliency.impl.improvedsimplesobel.copy;
+package de.dfki.km.text20.lightning.plugins.saliency.impl.improvedsimplesobel;
 
 import java.awt.Point;
 import java.awt.color.ColorSpace;
@@ -46,7 +46,7 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      * creates new simple sobel object
      */
     public ImprovedSimpleSobel() {
-        this.information = new PluginInformation("Improved Simple Sobel", "Improved Simple Sobel");
+        this.information = new PluginInformation("Improved Simple Sobel", "Improved Simple Sobel", false);
     }
 
     /**
@@ -55,11 +55,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      * All the other ones will be colored black.
      */
     private BufferedImage derivate(BufferedImage screenShot) {
-        
+
         ColorConvertOp converter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         screenShot = converter.filter(screenShot, null);
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        
+
         // Go through each pixel position in the derivate image ... 
         for (int x = 0; x < screenShot.getHeight(); x++) {
             for (int y = 0; y < screenShot.getHeight() - 1; y++) {
@@ -107,32 +107,32 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
 
         // grows till the whole screenshot is checked
         while ((size < derivatedScreenShot.getHeight()) && (Math.abs(temp.x) < derivatedScreenShot.getHeight() / 2) && (Math.abs(temp.y) < derivatedScreenShot.getHeight() / 2)) {
-            
-         // grow in every direction
+
+            // grow in every direction
             switch (direction) {
-            
+
             // run through line
             case 0:
                 for (int y = 0; (y < size) && (temp.y < derivatedScreenShot.getHeight() / 2 - 1); y++) {
-                    
+
                     // move temporary point
                     temp.setLocation(temp.x, temp.y + 1);
 
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
-                        
+
                         // check if the point is closer than the current offset
-                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
-                            
+                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+
                             // set new offset
                             offset.setLocation(temp);
-                            
+
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
-                
+
                 // if a point was found, return it
                 if (found) return offset;
 
@@ -142,62 +142,62 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                 break;
 
             case 1:
-                
+
                 // run through line
                 for (int x = 0; (x < size) && (-temp.x < derivatedScreenShot.getHeight() / 2 - 1); x++) {
-                    
+
                     // move temporary point
                     temp.setLocation(temp.x - 1, temp.y);
 
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
-                        
+
                         // check if the point is closer than the current offset
-                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
-                            
+                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+
                             // set new offset
                             offset.setLocation(temp);
-                            
+
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
-                
+
                 // if a point was found, return it
                 if (found) return offset;
 
                 // change direction
                 direction++;
                 direction = direction % 4;
-                
+
                 // increase size
                 size++;
                 break;
 
             case 2:
-                
+
                 // run through line
                 for (int y = 0; (y < size) && (-temp.y < derivatedScreenShot.getHeight() / 2 - 1); y++) {
-                    
+
                     // move temporary point
                     temp.setLocation(temp.x, temp.y - 1);
 
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
-                        
+
                         // check if the point is closer than the current offset
-                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
-                            
+                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+
                             // set new offset
                             offset.setLocation(temp);
-                            
+
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
-                
+
                 // if a point was found, return it
                 if (found) return offset;
 
@@ -207,35 +207,35 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                 break;
 
             case 3:
-                
+
                 // run through line
                 for (int x = 0; (x < size) && (temp.x < derivatedScreenShot.getHeight() / 2 - 1); x++) {
-                    
+
                     // move temporary point
                     temp.setLocation(temp.x + 1, temp.y);
 
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
-                        
+
                         // check if the point is closer than the current offset
-                        if (new Point(0,0).distance(temp) < new Point(0,0).distance(offset)) {
-                            
+                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+
                             // set new offset
                             offset.setLocation(temp);
-                            
+
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
-                
+
                 // if a point was found, return it
                 if (found) return offset;
 
                 // change direction
                 direction++;
                 direction = direction % 4;
-                
+
                 // increase size
                 size++;
                 break;
@@ -255,4 +255,24 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
         return this.information;
     }
 
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
+     */
+    @Override
+    public void showGui() {
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#shutDown()
+     */
+    @Override
+    public void stop() {
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#start()
+     */
+    @Override
+    public void start() {
+    }
 }

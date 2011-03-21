@@ -93,6 +93,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.comboBoxStatusHotkey.addActionListener(this);
         this.checkBoxUseWarp.addActionListener(this);
         this.checkBoxTraining.addActionListener(this);
+        this.buttonDetectorConfig.addActionListener(this);
+        this.buttonWarpConfig.addActionListener(this);
+        this.comboBoxWarpMethod.addActionListener(this);
+        this.comboBoxSearchMethod.addActionListener(this);
 
         // initialize checkbox
         this.checkBoxTraining.setSelected(!MainClass.getInstance().isNormalMode());
@@ -157,39 +161,46 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
             this.checkBockTrainingActionPerformed();
             return;
         }
+
+        if (event.getSource() == this.buttonWarpConfig) {
+            this.buttonWarpConfigActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.buttonDetectorConfig) {
+            this.buttonDetectorConfigActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.comboBoxSearchMethod) {
+            this.comboBoxSearchMethodActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.comboBoxWarpMethod) {
+            this.comboBoxWarpMethodActionPerformed();
+            return;
+        }
     }
 
     /**
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
-        // initialize variables with gui values, used to initialize warper
-        int angle = Integer.parseInt(this.spinnerAngle.getValue().toString());
-        int distance = Integer.parseInt(this.spinnerDistance.getValue().toString());
-        long duration = Long.parseLong(this.spinnerDuration.getValue().toString());
-        int home = Integer.parseInt(this.spinnerHomeRadius.getValue().toString());
-        int set = Integer.parseInt(this.spinnerSetRadius.getValue().toString());
-
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
-        this.properties.setAngleThreshold(angle);
-        this.properties.setDistanceThreshold(distance);
-        this.properties.setDurationThreshold(duration);
-        this.properties.setHomeRadius(home);
-        this.properties.setSetRadius(set);
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
 
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
-        this.internalPluginManager.getCurrentMouseWarper().initValues(angle, distance, duration, home, set);
 
         // set user name
         MainClass.getInstance().setCurrentUser(this.textFieldName.getText());
 
         // refresh warper
         MainClass.getInstance().honkWarper();
-        
+
         // set mode
         if (MainClass.getInstance().isNormalMode() && this.checkBoxTraining.isSelected())
             MainClass.getInstance().toggleMode();
@@ -207,6 +218,34 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void buttonCancelActionPerformed() {
         // close the window
         this.dispose();
+    }
+
+    /**
+     * manages the visibility of the configbutton
+     */
+    private void comboBoxSearchMethodActionPerformed() {
+        this.buttonDetectorConfig.setEnabled(((PluginInformation)this.comboBoxSearchMethod.getSelectedItem()).isGuiAvailable());
+    }
+
+    /**
+     * manages the visibility of the configbutton
+     */
+    private void comboBoxWarpMethodActionPerformed() {
+        this.buttonWarpConfig.setEnabled(((PluginInformation)this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
+    }
+
+    /**
+     * Fired if the Detector Config button is clicked. Shows the configdialog.
+     */
+    private void buttonDetectorConfigActionPerformed() {
+        this.internalPluginManager.getCurrentSaliencyDetector().showGui();
+    }
+
+    /**
+     * Fired if the Warper Config button is clicked. Shows the configdialog.
+     */
+    private void buttonWarpConfigActionPerformed() {
+        this.internalPluginManager.getCurrentMouseWarper().showGui();
     }
 
     /**
@@ -245,6 +284,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
         this.labelSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
         this.comboBoxSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
+        if (!this.checkBoxTraining.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
+        else
+            this.buttonDetectorConfig.setEnabled(false);
         this.labelName.setEnabled(this.checkBoxTraining.isSelected());
         this.textFieldName.setEnabled(this.checkBoxTraining.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxTraining.isSelected());
@@ -347,6 +389,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // set renderer
         this.comboBoxSearchMethod.setRenderer(this.renderer);
+
+        // initialize button
+        this.buttonDetectorConfig.setText(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().getDisplayName() + " Configuration");
+        this.buttonDetectorConfig.setEnabled(this.internalPluginManager.getCurrentMouseWarper().getInformation().isGuiAvailable());
     }
 
     /**
@@ -354,11 +400,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     private void manageWarpConfig() {
         // preselect values
-        this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
-        this.spinnerDuration.setValue(this.properties.getDurationThreshold());
-        this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());
-        this.spinnerSetRadius.setValue(this.properties.getSetRadius());
         this.checkBoxUseWarp.setSelected(this.properties.isUseWarp());
 
         // manage combobox
@@ -372,6 +413,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // set renderer
         this.comboBoxWarpMethod.setRenderer(this.renderer);
 
+        // set button text
+        this.buttonWarpConfig.setText(this.internalPluginManager.getCurrentMouseWarper().getInformation().getDisplayName() + " Configuration");
+
         // set enabled
         this.checkBoxUseWarpActionPerformed();
     }
@@ -381,18 +425,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     private void enableWarpConfig(boolean enable) {
         // change enable status of some components
-        this.spinnerAngle.setEnabled(enable);
-        this.spinnerDistance.setEnabled(enable);
-        this.spinnerDuration.setEnabled(enable);
-        this.spinnerHomeRadius.setEnabled(enable);
-        this.spinnerSetRadius.setEnabled(enable);
         this.comboBoxWarpMethod.setEnabled(enable);
-        this.labelAngleThreshold.setEnabled(enable);
-        this.labelDistanceThreshold.setEnabled(enable);
-        this.labelDurationThreshold.setEnabled(enable);
-        this.labelHomeRadius.setEnabled(enable);
-        this.labelSetRadius.setEnabled(enable);
         this.labelWarpMethod.setEnabled(enable);
+        if (enable && this.internalPluginManager.getCurrentMouseWarper().getInformation().isGuiAvailable()) this.buttonWarpConfig.setEnabled(true);
+        else
+            this.buttonWarpConfig.setEnabled(false);
     }
 
     /**
@@ -419,10 +456,5 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.labelSearchMethod.setToolTipText(labelSearchMethodTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
-        this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
-        this.labelDistanceThreshold.setToolTipText(labelDistanceThresholdTT);
-        this.labelDurationThreshold.setToolTipText(labelDurationThresholdTT);
-        this.labelHomeRadius.setToolTipText(labelHomeRadiusTT);
-        this.labelSetRadius.setToolTipText(labelSetRadiusTT);
     }
 }
