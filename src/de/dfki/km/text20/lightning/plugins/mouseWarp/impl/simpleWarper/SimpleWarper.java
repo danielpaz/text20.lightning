@@ -91,13 +91,13 @@ public class SimpleWarper implements MouseWarper {
      * creates a new ImprovedSimpleWarper and initializes some variables
      */
     public SimpleWarper() {
-        this.angleThres = 0;
-        this.distanceThres = 0;
-        this.durationThres = 0;
-        this.homeR = 0;
+        this.angleThres = 10;
+        this.distanceThres = 200;
+        this.durationThres = 200;
+        this.homeR = 200;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Simple Warper", "Simple Warper");
+        this.information = new PluginInformation("Simple Warper", "Simple Warper", false);
         this.angle = 0;
 
         try {
@@ -105,20 +105,6 @@ public class SimpleWarper implements MouseWarper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /* (non-Javadoc)
-     * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int, int, long)
-     */
-    @Override
-    public void initValues(int angleThreshold, int distanceThreshold,
-                           long durationThreshold, int homeRadius, int setRadius) {
-        this.angleThres = angleThreshold;
-        this.distanceThres = distanceThreshold;
-        this.durationThres = durationThreshold;
-        this.homeR = homeRadius;
-        this.setR = setRadius;
-
     }
 
     /* (non-Javadoc)
@@ -294,5 +280,26 @@ public class SimpleWarper implements MouseWarper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
+     */
+    @Override
+    public void showGui() {
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#shutDown()
+     */
+    @Override
+    public void stop() {
+    }
+
+    /* (non-Javadoc)
+     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#start()
+     */
+    @Override
+    public void start() {
     }
 }

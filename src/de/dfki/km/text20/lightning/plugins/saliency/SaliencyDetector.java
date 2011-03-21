@@ -25,6 +25,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.xeoh.plugins.base.Plugin;
+import de.dfki.km.text20.lightning.plugins.CommonPluginInterface;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 
 /**
@@ -32,7 +33,7 @@ import de.dfki.km.text20.lightning.plugins.PluginInformation;
  * 
  * @author Christoph Käding
  */
-public interface SaliencyDetector extends Plugin {
+public interface SaliencyDetector extends Plugin, CommonPluginInterface {
 
     /**
      * Analyzes the given processed screenshot and calculates an offset which is added to the fixation point.

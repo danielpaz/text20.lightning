@@ -100,30 +100,24 @@ public class ConfigWindow extends JFrame {
         separator5 = new JSeparator();
         labelEnableMouseWarp = new JLabel();
         checkBoxUseWarp = new JCheckBox();
-        labelSearchMethod = new JLabel();
-        comboBoxSearchMethod = new JComboBox();
+        labelStatusHotkey = new JLabel();
+        comboBoxStatusHotkey = new JComboBox();
         labelWarpMethod = new JLabel();
         comboBoxWarpMethod = new JComboBox();
         labelDimension = new JLabel();
         spinnerDimension = new JSpinner();
-        labelAngleThreshold = new JLabel();
-        spinnerAngle = new JSpinner();
+        buttonWarpConfig = new JButton();
         separator1 = new JSeparator();
-        labelDistanceThreshold = new JLabel();
-        spinnerDistance = new JSpinner();
-        labelStatusHotkey = new JLabel();
-        comboBoxStatusHotkey = new JComboBox();
-        labelDurationThreshold = new JLabel();
-        spinnerDuration = new JSpinner();
         separator3 = new JSeparator();
-        labelHomeRadius = new JLabel();
-        spinnerHomeRadius = new JSpinner();
         labelTraining = new JLabel();
         checkBoxTraining = new JCheckBox();
-        labelSetRadius = new JLabel();
-        spinnerSetRadius = new JSpinner();
+        labelSearchMethod = new JLabel();
+        comboBoxSearchMethod = new JComboBox();
         labelName = new JLabel();
         textFieldName = new JTextField();
+        buttonDetectorConfig = new JButton();
+        separator2 = new JSeparator();
+        separator6 = new JSeparator();
         buttonDefault = new JButton();
         buttonSubmit = new JButton();
         buttonOK = new JButton();
@@ -145,7 +139,7 @@ public class ConfigWindow extends JFrame {
             {
                 contentPanel.setLayout(new FormLayout(
                     "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu)",
-                    "3*(default, $lgap), [7dlu,default], 5*($lgap, default)"));
+                    "3*(default, $lgap), [7dlu,default], 2*($lgap, default), $lgap, 7dlu, 2*($lgap, default)"));
 
                 //---- labelActionHotkey ----
                 labelActionHotkey.setText("Action Hotkey");
@@ -167,7 +161,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- separator5 ----
                 separator5.setOrientation(SwingConstants.VERTICAL);
-                contentPanel.add(separator5, cc.xywh(9, 1, 1, 17));
+                contentPanel.add(separator5, cc.xywh(9, 1, 1, 15));
 
                 //---- labelEnableMouseWarp ----
                 labelEnableMouseWarp.setText("Enable Mouse Warp");
@@ -182,18 +176,18 @@ public class ConfigWindow extends JFrame {
                 });
                 contentPanel.add(checkBoxUseWarp, cc.xywh(15, 1, 3, 1));
 
-                //---- labelSearchMethod ----
-                labelSearchMethod.setText("Search Method");
-                contentPanel.add(labelSearchMethod, cc.xywh(1, 3, 3, 1));
+                //---- labelStatusHotkey ----
+                labelStatusHotkey.setText("Status Hotkey");
+                contentPanel.add(labelStatusHotkey, cc.xywh(1, 3, 3, 1));
 
-                //---- comboBoxSearchMethod ----
-                comboBoxSearchMethod.addActionListener(new ActionListener() {
+                //---- comboBoxStatusHotkey ----
+                comboBoxStatusHotkey.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        comboBoxSearchMethodActionPerformed(e);
+                        comboBoxStatusHotkeyActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxSearchMethod, cc.xywh(5, 3, 3, 1));
+                contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 3, 3, 1));
 
                 //---- labelWarpMethod ----
                 labelWarpMethod.setText("Warp Method");
@@ -209,56 +203,15 @@ public class ConfigWindow extends JFrame {
                 spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
                 contentPanel.add(spinnerDimension, cc.xywh(5, 5, 3, 1));
 
-                //---- labelAngleThreshold ----
-                labelAngleThreshold.setText("Angle Threshold");
-                contentPanel.add(labelAngleThreshold, cc.xywh(11, 5, 3, 1));
-
-                //---- spinnerAngle ----
-                spinnerAngle.setModel(new SpinnerNumberModel(10, 0, 180, 1));
-                contentPanel.add(spinnerAngle, cc.xywh(15, 5, 3, 1));
+                //---- buttonWarpConfig ----
+                buttonWarpConfig.setText("text");
+                contentPanel.add(buttonWarpConfig, cc.xywh(11, 5, 7, 1));
                 contentPanel.add(separator1, cc.xywh(1, 7, 7, 1));
-
-                //---- labelDistanceThreshold ----
-                labelDistanceThreshold.setText("Distance Threshold");
-                contentPanel.add(labelDistanceThreshold, cc.xywh(11, 7, 3, 1));
-
-                //---- spinnerDistance ----
-                spinnerDistance.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
-                contentPanel.add(spinnerDistance, cc.xywh(15, 7, 3, 1));
-
-                //---- labelStatusHotkey ----
-                labelStatusHotkey.setText("Status Hotkey");
-                contentPanel.add(labelStatusHotkey, cc.xywh(1, 9, 3, 1));
-
-                //---- comboBoxStatusHotkey ----
-                comboBoxStatusHotkey.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        comboBoxStatusHotkeyActionPerformed(e);
-                    }
-                });
-                contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 9, 3, 1));
-
-                //---- labelDurationThreshold ----
-                labelDurationThreshold.setText("Duration Threshold");
-                contentPanel.add(labelDurationThreshold, cc.xywh(11, 9, 3, 1));
-
-                //---- spinnerDuration ----
-                spinnerDuration.setModel(new SpinnerNumberModel(300, 200, 2147483647, 100));
-                contentPanel.add(spinnerDuration, cc.xywh(15, 9, 3, 1));
-                contentPanel.add(separator3, cc.xywh(1, 11, 7, 1));
-
-                //---- labelHomeRadius ----
-                labelHomeRadius.setText("Home Radius");
-                contentPanel.add(labelHomeRadius, cc.xywh(11, 11, 3, 1));
-
-                //---- spinnerHomeRadius ----
-                spinnerHomeRadius.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
-                contentPanel.add(spinnerHomeRadius, cc.xywh(15, 11, 3, 1));
+                contentPanel.add(separator3, cc.xywh(11, 7, 7, 1));
 
                 //---- labelTraining ----
                 labelTraining.setText("Trainingsmode");
-                contentPanel.add(labelTraining, cc.xywh(1, 13, 3, 1));
+                contentPanel.add(labelTraining, cc.xywh(1, 9, 3, 1));
 
                 //---- checkBoxTraining ----
                 checkBoxTraining.addActionListener(new ActionListener() {
@@ -267,20 +220,31 @@ public class ConfigWindow extends JFrame {
                         checkBoxTrainingActionPerformed(e);
                     }
                 });
-                contentPanel.add(checkBoxTraining, cc.xywh(5, 13, 3, 1));
+                contentPanel.add(checkBoxTraining, cc.xywh(5, 9, 3, 1));
 
-                //---- labelSetRadius ----
-                labelSetRadius.setText("Set Radius");
-                contentPanel.add(labelSetRadius, cc.xywh(11, 13, 3, 1));
+                //---- labelSearchMethod ----
+                labelSearchMethod.setText("Search Method");
+                contentPanel.add(labelSearchMethod, cc.xywh(11, 9, 3, 1));
 
-                //---- spinnerSetRadius ----
-                spinnerSetRadius.setModel(new SpinnerNumberModel(20, 0, 2147483647, 1));
-                contentPanel.add(spinnerSetRadius, cc.xywh(15, 13, 3, 1));
+                //---- comboBoxSearchMethod ----
+                comboBoxSearchMethod.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        comboBoxSearchMethodActionPerformed(e);
+                    }
+                });
+                contentPanel.add(comboBoxSearchMethod, cc.xywh(15, 9, 3, 1));
 
                 //---- labelName ----
                 labelName.setText("Unsername");
-                contentPanel.add(labelName, cc.xywh(1, 15, 3, 1));
-                contentPanel.add(textFieldName, cc.xywh(5, 15, 3, 1));
+                contentPanel.add(labelName, cc.xywh(1, 11, 3, 1));
+                contentPanel.add(textFieldName, cc.xywh(5, 11, 3, 1));
+
+                //---- buttonDetectorConfig ----
+                buttonDetectorConfig.setText("text");
+                contentPanel.add(buttonDetectorConfig, cc.xywh(11, 11, 7, 1));
+                contentPanel.add(separator2, cc.xywh(1, 13, 7, 1));
+                contentPanel.add(separator6, cc.xywh(11, 13, 7, 1));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
@@ -290,7 +254,7 @@ public class ConfigWindow extends JFrame {
                         buttonDefaultActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonDefault, cc.xywh(11, 15, 3, 1));
+                contentPanel.add(buttonDefault, cc.xywh(1, 15, 3, 1));
 
                 //---- buttonSubmit ----
                 buttonSubmit.setText("Submit");
@@ -300,7 +264,7 @@ public class ConfigWindow extends JFrame {
                         buttonSubmitActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonSubmit, cc.xywh(15, 15, 3, 1));
+                contentPanel.add(buttonSubmit, cc.xywh(5, 15, 3, 1));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
@@ -310,7 +274,7 @@ public class ConfigWindow extends JFrame {
                         buttonOKActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonOK, cc.xywh(11, 17, 3, 1));
+                contentPanel.add(buttonOK, cc.xywh(11, 15, 3, 1));
 
                 //---- buttonCancel ----
                 buttonCancel.setText("Cancel");
@@ -320,12 +284,12 @@ public class ConfigWindow extends JFrame {
                         buttonCancelActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonCancel, cc.xywh(15, 17, 3, 1));
+                contentPanel.add(buttonCancel, cc.xywh(15, 15, 3, 1));
             }
             dialogPane.add(contentPanel);
         }
         contentPane.add(dialogPane);
-        setSize(430, 280);
+        setSize(430, 235);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -340,30 +304,24 @@ public class ConfigWindow extends JFrame {
     private JSeparator separator5;
     protected JLabel labelEnableMouseWarp;
     protected JCheckBox checkBoxUseWarp;
-    protected JLabel labelSearchMethod;
-    protected JComboBox comboBoxSearchMethod;
+    protected JLabel labelStatusHotkey;
+    protected JComboBox comboBoxStatusHotkey;
     protected JLabel labelWarpMethod;
     protected JComboBox comboBoxWarpMethod;
     protected JLabel labelDimension;
     protected JSpinner spinnerDimension;
-    protected JLabel labelAngleThreshold;
-    protected JSpinner spinnerAngle;
+    protected JButton buttonWarpConfig;
     private JSeparator separator1;
-    protected JLabel labelDistanceThreshold;
-    protected JSpinner spinnerDistance;
-    protected JLabel labelStatusHotkey;
-    protected JComboBox comboBoxStatusHotkey;
-    protected JLabel labelDurationThreshold;
-    protected JSpinner spinnerDuration;
     private JSeparator separator3;
-    protected JLabel labelHomeRadius;
-    protected JSpinner spinnerHomeRadius;
     private JLabel labelTraining;
     protected JCheckBox checkBoxTraining;
-    protected JLabel labelSetRadius;
-    protected JSpinner spinnerSetRadius;
+    protected JLabel labelSearchMethod;
+    protected JComboBox comboBoxSearchMethod;
     protected JLabel labelName;
     protected JTextField textFieldName;
+    protected JButton buttonDetectorConfig;
+    private JSeparator separator2;
+    private JSeparator separator6;
     protected JButton buttonDefault;
     protected JButton buttonSubmit;
     protected JButton buttonOK;

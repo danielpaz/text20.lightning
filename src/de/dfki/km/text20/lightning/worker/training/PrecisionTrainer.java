@@ -81,6 +81,20 @@ public class PrecisionTrainer {
 
     /** indicates if the mouseposition was anytime out of dimension */
     private boolean warning;
+    
+    /** 
+     * size of the pupils 
+     * 0 = left 
+     * 1 = right
+     */
+    private float[] pupils;
+    
+    /** 
+     * temporary size of the pupils 
+     * 0 = left 
+     * 1 = right
+     */
+    private float[] pupilsTmp;
 
     /**
      * creates the precision trainer
@@ -96,6 +110,7 @@ public class PrecisionTrainer {
         this.allData = new ArrayList<StorageContainer>();
         this.properties = MainClass.getInstance().getProperties();
         this.warning = false;
+        this.pupils = new float[2];
 
         try {
             this.robot = new Robot();
@@ -106,20 +121,27 @@ public class PrecisionTrainer {
     }
 
     /**
-     * stores fixation and creates timestamp
+     * stores fixation and pupilssizes
      * 
      * @param fixation
+     * @param pupils 
+     *      0 = left
+     *      1 = right
      */
-    public void setFixationPoint(Point fixation) {
+    public void setFixationPoint(Point fixation, float[] pupils) {
         this.fixationTmp = fixation;
-        this.timestamp = System.currentTimeMillis();
+        this.pupilsTmp = pupils;
     }
 
     /**
      * stores last fixation so that it can be used to create a trainingsstep
      */
     public void storeFixation() {
+        this.timestamp = System.currentTimeMillis();
         this.fixation = new Point(this.fixationTmp);
+        this.pupils = new float[2];
+        this.pupils[0] = this.pupilsTmp[0];
+        this.pupils[1] = this.pupilsTmp[1];
     }
 
     /**
@@ -139,7 +161,7 @@ public class PrecisionTrainer {
         this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
 
         // collect data
-        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.mousePosition), MainClass.getInstance().getPupils()));
+        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.mousePosition), this.pupils));
 
         // write image
         try {
