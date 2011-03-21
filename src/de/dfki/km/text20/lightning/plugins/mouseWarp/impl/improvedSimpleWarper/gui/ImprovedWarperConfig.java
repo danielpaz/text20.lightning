@@ -13,6 +13,7 @@ import com.jgoodies.forms.layout.*;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class ImprovedWarperConfig extends JFrame {
     public ImprovedWarperConfig() {
         initComponents();

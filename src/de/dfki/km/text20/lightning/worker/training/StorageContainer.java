@@ -60,9 +60,10 @@ public class StorageContainer implements Serializable {
     /**
      * Creates new container an initializes its values.
      * 
-     * @param user
      * @param timestamp
+     * @param fixation 
      * @param mousePoint
+     * @param pubils 
      */
     public StorageContainer(long timestamp, Point fixation, Point mousePoint,
                             float[] pubils) {

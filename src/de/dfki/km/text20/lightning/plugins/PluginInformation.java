@@ -53,6 +53,7 @@ public class PluginInformation {
      * 
      * @param name
      * @param description
+     * @param guiAvailable 
      */
     public PluginInformation(String name, String description, boolean guiAvailable){
         this.displayName = name;

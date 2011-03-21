@@ -39,7 +39,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.gui.ImprovedWarperConfigImpl;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.resource.ImprovedWarperProperties;
 
 /**
  * Simple version of mouse warper which checks angleFirst between mouse-move-vector and start of movement to fixation,
@@ -89,9 +88,11 @@ public class ImprovedSimpleWarper implements MouseWarper {
     /** angle between mouse vector and start-fixation-vector */
     private double angleFirst;
 
+    /** angle between mouse vector and start-fixation-vector */
     private double angleSecLast;
 
-    private long tmp;
+    /** key of the second last entry of the hashmap */
+    private long secondLastKey;
     
     private ImprovedWarperProperties propertie;
 
@@ -99,6 +100,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
      * creates a new ImprovedSimpleWarper and initializes some variables
      */
     public ImprovedSimpleWarper() {
+        // initialize variables
         this.angleThres = 0;
         this.distanceThres = 0;
         this.durationThres = 0;
@@ -122,6 +124,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
      */
     @Override
     public void start() {
+        // load variables from properties
         this.propertie = ImprovedWarperProperties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
         this.distanceThres = this.propertie.getDistanceThreshold();
@@ -150,7 +153,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
         double distanceSecLastFix;
 
         // key of the second last
-        this.tmp = this.timeStamp;
+        this.secondLastKey = this.timeStamp;
         
         // timestamp
         this.timeStamp = System.currentTimeMillis();
@@ -169,7 +172,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
         // store distance
         distanceStartFix = this.mousePositions.firstEntry().getValue().distance(this.fixation);
         distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
-        distanceSecLastFix = this.mousePositions.get(this.tmp).distance(this.fixation);
+        distanceSecLastFix = this.mousePositions.get(this.secondLastKey).distance(this.fixation);
 
         // check if the cursor is already in home radius
         if (distanceStopFix < this.homeR) return;
@@ -186,7 +189,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
         // checks the angleFirst between mouse movement and vector between start of the mouse movement and fixation point
         this.angleFirst = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
         if ((this.angleFirst > this.angleThres)) return;
-        this.angleSecLast = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.get(this.tmp));
+        this.angleSecLast = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.get(this.secondLastKey));
         if ((this.angleSecLast > this.angleThres)) return;
 
         // moves fixation point a given distance to the mouse
@@ -267,7 +270,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
             e1.printStackTrace();
             return;
         }
-        File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
+        File file = new File("secondLastKey/warp_" + System.currentTimeMillis() + ".png");
 
         try {
             // create screenshot graphic
@@ -320,6 +323,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
     @SuppressWarnings("unused")
     @Override
     public void showGui() {
+        // create new gui to show it
         new ImprovedWarperConfigImpl();
     }
 
@@ -328,6 +332,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
      */
     @Override
     public void stop() {
+        // write current poperties in a file
         this.propertie.writeProperties();
     }
 }
