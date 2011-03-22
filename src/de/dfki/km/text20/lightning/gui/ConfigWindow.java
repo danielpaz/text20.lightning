@@ -116,8 +116,11 @@ public class ConfigWindow extends JFrame {
         labelName = new JLabel();
         textFieldName = new JTextField();
         buttonDetectorConfig = new JButton();
-        separator2 = new JSeparator();
+        labelScreenBright = new JLabel();
+        textFieldScreenBright = new JTextField();
         separator6 = new JSeparator();
+        labelSettingBright = new JLabel();
+        textFieldSettingBright = new JTextField();
         buttonDefault = new JButton();
         buttonSubmit = new JButton();
         buttonOK = new JButton();
@@ -139,7 +142,7 @@ public class ConfigWindow extends JFrame {
             {
                 contentPanel.setLayout(new FormLayout(
                     "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu)",
-                    "3*(default, $lgap), [7dlu,default], 2*($lgap, default), $lgap, 7dlu, 2*($lgap, default)"));
+                    "3*(default, $lgap), [7dlu,default], 2*($lgap, default), $lgap, 15dlu, 2*($lgap, default)"));
 
                 //---- labelActionHotkey ----
                 labelActionHotkey.setText("Action Hotkey");
@@ -161,7 +164,7 @@ public class ConfigWindow extends JFrame {
 
                 //---- separator5 ----
                 separator5.setOrientation(SwingConstants.VERTICAL);
-                contentPanel.add(separator5, cc.xywh(9, 1, 1, 15));
+                contentPanel.add(separator5, cc.xywh(9, 1, 1, 17));
 
                 //---- labelEnableMouseWarp ----
                 labelEnableMouseWarp.setText("Enable Mouse Warp");
@@ -243,8 +246,17 @@ public class ConfigWindow extends JFrame {
                 //---- buttonDetectorConfig ----
                 buttonDetectorConfig.setText("text");
                 contentPanel.add(buttonDetectorConfig, cc.xywh(11, 11, 7, 1));
-                contentPanel.add(separator2, cc.xywh(1, 13, 7, 1));
+
+                //---- labelScreenBright ----
+                labelScreenBright.setText("Screen Brightness");
+                contentPanel.add(labelScreenBright, cc.xywh(1, 13, 3, 1));
+                contentPanel.add(textFieldScreenBright, cc.xywh(5, 13, 3, 1));
                 contentPanel.add(separator6, cc.xywh(11, 13, 7, 1));
+
+                //---- labelSettingBright ----
+                labelSettingBright.setText("Setting Brightness");
+                contentPanel.add(labelSettingBright, cc.xywh(1, 15, 3, 1));
+                contentPanel.add(textFieldSettingBright, cc.xywh(5, 15, 3, 1));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
@@ -254,7 +266,7 @@ public class ConfigWindow extends JFrame {
                         buttonDefaultActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonDefault, cc.xywh(1, 15, 3, 1));
+                contentPanel.add(buttonDefault, cc.xywh(11, 15, 3, 1));
 
                 //---- buttonSubmit ----
                 buttonSubmit.setText("Submit");
@@ -264,7 +276,7 @@ public class ConfigWindow extends JFrame {
                         buttonSubmitActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonSubmit, cc.xywh(5, 15, 3, 1));
+                contentPanel.add(buttonSubmit, cc.xywh(15, 15, 3, 1));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
@@ -274,7 +286,7 @@ public class ConfigWindow extends JFrame {
                         buttonOKActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonOK, cc.xywh(11, 15, 3, 1));
+                contentPanel.add(buttonOK, cc.xywh(11, 17, 3, 1));
 
                 //---- buttonCancel ----
                 buttonCancel.setText("Cancel");
@@ -284,12 +296,12 @@ public class ConfigWindow extends JFrame {
                         buttonCancelActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonCancel, cc.xywh(15, 15, 3, 1));
+                contentPanel.add(buttonCancel, cc.xywh(15, 17, 3, 1));
             }
             dialogPane.add(contentPanel);
         }
         contentPane.add(dialogPane);
-        setSize(430, 235);
+        setSize(430, 280);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -320,8 +332,11 @@ public class ConfigWindow extends JFrame {
     protected JLabel labelName;
     protected JTextField textFieldName;
     protected JButton buttonDetectorConfig;
-    private JSeparator separator2;
+    protected JLabel labelScreenBright;
+    protected JTextField textFieldScreenBright;
     private JSeparator separator6;
+    protected JLabel labelSettingBright;
+    protected JTextField textFieldSettingBright;
     protected JButton buttonDefault;
     protected JButton buttonSubmit;
     protected JButton buttonOK;

@@ -81,14 +81,14 @@ public class PrecisionTrainer {
 
     /** indicates if the mouseposition was anytime out of dimension */
     private boolean warning;
-    
+
     /** 
      * size of the pupils 
      * 0 = left 
      * 1 = right
      */
     private float[] pupils;
-    
+
     /** 
      * temporary size of the pupils 
      * 0 = left 
@@ -152,7 +152,7 @@ public class PrecisionTrainer {
      */
     @SuppressWarnings("boxing")
     public boolean setMousePosition(Point mousePosition) {
-        this.user = MainClass.getInstance().getCurrentUser();
+        this.user = MainClass.getInstance().getTrainingsSettings()[0];
         this.mousePosition = mousePosition;
         Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
@@ -215,8 +215,22 @@ public class PrecisionTrainer {
             writer.writeComment("Project Lightning (Desktop) - trainingsdata");
             writer.writeCharacters("\n");
 
-            // Now start with root element
+            // start with root element
             writer.writeStartElement("alldata");
+            writer.writeCharacters("\n");
+            
+            // write screen brightness
+            writer.writeCharacters("\t");
+            writer.writeStartElement("screenBrightness");
+            writer.writeCharacters("" + MainClass.getInstance().getTrainingsSettings()[1]);
+            writer.writeEndElement();
+            writer.writeCharacters("\n");
+            
+            // write setting brightness
+            writer.writeCharacters("\t");
+            writer.writeStartElement("settingBrightness");
+            writer.writeCharacters("" + MainClass.getInstance().getTrainingsSettings()[2]);
+            writer.writeEndElement();
             writer.writeCharacters("\n");
 
             // write dimension

@@ -55,6 +55,12 @@ public class EvaluationContainer {
 
     /** username */
     private String name;
+    
+    /** size of pupils
+     *  0 = left
+     *  1 = right
+     */
+    private float[] pupilsize;
 
     /**
      * Creates a new container and initializes all necessary variables.
@@ -62,8 +68,10 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param value
+     * @param distance
      *      distance between mouse position and calculated result 
+     * @param pupils 
+     *      size of the pupils
      * @param log
      *      absolute path of the logfile
      * @param name
@@ -71,7 +79,7 @@ public class EvaluationContainer {
      * @param timeStamp
      *      start of the evaluation session
      */
-    public EvaluationContainer(int id, double value, String log, String name,
+    public EvaluationContainer(int id, double distance, float[] pupils, String log, String name,
                                long timeStamp) {
         // initialize variables
         this.results = new Hashtable<Integer, Double>();
@@ -81,9 +89,10 @@ public class EvaluationContainer {
         this.log = log;
         this.name = name;
         this.timeStamp = timeStamp;
+        this.pupilsize = new float[2];
 
         // add first value
-        this.add(id, value);
+        this.add(id, distance, pupils);
     }
 
     /**
@@ -92,11 +101,13 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param value
+     * @param distance
      *      distance between mouse position and calculated result 
+     * @param pupils 
+     *      size of the pupils
      */
     @SuppressWarnings("boxing")
-    public void add(int id, double value) {
+    public void add(int id, double distance, float[] pupils) {
         // if the given id is the key id, increase size
         if (this.keyId == id) this.size++;
 
@@ -104,11 +115,15 @@ public class EvaluationContainer {
         if (this.results.containsKey(id)) this.temp = this.results.get(id);
 
         // put temp + given value by given id to the map
-        this.results.put(id, this.temp + value);
+        this.results.put(id, this.temp + distance);
 
         // add id to the list of ids if it is not already there
         if (!this.ids.contains(id)) this.ids.add(id);
 
+        // add pupilsize
+        this.pupilsize[0] = pupils[0] + this.pupilsize[0];
+        this.pupilsize[1] = pupils[1] + this.pupilsize[1];
+        
         //        System.out.println("id: " + id + " value: " + value + " size: " + this.size + " keyId: " + this.keyId);
 
         // reset temp
@@ -122,9 +137,20 @@ public class EvaluationContainer {
      * @return averaged distance
      */
     @SuppressWarnings("boxing")
-    public double getAverage(int id) {
+    public double getAveragedDistance(int id) {
         if (this.results.containsKey(id)) return (this.results.get(id) / this.size);
         return 0;
+    }
+    
+    /**
+     * averaged pupilsize from all entries
+     * 
+     * @return pupils
+     */
+    public float[] getAveragedPupils() {
+        this.pupilsize[0] = this.pupilsize[0]/ this.size;
+        this.pupilsize[1] = this.pupilsize[1]/ this.size;
+        return this.pupilsize;
     }
 
     /**
