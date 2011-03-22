@@ -105,8 +105,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // initializes tooltips
         this.manageToolTips();
 
-        // initialize current user
-        this.textFieldName.setText(MainClass.getInstance().getCurrentUser());
+        // initialize current traings settings
+        this.textFieldName.setText(MainClass.getInstance().getTrainingsSettings()[0]);
+        this.textFieldScreenBright.setText(MainClass.getInstance().getTrainingsSettings()[1]);
+        this.textFieldSettingBright.setText(MainClass.getInstance().getTrainingsSettings()[2]);
 
         // show the gui
         repaint();
@@ -187,6 +189,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
+        // initialize temporary variables
+        String[] settings = {this.textFieldName.getText(), this.textFieldScreenBright.getText(), this.textFieldSettingBright.getText()};
+        
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
@@ -195,11 +200,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
 
-        // set user name
-        MainClass.getInstance().setCurrentUser(this.textFieldName.getText());
+        // set trainings settings
+        MainClass.getInstance().setTrainingsSettings(settings);
 
         // refresh warper
-        MainClass.getInstance().honkWarper();
+        MainClass.getInstance().refreshWarper();
 
         // set mode
         if (MainClass.getInstance().isNormalMode() && this.checkBoxTraining.isSelected())
@@ -289,6 +294,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
             this.buttonDetectorConfig.setEnabled(false);
         this.labelName.setEnabled(this.checkBoxTraining.isSelected());
         this.textFieldName.setEnabled(this.checkBoxTraining.isSelected());
+        this.labelScreenBright.setEnabled(this.checkBoxTraining.isSelected());
+        this.labelSettingBright.setEnabled(this.checkBoxTraining.isSelected());
+        this.textFieldScreenBright.setEnabled(this.checkBoxTraining.isSelected());
+        this.textFieldSettingBright.setEnabled(this.checkBoxTraining.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxTraining.isSelected());
         this.checkBoxUseWarpActionPerformed();
         if (!this.checkBoxTraining.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);

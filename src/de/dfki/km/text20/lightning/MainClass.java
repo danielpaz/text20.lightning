@@ -90,7 +90,7 @@ public class MainClass {
     private Statistics statistics;
 
     /** necessary to identify the training data */
-    private String currentUser;
+    private String[] trainingsSettings;
 
     /** collects training data */
     private PrecisionTrainer trainer;
@@ -103,7 +103,7 @@ public class MainClass {
 
     /** error sound */
     private AudioClip soundError;
-    
+
     /** indicates if the tool is initialized successfully */
     private boolean allFine;
 
@@ -178,7 +178,7 @@ public class MainClass {
 
             // initialize hotkeys
             Hotkey.init(fixationEvaluator, this.trainer);
-            
+
             // load sounds
             this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
             this.soundError = Applet.newAudioClip(MainClass.class.getResource("resources/error.wav"));
@@ -193,7 +193,7 @@ public class MainClass {
                 this.showTrayMessage("Initializing successful.");
                 System.out.println("\nInitializing successful.\n");
                 this.channel.status("Initializing successful.");
-                
+
                 // update status
                 this.allFine = true;
             }
@@ -251,7 +251,7 @@ public class MainClass {
     /**
      * refreshes warper
      */
-    public void honkWarper() {
+    public void refreshWarper() {
         this.warper.stop();
         this.warper.start();
     }
@@ -304,7 +304,7 @@ public class MainClass {
         // close plugins
         this.internalPluginManager.getCurrentMouseWarper().stop();
         this.internalPluginManager.getCurrentSaliencyDetector().stop();
-        
+
         // make the trainer known that the training is over
         this.trainer.leaveTraining();
 
@@ -407,18 +407,29 @@ public class MainClass {
     }
 
     /**
-     * @return the currentUser
+     * @return the trainingsSettings
+     *      0 = user name
+     *      1 = screen brightness
+     *      2 = setting brightness
      */
-    public String getCurrentUser() {
-        if (this.currentUser == null) this.currentUser = "DefaultUser";
-        return this.currentUser;
+    public String[] getTrainingsSettings() {
+        if (this.trainingsSettings == null) {
+            this.trainingsSettings = new String[3];
+            this.trainingsSettings[0] = "DefaultUser";
+            this.trainingsSettings[1] = "not choosen";
+            this.trainingsSettings[2] = "not choosen";
+        }
+        return this.trainingsSettings;
     }
 
     /**
-     * @param currentUser the currentUser to set
+     * @param settings 
+     *      0 = user name
+     *      1 = screen brightness
+     *      2 = setting brightness
      */
-    public void setCurrentUser(String currentUser) {
-        this.currentUser = currentUser;
+    public void setTrainingsSettings(String[] settings) {
+        this.trainingsSettings = settings;
     }
 
     /**

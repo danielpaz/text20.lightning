@@ -51,10 +51,10 @@ public class EvaluationThread implements Runnable {
 
     /** given main class */
     private EvaluatorMain mainClass;
-    
+
     /** indicates if the thread should be stopped */
     private boolean stop;
-    
+
     /** current used dimension */
     private int dimension;
 
@@ -79,7 +79,7 @@ public class EvaluationThread implements Runnable {
     public void stop() {
         this.stop = true;
     }
-    
+
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
@@ -89,7 +89,7 @@ public class EvaluationThread implements Runnable {
         XMLParser parser = new XMLParser();
         String user = "";
         int i = 1;
-        
+
         // run through every file ...
         for (File file : this.files) {
 
@@ -97,16 +97,16 @@ public class EvaluationThread implements Runnable {
             user = file.getName().substring(0, file.getName().lastIndexOf("_"));
 
             // ... and through every container in it ...
-            for (StorageContainer container : parser.readFile(file, this.dimension)) {
+            for (StorageContainer container : parser.readFile(file, this.dimension, this.worker)) {
 
                 // ... and every detector
                 for (SaliencyDetector detector : this.selectedDetectors) {
-                    
+
                     // process evaluation
-                    this.worker.evaluate(file.getName(), user, detector, container,file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
+                    this.worker.evaluate(file.getName(), user, detector, container, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
 
                     // stops the processing if needed
-                    if(this.stop) return;
+                    if (this.stop) return;
 
                     // update progress bar
                     this.progressBar.setValue(i++);
@@ -114,7 +114,7 @@ public class EvaluationThread implements Runnable {
                 }
             }
         }
-        
+
         // finish the evaluation
         this.mainClass.finish();
     }

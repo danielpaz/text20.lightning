@@ -49,7 +49,7 @@ public class TraySymbol {
     public TraySymbol() {
                 
         // initialize tray icon and add it to tray
-        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("../resources/TrayIconActive.gif")), "Project Lightning (Desktop)");
+        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")), "Project Lightning (Desktop)");
         this.trayIcon.setImageAutoSize(true);
         
         if (SystemTray.isSupported()) {
@@ -70,7 +70,7 @@ public class TraySymbol {
      */
     public boolean setActivatedIcon() {
         if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("../resources/TrayIconActive.gif")));
+            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")));
         } else {
             return false;
         }
@@ -84,7 +84,7 @@ public class TraySymbol {
      */
     public boolean setDeactivatedIcon() {
         if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("../resources/TrayIconInactive.gif")));
+            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconInactive.gif")));
         } else {
             return false;
         }

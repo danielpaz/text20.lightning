@@ -45,16 +45,16 @@ public class XMLParser {
     /** indicates if the readed comment should be the identifier */
     private boolean firstComment;
 
-    /** indicates if the next tag should be the timestamp */
+    /** indicates if the next entry should be the timestamp */
     private boolean timestamp;
 
-    /** indicates if the next tag should be the x coordinate of the mouseposition */
+    /** indicates if the next entry should be the x coordinate of the mouseposition */
     private boolean mouseX;
 
-    /** indicates if the next tag should be the y coordinate of the mouseposition */
+    /** indicates if the next entry should be the y coordinate of the mouseposition */
     private boolean mouseY;
 
-    /** indicates if the next tag should be the dimension of the screenshots */
+    /** indicates if the next entry should be the dimension of the screenshots */
     private boolean dimension;
 
     /** in data stored dimension */
@@ -75,10 +75,10 @@ public class XMLParser {
     /** stores used dimension */
     private int usedDimension;
 
-    /** indicates if the next tag should be the x coordinate of the fixation */
+    /** indicates if the next entry should be the x coordinate of the fixation */
     private boolean fixX;
 
-    /** indicates if the next tag should be the y coordinate of the fixation */
+    /** indicates if the next entry should be the y coordinate of the fixation */
     private boolean fixY;
 
     /** temporary stored fixX coordinate */
@@ -87,10 +87,10 @@ public class XMLParser {
     /** temporary stored fixY coordinate */
     private int fixYTmp;
 
-    /** indicates if the next tag should be the size of the left pupil */
+    /** indicates if the next entry should be the size of the left pupil */
     private boolean left;
 
-    /** indicates if the next tag should be the size of the right pupil */
+    /** indicates if the next entry should be the size of the right pupil */
     private boolean right;
 
     /** size of pupils
@@ -99,14 +99,32 @@ public class XMLParser {
      */
     private float[] pupils;
 
+    /** indicates if the next entry should be the screen brightness */
+    private boolean screen;
+
+    /** temporary stored screen brightness */
+    private String screenTmp;
+
+    /** indicates if the next entry should be the setting brightness */
+    private boolean setting;
+
+    /** temporary stored setting brightness */
+    private String settingTmp;
+
+    /** included setting will be stored in this container */
+    private SettingsContainer settingsContainer;
+
     /**
      * tries to read the included StorageContainer of the given XML-file
      * 
      * @param file
      * @param choosedDimension 
+     * @param worker 
+     * 
      * @return the readed container
      */
-    public ArrayList<StorageContainer> readFile(File file, int choosedDimension) {
+    public ArrayList<StorageContainer> readFile(File file, int choosedDimension,
+                                                EvaluatorWorker worker) {
         // initialize variables
         this.data = new ArrayList<StorageContainer>();
         this.firstComment = true;
@@ -127,6 +145,10 @@ public class XMLParser {
         this.left = false;
         this.right = false;
         this.pupils = new float[2];
+        this.screen = false;
+        this.setting = false;
+        this.screenTmp = "";
+        this.settingTmp = "";
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -164,6 +186,9 @@ public class XMLParser {
                 }
             }
 
+            // update settings map at worker
+            worker.addToSettingMap(this.fileName, this.settingsContainer);
+            
             // close all
             inputStream.close();
             reader.close();
@@ -198,7 +223,7 @@ public class XMLParser {
 
             // ... store it and ...
             this.pupils[1] = Float.parseFloat(value);
-            
+
             // ... add a new container to the data
             this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
 
@@ -210,6 +235,10 @@ public class XMLParser {
             this.fixY = false;
             this.left = false;
             this.right = false;
+            this.screen = false;
+            this.setting = false;
+            this.screenTmp = "";
+            this.settingTmp = "";
             this.pupils[0] = 0;
             this.pupils[1] = 0;
             this.mouseXTmp = 0;
@@ -222,7 +251,7 @@ public class XMLParser {
             return true;
         }
 
-     // if the readed characters should be the size of the left pupil ...
+        // if the readed characters should be the size of the left pupil ...
         if (this.left) {
 
             // ... store it
@@ -231,7 +260,7 @@ public class XMLParser {
             // return success
             return true;
         }
-        
+
         // if the readed characters should be the mouseY coordinate ...
         if (this.mouseY) {
 
@@ -239,8 +268,10 @@ public class XMLParser {
             this.mouseYTmp = Integer.parseInt(value);
 
             // indicate warning
-            if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension)
+            if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension) {
                 System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
+                this.settingsContainer.addOutOfDim();
+            }
 
             // return success
             return true;
@@ -253,9 +284,10 @@ public class XMLParser {
             this.mouseXTmp = Integer.parseInt(value);
 
             // indicate warning
-            if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension)
+            if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension) {
                 System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
-
+                this.settingsContainer.addOutOfDim();
+            }
             // return success
             return true;
         }
@@ -300,6 +332,29 @@ public class XMLParser {
             if (this.usedDimension < this.dimensionTmp)
                 System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
 
+            // initialize setting container
+            this.settingsContainer = new SettingsContainer(this.dimensionTmp, this.screenTmp, this.settingTmp);
+
+            // return success
+            return true;
+        }
+
+        // if the readed characters should be the setting brightness ...
+        if (this.setting) {
+
+            // ... store it
+            this.settingTmp = value;
+
+            // return success
+            return true;
+        }
+
+        // if the readed characters should be the screen brightness ...
+        if (this.screen) {
+
+            // ... store it
+            this.screenTmp = value;
+
             // return success
             return true;
         }
@@ -315,71 +370,84 @@ public class XMLParser {
      * @param value
      * @return true if successful
      */
+    // TODO: add a counter or something instead of all these booleans
     private boolean handleStartElement(String value) {
         // start of container
-        if (value.equals("alldata") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.firstComment && !this.fixX && !this.fixY && !this.left && !this.right)
+        if (value.equals("alldata") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.firstComment && !this.fixX && !this.fixY && !this.left && !this.right && !this.screen && !this.setting)
             return true;
 
+        // screen brightness tag 
+        if (value.equals("screenBrightness") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && !this.screen && !this.setting) {
+            this.screen = true;
+            return true;
+        }
+
+        // setting brightness tag 
+        if (value.equals("settingBrightness") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && !this.setting) {
+            this.setting = true;
+            return true;
+        }
+
         // dimension tag 
-        if (value.equals("dimension") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
+        if (value.equals("dimension") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.dimension = true;
             return true;
         }
 
         // start of each step-container
-        if (value.equals("step") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right)
+        if (value.equals("step") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting)
             return true;
 
         // timestamp
-        if (value.equals("timestamp") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
+        if (value.equals("timestamp") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.timestamp = true;
             return true;
         }
 
         // fixation tag
-        if (value.equals("fixation") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right)
+        if (value.equals("fixation") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting)
             return true;
 
         // fixX 
-        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right) {
+        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.fixX = true;
             return true;
         }
 
         // fixY
-        if (value.equals("y") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && !this.fixY && !this.left && !this.right) {
+        if (value.equals("y") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.fixY = true;
             return true;
         }
 
         // mouseposition 
-        if (value.equals("mouseposition") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right)
+        if (value.equals("mouseposition") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting)
             return true;
 
         // mouseX
-        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.mouseX = true;
             return true;
         }
 
         // mouseY 
-        if (value.equals("y") && this.timestamp && this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+        if (value.equals("y") && this.timestamp && this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.mouseY = true;
             return true;
         }
 
         // pupils
-        if (value.equals("pupils") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right)
+        if (value.equals("pupils") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting)
             return true;
 
         // left
-        if (value.equals("left") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right) {
+        if (value.equals("left") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
             this.left = true;
             return true;
         }
 
         // right 
-        if (value.equals("right") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && this.left && !this.right) {
+        if (value.equals("right") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && this.left && !this.right && this.screen && this.setting) {
             this.right = true;
             return true;
         }
