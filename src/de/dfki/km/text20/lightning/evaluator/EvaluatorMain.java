@@ -111,6 +111,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // create and initialize singleton
         EvaluatorMain.getInstance().init();
+        
+        System.out.println("Initializing done.");
     }
 
     /**
@@ -465,6 +467,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
         this.mainFrame.dispose();
+        System.out.println("Application closed.");
         System.exit(0);
     }
 
