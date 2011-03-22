@@ -21,20 +21,27 @@
 package de.dfki.km.text20.lightning.evaluator.worker;
 
 /**
+ * Container which stores the experiment settings of each XML-file.
+ * 
  * @author Christoph Käding
  *
  */
 public class SettingsContainer {
 
+    /** included dimension */
     private int dimension;
 
+    /** included screen brightness */
     private String screenBright;
 
+    /** included setting brightness */
     private String settingBright;
     
+    /** indicates how often was the mouseposition outside of the dimension */
     private int count;
 
     /**
+     * Creates a new container and initializes its variables.
      * 
      * @param dimension
      * @param screenBright
@@ -48,6 +55,8 @@ public class SettingsContainer {
     }
 
     /**
+     * stored dimension
+     * 
      * @return the dimension
      */
     public int getDimension() {
@@ -55,6 +64,8 @@ public class SettingsContainer {
     }
 
     /**
+     * stored brightness of the screen
+     * 
      * @return the screenBright
      */
     public String getScreenBright() {
@@ -62,6 +73,8 @@ public class SettingsContainer {
     }
 
     /**
+     * stored brightness of the setting
+     * 
      * @return the settingBright
      */
     public String getSettingBright() {
@@ -69,13 +82,14 @@ public class SettingsContainer {
     }
 
     /**
-     * 
+     * increase MouseOutOfDimension-counter
      */
     public void addOutOfDim() {
         this.count++;
     }
     
     /**
+     * returns current MouseOutOfDimension-counter
      * 
      * @return count
      */

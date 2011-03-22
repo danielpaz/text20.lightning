@@ -20,20 +20,9 @@
  */
 package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.simpleWarper;
 
-import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -83,7 +72,7 @@ public class SimpleWarper implements MouseWarper {
 
     /** information object */
     private PluginInformation information;
-    
+
     /** angle between mouse vector and start-fixation-vector */
     private double angle;
 
@@ -155,14 +144,10 @@ public class SimpleWarper implements MouseWarper {
 
         // checks the angle between mouse movement and vector between start of the mouse movement and fixation point
         this.angle = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
-        if (this.angle > this.angleThres)
-            return;
+        if (this.angle > this.angleThres) return;
 
         // moves fixation point a given distance to the mouse
-        //        calculateSetPoint(); TODO: uncomment this 
-
-        // debugging
-//        this.drawPicture();
+        calculateSetPoint();
 
         // places mouse cursor at the fixation point
         this.robot.mouseMove(this.fixation.x, this.fixation.y);
@@ -197,7 +182,6 @@ public class SimpleWarper implements MouseWarper {
      * Moves the fixation point in direction to the mouse vector. The distance is given by setR.
      * The coordinate system is the screen coordinate system.
      */
-    @SuppressWarnings("unused")
     private void calculateSetPoint() {
         // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
         double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.y);
@@ -216,72 +200,6 @@ public class SimpleWarper implements MouseWarper {
     @Override
     public PluginInformation getInformation() {
         return this.information;
-    }
-
-    /**
-     * writes current movement with recognized target to a file
-     * this is for debugging
-     */
-    @SuppressWarnings("unused")
-    private void drawPicture() {
-        // initialize variables
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        BufferedImage screenShot = null;
-        ArrayList<Long> keys = new ArrayList<Long>(this.mousePositions.keySet());
-
-        // create screenshot
-        Rectangle screenShotRect = new Rectangle(0, 0, dimension.width, dimension.height);
-        try {
-            screenShot = new Robot().createScreenCapture(screenShotRect);
-        } catch (AWTException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            return;
-        }
-        File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
-
-        try {
-            // create screenshot graphic
-            Graphics2D graphic = screenShot.createGraphics();
-            graphic.setFont(graphic.getFont().deriveFont(5));
-
-            // visualize fixation point 
-            graphic.setColor(new Color(255, 0, 0, 255));
-            graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
-            graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + this.fixation.x, 12 + this.fixation.y);
-            graphic.drawChars(("" + this.angle).toCharArray(), 0, ("" + this.angle).toCharArray().length, 12 + this.fixation.x, 24 + this.fixation.y);
-            graphic.setColor(new Color(255, 0, 0, 32));
-            graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
-
-            // visualize mouse vector
-            for (int i = 0; i < keys.size() - 1; i++) {
-                graphic.setColor(new Color(0, 0, 255, 255));
-                graphic.drawOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawChars(("" + i).toCharArray(), 0, ("" + i).toCharArray().length, (int) this.mousePositions.get(keys.get(i)).getX() + 12, (int) this.mousePositions.get(keys.get(i)).getY() + 12);
-                graphic.setColor(new Color(0, 0, 255, 32));
-                graphic.fillOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawLine((int) this.mousePositions.get(keys.get(i)).getX(), (int) this.mousePositions.get(keys.get(i)).getY(), (int) this.mousePositions.get(keys.get(i + 1)).getX(), (int) this.mousePositions.get(keys.get(i + 1)).getY());
-            }
-            graphic.setColor(new Color(0, 0, 255, 255));
-            graphic.drawOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
-            graphic.drawChars(("" + (this.mousePositions.size() - 1)).toCharArray(), 0, ("" + (this.mousePositions.size() - 1)).toCharArray().length, (int) this.mousePositions.lastEntry().getValue().getX() + 12, (int) this.mousePositions.lastEntry().getValue().getY() + 12);
-            graphic.setColor(new Color(0, 0, 255, 32));
-            graphic.fillOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
-
-            // calculate and visualize setpoint
-//            this.calculateSetPoint();
-            graphic.setColor(new Color(0, 255, 0, 255));
-            graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
-            graphic.drawChars(("set point").toCharArray(), 0, 9, 12 + this.fixation.x, 12 + this.fixation.y);
-            graphic.setColor(new Color(0, 255, 0, 32));
-            graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
-
-            // write the image
-            file.mkdirs();
-            ImageIO.write(screenShot, "png", file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /* (non-Javadoc)
