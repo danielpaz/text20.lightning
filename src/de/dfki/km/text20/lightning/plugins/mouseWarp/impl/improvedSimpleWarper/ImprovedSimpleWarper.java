@@ -195,8 +195,8 @@ public class ImprovedSimpleWarper implements MouseWarper {
         // moves fixation point a given distance to the mouse
         //        calculateSetPoint(); TODO: uncomment this 
 
-        // debugging
-        this.drawPicture();
+        // TODO: debugging
+//        this.drawPicture();
 
         // places mouse cursor at the fixation point
         this.robot.mouseMove(this.fixation.x, this.fixation.y);
@@ -255,6 +255,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
      * writes current movement with recognized target to a file
      * this is for debugging
      */
+    @SuppressWarnings("unused")
     private void drawPicture() {
         // initialize variables
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();

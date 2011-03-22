@@ -21,10 +21,15 @@
  */
 package de.dfki.km.text20.lightning.plugins.saliency.impl.improvedsimplesobel;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -41,6 +46,9 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
 
     /** information object*/
     private PluginInformation information;
+
+    /** current timestamp for debugging */
+    private long timestamp;
 
     /**
      * creates new simple sobel object
@@ -79,6 +87,8 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      */
     @Override
     public Point analyse(BufferedImage screenShot) {
+        // set current timestamp
+        this.timestamp = System.currentTimeMillis();
 
         //encoding for direction:
         // 0 = down
@@ -121,8 +131,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
+                        // TODO: comment this out, its only for debugging
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+
                         // check if the point is closer than the current offset
-                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
@@ -152,8 +165,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
+                        // TODO: comment this out, its only for debugging
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+
                         // check if the point is closer than the current offset
-                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
@@ -186,8 +202,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
+                        // TODO: comment this out, its only for debugging
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+
                         // check if the point is closer than the current offset
-                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
@@ -217,8 +236,11 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
                     // check if something which is not black there
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
+                        // TODO: comment this out, its only for debugging
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+
                         // check if the point is closer than the current offset
-                        if (new Point(0, 0).distance(temp) < new Point(0, 0).distance(offset)) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
@@ -274,5 +296,50 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      */
     @Override
     public void start() {
+    }
+
+    /**
+     * writes given point in given image to tmp-directory
+     * only for debugging
+     * 
+     * @param screenShot
+     * @param point
+     */
+    @SuppressWarnings("unused")
+    private void drawPicture(BufferedImage screenShot, Point point) {
+        // initialize variables
+        int dimension = screenShot.getHeight();
+        File file = new File("tmp/IMprovedSimpleSobel_" + this.timestamp + ".png");
+        boolean alreadyExists = file.exists();
+
+        try {
+            // if the screenshot file already exists, the given screenshot is overwritten by the existing one to update new data 
+            if (alreadyExists) screenShot = ImageIO.read(file);
+
+            // create screenshot graphic
+            Graphics2D graphic = screenShot.createGraphics();
+            graphic.setFont(graphic.getFont().deriveFont(5));
+
+            if (!alreadyExists) {
+                // visualize fixation point 
+                graphic.setColor(new Color(255, 255, 0, 255));
+                graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
+                graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
+                graphic.setColor(new Color(255, 255, 0, 32));
+                graphic.fillOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
+            }
+
+            // visualize calculations
+            graphic.setColor(new Color(0, 128, 128, 255));
+            graphic.drawOval(point.x - 5, point.y - 5, 10, 10);
+            graphic.setColor(new Color(0, 128, 128, 32));
+            graphic.fillOval(point.x - 5, point.y - 5, 10, 10);
+
+            // write the image
+            file.mkdirs();
+            ImageIO.write(screenShot, "png", file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

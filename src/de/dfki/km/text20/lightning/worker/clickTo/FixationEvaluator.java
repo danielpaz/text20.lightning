@@ -108,15 +108,15 @@ public class FixationEvaluator {
      */
     public void evaluateLocation() {
         // check if a valid fixation is placed
-        if(this.fixation == null) return;
-        
+        if (this.fixation == null) return;
+
         // store current mouse position to reset is later 
         this.location = MouseInfo.getPointerInfo().getLocation();
 
         // create screenshot
         Rectangle screenShotRect = new Rectangle(this.fixation.x - this.properties.getDimension() / 2, this.fixation.y - this.properties.getDimension() / 2, this.properties.getDimension(), this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
-        
+
         // create timestamp
         this.timestamp = System.currentTimeMillis();
 
@@ -134,18 +134,19 @@ public class FixationEvaluator {
         this.robot.mousePress(InputEvent.BUTTON1_MASK);
         this.robot.mouseRelease(InputEvent.BUTTON1_MASK);
         this.robot.mouseMove(this.location.x, this.location.y);
-        
+
         // reset fixation point
         this.fixation = null;
-        
-        // for debugging
-        this.drawPicture();
+
+        // TODO: for debugging
+        //        this.drawPicture();
     }
 
     /**
      * writes current screenshot with recognized target to a file
      * this is for debugging
      */
+    @SuppressWarnings("unused")
     private void drawPicture() {
         // initialize variables
         int dimension = this.screenShot.getHeight();
