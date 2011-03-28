@@ -104,7 +104,7 @@ public class EvaluationThread implements Runnable {
 
                     // process evaluation
                     this.worker.evaluate(file.getName(), user, detector, container, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
-
+                    
                     // stops the processing if needed
                     if (this.stop) return;
 
@@ -113,6 +113,8 @@ public class EvaluationThread implements Runnable {
                     this.progressBar.paint(this.progressBar.getGraphics());
                 }
             }
+            
+            System.out.println("- File " + file.getName() + " finished.\n");
         }
 
         // finish the evaluation

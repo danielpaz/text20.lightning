@@ -111,8 +111,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // create and initialize singleton
         EvaluatorMain.getInstance().init();
-        
-        System.out.println("Initializing done.");
+
+        System.out.println("Initializing done.\n");
     }
 
     /**
@@ -453,6 +453,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public void finish() {
         // show best result
         this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult(this.saliencyDetectors) + " achived the best results.");
+        System.out.println("Evaluation finished. Best results for " + this.worker.getBestResult(this.saliencyDetectors) + ".\n");
 
         // inidicate finish
         this.selectedDetectors.clear();
@@ -496,6 +497,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public void windowClosing(WindowEvent arg0) {
         this.running = false;
         this.pluginManager.shutdown();
+        this.evaluationThread.stop();
         System.exit(0);
     }
 

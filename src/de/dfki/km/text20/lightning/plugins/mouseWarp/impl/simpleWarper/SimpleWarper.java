@@ -109,7 +109,7 @@ public class SimpleWarper implements MouseWarper {
      */
     @SuppressWarnings("boxing")
     @Override
-    public void addMousePosition(Point position) {
+    public void addMousePosition(Point position, int interval) {
         double distanceStartFix;
         double distanceStopFix;
 
@@ -120,11 +120,11 @@ public class SimpleWarper implements MouseWarper {
         this.mousePositions.put(this.timeStamp, position);
 
         // check if fixation is placed and if there are enough positions stored, 20 is the rate of mouse updates
-        if ((this.fixation == null) && (this.mousePositions.size() < this.durationThres * 20))
+        if ((this.fixation == null) && (this.mousePositions.size() < this.durationThres * interval))
             return;
 
         // cut the array to the needed size, 20 is the rate of mouse updates
-        if (this.mousePositions.size() * 20 > this.durationThres)
+        if (this.mousePositions.size() * interval > this.durationThres)
             this.mousePositions.remove(this.mousePositions.firstEntry().getKey());
 
         // store distance
