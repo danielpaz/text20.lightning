@@ -147,12 +147,12 @@ public class Hotkey implements HotkeyListener {
             }
 
             // decide which mode
-            if (this.main.isNormalMode())
-
-            // if the hotkey is typed, the stored fixation will be evaluated
-            this.fixationEvaluator.evaluateLocation();
-
-            else {
+            if (this.main.isNormalMode()) {
+                // if the hotkey is typed, the stored fixation will be evaluated
+                if (this.fixationEvaluator.evaluateLocation()) MainClass.getInstance().playDing();
+                else
+                    MainClass.getInstance().playError();
+            } else {
                 if (this.trainingsStatus) {
 
                     // store last fixation point

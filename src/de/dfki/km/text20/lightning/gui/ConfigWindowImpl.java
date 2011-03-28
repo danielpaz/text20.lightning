@@ -101,6 +101,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // initialize checkbox
         this.checkBoxTraining.setSelected(!MainClass.getInstance().isNormalMode());
         this.checkBockTrainingActionPerformed();
+        this.checkBoxSound.setSelected(this.properties.isSoundActivated());
 
         // initializes tooltips
         this.manageToolTips();
@@ -195,6 +196,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
+        this.properties.setSoundActivated(this.checkBoxSound.isSelected());
 
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());

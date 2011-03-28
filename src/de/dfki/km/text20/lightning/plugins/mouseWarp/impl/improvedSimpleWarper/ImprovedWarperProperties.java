@@ -126,7 +126,7 @@ public class ImprovedWarperProperties implements Serializable {
         this.distanceThreshold = 200;
         this.durationThreshold = 200;
         this.homeRadius = 200;
-        this.setRadius = 20;
+        this.setRadius = 100;
     }
 
     /**

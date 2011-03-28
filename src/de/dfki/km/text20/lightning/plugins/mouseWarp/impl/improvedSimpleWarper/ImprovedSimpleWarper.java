@@ -172,17 +172,11 @@ public class ImprovedSimpleWarper implements MouseWarper {
         // remove first
         this.mousePositions.remove(this.mousePositions.firstKey());
 
-        //        System.out.println(this.mousePositions.size());
-
         // check if fixation is placed and if there are enough positions stored, 20 is the rate of mouse updates
         if (this.fixation == null) {
             this.isProcessing = false;
             return;
         }
-
-        // cut the array to the needed size, 20 is the rate of mouse updates
-        //        while (this.mousePositions.size() * interval > this.durationThres)
-        //            this.mousePositions.remove(this.mousePositions.firstEntry().getKey());
 
         // store distance
         distanceStartFix = this.mousePositions.firstEntry().getValue().distance(this.fixation);
@@ -214,15 +208,13 @@ public class ImprovedSimpleWarper implements MouseWarper {
             this.isProcessing = false;
             return;
         }
-        this.angleSecLast = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.get(this.secondLastKey));
+        this.angleSecLast = calculateAngle(this.mousePositions.get(this.secondLastKey), this.mousePositions.lastEntry().getValue());
         if ((this.angleSecLast > this.angleThres)) {
             this.isProcessing = false;
             return;
         }
 
         // moves fixation point a given distance to the mouse
-        //        calculateSetPoint(); TODO: uncomment this 
-
         fixationTmp = new Point(this.fixation);
         this.calculateSetPoint();
 

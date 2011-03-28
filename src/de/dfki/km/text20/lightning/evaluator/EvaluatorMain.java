@@ -501,6 +501,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.running = false;
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
+        System.out.println("Application closed.");
         System.exit(0);
     }
 

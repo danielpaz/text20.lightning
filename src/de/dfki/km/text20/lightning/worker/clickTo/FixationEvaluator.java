@@ -46,7 +46,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
  * @author Christoph Käding
  *
  */
-public class FixationEvaluator {
+public class FixationEvaluator implements Runnable {
 
     /** Point of fixation which is provided by the eyetracker */
     private Point fixation;
@@ -72,33 +72,14 @@ public class FixationEvaluator {
     /** internal used plugin manager */
     private InternalPluginManager manager;
 
-    /**
-     * creates the FixationEvaluator
-     * 
-     * @param manager
-     */
-    public FixationEvaluator() {
-
-        // initialize variables
-        this.fixation = new Point();
-        this.location = new Point();
-        this.offset = new Point();
-        this.properties = MainClass.getInstance().getProperties();
-        this.manager = MainClass.getInstance().getInternalPluginManager();
-
-        try {
-            this.robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-            MainClass.getInstance().exit();
-        }
-    }
+    private boolean isProcessing;
 
     /**
      * sets the fixation point which is provided by the eyetracker
      * @param fixation 
      */
     public void setFixationPoint(Point fixation) {
+        if (this.isProcessing) return;
         this.fixation = fixation;
     }
 
@@ -106,9 +87,12 @@ public class FixationEvaluator {
      * makes a screenshot with choosed dimension around the fixation point an starts the processing of it. 
      * At the end a mouseclick were taken to the calculated point.
      */
-    public void evaluateLocation() {
-        // check if a valid fixation is placed
-        if (this.fixation == null) return;
+    public boolean evaluateLocation() {
+        // check if a valid fixation is placed or process is already running
+        if ((this.fixation == null) || this.isProcessing) return false;
+
+        // set status
+        this.isProcessing = true;
 
         // store current mouse position to reset is later 
         this.location = MouseInfo.getPointerInfo().getLocation();
@@ -135,11 +119,15 @@ public class FixationEvaluator {
         this.robot.mouseRelease(InputEvent.BUTTON1_MASK);
         this.robot.mouseMove(this.location.x, this.location.y);
 
-        // reset fixation point
-        this.fixation = null;
-
         // TODO: for debugging
-        //        this.drawPicture();
+        this.drawPicture();
+
+        // reset fixation point and status
+        this.fixation = null;
+        this.isProcessing = false;
+
+        //return success
+        return true;
     }
 
     /**
@@ -176,6 +164,27 @@ public class FixationEvaluator {
             ImageIO.write(this.screenShot, "png", file);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run() {
+        // initialize variables
+        this.fixation = new Point();
+        this.location = new Point();
+        this.offset = new Point();
+        this.properties = MainClass.getInstance().getProperties();
+        this.manager = MainClass.getInstance().getInternalPluginManager();
+        this.isProcessing = false;
+
+        try {
+            this.robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+            MainClass.getInstance().exit();
         }
     }
 }

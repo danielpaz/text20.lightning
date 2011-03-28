@@ -107,22 +107,24 @@ public class ConfigWindow extends JFrame {
         labelDimension = new JLabel();
         spinnerDimension = new JSpinner();
         buttonWarpConfig = new JButton();
-        separator1 = new JSeparator();
+        labelSound = new JLabel();
+        checkBoxSound = new JCheckBox();
         separator3 = new JSeparator();
-        labelTraining = new JLabel();
-        checkBoxTraining = new JCheckBox();
+        separator1 = new JSeparator();
         labelSearchMethod = new JLabel();
         comboBoxSearchMethod = new JComboBox();
+        labelTraining = new JLabel();
+        checkBoxTraining = new JCheckBox();
+        buttonDetectorConfig = new JButton();
         labelName = new JLabel();
         textFieldName = new JTextField();
-        buttonDetectorConfig = new JButton();
+        separator6 = new JSeparator();
         labelScreenBright = new JLabel();
         textFieldScreenBright = new JTextField();
-        separator6 = new JSeparator();
-        labelSettingBright = new JLabel();
-        textFieldSettingBright = new JTextField();
         buttonDefault = new JButton();
         buttonSubmit = new JButton();
+        labelSettingBright = new JLabel();
+        textFieldSettingBright = new JTextField();
         buttonOK = new JButton();
         buttonCancel = new JButton();
         CellConstraints cc = new CellConstraints();
@@ -209,21 +211,16 @@ public class ConfigWindow extends JFrame {
                 //---- buttonWarpConfig ----
                 buttonWarpConfig.setText("text");
                 contentPanel.add(buttonWarpConfig, cc.xywh(11, 5, 7, 1));
-                contentPanel.add(separator1, cc.xywh(1, 7, 7, 1));
+
+                //---- labelSound ----
+                labelSound.setText("Sound");
+                contentPanel.add(labelSound, cc.xy(1, 7));
+
+                //---- checkBoxSound ----
+                checkBoxSound.setSelectedIcon(null);
+                contentPanel.add(checkBoxSound, cc.xywh(5, 7, 3, 1));
                 contentPanel.add(separator3, cc.xywh(11, 7, 7, 1));
-
-                //---- labelTraining ----
-                labelTraining.setText("Trainingsmode");
-                contentPanel.add(labelTraining, cc.xywh(1, 9, 3, 1));
-
-                //---- checkBoxTraining ----
-                checkBoxTraining.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        checkBoxTrainingActionPerformed(e);
-                    }
-                });
-                contentPanel.add(checkBoxTraining, cc.xywh(5, 9, 3, 1));
+                contentPanel.add(separator1, cc.xywh(1, 9, 7, 1));
 
                 //---- labelSearchMethod ----
                 labelSearchMethod.setText("Search Method");
@@ -238,25 +235,33 @@ public class ConfigWindow extends JFrame {
                 });
                 contentPanel.add(comboBoxSearchMethod, cc.xywh(15, 9, 3, 1));
 
-                //---- labelName ----
-                labelName.setText("Unsername");
-                contentPanel.add(labelName, cc.xywh(1, 11, 3, 1));
-                contentPanel.add(textFieldName, cc.xywh(5, 11, 3, 1));
+                //---- labelTraining ----
+                labelTraining.setText("Trainingsmode");
+                contentPanel.add(labelTraining, cc.xywh(1, 11, 3, 1));
+
+                //---- checkBoxTraining ----
+                checkBoxTraining.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        checkBoxTrainingActionPerformed(e);
+                    }
+                });
+                contentPanel.add(checkBoxTraining, cc.xywh(5, 11, 3, 1));
 
                 //---- buttonDetectorConfig ----
                 buttonDetectorConfig.setText("text");
                 contentPanel.add(buttonDetectorConfig, cc.xywh(11, 11, 7, 1));
 
-                //---- labelScreenBright ----
-                labelScreenBright.setText("Screen Brightness");
-                contentPanel.add(labelScreenBright, cc.xywh(1, 13, 3, 1));
-                contentPanel.add(textFieldScreenBright, cc.xywh(5, 13, 3, 1));
+                //---- labelName ----
+                labelName.setText("Unsername");
+                contentPanel.add(labelName, cc.xywh(1, 13, 3, 1));
+                contentPanel.add(textFieldName, cc.xywh(5, 13, 3, 1));
                 contentPanel.add(separator6, cc.xywh(11, 13, 7, 1));
 
-                //---- labelSettingBright ----
-                labelSettingBright.setText("Setting Brightness");
-                contentPanel.add(labelSettingBright, cc.xywh(1, 15, 3, 1));
-                contentPanel.add(textFieldSettingBright, cc.xywh(5, 15, 3, 1));
+                //---- labelScreenBright ----
+                labelScreenBright.setText("Screen Brightness");
+                contentPanel.add(labelScreenBright, cc.xywh(1, 15, 3, 1));
+                contentPanel.add(textFieldScreenBright, cc.xywh(5, 15, 3, 1));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
@@ -277,6 +282,11 @@ public class ConfigWindow extends JFrame {
                     }
                 });
                 contentPanel.add(buttonSubmit, cc.xywh(15, 15, 3, 1));
+
+                //---- labelSettingBright ----
+                labelSettingBright.setText("Setting Brightness");
+                contentPanel.add(labelSettingBright, cc.xywh(1, 17, 3, 1));
+                contentPanel.add(textFieldSettingBright, cc.xywh(5, 17, 3, 1));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
@@ -301,7 +311,7 @@ public class ConfigWindow extends JFrame {
             dialogPane.add(contentPanel);
         }
         contentPane.add(dialogPane);
-        setSize(430, 280);
+        setSize(430, 290);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -323,22 +333,24 @@ public class ConfigWindow extends JFrame {
     protected JLabel labelDimension;
     protected JSpinner spinnerDimension;
     protected JButton buttonWarpConfig;
-    private JSeparator separator1;
+    protected JLabel labelSound;
+    protected JCheckBox checkBoxSound;
     private JSeparator separator3;
-    private JLabel labelTraining;
-    protected JCheckBox checkBoxTraining;
+    private JSeparator separator1;
     protected JLabel labelSearchMethod;
     protected JComboBox comboBoxSearchMethod;
+    private JLabel labelTraining;
+    protected JCheckBox checkBoxTraining;
+    protected JButton buttonDetectorConfig;
     protected JLabel labelName;
     protected JTextField textFieldName;
-    protected JButton buttonDetectorConfig;
+    private JSeparator separator6;
     protected JLabel labelScreenBright;
     protected JTextField textFieldScreenBright;
-    private JSeparator separator6;
-    protected JLabel labelSettingBright;
-    protected JTextField textFieldSettingBright;
     protected JButton buttonDefault;
     protected JButton buttonSubmit;
+    protected JLabel labelSettingBright;
+    protected JTextField textFieldSettingBright;
     protected JButton buttonOK;
     protected JButton buttonCancel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
