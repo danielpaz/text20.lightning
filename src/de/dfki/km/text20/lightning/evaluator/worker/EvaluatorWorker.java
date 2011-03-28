@@ -95,26 +95,23 @@ public class EvaluatorWorker {
     /**
      * evaluates the given container with the given detector
      * 
-     * @param identifier
-     *      for the map where the results are stored
-     * @param user
-     *      which should be used
+     * @param file 
+     *      which includes the data, used to create identifier etc
      * @param detector
      *      which should be used
      * @param container
      *      which should be used
      * @param drawImage
      *      boolean which indicates if the results should be written into an png-file
-     * @param path
-     *      path were the data-directory is located, where the container-file and the screenshots are
      */
-    public void evaluate(String identifier, String user, SaliencyDetector detector,
-                         StorageContainer container, String path) {
-
+    public void evaluate(File file, SaliencyDetector detector, StorageContainer container) {
         // initialize variables
         BufferedImage screenShot = null;
         Point point = new Point();
         Point translatedMousePoint = new Point(container.getMousePoint().x - container.getFixation().x + this.main.getDimension() / 2, container.getMousePoint().y - container.getFixation().y + this.main.getDimension() / 2);
+        String user = file.getName().substring(0, file.getName().lastIndexOf("_"));
+        String path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator));
+        String identifier = file.getName();
 
         // test if the path is already known
         if (!this.overAllPath.contains(path + "/evaluation/evaluation.log"))

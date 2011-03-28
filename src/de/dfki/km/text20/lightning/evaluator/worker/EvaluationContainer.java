@@ -131,7 +131,7 @@ public class EvaluationContainer {
         // add id to the list of ids if it is not already there
         if (!this.ids.contains(id)) this.ids.add(id);
 
-        System.out.println("id: " + id + " distance: " + distance + " pupils: left - " + this.pupilsize[0] + " - right -" + this.pupilsize[1] + " size: " + this.size);
+        //        System.out.println("id: " + id + " distance: " + distance + " pupils: left - " + this.pupilsize[0] + " - right -" + this.pupilsize[1] + " size: " + this.size);
 
         // reset temp
         this.temp = 0;
