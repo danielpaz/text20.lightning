@@ -72,6 +72,9 @@ public class Properties implements Serializable {
 
     /** from properties file readed object */
     private Object object;
+    
+    /** indicates if the sound is activated */
+    private boolean soundActivated; 
 
     /**
      * creates properties, tries to load property file
@@ -100,11 +103,13 @@ public class Properties implements Serializable {
                     this.useWarp = ((Properties) this.object).isUseWarp();
                     this.warperName = ((Properties) this.object).getWarperName();
                     this.detectorName = ((Properties) this.object).getDetectorName();
+                    this.soundActivated = ((Properties) this.object).isSoundActivated();
 
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
+                    System.out.println("use warp: " + this.useWarp + ", sound activated: " + this.soundActivated);
                     System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName);
                 }
 
@@ -133,6 +138,7 @@ public class Properties implements Serializable {
         this.useWarp = true;
         this.warperName = "";
         this.detectorName = "";
+        this.soundActivated = true;
     }
 
     /**
@@ -151,6 +157,20 @@ public class Properties implements Serializable {
      */
     public void setDimension(int dimension) {
         this.dimension = dimension;
+    }
+
+    /**
+     * @return the soundActivated
+     */
+    public boolean isSoundActivated() {
+        return this.soundActivated;
+    }
+
+    /**
+     * @param soundActivated the soundActivated to set
+     */
+    public void setSoundActivated(boolean soundActivated) {
+        this.soundActivated = soundActivated;
     }
 
     /**

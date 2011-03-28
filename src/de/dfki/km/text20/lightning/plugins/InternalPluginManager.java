@@ -80,9 +80,11 @@ public class InternalPluginManager {
             }
         }
         if (!this.properties.getDetectorName().equals("") && !found)
-            System.out.println("former used detector couldn't be found...");
-        if ((this.saliencyDetectors.size() > 0) && !found)
-            this.setCurrentSaliencyDetector(0);
+            System.out.println("former used detector " + this.properties.getDetectorName() + " couldn't be found...");
+        if ((this.saliencyDetectors.size() > 0) && !found) {
+            this.currentSaliencyDetectorId = 0;
+            this.properties.setDetectorName(this.saliencyDetectors.get(0).getInformation().getDisplayName());
+        }
 
         // ...mouse warpers
         found = false;
@@ -95,9 +97,12 @@ public class InternalPluginManager {
             }
         }
         if (!this.properties.getWarperName().equals("") && !found)
-            System.out.println("former used warper couldn't be found...");
-        if ((this.mouseWarpers.size() > 0) && !found) this.setCurrentMouseWarper(0);
-
+            System.out.println("former used warper " + this.properties.getWarperName() + " couldn't be found...");
+        if ((this.mouseWarpers.size() > 0) && !found) {
+            this.currentMouseWarperId = 0;
+            this.properties.setWarperName(this.mouseWarpers.get(0).getInformation().getDisplayName());
+        }
+        
         // start plugins
         this.mouseWarpers.get(this.currentMouseWarperId).start();
         this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();

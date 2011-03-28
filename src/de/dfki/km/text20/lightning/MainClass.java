@@ -170,7 +170,7 @@ public class MainClass {
         this.trainer = new PrecisionTrainer();
         this.warper = new WarpCommander();
         Thread warpThread = new Thread(this.warper);
-        warpThread.start();
+        Thread evaluationThread = new Thread(fixationEvaluator);
 
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);
@@ -188,6 +188,8 @@ public class MainClass {
             if (fixationCatcher.getStatus()) {
 
                 // start listening
+                warpThread.start();
+                evaluationThread.start();
                 fixationCatcher.startCatching();
                 this.warper.start();
 
@@ -452,6 +454,7 @@ public class MainClass {
      * plays the ding sound
      */
     public void playDing() {
+        if (!this.properties.isSoundActivated()) return;
         this.soundDing.play();
     }
 
@@ -459,6 +462,7 @@ public class MainClass {
      * plays the error sound
      */
     public void playError() {
+        if (!this.properties.isSoundActivated()) return;
         this.soundError.play();
     }
 
