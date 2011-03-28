@@ -45,7 +45,7 @@ public interface MouseWarper extends Plugin, CommonPluginInterface {
      * adds current mouse position
      * 
      * @param position
+     * @param interval 
      */
-    // TODO: maybe add interval (see WarpCommander ~ 20ms)
-    public void addMousePosition(Point position);
+    public void addMousePosition(Point position, int interval);
 }

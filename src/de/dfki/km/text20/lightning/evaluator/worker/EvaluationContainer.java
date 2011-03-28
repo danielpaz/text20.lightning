@@ -55,7 +55,10 @@ public class EvaluationContainer {
 
     /** username */
     private String name;
-    
+
+    /** indicates if the pupilsize should be devided or not */
+    private boolean firstGet;
+
     /** size of pupils
      *  0 = left
      *  1 = right
@@ -79,8 +82,8 @@ public class EvaluationContainer {
      * @param timeStamp
      *      start of the evaluation session
      */
-    public EvaluationContainer(int id, double distance, float[] pupils, String log, String name,
-                               long timeStamp) {
+    public EvaluationContainer(int id, double distance, float[] pupils, String log,
+                               String name, long timeStamp) {
         // initialize variables
         this.results = new Hashtable<Integer, Double>();
         this.ids = new ArrayList<Integer>();
@@ -90,6 +93,7 @@ public class EvaluationContainer {
         this.name = name;
         this.timeStamp = timeStamp;
         this.pupilsize = new float[2];
+        this.firstGet = true;
 
         // add first value
         this.add(id, distance, pupils);
@@ -108,8 +112,15 @@ public class EvaluationContainer {
      */
     @SuppressWarnings("boxing")
     public void add(int id, double distance, float[] pupils) {
-        // if the given id is the key id, increase size
-        if (this.keyId == id) this.size++;
+        // if the given id is the key id ... 
+        if (this.keyId == id) {
+            // ... increase size ...
+            this.size++;
+
+            // ... and add pupilsize
+            this.pupilsize[0] = pupils[0] + this.pupilsize[0];
+            this.pupilsize[1] = pupils[1] + this.pupilsize[1];
+        }
 
         // if the map contains already the given id, store value in temp
         if (this.results.containsKey(id)) this.temp = this.results.get(id);
@@ -120,11 +131,7 @@ public class EvaluationContainer {
         // add id to the list of ids if it is not already there
         if (!this.ids.contains(id)) this.ids.add(id);
 
-        // add pupilsize
-        this.pupilsize[0] = pupils[0] + this.pupilsize[0];
-        this.pupilsize[1] = pupils[1] + this.pupilsize[1];
-        
-        //        System.out.println("id: " + id + " value: " + value + " size: " + this.size + " keyId: " + this.keyId);
+        System.out.println("id: " + id + " distance: " + distance + " pupils: left - " + this.pupilsize[0] + " - right -" + this.pupilsize[1] + " size: " + this.size);
 
         // reset temp
         this.temp = 0;
@@ -141,15 +148,18 @@ public class EvaluationContainer {
         if (this.results.containsKey(id)) return (this.results.get(id) / this.size);
         return 0;
     }
-    
+
     /**
      * averaged pupilsize from all entries
      * 
      * @return pupils
      */
     public float[] getAveragedPupils() {
-        this.pupilsize[0] = this.pupilsize[0]/ this.size;
-        this.pupilsize[1] = this.pupilsize[1]/ this.size;
+        if (this.firstGet) {
+            this.pupilsize[0] = this.pupilsize[0] / this.size;
+            this.pupilsize[1] = this.pupilsize[1] / this.size;
+            this.firstGet = false;
+        }
         return this.pupilsize;
     }
 
@@ -188,7 +198,7 @@ public class EvaluationContainer {
     public long getTimeStamp() {
         return this.timeStamp;
     }
-    
+
     /**
      * @return the number of datasets
      */

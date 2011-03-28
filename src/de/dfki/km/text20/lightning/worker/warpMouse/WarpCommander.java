@@ -40,7 +40,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
  * @author Christoph Käding 
  * 
  */
-public class WarpCommander {
+public class WarpCommander implements Runnable {
 
     /** timer which clocks the mouse position tracking */
     private Timer timer;
@@ -50,26 +50,31 @@ public class WarpCommander {
 
     /** global used properties */
     private Properties properties;
-    
+
     /**
      * creates a new WarpCommander and initializes the timer and the currently used warp plugin.
      */
     public WarpCommander() {
+    }
+
+    public void run() {
         // initialize variables
         this.properties = MainClass.getInstance().getProperties();
         this.manager = MainClass.getInstance().getInternalPluginManager();
-        
+        final int interval = 20;
+
         // initialize timer
-        this.timer = new Timer(20, new ActionListener() {
+        this.timer = new Timer(interval, new ActionListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
                 if (manager.getCurrentMouseWarper() != null)
-                    manager.getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation());
+                    manager.getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation(), interval);
             }
         });
+
     }
 
     /**

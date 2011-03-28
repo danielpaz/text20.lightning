@@ -227,7 +227,7 @@ public class XMLParser {
             // ... add a new container to the data
             this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
 
-            // reset all variables
+            // reset variables
             this.timestamp = false;
             this.mouseX = false;
             this.mouseY = false;
@@ -235,12 +235,7 @@ public class XMLParser {
             this.fixY = false;
             this.left = false;
             this.right = false;
-            this.screen = false;
-            this.setting = false;
-            this.screenTmp = "";
-            this.settingTmp = "";
-            this.pupils[0] = 0;
-            this.pupils[1] = 0;
+            this.pupils = new float[2];
             this.mouseXTmp = 0;
             this.mouseYTmp = 0;
             this.timastampTmp = 0;

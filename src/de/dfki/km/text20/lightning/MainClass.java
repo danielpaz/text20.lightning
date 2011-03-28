@@ -169,6 +169,8 @@ public class MainClass {
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
         this.trainer = new PrecisionTrainer();
         this.warper = new WarpCommander();
+        Thread warpThread = new Thread(this.warper);
+        warpThread.start();
 
         // main component which listen on trackingevents
         FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);

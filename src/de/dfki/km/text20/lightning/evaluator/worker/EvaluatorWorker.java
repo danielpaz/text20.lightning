@@ -67,7 +67,11 @@ public class EvaluatorWorker {
     /** current main class */
     private EvaluatorMain main;
 
+    /** map of all settings of the different datasets */
     private Map<String, SettingsContainer> settings;
+
+    /** last file with error, used to kill double-error-output */
+    private String errorKey;
 
     /**
      * creates a new evaluation worker and initializes necessary variables
@@ -85,6 +89,7 @@ public class EvaluatorWorker {
         this.channel = channel;
         this.overAllPath = new ArrayList<String>();
         this.main = main;
+        this.errorKey = "";
     }
 
     /**
@@ -131,7 +136,9 @@ public class EvaluatorWorker {
         try {
             screenShot = screenShot.getSubimage(container.getFixation().x, container.getFixation().y, this.main.getDimension(), this.main.getDimension());
         } catch (RasterFormatException e) {
+            if (screenFile.getName().equals(this.errorKey)) return;
             System.out.println("ERROR: raster out of format at file: " + screenFile.getName());
+            this.errorKey = screenFile.getName();
             return;
         }
 
@@ -210,7 +217,7 @@ public class EvaluatorWorker {
                     if (i == 0) {
                         $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + "\nTimestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\n");
                         $(this.results.get(key).getLogPath()).file().append("Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\nScreen Brightness: " + this.settings.get(key).getScreenBright() + ", Setting Brightness: " + this.settings.get(key).getSettingBright() + "\n");
-                        $(this.results.get(key).getLogPath()).file().append("Averaged Pupilsize: "+ this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\n");
+                        $(this.results.get(key).getLogPath()).file().append("Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\n");
                     }
                     $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
                     if (i == this.results.get(key).getIds().size() - 1)
