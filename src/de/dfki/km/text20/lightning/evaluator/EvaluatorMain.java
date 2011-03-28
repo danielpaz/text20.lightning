@@ -315,8 +315,11 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 super.approveSelection();
 
                 // add selected files to array list ...
-                for (File file : getSelectedFiles())
-                    files.addAll(getAllTrainingFiles(file));
+                // TODO: add regex to filter other XML-files
+                for (File allFiles : getSelectedFiles())
+                    for (File file : getAllTrainingFiles(allFiles))
+                        // ignore duplicates
+                        if (!files.contains(file)) files.add(file);
 
                 // ... and to the listFiles
                 listFiles.setListData(files.toArray());

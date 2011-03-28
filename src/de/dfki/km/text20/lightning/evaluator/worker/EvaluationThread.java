@@ -87,14 +87,10 @@ public class EvaluationThread implements Runnable {
     public void run() {
         // initialize Variables
         XMLParser parser = new XMLParser();
-        String user = "";
         int i = 1;
 
         // run through every file ...
         for (File file : this.files) {
-
-            // create name from filename 
-            user = file.getName().substring(0, file.getName().lastIndexOf("_"));
 
             // ... and through every container in it ...
             for (StorageContainer container : parser.readFile(file, this.dimension, this.worker)) {
@@ -103,8 +99,8 @@ public class EvaluationThread implements Runnable {
                 for (SaliencyDetector detector : this.selectedDetectors) {
 
                     // process evaluation
-                    this.worker.evaluate(file.getName(), user, detector, container, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator)));
-                    
+                    this.worker.evaluate(file, detector, container);
+
                     // stops the processing if needed
                     if (this.stop) return;
 
@@ -113,7 +109,7 @@ public class EvaluationThread implements Runnable {
                     this.progressBar.paint(this.progressBar.getGraphics());
                 }
             }
-            
+
             System.out.println("- File " + file.getName() + " finished.\n");
         }
 
