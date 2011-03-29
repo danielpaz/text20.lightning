@@ -170,6 +170,7 @@ public class MainClass {
         this.trainer = new PrecisionTrainer();
         this.warper = new WarpCommander();
         Thread warpThread = new Thread(this.warper);
+        warpThread.start();
         Thread evaluationThread = new Thread(fixationEvaluator);
 
         // main component which listen on trackingevents
@@ -188,7 +189,6 @@ public class MainClass {
             if (fixationCatcher.getStatus()) {
 
                 // start listening
-                warpThread.start();
                 evaluationThread.start();
                 fixationCatcher.startCatching();
                 this.warper.start();
