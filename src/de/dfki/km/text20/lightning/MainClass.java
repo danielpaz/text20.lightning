@@ -462,6 +462,7 @@ public class MainClass {
      * plays the error sound
      */
     public void playError() {
+        System.out.println("- Error -");
         if (!this.properties.isSoundActivated()) return;
         this.soundError.play();
     }

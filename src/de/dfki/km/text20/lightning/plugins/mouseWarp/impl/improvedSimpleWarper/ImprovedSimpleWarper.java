@@ -154,9 +154,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
     @SuppressWarnings("boxing")
     @Override
     public void addMousePosition(Point position, int interval) {
-        double distanceStartFix;
         double distanceStopFix;
-        double distanceSecLastFix;
         Point fixationTmp = new Point();
         this.isProcessing = true;
 
@@ -179,18 +177,10 @@ public class ImprovedSimpleWarper implements MouseWarper {
         }
 
         // store distance
-        distanceStartFix = this.mousePositions.firstEntry().getValue().distance(this.fixation);
         distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
-        distanceSecLastFix = this.mousePositions.get(this.secondLastKey).distance(this.fixation);
 
         // check if the cursor is already in home radius
         if (distanceStopFix < this.homeR) {
-            this.isProcessing = false;
-            return;
-        }
-
-        // check the direction of movement
-        if ((distanceStartFix <= distanceStopFix) || (distanceSecLastFix <= distanceStopFix)) {
             this.isProcessing = false;
             return;
         }
@@ -204,11 +194,13 @@ public class ImprovedSimpleWarper implements MouseWarper {
 
         // checks the angleFirst between mouse movement and vector between start of the mouse movement and fixation point
         this.angleFirst = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
+        //        System.out.println("angleFirst: " + this.angleFirst);
         if ((this.angleFirst > this.angleThres)) {
             this.isProcessing = false;
             return;
         }
         this.angleSecLast = calculateAngle(this.mousePositions.get(this.secondLastKey), this.mousePositions.lastEntry().getValue());
+        //        System.out.println("angleSecLast: " + this.angleSecLast);
         if ((this.angleSecLast > this.angleThres)) {
             this.isProcessing = false;
             return;
@@ -223,7 +215,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
 
         // places mouse cursor at the fixation point
         this.robot.mouseMove(this.fixation.x, this.fixation.y);
-        
+
         // indicate warp
         System.out.println("Warp - Mouse move to (" + this.fixation.x + "," + this.fixation.y + ")");
 
