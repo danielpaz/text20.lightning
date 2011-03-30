@@ -33,10 +33,10 @@ import java.awt.TrayIcon;
  *
  */
 public class TraySymbol {
-    
+
     /** */
     private TrayIcon trayIcon;
-    
+
     /** */
     private SystemTray systemTray;
 
@@ -44,11 +44,11 @@ public class TraySymbol {
      * creates the taskicon 
      */
     public TraySymbol() {
-                
+
         // initialize tray icon and add it to tray
-        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")), "Project Lightning (Desktop)");
+        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveNormal.gif")), "Project Lightning (Desktop)");
         this.trayIcon.setImageAutoSize(true);
-        
+
         if (SystemTray.isSupported()) {
             this.systemTray = SystemTray.getSystemTray();
             try {
@@ -63,11 +63,16 @@ public class TraySymbol {
     /**
      * shows the 'active' symbol in the tray
      * 
+     * @param normal
+     *      indicates in which mode the tool is 
+     *       
      * @return true if it was successful
      */
-    public boolean setActivatedIcon() {
+    public boolean setActivatedIcon(boolean normal) {
         if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconActive.gif")));
+            if (normal) this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveNormal.gif")));
+            else
+                this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveEvaluation.gif")));
         } else {
             return false;
         }
@@ -81,7 +86,7 @@ public class TraySymbol {
      */
     public boolean setDeactivatedIcon() {
         if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("TrayIconInactive.gif")));
+            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("Inactive.gif")));
         } else {
             return false;
         }

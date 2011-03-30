@@ -150,6 +150,9 @@ public class Hotkey implements HotkeyListener {
 
 		// action hotkey
 		case 1:
+		    // check if the tool is activated
+		    if(!this.main.isActivated()) return;
+		    
 			// check if trackingdevice provides correct data and if the
 			// initializing was successful
 			if (!this.main.isTrackingValid() || !this.main.isAllFine()) {
@@ -214,7 +217,7 @@ public class Hotkey implements HotkeyListener {
 		// status hotkey
 		case 2:
 			// change status
-			MainClass.getInstance().toggleStatus();
+			this.main.toggleStatus();
 			break;
 		default:
 			return;
