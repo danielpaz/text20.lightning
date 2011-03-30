@@ -21,3 +21,5 @@ syntax: regexp
 ^properties\.prop$
 syntax: regexp
 ^plugins/improvedWarperProperties\.prop$
+syntax: regexp
+^plugins/advancedWarperProperties\.prop$
