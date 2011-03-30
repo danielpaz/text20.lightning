@@ -455,8 +455,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public void finish() {
         // show best result
-        this.labelDescription.setText("Evaluation finished. " + this.worker.getBestResult(this.saliencyDetectors) + " achived the best results.");
-        System.out.println("Evaluation finished. Best results for " + this.worker.getBestResult(this.saliencyDetectors) + ".\n");
+        String bestResult = this.worker.getBestResult(this.saliencyDetectors);
+        this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
+        System.out.println("Evaluation finished. Best results for " + bestResult + ".\n");
 
         // inidicate finish
         this.selectedDetectors.clear();

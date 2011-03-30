@@ -110,10 +110,11 @@ public class EvaluatorWorker {
         String user = file.getName().substring(0, file.getName().lastIndexOf("_"));
         String path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator + "data" + File.separator));
         String identifier = file.getName();
+        String xmlTimeStamp = file.getName().substring(file.getName().lastIndexOf("_") + 1, file.getName().lastIndexOf("."));
 
         // test if the path is already known
-        if (!this.overAllPath.contains(path + "/evaluated/evaluation.log"))
-            this.overAllPath.add(path + "/evaluated/evaluation.log");
+        if (!this.overAllPath.contains(path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log"))
+            this.overAllPath.add(path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log");
 
         // test if associated screenshot is available
         File screenFile = new File(path + "/data/" + user + "/" + user + "_" + container.getTimestamp() + ".png");
@@ -143,7 +144,7 @@ public class EvaluatorWorker {
 
         // write the png-file
         if (this.main.writeImages())
-            this.drawPicture(detector, point, path + "/evaluated/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
+            this.drawPicture(detector, point, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
 
         // add results to over all storage
         if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), "", user, this.currentTimeStamp);
@@ -158,7 +159,7 @@ public class EvaluatorWorker {
         } else {
 
             // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), path + "/evaluated/evaluation.log", user, this.currentTimeStamp));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log", user, Long.parseLong(xmlTimeStamp)));
         }
 
     }
@@ -192,6 +193,32 @@ public class EvaluatorWorker {
         double veryBestValue = Double.MAX_VALUE;
         int veryBestKey = -1;
 
+        for (String path : this.overAllPath) {
+            if (this.main.writeLog())
+                $(path).file().append("- overall results for this session -\n\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
+
+            // run through all included ids
+            for (int id : this.overAllResults.getIds()) {
+
+                // write result to log
+                if (this.main.writeLog())
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\n");
+
+                // check if the current value is better then the best value
+                if (veryBestValue > this.overAllResults.getAveragedDistance(id)) {
+
+                    // store new best value
+                    veryBestKey = id;
+                    veryBestValue = this.overAllResults.getAveragedDistance(id);
+                }
+            }
+            if (this.main.writeLog())
+                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n\n\n- detailed evaluation per usersession -\n\n");
+
+            // log best result
+            this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
+        }
+
         // run through the keyset of the result map
         for (String key : this.results.keySet()) {
 
@@ -222,32 +249,6 @@ public class EvaluatorWorker {
             // reset values
             bestValue = Double.MAX_VALUE;
             bestKey = -1;
-        }
-
-        for (String path : this.overAllPath) {
-            if (this.main.writeLog())
-                $(path).file().append("- over all results for the session above -\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
-
-            // run through all included ids
-            for (int id : this.overAllResults.getIds()) {
-
-                // write result to log
-                if (this.main.writeLog())
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\n");
-
-                // check if the current value is better then the best value
-                if (veryBestValue > this.overAllResults.getAveragedDistance(id)) {
-
-                    // store new best value
-                    veryBestKey = id;
-                    veryBestValue = this.overAllResults.getAveragedDistance(id);
-                }
-            }
-            if (this.main.writeLog())
-                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n----------------------------------------------------------\n\n\n");
-
-            // log best result
-            this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
         }
 
         // return the name of the very best detector

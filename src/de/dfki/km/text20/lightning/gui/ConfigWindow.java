@@ -89,6 +89,10 @@ public class ConfigWindow extends JFrame {
     private void checkBoxEvaluationActionPerformed(ActionEvent e) {
     }
 
+    private void checkBoxTrainingActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
@@ -223,7 +227,7 @@ public class ConfigWindow extends JFrame {
                 contentPanel.add(separator1, cc.xywh(1, 9, 7, 1));
 
                 //---- labelDetector ----
-                labelDetector.setText("Search Method");
+                labelDetector.setText("Detector");
                 contentPanel.add(labelDetector, cc.xywh(11, 9, 3, 1));
 
                 //---- comboBoxDetector ----
@@ -243,7 +247,7 @@ public class ConfigWindow extends JFrame {
                 checkBoxEvaluation.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        checkBoxEvaluationActionPerformed(e);
+                        checkBoxTrainingActionPerformed(e);
                     }
                 });
                 contentPanel.add(checkBoxEvaluation, cc.xywh(5, 11, 3, 1));
