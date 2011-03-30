@@ -34,7 +34,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import de.dfki.km.text20.lightning.worker.training.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
 
 /**
  * converts former used binary containers to an human readable xml

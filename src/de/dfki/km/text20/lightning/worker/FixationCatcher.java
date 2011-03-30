@@ -27,7 +27,7 @@ import net.xeoh.plugins.base.options.getplugin.OptionCapabilities;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.PrecisionEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEvent;
@@ -52,8 +52,8 @@ public class FixationCatcher {
     /** evaluates eyetracking events */
     private GazeEvaluator evaluator;
 
-    /** this is needed for trainings mode */
-    private PrecisionTrainer precisionTrainer;
+    /** this is needed for evaluation mode */
+    private PrecisionEvaluator precisionEvaluator;
 
     /** indicates if the tracking device is working probably */
     private boolean status;
@@ -82,13 +82,13 @@ public class FixationCatcher {
     /**
      * create fixation catcher
      * 
-     * @param evaluator
-     * @param trainer
+     * @param fixationEvaluator
+     * @param precisionEvaluator
      */
-    public FixationCatcher(FixationEvaluator evaluator, PrecisionTrainer trainer) {
+    public FixationCatcher(FixationEvaluator fixationEvaluator, PrecisionEvaluator precisionEvaluator) {
         // initialize variables
-        this.fixationEvaluator = evaluator;
-        this.precisionTrainer = trainer;
+        this.fixationEvaluator = fixationEvaluator;
+        this.precisionEvaluator = precisionEvaluator;
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         this.isValid = true;
@@ -145,7 +145,7 @@ public class FixationCatcher {
                 
                 // if the tool is activated and a fixation occurs, it will be stored 
                 fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-                precisionTrainer.setFixationPoint(event.getFixation().getCenter(), pupils);
+                precisionEvaluator.setFixationPoint(event.getFixation().getCenter(), pupils);
                 if (manager.getCurrentMouseWarper() != null)
                     manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
             }

@@ -1,5 +1,5 @@
 /*
- * PrecisionTrainer.java
+ * PrecisionEvaluator.java
  *
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -19,7 +19,7 @@
  * MA 02110-1301  USA
  *
  */
-package de.dfki.km.text20.lightning.worker.training;
+package de.dfki.km.text20.lightning.worker.evaluationMode;
 
 import java.awt.AWTException;
 import java.awt.Point;
@@ -42,13 +42,13 @@ import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 
 /**
- * The precision trainer is used in trainings mode. Here the collected data is
+ * The precision evaluator is used in evaluation mode. Here the collected data is
  * handled.
  * 
  * @author Christoph Käding
  * 
  */
-public class PrecisionTrainer {
+public class PrecisionEvaluator {
 
 	/** last fixation point */
 	private Point fixationTmp;
@@ -97,9 +97,9 @@ public class PrecisionTrainer {
 	private boolean isProcessing;
 
 	/**
-	 * creates the precision trainer
+	 * creates the precision evaluator
 	 */
-	public PrecisionTrainer() {
+	public PrecisionEvaluator() {
 
 		// initialize variables
 		this.fixation = new Point();
@@ -120,7 +120,7 @@ public class PrecisionTrainer {
 	}
 
 	/**
-	 * stores fixation and pupilssizes
+	 * stores fixation and pupil sizes
 	 * 
 	 * @param fixation
 	 * @param pupils
@@ -132,7 +132,9 @@ public class PrecisionTrainer {
 	}
 
 	/**
-	 * stores last fixation so that it can be used to create a trainingsstep
+	 * stores last fixation so that it can be used to create a evaluation step
+	 * 
+	 * @return true if successful 
 	 */
 	public boolean storeFixation() {
 		if (this.fixationTmp == null || this.isProcessing)
@@ -159,7 +161,7 @@ public class PrecisionTrainer {
 		if (this.fixation == null || this.isProcessing)
 			return false;
 		this.isProcessing = true;
-		this.user = MainClass.getInstance().getTrainingsSettings()[0];
+		this.user = MainClass.getInstance().getEvaluationSettings()[0];
 		this.mousePosition = mousePosition;
 		Rectangle screenShotRect = new Rectangle(
 				-this.properties.getDimension() / 2,
@@ -182,7 +184,7 @@ public class PrecisionTrainer {
 
 		// write image
 		try {
-			File outputfile = new File("./training/data/" + this.user + "/"
+			File outputfile = new File("./evaluation/data/" + this.user + "/"
 					+ this.user + "_" + this.timestamp + ".png");
 			outputfile.mkdirs();
 			ImageIO.write(this.screenShot, "png", outputfile);
@@ -191,7 +193,7 @@ public class PrecisionTrainer {
 		}
 
 		// update logfile
-		String logString = new String("Training - Timestamp: " + this.timestamp
+		String logString = new String("Evaluation - Timestamp: " + this.timestamp
 				+ ", Fixation: (" + this.fixation.x + "," + this.fixation.y
 				+ "), Mouseposition: (" + this.mousePosition.x + ","
 				+ this.mousePosition.y + "), Dimension: "
@@ -219,15 +221,16 @@ public class PrecisionTrainer {
 	}
 
 	/**
-	 * called when training ends writes training data into a file
+	 * called when evaluation ends
+	 * writes evaluation data into a file
 	 */
-	public void leaveTraining() {
+	public void leaveEvaluation() {
 		// only write file if there is some data
 		if (this.allData.size() == 0)
 			return;
 
 		// create file
-		File logfile = new File("./training/data/" + this.user + "/"
+		File logfile = new File("./evaluation/data/" + this.user + "/"
 				+ this.user + "_" + System.currentTimeMillis() + ".xml");
 
 		try {
@@ -243,7 +246,7 @@ public class PrecisionTrainer {
 			// TODO: add a dtd, encodingtag, namespace, ...
 
 			// set identifier
-			writer.writeComment("Project Lightning (Desktop) - trainingsdata");
+			writer.writeComment("Project Lightning (Desktop) - evaluation data");
 			writer.writeCharacters("\n");
 
 			// start with root element
@@ -254,7 +257,7 @@ public class PrecisionTrainer {
 			writer.writeCharacters("\t");
 			writer.writeStartElement("screenBrightness");
 			writer.writeCharacters(""
-					+ MainClass.getInstance().getTrainingsSettings()[1]);
+					+ MainClass.getInstance().getEvaluationSettings()[1]);
 			writer.writeEndElement();
 			writer.writeCharacters("\n");
 
@@ -262,7 +265,7 @@ public class PrecisionTrainer {
 			writer.writeCharacters("\t");
 			writer.writeStartElement("settingBrightness");
 			writer.writeCharacters(""
-					+ MainClass.getInstance().getTrainingsSettings()[2]);
+					+ MainClass.getInstance().getEvaluationSettings()[2]);
 			writer.writeEndElement();
 			writer.writeCharacters("\n");
 
