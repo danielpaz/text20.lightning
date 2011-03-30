@@ -101,8 +101,6 @@ public class EvaluatorWorker {
      *      which should be used
      * @param container
      *      which should be used
-     * @param drawImage
-     *      boolean which indicates if the results should be written into an png-file
      */
     public void evaluate(File file, SaliencyDetector detector, StorageContainer container) {
         // initialize variables
@@ -178,7 +176,6 @@ public class EvaluatorWorker {
     /**
      * A call of this method indicates that the evaluation is finished and the result file can be updated.
      * 
-     * @param writeLog 
      * @param detectors 
      * 
      * @return name of best ranked detector 

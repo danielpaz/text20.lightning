@@ -42,9 +42,6 @@ public class TrayMenu {
     /** 
      * returns the singleton of the tray menu
      * 
-     * @param manager
-     * is necessary for the gui which is build by this menu
-     * 
      * @return menu
      *  
      */

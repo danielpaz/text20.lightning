@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,7 +30,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.I
  *
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
+public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
         ActionListener {
 
     /** current used properties */
@@ -39,14 +39,12 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
     /**
      * creates new AdvancedWarperConfigImpl-object and initializes variables
      */
-    public ImprovedWarperConfigImpl() {
+    public AdvancedWarperConfigImpl() {
         // initialize properties and preselect spinners
         this.properties = ImprovedWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
         this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
-        this.spinnerDuration.setValue(this.properties.getDurationThreshold());
         this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());
-        this.spinnerSetRadius.setValue(this.properties.getSetRadius());
 
         // add listener
         this.buttonCancel.addActionListener(this);
@@ -90,9 +88,7 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
         this.properties.restoreDefault();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
         this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
-        this.spinnerDuration.setValue(this.properties.getDurationThreshold());
         this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());
-        this.spinnerSetRadius.setValue(this.properties.getSetRadius());
     }
 
     /**
@@ -102,9 +98,7 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
     private void buttonOKActionPerformed() {
         this.properties.setAngleThreshold(Integer.parseInt(this.spinnerAngle.getValue().toString()));
         this.properties.setDistanceThreshold(Integer.parseInt(this.spinnerDistance.getValue().toString()));
-        this.properties.setDurationThreshold(Integer.parseInt(this.spinnerDuration.getValue().toString()));
         this.properties.setHomeRadius(Integer.parseInt(this.spinnerHomeRadius.getValue().toString()));
-        this.properties.setSetRadius(Integer.parseInt(this.spinnerSetRadius.getValue().toString()));
         dispose();
     }
 
@@ -120,15 +114,11 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
         // set tooltip text
         String labelAngleThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must do this in an angle within this<br>threshold to activate the mouse warp.<br>The lower this value the more exact you must<br>move your mouse.</body></HTML>";
         String labelDistanceThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal this way in pixels to<br>activate the mouse warp. The higher this value<br>the more pixels you have to pass.<br>This means you have to move faster.</body></HTML>";
-        String labelDurationThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal this time in ms to<br>activate the mouse warp. The higher this value<br>the more exact the calculation can be done and<br>the mouse only warps when you really want it.</body></HTML>";
         String labelHomeRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your cursor is within this radius, your<br>mousecursor will not be warped.</body></HTML>";
-        String labelSetRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your mouse warp is activated, it will be set<br>in the choosed distance from the fixation point<br>to allow you to stop the movement by<br>yourself.</body></HTML>";
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
         this.labelDistanceThreshold.setToolTipText(labelDistanceThresholdTT);
-        this.labelDurationThreshold.setToolTipText(labelDurationThresholdTT);
         this.labelHomeRadius.setToolTipText(labelHomeRadiusTT);
-        this.labelSetRadius.setToolTipText(labelSetRadiusTT);
     }
 }

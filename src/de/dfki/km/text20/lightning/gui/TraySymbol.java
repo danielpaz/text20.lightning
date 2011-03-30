@@ -42,9 +42,6 @@ public class TraySymbol {
 
     /** 
      * creates the taskicon 
-     * 
-     * @param manager 
-     * necessary to show and activate plugins by the gui
      */
     public TraySymbol() {
                 

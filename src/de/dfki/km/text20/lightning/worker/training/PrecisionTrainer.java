@@ -98,8 +98,6 @@ public class PrecisionTrainer {
 
     /**
      * creates the precision trainer
-     * 
-     * @param manager
      */
     public PrecisionTrainer() {
 
