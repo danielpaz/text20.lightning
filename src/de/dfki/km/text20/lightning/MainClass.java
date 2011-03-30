@@ -280,7 +280,7 @@ public class MainClass {
 
             // show change in tray
             this.showTrayMessage("Status: tool is now activated");
-            this.trayIcon.setActivatedIcon();
+            this.trayIcon.setActivatedIcon(this.isNormalMode);
 
             // activate warper
             this.warper.start();
@@ -371,6 +371,9 @@ public class MainClass {
             // activate warper
             this.warper.start();
         }
+
+        // change icon
+        if (this.isActivated) this.trayIcon.setActivatedIcon(this.isNormalMode);
     }
 
     /**
