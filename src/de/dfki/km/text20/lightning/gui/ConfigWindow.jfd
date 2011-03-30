@@ -573,7 +573,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Search Method</string> 
+             <string>Detector</string> 
             </void> 
             <void property="name"> 
              <string>labelDetector</string> 
