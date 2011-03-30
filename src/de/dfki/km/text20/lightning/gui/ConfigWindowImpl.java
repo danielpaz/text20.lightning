@@ -63,9 +63,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
     /**
      * builds the window with all its components and shows it
-     * 
-     * @param manager
-     * necessary to show and switch the plugins.
      */
     public ConfigWindowImpl() {
         this.internalPluginManager = MainClass.getInstance().getInternalPluginManager();

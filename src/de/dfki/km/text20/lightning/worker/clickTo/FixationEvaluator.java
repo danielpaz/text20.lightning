@@ -86,6 +86,8 @@ public class FixationEvaluator implements Runnable {
     /**
      * makes a screenshot with choosed dimension around the fixation point an starts the processing of it. 
      * At the end a mouseclick were taken to the calculated point.
+     * 
+     * @return true if successful
      */
     public boolean evaluateLocation() {
         // check if a valid fixation is placed or process is already running

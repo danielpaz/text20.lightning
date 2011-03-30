@@ -1,5 +1,5 @@
 /*
- * ImprovedSimpleWarper.java
+ * AdvancedWarper.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -77,7 +77,7 @@ public class SimpleWarper implements MouseWarper {
     private double angle;
 
     /**
-     * creates a new ImprovedSimpleWarper and initializes some variables
+     * creates a new AdvancedWarper and initializes some variables
      */
     public SimpleWarper() {
         this.angleThres = 10;

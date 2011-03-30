@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,10 +35,10 @@ import org.simpleframework.xml.Attribute;
  * @author Christoph Käding
  *
  */
-public class ImprovedWarperProperties implements Serializable {
+public class AdvancedWarperProperties implements Serializable {
 
     /** generated serial id */
-    private static final long serialVersionUID = 8852912029566928635L;
+    private static final long serialVersionUID = -4766853585658130189L;
 
     @Attribute
     /** angle threshold for mousewarping */
@@ -49,16 +49,8 @@ public class ImprovedWarperProperties implements Serializable {
     private int distanceThreshold;
 
     @Attribute
-    /** duration threshold for mousewarping */
-    private long durationThreshold;
-
-    @Attribute
     /** home radius for mousewarping */
     private int homeRadius;
-
-    @Attribute
-    /** set radius for mousewarping */
-    private int setRadius;
 
     /** file where porperties are stored */
     private File propertiesFile;
@@ -67,15 +59,15 @@ public class ImprovedWarperProperties implements Serializable {
     private Object object;
     
     /** singleton instance of this properties */
-    private static ImprovedWarperProperties properties;
+    private static AdvancedWarperProperties properties;
 
     /**
      * creates properties, tries to load property file
      */
-    private ImprovedWarperProperties() {
+    private AdvancedWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/improvedWarperProperties.prop");
+        this.propertiesFile = new File("./plugins/advancedWarperProperties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -87,19 +79,17 @@ public class ImprovedWarperProperties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof ImprovedWarperProperties) {
+                if (this.object instanceof AdvancedWarperProperties) {
 
                     // store readed configurations
-                    this.angleThreshold = ((ImprovedWarperProperties) this.object).getAngleThreshold();
-                    this.distanceThreshold = ((ImprovedWarperProperties) this.object).getDistanceThreshold();
-                    this.durationThreshold = ((ImprovedWarperProperties) this.object).getDurationThreshold();
-                    this.homeRadius = ((ImprovedWarperProperties) this.object).getHomeRadius();
-                    this.setRadius = ((ImprovedWarperProperties) this.object).getSetRadius();
+                    this.angleThreshold = ((AdvancedWarperProperties) this.object).getAngleThreshold();
+                    this.distanceThreshold = ((AdvancedWarperProperties) this.object).getDistanceThreshold();
+                    this.homeRadius = ((AdvancedWarperProperties) this.object).getHomeRadius();
 
                     // reading successful
                     status = true;
                     System.out.println("\nImprovedWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
+                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
                 }
 
                 // cleanup
@@ -124,9 +114,7 @@ public class ImprovedWarperProperties implements Serializable {
         // set default values
         this.angleThreshold = 10;
         this.distanceThreshold = 200;
-        this.durationThreshold = 200;
         this.homeRadius = 200;
-        this.setRadius = 100;
     }
 
     /**
@@ -134,9 +122,9 @@ public class ImprovedWarperProperties implements Serializable {
      * 
      * @return properties
      */
-    public static ImprovedWarperProperties getInstance() {
+    public static AdvancedWarperProperties getInstance() {
         if(properties == null) {
-            properties = new ImprovedWarperProperties();
+            properties = new AdvancedWarperProperties();
         }
         return properties;
     }
@@ -170,20 +158,6 @@ public class ImprovedWarperProperties implements Serializable {
     }
 
     /**
-     * @return the durationThreshold
-     */
-    public long getDurationThreshold() {
-        return this.durationThreshold;
-    }
-
-    /**
-     * @param durationThreshold the durationThreshold to set
-     */
-    public void setDurationThreshold(long durationThreshold) {
-        this.durationThreshold = durationThreshold;
-    }
-
-    /**
      * @return the homeRadius
      */
     public int getHomeRadius() {
@@ -195,20 +169,6 @@ public class ImprovedWarperProperties implements Serializable {
      */
     public void setHomeRadius(int homeRadius) {
         this.homeRadius = homeRadius;
-    }
-
-    /**
-     * @return the setRadius
-     */
-    public int getSetRadius() {
-        return this.setRadius;
-    }
-
-    /**
-     * @param setRadius the setRadius to set
-     */
-    public void setSetRadius(int setRadius) {
-        this.setRadius = setRadius;
     }
 
     /**

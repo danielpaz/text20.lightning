@@ -376,7 +376,6 @@ public class MainClass {
     /**
      * shows the given text as popup on the tray icon
      * 
-     * @param caption
      * @param text
      */
     public void showTrayMessage(String text) {

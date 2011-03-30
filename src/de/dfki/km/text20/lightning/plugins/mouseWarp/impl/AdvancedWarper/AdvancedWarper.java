@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -50,7 +50,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.g
  *
  */
 @PluginImplementation
-public class ImprovedSimpleWarper implements MouseWarper {
+public class AdvancedWarper implements MouseWarper {
 
     /** threshold for the angleFirst */
     private int angleThres;
@@ -58,17 +58,8 @@ public class ImprovedSimpleWarper implements MouseWarper {
     /** threshold for the distance */
     private int distanceThres;
 
-    /** threshold for the duration */
-    private long durationThres;
-
     /** radius around the fixation within the mouse cursor won't be moved */
     private int homeR;
-
-    /** 
-     * Distance from the fixation to the point where the cursor will be set.
-     * This is used to allow the user to move the mouse by himself to the target.
-     */
-    private int setR;
 
     /** time stamp */
     private long timeStamp;
@@ -94,22 +85,21 @@ public class ImprovedSimpleWarper implements MouseWarper {
     /** key of the second last entry of the hashmap */
     private long secondLastKey;
 
-    private ImprovedWarperProperties propertie;
+    private AdvancedWarperProperties propertie;
 
     private boolean isProcessing;
 
     /**
      * creates a new AdvancedWarper and initializes some variables
      */
-    public ImprovedSimpleWarper() {
+    public AdvancedWarper() {
         // initialize variables
         this.angleThres = 0;
         this.distanceThres = 0;
-        this.durationThres = 0;
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Improved Simple Warper", "Improved Simple Warper", true);
+        this.information = new PluginInformation("Advanced Warper", "Advanced Warper", true);
         this.angleFirst = 0;
         this.angleSecLast = 0;
         this.propertie = null;
@@ -128,12 +118,10 @@ public class ImprovedSimpleWarper implements MouseWarper {
     @Override
     public void start() {
         // load variables from properties
-        this.propertie = ImprovedWarperProperties.getInstance();
+        this.propertie = AdvancedWarperProperties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
         this.distanceThres = this.propertie.getDistanceThreshold();
-        this.durationThres = this.propertie.getDurationThreshold();
         this.homeR = this.propertie.getHomeRadius();
-        this.setR = this.propertie.getSetRadius();
 
         // refresh map
         this.refreshMouseMap();
@@ -253,10 +241,13 @@ public class ImprovedSimpleWarper implements MouseWarper {
     private void calculateSetPoint() {
         // angle in radian measure between this x-axis and the vector from end point of the current mouse vector an the fixation point
         double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.y);
+
+        double setR = this.mousePositions.firstEntry().getValue().distance(this.mousePositions.lastEntry().getValue());
+        System.out.println("setR: " + setR);
         
         // calculate x and y by their polar coordinates
-        int x = (int) (this.setR * Math.cos(phi));
-        int y = (int) (this.setR * Math.sin(phi));
+        int x = (int) (setR * Math.cos(phi));
+        int y = (int) (setR * Math.sin(phi));
 
         // move fixation point 
         this.fixation.translate(x, y);
