@@ -42,312 +42,345 @@ import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 
 /**
- * The precision trainer is used in trainings mode. Here the collected data is handled.
+ * The precision trainer is used in trainings mode. Here the collected data is
+ * handled.
  * 
  * @author Christoph Käding
- *
+ * 
  */
 public class PrecisionTrainer {
 
-    /** last fixation point */
-    private Point fixationTmp;
+	/** last fixation point */
+	private Point fixationTmp;
 
-    /** stored fixation point */
-    private Point fixation;
+	/** stored fixation point */
+	private Point fixation;
 
-    /** associated mouse position which shows the real target*/
-    private Point mousePosition;
+	/** associated mouse position which shows the real target */
+	private Point mousePosition;
 
-    /** offset between fixation point and mouse position */
-    private Point mousePoint;
+	/** offset between fixation point and mouse position */
+	private Point mousePoint;
 
-    /** robot for creating screenshots */
-    private Robot robot;
+	/** robot for creating screenshots */
+	private Robot robot;
 
-    /** actual time */
-    private long timestamp;
+	/** actual time */
+	private long timestamp;
 
-    /** screenshot of the target area*/
-    private BufferedImage screenShot;
+	/** screenshot of the target area */
+	private BufferedImage screenShot;
 
-    /** a list of all catched data */
-    private ArrayList<StorageContainer> allData;
+	/** a list of all catched data */
+	private ArrayList<StorageContainer> allData;
 
-    /** global used properties */
-    private Properties properties;
+	/** global used properties */
+	private Properties properties;
 
-    /** name of current registered user */
-    private String user;
+	/** name of current registered user */
+	private String user;
 
-    /** indicates if the mouseposition was anytime out of dimension */
-    private boolean warning;
+	/** indicates if the mouseposition was anytime out of dimension */
+	private boolean warning;
 
-    /** 
-     * size of the pupils 
-     * 0 = left 
-     * 1 = right
-     */
-    private float[] pupils;
+	/**
+	 * size of the pupils 0 = left 1 = right
+	 */
+	private float[] pupils;
 
-    /** 
-     * temporary size of the pupils 
-     * 0 = left 
-     * 1 = right
-     */
-    private float[] pupilsTmp;
+	/**
+	 * temporary size of the pupils 0 = left 1 = right
+	 */
+	private float[] pupilsTmp;
 
-    /**
-     * creates the precision trainer
-     */
-    public PrecisionTrainer() {
+	/** indicates if already any processing is in progress */
+	private boolean isProcessing;
 
-        // initialize variables
-        this.fixation = new Point();
-        this.fixationTmp = new Point();
-        this.mousePoint = new Point();
-        this.allData = new ArrayList<StorageContainer>();
-        this.properties = MainClass.getInstance().getProperties();
-        this.warning = false;
-        this.pupils = new float[2];
+	/**
+	 * creates the precision trainer
+	 */
+	public PrecisionTrainer() {
 
-        try {
-            this.robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-            MainClass.getInstance().exit();
-        }
-    }
+		// initialize variables
+		this.fixation = new Point();
+		this.fixationTmp = new Point();
+		this.mousePoint = new Point();
+		this.allData = new ArrayList<StorageContainer>();
+		this.properties = MainClass.getInstance().getProperties();
+		this.warning = false;
+		this.pupils = new float[2];
+		this.isProcessing = false;
 
-    /**
-     * stores fixation and pupilssizes
-     * 
-     * @param fixation
-     * @param pupils 
-     *      0 = left
-     *      1 = right
-     */
-    public void setFixationPoint(Point fixation, float[] pupils) {
-        this.fixationTmp = fixation;
-        this.pupilsTmp = pupils;
-    }
+		try {
+			this.robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+			MainClass.getInstance().exit();
+		}
+	}
 
-    /**
-     * stores last fixation so that it can be used to create a trainingsstep
-     */
-    public void storeFixation() {
-        this.timestamp = System.currentTimeMillis();
-        this.fixation = new Point(this.fixationTmp);
-        this.pupils = new float[2];
-        this.pupils[0] = this.pupilsTmp[0];
-        this.pupils[1] = this.pupilsTmp[1];
-    }
+	/**
+	 * stores fixation and pupilssizes
+	 * 
+	 * @param fixation
+	 * @param pupils
+	 *            0 = left 1 = right
+	 */
+	public void setFixationPoint(Point fixation, float[] pupils) {
+		this.fixationTmp = fixation;
+		this.pupilsTmp = pupils;
+	}
 
-    /**
-     * sets the mouseposition to associate it with the stored fixation
-     * 
-     * @param mousePosition
-     * @return true if the position is valid
-     */
-    @SuppressWarnings("boxing")
-    public boolean setMousePosition(Point mousePosition) {
-        this.user = MainClass.getInstance().getTrainingsSettings()[0];
-        this.mousePosition = mousePosition;
-        Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
-        this.screenShot = this.robot.createScreenCapture(screenShotRect);
+	/**
+	 * stores last fixation so that it can be used to create a trainingsstep
+	 */
+	public boolean storeFixation() {
+		if (this.fixationTmp == null || this.isProcessing)
+			return false;
+		this.isProcessing = true;
+		this.timestamp = System.currentTimeMillis();
+		this.fixation = new Point(this.fixationTmp);
+		this.pupils = new float[2];
+		this.pupils[0] = this.pupilsTmp[0];
+		this.pupils[1] = this.pupilsTmp[1];
+		this.fixationTmp = null;
+		this.isProcessing = false;
+		return true;
+	}
 
-        // calculate offset
-        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
+	/**
+	 * sets the mouseposition to associate it with the stored fixation
+	 * 
+	 * @param mousePosition
+	 * @return true if the position is valid
+	 */
+	@SuppressWarnings("boxing")
+	public boolean setMousePosition(Point mousePosition) {
+		if (this.fixation == null || this.isProcessing)
+			return false;
+		this.isProcessing = true;
+		this.user = MainClass.getInstance().getTrainingsSettings()[0];
+		this.mousePosition = mousePosition;
+		Rectangle screenShotRect = new Rectangle(
+				-this.properties.getDimension() / 2,
+				-this.properties.getDimension() / 2, Toolkit
+						.getDefaultToolkit().getScreenSize().width
+						+ this.properties.getDimension(), Toolkit
+						.getDefaultToolkit().getScreenSize().height
+						+ this.properties.getDimension());
+		this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
-        // collect data
-        this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.mousePosition), this.pupils));
+		// calculate offset
+		this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x
+				+ this.properties.getDimension() / 2, this.mousePosition.y
+				- this.fixation.y + this.properties.getDimension() / 2);
 
-        // write image
-        try {
-            File outputfile = new File("./training/data/" + this.user + "/" + this.user + "_" + this.timestamp + ".png");
-            outputfile.mkdirs();
-            ImageIO.write(this.screenShot, "png", outputfile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		// collect data
+		this.allData.add(new StorageContainer(new Long(this.timestamp),
+				new Point(this.fixation), new Point(this.mousePosition),
+				this.pupils));
 
-        // update logfile
-        String logString = new String("Training - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension());
-        System.out.println(logString);
-        MainClass.getInstance().getChannel().status(logString);
+		// write image
+		try {
+			File outputfile = new File("./training/data/" + this.user + "/"
+					+ this.user + "_" + this.timestamp + ".png");
+			outputfile.mkdirs();
+			ImageIO.write(this.screenShot, "png", outputfile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        // indicate error
-        if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
-            this.warning = true;
+		// update logfile
+		String logString = new String("Training - Timestamp: " + this.timestamp
+				+ ", Fixation: (" + this.fixation.x + "," + this.fixation.y
+				+ "), Mouseposition: (" + this.mousePosition.x + ","
+				+ this.mousePosition.y + "), Dimension: "
+				+ this.properties.getDimension());
+		System.out.println(logString);
+		MainClass.getInstance().getChannel().status(logString);
 
-            // return failure
-            return false;
-        }
+		// indicate error
+		if ((this.mousePoint.x > this.properties.getDimension())
+				|| (this.mousePoint.y > this.properties.getDimension())) {
+			this.warning = true;
 
-        // return success
-        return true;
-    }
+			// reset status
+			this.isProcessing = false;
 
-    /**
-     * called when training ends
-     * writes training data into a file
-     */
-    public void leaveTraining() {
-        // only write file if there is some data
-        if (this.allData.size() == 0) return;
+			// return failure
+			return false;
+		}
 
-        // create file
-        File logfile = new File("./training/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".xml");
+		// reset status
+		this.isProcessing = false;
 
-        try {
-            // Create an XML stream writer
-            FileOutputStream outputStream = new FileOutputStream(logfile);
-            XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, "UTF-8");
+		// return success
+		return true;
+	}
 
-            // Write XML prologue
-            writer.writeStartDocument();
-            writer.writeCharacters("\n");
+	/**
+	 * called when training ends writes training data into a file
+	 */
+	public void leaveTraining() {
+		// only write file if there is some data
+		if (this.allData.size() == 0)
+			return;
 
-            // TODO: add a dtd, encodingtag, namespace, ...            
+		// create file
+		File logfile = new File("./training/data/" + this.user + "/"
+				+ this.user + "_" + System.currentTimeMillis() + ".xml");
 
-            // set identifier
-            writer.writeComment("Project Lightning (Desktop) - trainingsdata");
-            writer.writeCharacters("\n");
+		try {
+			// Create an XML stream writer
+			FileOutputStream outputStream = new FileOutputStream(logfile);
+			XMLStreamWriter writer = XMLOutputFactory.newInstance()
+					.createXMLStreamWriter(outputStream, "UTF-8");
 
-            // start with root element
-            writer.writeStartElement("alldata");
-            writer.writeCharacters("\n");
-            
-            // write screen brightness
-            writer.writeCharacters("\t");
-            writer.writeStartElement("screenBrightness");
-            writer.writeCharacters("" + MainClass.getInstance().getTrainingsSettings()[1]);
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
-            
-            // write setting brightness
-            writer.writeCharacters("\t");
-            writer.writeStartElement("settingBrightness");
-            writer.writeCharacters("" + MainClass.getInstance().getTrainingsSettings()[2]);
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
+			// Write XML prologue
+			writer.writeStartDocument();
+			writer.writeCharacters("\n");
 
-            // write dimension
-            writer.writeCharacters("\t");
-            writer.writeStartElement("dimension");
-            writer.writeCharacters("" + this.properties.getDimension());
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
+			// TODO: add a dtd, encodingtag, namespace, ...
 
-            // if mouseposition was anytime out of dimension
-            if (this.warning) {
-                writer.writeCharacters("\t");
-                writer.writeComment("mouseposition was anytime out of dimension");
-                writer.writeCharacters("\n");
-                this.warning = false;
-            }
+			// set identifier
+			writer.writeComment("Project Lightning (Desktop) - trainingsdata");
+			writer.writeCharacters("\n");
 
-            // run through all data
-            for (StorageContainer data : this.allData) {
+			// start with root element
+			writer.writeStartElement("alldata");
+			writer.writeCharacters("\n");
 
-                // write datatag
-                writer.writeCharacters("\t");
-                writer.writeStartElement("step");
-                writer.writeCharacters("\n");
+			// write screen brightness
+			writer.writeCharacters("\t");
+			writer.writeStartElement("screenBrightness");
+			writer.writeCharacters(""
+					+ MainClass.getInstance().getTrainingsSettings()[1]);
+			writer.writeEndElement();
+			writer.writeCharacters("\n");
 
-                // write timestamp
-                writer.writeCharacters("\t\t");
-                writer.writeStartElement("timestamp");
-                writer.writeCharacters("" + data.getTimestamp());
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
+			// write setting brightness
+			writer.writeCharacters("\t");
+			writer.writeStartElement("settingBrightness");
+			writer.writeCharacters(""
+					+ MainClass.getInstance().getTrainingsSettings()[2]);
+			writer.writeEndElement();
+			writer.writeCharacters("\n");
 
-                // write fixation
-                writer.writeCharacters("\t\t");
-                writer.writeStartElement("fixation");
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("x");
-                writer.writeCharacters("" + data.getFixation().x);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("y");
-                writer.writeCharacters("" + data.getFixation().y);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t");
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
+			// write dimension
+			writer.writeCharacters("\t");
+			writer.writeStartElement("dimension");
+			writer.writeCharacters("" + this.properties.getDimension());
+			writer.writeEndElement();
+			writer.writeCharacters("\n");
 
-                // write mouse position
-                writer.writeCharacters("\t\t");
-                writer.writeStartElement("mouseposition");
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("x");
-                writer.writeCharacters("" + data.getMousePoint().x);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("y");
-                writer.writeCharacters("" + data.getMousePoint().y);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t");
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
+			// if mouseposition was anytime out of dimension
+			if (this.warning) {
+				writer.writeCharacters("\t");
+				writer.writeComment("mouseposition was anytime out of dimension");
+				writer.writeCharacters("\n");
+				this.warning = false;
+			}
 
-                // write pupil size
-                writer.writeCharacters("\t\t");
-                writer.writeStartElement("pupils");
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("left");
-                writer.writeCharacters("" + data.getPupils()[0]);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("right");
-                writer.writeCharacters("" + data.getPupils()[1]);
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeCharacters("\t\t");
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
+			// run through all data
+			for (StorageContainer data : this.allData) {
 
-                // close datatag
-                writer.writeCharacters("\t");
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-            }
+				// write datatag
+				writer.writeCharacters("\t");
+				writer.writeStartElement("step");
+				writer.writeCharacters("\n");
 
-            // Write document end. This closes all open structures
-            writer.writeEndDocument();
+				// write timestamp
+				writer.writeCharacters("\t\t");
+				writer.writeStartElement("timestamp");
+				writer.writeCharacters("" + data.getTimestamp());
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
 
-            // Close the writer to flush the output
-            outputStream.close();
-            writer.close();
+				// write fixation
+				writer.writeCharacters("\t\t");
+				writer.writeStartElement("fixation");
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("x");
+				writer.writeCharacters("" + data.getFixation().x);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("y");
+				writer.writeCharacters("" + data.getFixation().y);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t");
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
 
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+				// write mouse position
+				writer.writeCharacters("\t\t");
+				writer.writeStartElement("mouseposition");
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("x");
+				writer.writeCharacters("" + data.getMousePoint().x);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("y");
+				writer.writeCharacters("" + data.getMousePoint().y);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t");
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
 
-        // try to write file
-        /*try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(logfile));
-            for (StorageContainer temp : this.allData) {
-                outputStream.writeObject(temp);
-            }
+				// write pupil size
+				writer.writeCharacters("\t\t");
+				writer.writeStartElement("pupils");
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("left");
+				writer.writeCharacters("" + data.getPupils()[0]);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t\t");
+				writer.writeStartElement("right");
+				writer.writeCharacters("" + data.getPupils()[1]);
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				writer.writeCharacters("\t\t");
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
+				// close datatag
+				writer.writeCharacters("\t");
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+			}
 
-        // reset data
-        this.allData.clear();
-    }
+			// Write document end. This closes all open structures
+			writer.writeEndDocument();
+
+			// Close the writer to flush the output
+			outputStream.close();
+			writer.close();
+
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// try to write file
+		/*
+		 * try { ObjectOutputStream outputStream = new ObjectOutputStream(new
+		 * FileOutputStream(logfile)); for (StorageContainer temp :
+		 * this.allData) { outputStream.writeObject(temp); }
+		 * 
+		 * } catch (Exception e) { e.printStackTrace(); }
+		 */
+
+		// reset data
+		this.allData.clear();
+	}
 }
