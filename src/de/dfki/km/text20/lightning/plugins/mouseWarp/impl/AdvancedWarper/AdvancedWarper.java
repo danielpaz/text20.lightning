@@ -133,7 +133,7 @@ public class AdvancedWarper implements MouseWarper {
     @Override
     public void setFixationPoint(Point fixation) {
         if (this.isProcessing) return;
-        this.fixation = new Point(0, 0);
+        this.fixation = fixation;
     }
 
     /* (non-Javadoc)

@@ -88,7 +88,7 @@ public class AdvancedWarperProperties implements Serializable {
 
                     // reading successful
                     status = true;
-                    System.out.println("\nImprovedWarperProperties file was found.");
+                    System.out.println("\nAdvancedWarperProperties file was found.");
                     System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
                 }
 
