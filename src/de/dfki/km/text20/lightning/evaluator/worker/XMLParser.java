@@ -29,10 +29,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import de.dfki.km.text20.lightning.worker.training.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
 
 /**
- * the XML-files which stores the trainingsdatas are processed by this class
+ * the XML-files which stores the evaluation datas are processed by this class
  * 
  * @author Christoph Käding
  *
@@ -459,7 +459,7 @@ public class XMLParser {
      */
     private boolean handleComment(String value) {
         // if it is the first comment and the identifier is not recognized ...
-        if (this.firstComment && !(value.equals("Project Lightning (Desktop) - trainingsdata"))) {
+        if (this.firstComment && !(value.equals("Project Lightning (Desktop) - evaluation data"))) {
 
             // indicate error and return failure
             System.out.println(this.fileName + " isn't a valid file");
@@ -507,7 +507,7 @@ public class XMLParser {
 
                 case XMLStreamConstants.COMMENT:
                     // unsure check if the file is valid
-                    if (this.firstComment && !reader.getText().trim().equals("Project Lightning (Desktop) - trainingsdata"))
+                    if (this.firstComment && !reader.getText().trim().equals("Project Lightning (Desktop) - evaluation data"))
                         return 0;
 
                     this.firstComment = false;

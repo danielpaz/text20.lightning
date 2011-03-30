@@ -86,7 +86,7 @@ public class TrayMenu {
             menu.add(changeState);
 
             // adds change mode to the menu
-            final MenuItem changeMode = new MenuItem("Change Modus: Training");
+            final MenuItem changeMode = new MenuItem("Change Modus: Evaluation");
             changeMode.addActionListener(new ActionListener() {
 
                 // depending on the current mode, the label for the next mode is printed and the modus is changed 
@@ -94,7 +94,7 @@ public class TrayMenu {
                 public void actionPerformed(ActionEvent e) {
                     MainClass.getInstance().toggleMode();
                     if (MainClass.getInstance().isNormalMode()) {
-                        changeMode.setLabel("Change Modus: Training");
+                        changeMode.setLabel("Change Modus: Evaluation");
                     } else {
                         changeMode.setLabel("Change Modus: Normal");
                     }

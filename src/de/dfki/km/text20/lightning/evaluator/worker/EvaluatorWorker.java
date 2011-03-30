@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.training.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
 
 /**
  * The EvaluationWorker runs the given plugin with the given container, collects the data,
@@ -112,8 +112,8 @@ public class EvaluatorWorker {
         String identifier = file.getName();
 
         // test if the path is already known
-        if (!this.overAllPath.contains(path + "/evaluation/evaluation.log"))
-            this.overAllPath.add(path + "/evaluation/evaluation.log");
+        if (!this.overAllPath.contains(path + "/evaluated/evaluation.log"))
+            this.overAllPath.add(path + "/evaluated/evaluation.log");
 
         // test if associated screenshot is available
         File screenFile = new File(path + "/data/" + user + "/" + user + "_" + container.getTimestamp() + ".png");
@@ -143,7 +143,7 @@ public class EvaluatorWorker {
 
         // write the png-file
         if (this.main.writeImages())
-            this.drawPicture(detector, point, path + "/evaluation/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
+            this.drawPicture(detector, point, path + "/evaluated/" + user + "_" + this.currentTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
 
         // add results to over all storage
         if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), "", user, this.currentTimeStamp);
@@ -158,7 +158,7 @@ public class EvaluatorWorker {
         } else {
 
             // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), path + "/evaluation/evaluation.log", user, this.currentTimeStamp));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), path + "/evaluated/evaluation.log", user, this.currentTimeStamp));
         }
 
     }

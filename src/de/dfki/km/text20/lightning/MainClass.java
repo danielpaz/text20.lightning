@@ -46,7 +46,7 @@ import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.PrecisionEvaluator;
 import de.dfki.km.text20.lightning.worker.warpMouse.WarpCommander;
 
 /**
@@ -59,7 +59,7 @@ public class MainClass {
     /** indicates if the program should react on hotkeys */
     private boolean isActivated;
 
-    /** indicates if normal mode or trainings mode is activated */
+    /** indicates if normal mode or evaluation mode is activated */
     private boolean isNormalMode;
 
     /** pluginmanager for the different methods */
@@ -89,11 +89,11 @@ public class MainClass {
     /** statistics plugin */
     private Statistics statistics;
 
-    /** necessary to identify the training data */
-    private String[] trainingsSettings;
+    /** necessary to identify the evaluation data */
+    private String[] evaluationSettings;
 
-    /** collects training data */
-    private PrecisionTrainer trainer;
+    /** collects evaluation data */
+    private PrecisionEvaluator evaluator;
 
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
@@ -165,22 +165,22 @@ public class MainClass {
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
 
-        // Creates classes which are needed for the three parts (clicking, warping and training) of this tool.
+        // Creates classes which are needed for the three parts (clicking, warping and evaluation) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
-        this.trainer = new PrecisionTrainer();
+        this.evaluator = new PrecisionEvaluator();
         this.warper = new WarpCommander();
         Thread warpThread = new Thread(this.warper);
         warpThread.start();
         Thread evaluationThread = new Thread(fixationEvaluator);
 
         // main component which listen on trackingevents
-        FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.trainer);
+        FixationCatcher fixationCatcher = new FixationCatcher(fixationEvaluator, this.evaluator);
 
         // check if all things are fine
         if (this.dllStatus) {
 
             // initialize hotkeys
-            Hotkey.init(fixationEvaluator, this.trainer);
+            Hotkey.init(fixationEvaluator, this.evaluator);
 
             // load sounds
             this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
@@ -309,8 +309,8 @@ public class MainClass {
         this.internalPluginManager.getCurrentMouseWarper().stop();
         this.internalPluginManager.getCurrentSaliencyDetector().stop();
 
-        // make the trainer known that the training is over
-        this.trainer.leaveTraining();
+        // make the evaluator known that the evaluation is over
+        this.evaluator.leaveEvaluation();
 
         if (this.dllStatus) {
             // deactivate the hotkeys
@@ -334,7 +334,7 @@ public class MainClass {
     }
 
     /**
-     * Indicates if the tool is in normal or trainings mode.
+     * Indicates if the tool is in normal or evaluation mode.
      * 
      * @return true if is in normal mode 
      */
@@ -343,13 +343,13 @@ public class MainClass {
     }
 
     /**
-     * Toggles mode between normal an trainings mode.
+     * Toggles mode between normal an evaluation mode.
      */
     public void toggleMode() {
         if (this.isNormalMode) {
 
             // shows change in tray and console
-            this.showTrayMessage("Modus: trainings mode activated");
+            this.showTrayMessage("Modus: evaluation mode activated");
 
             // change mode
             this.isNormalMode = false;
@@ -362,8 +362,8 @@ public class MainClass {
             // shows change in tray and console
             this.showTrayMessage("Modus: normal mode activated");
 
-            // make the trainer known that the training is over
-            this.trainer.leaveTraining();
+            // make the evaluator known that the evaluation is over
+            this.evaluator.leaveEvaluation();
 
             // change mode
             this.isNormalMode = true;
@@ -392,12 +392,12 @@ public class MainClass {
     }
 
     /**
-     * resets trainer, used to notify new user names
+     * resets evaluator, used to notify new user names
      * 
      * @param name
      */
-    public void resetTrainer(String name) {
-        this.trainer.leaveTraining();
+    public void resetEvaluator(String name) {
+        this.evaluator.leaveEvaluation();
     }
 
     /**
@@ -410,19 +410,19 @@ public class MainClass {
     }
 
     /**
-     * @return the trainingsSettings
+     * @return the evaluationSettings
      *      0 = user name
      *      1 = screen brightness
      *      2 = setting brightness
      */
-    public String[] getTrainingsSettings() {
-        if (this.trainingsSettings == null) {
-            this.trainingsSettings = new String[3];
-            this.trainingsSettings[0] = "DefaultUser";
-            this.trainingsSettings[1] = "not choosen";
-            this.trainingsSettings[2] = "not choosen";
+    public String[] getEvaluationSettings() {
+        if (this.evaluationSettings == null) {
+            this.evaluationSettings = new String[3];
+            this.evaluationSettings[0] = "DefaultUser";
+            this.evaluationSettings[1] = "not choosen";
+            this.evaluationSettings[2] = "not choosen";
         }
-        return this.trainingsSettings;
+        return this.evaluationSettings;
     }
 
     /**
@@ -431,8 +431,8 @@ public class MainClass {
      *      1 = screen brightness
      *      2 = setting brightness
      */
-    public void setTrainingsSettings(String[] settings) {
-        this.trainingsSettings = settings;
+    public void setEvaluationSettings(String[] settings) {
+        this.evaluationSettings = settings;
     }
 
     /**

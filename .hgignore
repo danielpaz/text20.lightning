@@ -23,3 +23,5 @@ syntax: regexp
 ^plugins/improvedWarperProperties\.prop$
 syntax: regexp
 ^plugins/advancedWarperProperties\.prop$
+syntax: regexp
+^evaluation$

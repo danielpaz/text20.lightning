@@ -27,7 +27,7 @@ import javax.swing.JProgressBar;
 
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.training.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
 
 /**
  * This thread runs through all given files and detectors and evaluates them.
@@ -43,7 +43,7 @@ public class EvaluationThread implements Runnable {
     /** evaluation worker which runs the detectors */
     private EvaluatorWorker worker;
 
-    /** selected *.training files */
+    /** selected *.xml files */
     private ArrayList<File> files;
 
     /** the current shown progressbar */

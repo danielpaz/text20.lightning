@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.worker.training;
+package de.dfki.km.text20.lightning.worker.evaluationMode;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -28,7 +28,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
 /**
- * Container which stores collected trainings data.
+ * Container which stores collected evaluation data.
  * 
  * @author Christoph Käding
  *
@@ -46,7 +46,7 @@ public class StorageContainer implements Serializable {
     @Element
     private Point mousePoint;
 
-    /** timestamp of the trainings step */
+    /** timestamp of the evaluation step */
     @Attribute
     private long timestamp;
 

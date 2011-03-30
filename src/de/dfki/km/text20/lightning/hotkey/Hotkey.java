@@ -32,7 +32,7 @@ import com.melloware.jintellitype.JIntellitypeConstants;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.training.PrecisionTrainer;
+import de.dfki.km.text20.lightning.worker.evaluationMode.PrecisionEvaluator;
 
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys
@@ -61,25 +61,25 @@ public class Hotkey implements HotkeyListener {
 	/** this is necessary for move the mouse and click in normal mode */
 	FixationEvaluator fixationEvaluator;
 
-	/** this is needed for trainings mode */
-	private PrecisionTrainer precisionTrainer;
+	/** this is needed for evaluation mode */
+	private PrecisionEvaluator precisionEvaluator;
 
 	/** singleton instance of the main class */
 	private MainClass main;
 
 	/**
-	 * indicates status of trainingsstep true = catch fixation false = catch
+	 * indicates status of evaluation step true = catch fixation false = catch
 	 * mouse position
 	 */
-	private boolean trainingsStatus;
+	private boolean evaluationStatus;
 
 	/** */
-	private Hotkey(FixationEvaluator evaluator, PrecisionTrainer trainer) {
-		this.fixationEvaluator = evaluator;
-		this.precisionTrainer = trainer;
+	private Hotkey(FixationEvaluator fixationEvaluator, PrecisionEvaluator precisionEvaluator) {
+		this.fixationEvaluator = fixationEvaluator;
+		this.precisionEvaluator = precisionEvaluator;
 		this.properties = MainClass.getInstance().getProperties();
 		this.main = MainClass.getInstance();
-		this.trainingsStatus = true;
+		this.evaluationStatus = true;
 		this.initHotkeys();
 
 		if ((this.properties.getActionHotkey() != null)
@@ -132,12 +132,12 @@ public class Hotkey implements HotkeyListener {
 	 * Initializes the hotkeys. This method should be used before every call of
 	 * any hotkey function.
 	 * 
-	 * @param evaluator
-	 * @param trainer
+	 * @param fixationEvaluator
+	 * @param precisionEvaluator
 	 */
-	public static void init(FixationEvaluator evaluator,
-			PrecisionTrainer trainer) {
-		instance = new Hotkey(evaluator, trainer);
+	public static void init(FixationEvaluator fixationEvaluator,
+			PrecisionEvaluator precisionEvaluator) {
+		instance = new Hotkey(fixationEvaluator, precisionEvaluator);
 	}
 
 	/**
@@ -167,46 +167,46 @@ public class Hotkey implements HotkeyListener {
 				break;
 			}
 
-			if (this.trainingsStatus) {
+			if (this.evaluationStatus) {
 
 				// store last fixation point
-				if (this.precisionTrainer.storeFixation()) {
+				if (this.precisionEvaluator.storeFixation()) {
 					this.main
-							.showTrayMessage("Training: fixation position recognized, now place the mouse to the point you look at and press "
+							.showTrayMessage("Evaluation: fixation position recognized, now place the mouse to the point you look at and press "
 									+ this.getCurrentHotkey(1) + " again...");
-					this.trainingsStatus = !(this.trainingsStatus);
+					this.evaluationStatus = !(this.evaluationStatus);
 					break;
 				}
 
 				// indicate error
 				this.main.playError();
 				this.main
-						.showTrayMessage("Training: --WARNING-- failure in recognizing fixation position, please try again...");
+						.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
 				break;
 			}
 
-			if (!this.trainingsStatus) {
+			if (!this.evaluationStatus) {
 				// set mouse position which is associated with the last stored
 				// fixation
-				if (this.precisionTrainer.setMousePosition(MouseInfo
+				if (this.precisionEvaluator.setMousePosition(MouseInfo
 						.getPointerInfo().getLocation())) {
 
 					// indicate success
 					this.main.playDing();
 					this.main
-							.showTrayMessage("Training: mouse position recognized, now look at the next point and press "
+							.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press "
 									+ this.getCurrentHotkey(1) + " again...");
 				} else {
 
 					// indicate failure
 					this.main.playError();
 					this.main
-							.showTrayMessage("Training: --WARNING-- mouse position was out of dimension or processing was already in progress! now look at the next point and press "
+							.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension or processing was already in progress! now look at the next point and press "
 									+ this.getCurrentHotkey(1) + " again...");
 				}
 
 				// toggle status
-				this.trainingsStatus = !(this.trainingsStatus);
+				this.evaluationStatus = !(this.evaluationStatus);
 				break;
 			}
 

@@ -63,7 +63,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** singleton instance of this main */
     private static EvaluatorMain evaluatorMain;
 
-    /** selected *.training files */
+    /** selected *.xml files */
     private ArrayList<File> files;
 
     /** manager which handles the detector plugins, statitic plugin, logging plugin .... */
@@ -143,7 +143,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // set enable/disable and text to some components
         this.buttonStart.setEnabled(false);
         this.buttonStart.setText("Start");
-        this.labelDescription.setText("Step 1: Select *.training files.");
+        this.labelDescription.setText("Step 1: Select *.xml files.");
         this.checkBoxImages.setSelected(true);
         this.checkBoxSummary.setSelected(true);
         this.buttonStart.setEnabled(false);
@@ -317,7 +317,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 // add selected files to array list ...
                 // TODO: add regex to filter other XML-files
                 for (File allFiles : getSelectedFiles())
-                    for (File file : getAllTrainingFiles(allFiles))
+                    for (File file : getAllXMLFiles(allFiles))
                         // ignore duplicates
                         if (!files.contains(file)) files.add(file);
 
@@ -362,19 +362,19 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * return all *.training-files within a directory
+     * return all *.xml-files within a directory
      * 
      * @param file
      * @return arraylist of files
      */
-    private ArrayList<File> getAllTrainingFiles(File file) {
+    private ArrayList<File> getAllXMLFiles(File file) {
         // initialize list
         ArrayList<File> result = new ArrayList<File>();
 
         // if given file is a file ...
         if (file.isFile()) {
 
-            // ... and ends with '.training' ....
+            // ... and ends with '.xml' ....
             if (file.getName().endsWith(".xml")) {
 
                 // return it
@@ -387,7 +387,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
             // ... check all included files
             for (File includedFiles : file.listFiles()) {
-                result.addAll(this.getAllTrainingFiles(includedFiles));
+                result.addAll(this.getAllXMLFiles(includedFiles));
             }
 
             // return results

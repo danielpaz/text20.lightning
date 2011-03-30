@@ -86,7 +86,7 @@ public class ConfigWindow extends JFrame {
     private void buttonCancelActionPerformed(ActionEvent e) {
     }
 
-    private void checkBoxTrainingActionPerformed(ActionEvent e) {
+    private void checkBoxEvaluationActionPerformed(ActionEvent e) {
     }
 
     private void initComponents() {
@@ -111,10 +111,10 @@ public class ConfigWindow extends JFrame {
         checkBoxSound = new JCheckBox();
         separator3 = new JSeparator();
         separator1 = new JSeparator();
-        labelSearchMethod = new JLabel();
-        comboBoxSearchMethod = new JComboBox();
-        labelTraining = new JLabel();
-        checkBoxTraining = new JCheckBox();
+        labelDetector = new JLabel();
+        comboBoxDetector = new JComboBox();
+        labelEvaluation = new JLabel();
+        checkBoxEvaluation = new JCheckBox();
         buttonDetectorConfig = new JButton();
         labelName = new JLabel();
         textFieldName = new JTextField();
@@ -222,31 +222,31 @@ public class ConfigWindow extends JFrame {
                 contentPanel.add(separator3, cc.xywh(11, 7, 7, 1));
                 contentPanel.add(separator1, cc.xywh(1, 9, 7, 1));
 
-                //---- labelSearchMethod ----
-                labelSearchMethod.setText("Search Method");
-                contentPanel.add(labelSearchMethod, cc.xywh(11, 9, 3, 1));
+                //---- labelDetector ----
+                labelDetector.setText("Search Method");
+                contentPanel.add(labelDetector, cc.xywh(11, 9, 3, 1));
 
-                //---- comboBoxSearchMethod ----
-                comboBoxSearchMethod.addActionListener(new ActionListener() {
+                //---- comboBoxDetector ----
+                comboBoxDetector.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         comboBoxSearchMethodActionPerformed(e);
                     }
                 });
-                contentPanel.add(comboBoxSearchMethod, cc.xywh(15, 9, 3, 1));
+                contentPanel.add(comboBoxDetector, cc.xywh(15, 9, 3, 1));
 
-                //---- labelTraining ----
-                labelTraining.setText("Trainingsmode");
-                contentPanel.add(labelTraining, cc.xywh(1, 11, 3, 1));
+                //---- labelEvaluation ----
+                labelEvaluation.setText("Evaluation Mode");
+                contentPanel.add(labelEvaluation, cc.xywh(1, 11, 3, 1));
 
-                //---- checkBoxTraining ----
-                checkBoxTraining.addActionListener(new ActionListener() {
+                //---- checkBoxEvaluation ----
+                checkBoxEvaluation.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        checkBoxTrainingActionPerformed(e);
+                        checkBoxEvaluationActionPerformed(e);
                     }
                 });
-                contentPanel.add(checkBoxTraining, cc.xywh(5, 11, 3, 1));
+                contentPanel.add(checkBoxEvaluation, cc.xywh(5, 11, 3, 1));
 
                 //---- buttonDetectorConfig ----
                 buttonDetectorConfig.setText("text");
@@ -337,10 +337,10 @@ public class ConfigWindow extends JFrame {
     protected JCheckBox checkBoxSound;
     private JSeparator separator3;
     private JSeparator separator1;
-    protected JLabel labelSearchMethod;
-    protected JComboBox comboBoxSearchMethod;
-    private JLabel labelTraining;
-    protected JCheckBox checkBoxTraining;
+    protected JLabel labelDetector;
+    protected JComboBox comboBoxDetector;
+    private JLabel labelEvaluation;
+    protected JCheckBox checkBoxEvaluation;
     protected JButton buttonDetectorConfig;
     protected JLabel labelName;
     protected JTextField textFieldName;

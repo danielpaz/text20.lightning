@@ -89,24 +89,24 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.comboBoxActionHotkey.addActionListener(this);
         this.comboBoxStatusHotkey.addActionListener(this);
         this.checkBoxUseWarp.addActionListener(this);
-        this.checkBoxTraining.addActionListener(this);
+        this.checkBoxEvaluation.addActionListener(this);
         this.buttonDetectorConfig.addActionListener(this);
         this.buttonWarpConfig.addActionListener(this);
         this.comboBoxWarpMethod.addActionListener(this);
-        this.comboBoxSearchMethod.addActionListener(this);
+        this.comboBoxDetector.addActionListener(this);
 
         // initialize checkbox
-        this.checkBoxTraining.setSelected(!MainClass.getInstance().isNormalMode());
-        this.checkBockTrainingActionPerformed();
+        this.checkBoxEvaluation.setSelected(!MainClass.getInstance().isNormalMode());
+        this.checkBockEvaluationActionPerformed();
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
 
         // initializes tooltips
         this.manageToolTips();
 
         // initialize current traings settings
-        this.textFieldName.setText(MainClass.getInstance().getTrainingsSettings()[0]);
-        this.textFieldScreenBright.setText(MainClass.getInstance().getTrainingsSettings()[1]);
-        this.textFieldSettingBright.setText(MainClass.getInstance().getTrainingsSettings()[2]);
+        this.textFieldName.setText(MainClass.getInstance().getEvaluationSettings()[0]);
+        this.textFieldScreenBright.setText(MainClass.getInstance().getEvaluationSettings()[1]);
+        this.textFieldSettingBright.setText(MainClass.getInstance().getEvaluationSettings()[2]);
 
         // show the gui
         repaint();
@@ -157,8 +157,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
             return;
         }
 
-        if (event.getSource() == this.checkBoxTraining) {
-            this.checkBockTrainingActionPerformed();
+        if (event.getSource() == this.checkBoxEvaluation) {
+            this.checkBockEvaluationActionPerformed();
             return;
         }
 
@@ -172,8 +172,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
             return;
         }
 
-        if (event.getSource() == this.comboBoxSearchMethod) {
-            this.comboBoxSearchMethodActionPerformed();
+        if (event.getSource() == this.comboBoxDetector) {
+            this.comboBoxDetectorActionPerformed();
             return;
         }
 
@@ -196,21 +196,21 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.properties.setSoundActivated(this.checkBoxSound.isSelected());
 
         // set new plugins
-        this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxSearchMethod.getSelectedItem()).getId());
+        this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
 
-        // set trainings settings
-        MainClass.getInstance().setTrainingsSettings(settings);
+        // set evaluation settings
+        MainClass.getInstance().setEvaluationSettings(settings);
 
         // refresh warper
         MainClass.getInstance().refreshWarper();
 
         // set mode
-        if (MainClass.getInstance().isNormalMode() && this.checkBoxTraining.isSelected())
+        if (MainClass.getInstance().isNormalMode() && this.checkBoxEvaluation.isSelected())
             MainClass.getInstance().toggleMode();
-        if (!MainClass.getInstance().isNormalMode() && !this.checkBoxTraining.isSelected())
+        if (!MainClass.getInstance().isNormalMode() && !this.checkBoxEvaluation.isSelected())
             MainClass.getInstance().toggleMode();
-        MainClass.getInstance().resetTrainer(this.textFieldName.getText());
+        MainClass.getInstance().resetEvaluator(this.textFieldName.getText());
 
         // close the gui
         this.dispose();
@@ -227,8 +227,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     /**
      * manages the visibility of the configbutton
      */
-    private void comboBoxSearchMethodActionPerformed() {
-        this.buttonDetectorConfig.setEnabled(((PluginInformation)this.comboBoxSearchMethod.getSelectedItem()).isGuiAvailable());
+    private void comboBoxDetectorActionPerformed() {
+        this.buttonDetectorConfig.setEnabled(((PluginInformation)this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
     }
 
     /**
@@ -281,25 +281,25 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     }
 
     /**
-     * fired if the checkbock training is selected
+     * fired if the checkbock evaluation is selected
      */
-    private void checkBockTrainingActionPerformed() {
+    private void checkBockEvaluationActionPerformed() {
         // change enable status of some components
-        this.checkBoxUseWarp.setEnabled(!this.checkBoxTraining.isSelected());
-        this.labelSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
-        this.comboBoxSearchMethod.setEnabled(!this.checkBoxTraining.isSelected());
-        if (!this.checkBoxTraining.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
+        this.checkBoxUseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
+        this.labelDetector.setEnabled(!this.checkBoxEvaluation.isSelected());
+        this.comboBoxDetector.setEnabled(!this.checkBoxEvaluation.isSelected());
+        if (!this.checkBoxEvaluation.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
         else
             this.buttonDetectorConfig.setEnabled(false);
-        this.labelName.setEnabled(this.checkBoxTraining.isSelected());
-        this.textFieldName.setEnabled(this.checkBoxTraining.isSelected());
-        this.labelScreenBright.setEnabled(this.checkBoxTraining.isSelected());
-        this.labelSettingBright.setEnabled(this.checkBoxTraining.isSelected());
-        this.textFieldScreenBright.setEnabled(this.checkBoxTraining.isSelected());
-        this.textFieldSettingBright.setEnabled(this.checkBoxTraining.isSelected());
-        this.labelEnableMouseWarp.setEnabled(!this.checkBoxTraining.isSelected());
+        this.labelName.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.textFieldName.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.labelScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.labelSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.textFieldScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.textFieldSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.labelEnableMouseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
         this.checkBoxUseWarpActionPerformed();
-        if (!this.checkBoxTraining.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
+        if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
     }
@@ -388,15 +388,15 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void manageComboBoxSaliencyDetector() {
         // add all saliency detectors to the combobox
         for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
-            this.comboBoxSearchMethod.addItem(this.internalPluginManager.getSaliencyDetectors().get(i).getInformation());
+            this.comboBoxDetector.addItem(this.internalPluginManager.getSaliencyDetectors().get(i).getInformation());
         }
 
         // preselect the current one
         if (this.internalPluginManager.getCurrentSaliencyDetector() != null)
-            this.comboBoxSearchMethod.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector().getInformation());
+            this.comboBoxDetector.setSelectedItem(this.internalPluginManager.getCurrentSaliencyDetector().getInformation());
 
         // set renderer
-        this.comboBoxSearchMethod.setRenderer(this.renderer);
+        this.comboBoxDetector.setRenderer(this.renderer);
 
         // initialize button
         this.buttonDetectorConfig.setText(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().getDisplayName() + " Configuration");
@@ -448,7 +448,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         String labelStatusHotkeyTT = "<HTML><body>Enables/Disables the hotkeys and the mousewarp.</body></HTML>";
         String labelDimensionTT = "<HTML><body>Radius around the fixation point which is checked<br>for something interesting to click on.</body></HTML>";
         String labelActionHotkeyTT = "<HTML><body>Hotkey to click where you are looking at.</body></HTML>";
-        String labelSearchMethodTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
+        String labelDetectorTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
         
@@ -456,7 +456,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
         this.labelDimension.setToolTipText(labelDimensionTT);
         this.labelActionHotkey.setToolTipText(labelActionHotkeyTT);
-        this.labelSearchMethod.setToolTipText(labelSearchMethodTT);
+        this.labelDetector.setToolTipText(labelDetectorTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
     }
