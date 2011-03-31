@@ -102,7 +102,7 @@ public class DistanceWarper implements MouseWarper {
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Advanced Warper", "Advanced Warper", true);
+        this.information = new PluginInformation("Distance Warper", "Distance Warper", true);
         this.angleFirst = 0;
         this.angleSecLast = 0;
         this.propertie = null;
