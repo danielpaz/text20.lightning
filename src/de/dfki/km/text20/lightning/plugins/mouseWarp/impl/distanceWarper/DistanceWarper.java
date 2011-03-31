@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.gui.ImprovedWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper.gui.DistanceWarperConfigImpl;
 
 /**
  * Simple version of mouse warper which checks angleFirst between
@@ -381,7 +381,7 @@ public class DistanceWarper implements MouseWarper {
     @Override
     public void showGui() {
         // create new gui to show it
-        new ImprovedWarperConfigImpl();
+        new DistanceWarperConfigImpl();
     }
 
     /*

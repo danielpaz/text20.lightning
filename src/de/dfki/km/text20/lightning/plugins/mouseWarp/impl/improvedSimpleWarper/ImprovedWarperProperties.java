@@ -99,7 +99,7 @@ public class ImprovedWarperProperties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("\nImprovedWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius);
+                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius + "\n");
                 }
 
                 // cleanup
@@ -113,7 +113,7 @@ public class ImprovedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nImprovedWarperProperties file was not found.");
+            System.out.println("\nImprovedWarperProperties file was not found.\n");
         }
     }
 

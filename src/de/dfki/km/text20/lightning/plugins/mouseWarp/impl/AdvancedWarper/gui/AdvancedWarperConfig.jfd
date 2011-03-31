@@ -110,7 +110,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Distance Threshold</string> 
+             <string>minimal Speed in Pixel/ms</string> 
             </void> 
             <void property="name"> 
              <string>labelDistanceThreshold</string> 
@@ -140,10 +140,10 @@
             <void method="setProperty"> 
              <string>model</string> 
              <object class="javax.swing.SpinnerNumberModel"> 
-              <int>0</int> 
-              <int>0</int> 
-              <int>2147483647</int> 
-              <int>1</int> 
+              <double>0.0</double> 
+              <double>0.0</double> 
+              <double>2.147483647E9</double> 
+              <double>1.0</double> 
              </object> 
             </void> 
             <void property="name"> 

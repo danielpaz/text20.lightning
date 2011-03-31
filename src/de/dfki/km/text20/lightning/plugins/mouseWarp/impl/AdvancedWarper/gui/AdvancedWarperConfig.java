@@ -64,11 +64,11 @@ public class AdvancedWarperConfig extends JFrame {
                 contentPanel.add(spinnerAngle, cc.xy(5, 1));
 
                 //---- labelDistanceThreshold ----
-                labelDistanceThreshold.setText("Distance Threshold");
+                labelDistanceThreshold.setText("minimal Speed in Pixel/ms");
                 contentPanel.add(labelDistanceThreshold, cc.xywh(1, 3, 3, 1));
 
                 //---- spinnerDistance ----
-                spinnerDistance.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
+                spinnerDistance.setModel(new SpinnerNumberModel(0.0, 0.0, 2.147483647E9, 1.0));
                 contentPanel.add(spinnerDistance, cc.xy(5, 3));
 
                 //---- labelHomeRadius ----

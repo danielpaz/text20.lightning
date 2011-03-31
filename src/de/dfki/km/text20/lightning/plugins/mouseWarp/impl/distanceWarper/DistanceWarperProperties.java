@@ -30,160 +30,175 @@ import java.io.Serializable;
 import org.simpleframework.xml.Attribute;
 
 /**
- * stores configurations, write them to a file on exit and tries to load them on startup 
+ * stores configurations, write them to a file on exit and tries to load them on
+ * startup
  * 
  * @author Christoph Käding
- *
+ * 
  */
 public class DistanceWarperProperties implements Serializable {
 
-    /** generated serial id */
-    private static final long serialVersionUID = 167798295112396454L;
+	/** generated serial id */
+	private static final long serialVersionUID = 167798295112396454L;
 
-    @Attribute
-    /** angle threshold for mousewarping */
-    private int angleThreshold;
+	@Attribute
+	/** angle threshold for mousewarping */
+	private int angleThreshold;
 
-    @Attribute
-    /** distance threshold for mousewarping */
-    private int distanceThreshold;
+	@Attribute
+	/** distance threshold for mousewarping */
+	private int distanceThreshold;
 
-    @Attribute
-    /** home radius for mousewarping */
-    private int homeRadius;
+	@Attribute
+	/** home radius for mousewarping */
+	private int homeRadius;
 
-    /** file where porperties are stored */
-    private File propertiesFile;
+	/** file where porperties are stored */
+	private File propertiesFile;
 
-    /** from properties file readed object */
-    private Object object;
-    
-    /** singleton instance of this properties */
-    private static DistanceWarperProperties properties;
+	/** from properties file readed object */
+	private Object object;
 
-    /**
-     * creates properties, tries to load property file
-     */
-    private DistanceWarperProperties() {
+	/** singleton instance of this properties */
+	private static DistanceWarperProperties properties;
 
-        // creates properties file
-        this.propertiesFile = new File("./plugins/distanceWarperProperties.prop");
+	/**
+	 * creates properties, tries to load property file
+	 */
+	private DistanceWarperProperties() {
 
-        // status is used to indicate if the properties object could be readed probably 
-        boolean status = false;
+		// creates properties file
+		this.propertiesFile = new File(
+				"./plugins/distanceWarperProperties.prop");
 
-        if (this.propertiesFile.exists()) {
-            try {
+		// status is used to indicate if the properties object could be readed
+		// probably
+		boolean status = false;
 
-                // read object from file
-                ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
-                this.object = inputStream.readObject();
+		if (this.propertiesFile.exists()) {
+			try {
 
-                if (this.object instanceof DistanceWarperProperties) {
+				// read object from file
+				ObjectInputStream inputStream = new ObjectInputStream(
+						(new FileInputStream(this.propertiesFile)));
+				this.object = inputStream.readObject();
 
-                    // store readed configurations
-                    this.angleThreshold = ((DistanceWarperProperties) this.object).getAngleThreshold();
-                    this.distanceThreshold = ((DistanceWarperProperties) this.object).getDistanceThreshold();
-                    this.homeRadius = ((DistanceWarperProperties) this.object).getHomeRadius();
+				if (this.object instanceof DistanceWarperProperties) {
 
-                    // reading successful
-                    status = true;
-                    System.out.println("\nDistanceWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
-                }
+					// store readed configurations
+					this.angleThreshold = ((DistanceWarperProperties) this.object)
+							.getAngleThreshold();
+					this.distanceThreshold = ((DistanceWarperProperties) this.object)
+							.getDistanceThreshold();
+					this.homeRadius = ((DistanceWarperProperties) this.object)
+							.getHomeRadius();
 
-                // cleanup
-                inputStream.close();
+					// reading successful
+					status = true;
+					System.out
+							.println("\nDistanceWarperProperties file was found.");
+					System.out.println("angle: " + this.angleThreshold
+							+ ", distance: " + this.distanceThreshold
+							+ ", homeRadius: " + this.homeRadius + "\n");
+				}
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+				// cleanup
+				inputStream.close();
 
-        // if reading was not successful or properties file was not found
-        if (!status) {
-            this.restoreDefault();
-            System.out.println("\nDistanceWarperProperties file was not found.");
-        }
-    }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-    /**
-     * restores default values
-     */
-    public void restoreDefault() {
-        // set default values
-        this.angleThreshold = 10;
-        this.distanceThreshold = 200;
-        this.homeRadius = 200;
-    }
+		// if reading was not successful or properties file was not found
+		if (!status) {
+			this.restoreDefault();
+			System.out
+					.println("\nDistanceWarperProperties file was not found.\n");
+		}
+	}
 
-    /**
-     * creates and returns the singleton instance
-     * 
-     * @return properties
-     */
-    public static DistanceWarperProperties getInstance() {
-        if(properties == null) {
-            properties = new DistanceWarperProperties();
-        }
-        return properties;
-    }
-    
-    /**
-     * @return the angleThreshold
-     */
-    public int getAngleThreshold() {
-        return this.angleThreshold;
-    }
+	/**
+	 * restores default values
+	 */
+	public void restoreDefault() {
+		// set default values
+		this.angleThreshold = 10;
+		this.distanceThreshold = 200;
+		this.homeRadius = 200;
+	}
 
-    /**
-     * @param angleThreshold the angleThreshold to set
-     */
-    public void setAngleThreshold(int angleThreshold) {
-        this.angleThreshold = angleThreshold;
-    }
+	/**
+	 * creates and returns the singleton instance
+	 * 
+	 * @return properties
+	 */
+	public static DistanceWarperProperties getInstance() {
+		if (properties == null) {
+			properties = new DistanceWarperProperties();
+		}
+		return properties;
+	}
 
-    /**
-     * @return the distanceThreshold
-     */
-    public int getDistanceThreshold() {
-        return this.distanceThreshold;
-    }
+	/**
+	 * @return the angleThreshold
+	 */
+	public int getAngleThreshold() {
+		return this.angleThreshold;
+	}
 
-    /**
-     * @param distanceThreshold the distanceThreshold to set
-     */
-    public void setDistanceThreshold(int distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
-    }
+	/**
+	 * @param angleThreshold
+	 *            the angleThreshold to set
+	 */
+	public void setAngleThreshold(int angleThreshold) {
+		this.angleThreshold = angleThreshold;
+	}
 
-    /**
-     * @return the homeRadius
-     */
-    public int getHomeRadius() {
-        return this.homeRadius;
-    }
+	/**
+	 * @return the distanceThreshold
+	 */
+	public int getDistanceThreshold() {
+		return this.distanceThreshold;
+	}
 
-    /**
-     * @param homeRadius the homeRadius to set
-     */
-    public void setHomeRadius(int homeRadius) {
-        this.homeRadius = homeRadius;
-    }
+	/**
+	 * @param distanceThreshold
+	 *            the distanceThreshold to set
+	 */
+	public void setDistanceThreshold(int distanceThreshold) {
+		this.distanceThreshold = distanceThreshold;
+	}
 
-    /**
-     * write properties to propertiesFile
-     */
-    public void writeProperties() {
-        try {
+	/**
+	 * @return the homeRadius
+	 */
+	public int getHomeRadius() {
+		return this.homeRadius;
+	}
 
-            // write object
-            new File("plugins").mkdirs();
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
-            outputStream.writeObject(this);
+	/**
+	 * @param homeRadius
+	 *            the homeRadius to set
+	 */
+	public void setHomeRadius(int homeRadius) {
+		this.homeRadius = homeRadius;
+	}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	/**
+	 * write properties to propertiesFile
+	 */
+	public void writeProperties() {
+		try {
+
+			// write object
+			new File("plugins").mkdirs();
+			ObjectOutputStream outputStream = new ObjectOutputStream(
+					new FileOutputStream(this.propertiesFile));
+			outputStream.writeObject(this);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

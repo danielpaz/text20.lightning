@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.gui.ImprovedWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui.AdvancedWarperConfigImpl;
 
 /**
  * Simple version of mouse warper which checks angleFirst between
@@ -57,7 +57,7 @@ public class AdvancedWarper implements MouseWarper {
     private int angleThres;
 
     /** threshold for the distance */
-    private int distanceThres;
+    private double speed;
 
     /** radius around the fixation within the mouse cursor won't be moved */
     private int homeR;
@@ -98,7 +98,7 @@ public class AdvancedWarper implements MouseWarper {
     public AdvancedWarper() {
         // initialize variables
         this.angleThres = 0;
-        this.distanceThres = 0;
+        this.speed = 0;
         this.homeR = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
@@ -127,7 +127,7 @@ public class AdvancedWarper implements MouseWarper {
         // load variables from properties
         this.propertie = AdvancedWarperProperties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
-        this.distanceThres = this.propertie.getDistanceThreshold();
+        this.speed = this.propertie.getSpeed();
         this.homeR = this.propertie.getHomeRadius();
 
         // refresh map
@@ -193,7 +193,7 @@ public class AdvancedWarper implements MouseWarper {
         // check the distance which the mouse has traveled within the time that
         // is represented by the tree map
         // TODO: change to mouse acceleration
-        if (this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) < this.distanceThres) {
+        if ((this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) / (this.mousePositions.size() * interval)) < this.speed) {
             this.isProcessing = false;
             return;
         }
@@ -381,7 +381,7 @@ public class AdvancedWarper implements MouseWarper {
     @Override
     public void showGui() {
         // create new gui to show it
-        new ImprovedWarperConfigImpl();
+        new AdvancedWarperConfigImpl();
     }
 
     /*
