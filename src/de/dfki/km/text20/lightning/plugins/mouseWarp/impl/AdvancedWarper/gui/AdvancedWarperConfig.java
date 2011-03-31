@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Mar 21 11:10:43 CET 2011
  */
 
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.advancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -20,7 +20,6 @@ public class AdvancedWarperConfig extends JFrame {
     }
 
     private void buttonDefaultActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void initComponents() {
