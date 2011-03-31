@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Mar 21 11:10:43 CET 2011
  */
 
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.advancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,8 +14,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class AdvancedWarperConfig extends JFrame {
-    public AdvancedWarperConfig() {
+public class DistanceWarperConfig extends JFrame {
+    public DistanceWarperConfig() {
         initComponents();
     }
 
@@ -41,7 +41,7 @@ public class AdvancedWarperConfig extends JFrame {
 
         //======== this ========
         setResizable(false);
-        setTitle("Advanced Warper");
+        setTitle("Distance Warper");
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 

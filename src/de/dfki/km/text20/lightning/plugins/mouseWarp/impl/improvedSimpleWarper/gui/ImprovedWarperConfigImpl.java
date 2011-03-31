@@ -1,5 +1,5 @@
 /*
- * AdvancedWarperConfigImpl.java
+ * ImprovedWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -37,7 +37,7 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
     private ImprovedWarperProperties properties;
 
     /**
-     * creates new AdvancedWarperConfigImpl-object and initializes variables
+     * creates new DistanceWarperConfigImpl-object and initializes variables
      */
     public ImprovedWarperConfigImpl() {
         // initialize properties and preselect spinners

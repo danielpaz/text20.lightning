@@ -1,5 +1,5 @@
 /*
- * AdvancedWarper.java
+ * ImprovedSimpleWarper.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -99,7 +99,7 @@ public class ImprovedSimpleWarper implements MouseWarper {
     private boolean isProcessing;
 
     /**
-     * creates a new AdvancedWarper and initializes some variables
+     * creates a new DistanceWarper and initializes some variables
      */
     public ImprovedSimpleWarper() {
         // initialize variables

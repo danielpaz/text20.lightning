@@ -1,5 +1,5 @@
 /*
- * AdvancedWarperConfigImpl.java
+ * DistanceWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.advancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,7 +30,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.I
  *
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
+public class DistanceWarperConfigImpl extends DistanceWarperConfig implements
         ActionListener {
 
     /** current used properties */
@@ -39,7 +39,7 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
-    public AdvancedWarperConfigImpl() {
+    public DistanceWarperConfigImpl() {
         // initialize properties and preselect spinners
         this.properties = ImprovedWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());

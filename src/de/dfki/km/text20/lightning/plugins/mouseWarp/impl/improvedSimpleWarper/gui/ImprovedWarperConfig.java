@@ -45,7 +45,7 @@ public class ImprovedWarperConfig extends JFrame {
 
         //======== this ========
         setResizable(false);
-        setTitle("Improved Simple Sobel");
+        setTitle("Improved Warper");
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 

@@ -18,7 +18,7 @@
       </void> 
       <void method="setProperty"> 
        <string>title</string> 
-       <string>Improved Simple Sobel</string> 
+       <string>Improved Warper</string> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
