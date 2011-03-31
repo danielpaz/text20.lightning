@@ -46,7 +46,7 @@ public class AdvancedWarperProperties implements Serializable {
 
     @Attribute
     /** distance threshold for mousewarping */
-    private int distanceThreshold;
+    private double speed;
 
     @Attribute
     /** home radius for mousewarping */
@@ -83,13 +83,13 @@ public class AdvancedWarperProperties implements Serializable {
 
                     // store readed configurations
                     this.angleThreshold = ((AdvancedWarperProperties) this.object).getAngleThreshold();
-                    this.distanceThreshold = ((AdvancedWarperProperties) this.object).getDistanceThreshold();
+                    this.speed = ((AdvancedWarperProperties) this.object).getSpeed();
                     this.homeRadius = ((AdvancedWarperProperties) this.object).getHomeRadius();
 
                     // reading successful
                     status = true;
                     System.out.println("\nAdvancedWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
+                    System.out.println("angle: " + this.angleThreshold + ", speed: " + this.speed + ", homeRadius: " + this.homeRadius + "\n");
                 }
 
                 // cleanup
@@ -103,7 +103,7 @@ public class AdvancedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nAdvancedWarperProperties file was not found.");
+            System.out.println("\nAdvancedWarperProperties file was not found.\n");
         }
     }
 
@@ -113,7 +113,7 @@ public class AdvancedWarperProperties implements Serializable {
     public void restoreDefault() {
         // set default values
         this.angleThreshold = 10;
-        this.distanceThreshold = 200;
+        this.speed = 1;
         this.homeRadius = 200;
     }
 
@@ -146,15 +146,15 @@ public class AdvancedWarperProperties implements Serializable {
     /**
      * @return the distanceThreshold
      */
-    public int getDistanceThreshold() {
-        return this.distanceThreshold;
+    public double getSpeed() {
+        return this.speed;
     }
 
     /**
-     * @param distanceThreshold the distanceThreshold to set
+     * @param speed , the minimal movement speed
      */
-    public void setDistanceThreshold(int distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     /**

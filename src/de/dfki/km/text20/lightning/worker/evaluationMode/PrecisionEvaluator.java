@@ -200,6 +200,7 @@ public class PrecisionEvaluator {
 				+ this.properties.getDimension());
 		System.out.println(logString);
 		MainClass.getInstance().getChannel().status(logString);
+		MainClass.getInstance().addToStatistic(logString);
 
 		// indicate error
 		if ((this.mousePoint.x > this.properties.getDimension())

@@ -114,6 +114,7 @@ public class FixationEvaluator implements Runnable {
         String logString = "Normal - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
         System.out.println(logString);
         MainClass.getInstance().getChannel().status(logString);
+        MainClass.getInstance().addToStatistic(logString);
 
         // click to calculated target and reset mouseposition
         this.robot.mouseMove(this.fixation.x + this.offset.x, this.fixation.y + this.offset.y);

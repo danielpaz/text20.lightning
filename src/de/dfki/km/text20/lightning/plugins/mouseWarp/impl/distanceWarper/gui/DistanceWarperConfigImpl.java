@@ -23,7 +23,7 @@ package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.ImprovedWarperProperties;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper.DistanceWarperProperties;
 
 /**
  * @author Christoph Käding
@@ -34,14 +34,14 @@ public class DistanceWarperConfigImpl extends DistanceWarperConfig implements
         ActionListener {
 
     /** current used properties */
-    private ImprovedWarperProperties properties;
+    private DistanceWarperProperties properties;
 
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
     public DistanceWarperConfigImpl() {
         // initialize properties and preselect spinners
-        this.properties = ImprovedWarperProperties.getInstance();
+        this.properties = DistanceWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
         this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
         this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());

@@ -36,10 +36,10 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
+import net.xeoh.plugins.meta.statistics.Statistics;
 
 import com.melloware.jintellitype.JIntellitype;
 
-import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
@@ -113,7 +113,17 @@ public class MainClass {
      * @param args
      */
     public static void main(String[] args) {
+    	// initialize main
         MainClass.getInstance().init();
+        
+        // log initial status
+        MainClass.getInstance().addToStatistic("dimension: " + MainClass.getInstance().getProperties().getDimension());
+        MainClass.getInstance().addToStatistic("action hotkey: " + MainClass.getInstance().getProperties().getActionHotkey());
+        MainClass.getInstance().addToStatistic("status hotkey: " + MainClass.getInstance().getProperties().getStatusHotkey());
+        MainClass.getInstance().addToStatistic("use warp: " + MainClass.getInstance().getProperties().isUseWarp());
+        MainClass.getInstance().addToStatistic("sound activated" + MainClass.getInstance().getProperties().isSoundActivated());
+        MainClass.getInstance().addToStatistic("detector: " + MainClass.getInstance().getProperties().getDetectorName());
+        MainClass.getInstance().addToStatistic("warper: " + MainClass.getInstance().getProperties().getWarperName());
     }
 
     /**
@@ -152,9 +162,9 @@ public class MainClass {
 
         // initialize other variables
         this.allFine = false;
-        this.statistics = this.pluginManager.getPlugin(Statistics.class); // FIXME: sth strange with statistic
-        this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.properties = new Properties();
+        this.statistics = this.pluginManager.getPlugin(Statistics.class); 
+        this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
         this.trayIcon = new TraySymbol();
         this.dllStatus = this.checkDll();
@@ -164,7 +174,8 @@ public class MainClass {
         // indicate start
         System.out.println("\nSession started.\n");
         this.channel.status("Session started.");
-
+        this.addToStatistic("Session started.");
+        
         // Creates classes which are needed for the three parts (clicking, warping and evaluation) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
         this.evaluator = new PrecisionEvaluator();
@@ -197,6 +208,7 @@ public class MainClass {
                 this.showTrayMessage("Initializing successful.");
                 System.out.println("\nInitializing successful.\n");
                 this.channel.status("Initializing successful.");
+                this.addToStatistic("Initializing successful.");
 
                 // update status
                 this.allFine = true;
@@ -211,6 +223,7 @@ public class MainClass {
      */
     public static MainClass getInstance() {
         if (main == null) {
+        	// create instance
             main = new MainClass();
         }
         return main;
@@ -222,7 +235,7 @@ public class MainClass {
      * @param text
      */
     public void addToStatistic(String text) {
-        //        this.statistics.
+        this.statistics.collect(text);
     }
 
     /**
@@ -304,6 +317,10 @@ public class MainClass {
 
         // store properties to a file
         this.properties.writeProperties();
+        
+        // update statistics
+        this.addToStatistic("Session closed.");
+        this.statistics.publish();
 
         // close plugins
         this.internalPluginManager.getCurrentMouseWarper().stop();
@@ -351,6 +368,11 @@ public class MainClass {
             // shows change in tray and console
             this.showTrayMessage("Modus: evaluation mode activated");
 
+            // update settings to statistic
+            this.addToStatistic("evaluation activated");
+            this.addToStatistic("screen brighness: " + this.getEvaluationSettings()[1]);
+            this.addToStatistic("setting brightness: " + this.getEvaluationSettings()[2]);
+            
             // change mode
             this.isNormalMode = false;
 
@@ -476,7 +498,6 @@ public class MainClass {
      * 
      * @return true if it is there or the copy was successful 
      */
-    // FIXME: works only with admin rights
     private boolean checkDll() {
 
         // create target file

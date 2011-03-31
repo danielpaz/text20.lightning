@@ -62,13 +62,17 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
 
     /** renderer to show displaynames in comboboxes */
     private DefaultListCellRenderer renderer;
+    
+    /** instance of the mainclass */
+    private MainClass main;
 
     /**
      * builds the window with all its components and shows it
      */
     public ConfigWindowImpl() {
-        this.internalPluginManager = MainClass.getInstance().getInternalPluginManager();
-        this.properties = MainClass.getInstance().getProperties();
+    	this.main = MainClass.getInstance();
+        this.internalPluginManager = this.main.getInternalPluginManager();
+        this.properties = this.main.getProperties();
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
@@ -99,7 +103,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.mainFrame.addWindowListener(this);
 
         // initialize checkbox
-        this.checkBoxEvaluation.setSelected(!MainClass.getInstance().isNormalMode());
+        this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
         this.checkBockEvaluationActionPerformed();
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
 
@@ -107,9 +111,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.manageToolTips();
 
         // initialize current traings settings
-        this.textFieldName.setText(MainClass.getInstance().getEvaluationSettings()[0]);
-        this.textFieldScreenBright.setText(MainClass.getInstance().getEvaluationSettings()[1]);
-        this.textFieldSettingBright.setText(MainClass.getInstance().getEvaluationSettings()[2]);
+        this.textFieldName.setText(this.main.getEvaluationSettings()[0]);
+        this.textFieldScreenBright.setText(this.main.getEvaluationSettings()[1]);
+        this.textFieldSettingBright.setText(this.main.getEvaluationSettings()[2]);
 
         // show the gui
         this.mainFrame.repaint();
@@ -208,18 +212,28 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
 
         // set evaluation settings
-        MainClass.getInstance().setEvaluationSettings(settings);
+        this.main.setEvaluationSettings(settings);
 
         // refresh warper
-        MainClass.getInstance().refreshWarper();
+        this.main.refreshWarper();
 
         // set mode
-        if (MainClass.getInstance().isNormalMode() && this.checkBoxEvaluation.isSelected())
-            MainClass.getInstance().toggleMode();
-        if (!MainClass.getInstance().isNormalMode() && !this.checkBoxEvaluation.isSelected())
-            MainClass.getInstance().toggleMode();
-        MainClass.getInstance().resetEvaluator(this.textFieldName.getText());
+        if (this.main.isNormalMode() && this.checkBoxEvaluation.isSelected())
+            this.main.toggleMode();
+        if (!this.main.isNormalMode() && !this.checkBoxEvaluation.isSelected())
+            this.main.toggleMode();
+        this.main.resetEvaluator(this.textFieldName.getText());
 
+        // update statistics
+        this.main.addToStatistic("settings changed");
+        this.main.addToStatistic("dimension: " + this.main.getProperties().getDimension());
+        this.main.addToStatistic("action hotkey: " + this.main.getProperties().getActionHotkey());
+        this.main.addToStatistic("status hotkey: " + this.main.getProperties().getStatusHotkey());
+        this.main.addToStatistic("use warp: " + this.main.getProperties().isUseWarp());
+        this.main.addToStatistic("sound activated" + this.main.getProperties().isSoundActivated());
+        this.main.addToStatistic("detector: " + this.main.getProperties().getDetectorName());
+        this.main.addToStatistic("warper: " + this.main.getProperties().getWarperName());
+        
         // close the gui
         this.mainFrame.dispose();
     }
@@ -253,14 +267,14 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * Fired if the Detector Config button is clicked. Shows the configdialog.
      */
     private void buttonDetectorConfigActionPerformed() {
-        this.internalPluginManager.getCurrentSaliencyDetector().showGui();
+    	this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation)this.comboBoxDetector.getSelectedItem()).getId()).showGui();
     }
 
     /**
      * Fired if the Warper Config button is clicked. Shows the configdialog.
      */
     private void buttonWarpConfigActionPerformed() {
-        this.internalPluginManager.getCurrentMouseWarper().showGui();
+        this.internalPluginManager.getMouseWarpers().get(((PluginInformation)this.comboBoxWarpMethod.getSelectedItem()).getId()).showGui();
     }
 
     /**
