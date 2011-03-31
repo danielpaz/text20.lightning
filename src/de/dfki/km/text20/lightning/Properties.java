@@ -135,6 +135,7 @@ public class Properties implements Serializable {
         // set default values
         this.dimension = 200;
         this.actionHotkey = null;
+        this.statusHotkey = null;
         this.useWarp = true;
         this.warperName = "";
         this.detectorName = "";
