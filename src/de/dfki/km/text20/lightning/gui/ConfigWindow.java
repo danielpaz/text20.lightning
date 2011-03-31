@@ -50,7 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * @author Christoph Käding
  */
 @SuppressWarnings("all")
-public class ConfigWindow extends JFrame {
+public class ConfigWindow {
 
     public ConfigWindow() {
         initComponents();
@@ -96,6 +96,7 @@ public class ConfigWindow extends JFrame {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
+        mainFrame = new JFrame();
         dialogPane = new JPanel();
         contentPanel = new JPanel();
         labelActionHotkey = new JLabel();
@@ -133,195 +134,198 @@ public class ConfigWindow extends JFrame {
         buttonCancel = new JButton();
         CellConstraints cc = new CellConstraints();
 
-        //======== this ========
-        setTitle("Project Lightning (Desktop)");
-        setResizable(false);
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout());
-
-        //======== dialogPane ========
+        //======== mainFrame ========
         {
-            dialogPane.setBorder(Borders.DIALOG_BORDER);
-            dialogPane.setLayout(new BoxLayout(dialogPane, BoxLayout.X_AXIS));
+            mainFrame.setTitle("Project Lightning (Desktop)");
+            mainFrame.setResizable(false);
+            Container mainFrameContentPane = mainFrame.getContentPane();
+            mainFrameContentPane.setLayout(new GridLayout());
 
-            //======== contentPanel ========
+            //======== dialogPane ========
             {
-                contentPanel.setLayout(new FormLayout(
-                    "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu)",
-                    "3*(default, $lgap), [7dlu,default], 2*($lgap, default), $lgap, 15dlu, 2*($lgap, default)"));
+                dialogPane.setBorder(Borders.DIALOG_BORDER);
+                dialogPane.setLayout(new BoxLayout(dialogPane, BoxLayout.X_AXIS));
 
-                //---- labelActionHotkey ----
-                labelActionHotkey.setText("Action Hotkey");
-                labelActionHotkey.setIcon(null);
-                contentPanel.add(labelActionHotkey, cc.xywh(1, 1, 3, 1));
+                //======== contentPanel ========
+                {
+                    contentPanel.setLayout(new FormLayout(
+                        "4*(30dlu, $lcgap), 3dlu, 4*($lcgap, 30dlu)",
+                        "3*(default, $lgap), [7dlu,default], 2*($lgap, default), $lgap, 15dlu, 2*($lgap, default)"));
 
-                //---- comboBoxActionHotkey ----
-                comboBoxActionHotkey.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        comboBoxActionHotkeyActionPerformed(e);
-                    }
-                });
-                contentPanel.add(comboBoxActionHotkey, cc.xywh(5, 1, 3, 1));
+                    //---- labelActionHotkey ----
+                    labelActionHotkey.setText("Action Hotkey");
+                    labelActionHotkey.setIcon(null);
+                    contentPanel.add(labelActionHotkey, cc.xywh(1, 1, 3, 1));
 
-                //---- separator4 ----
-                separator4.setOrientation(SwingConstants.VERTICAL);
-                contentPanel.add(separator4, cc.xy(9, 1));
+                    //---- comboBoxActionHotkey ----
+                    comboBoxActionHotkey.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            comboBoxActionHotkeyActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(comboBoxActionHotkey, cc.xywh(5, 1, 3, 1));
 
-                //---- separator5 ----
-                separator5.setOrientation(SwingConstants.VERTICAL);
-                contentPanel.add(separator5, cc.xywh(9, 1, 1, 17));
+                    //---- separator4 ----
+                    separator4.setOrientation(SwingConstants.VERTICAL);
+                    contentPanel.add(separator4, cc.xy(9, 1));
 
-                //---- labelEnableMouseWarp ----
-                labelEnableMouseWarp.setText("Enable Mouse Warp");
-                contentPanel.add(labelEnableMouseWarp, cc.xywh(11, 1, 3, 1));
+                    //---- separator5 ----
+                    separator5.setOrientation(SwingConstants.VERTICAL);
+                    contentPanel.add(separator5, cc.xywh(9, 1, 1, 17));
 
-                //---- checkBoxUseWarp ----
-                checkBoxUseWarp.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        checkBoxUseWarpActionPerformed(e);
-                    }
-                });
-                contentPanel.add(checkBoxUseWarp, cc.xywh(15, 1, 3, 1));
+                    //---- labelEnableMouseWarp ----
+                    labelEnableMouseWarp.setText("Enable Mouse Warp");
+                    contentPanel.add(labelEnableMouseWarp, cc.xywh(11, 1, 3, 1));
 
-                //---- labelStatusHotkey ----
-                labelStatusHotkey.setText("Status Hotkey");
-                contentPanel.add(labelStatusHotkey, cc.xywh(1, 3, 3, 1));
+                    //---- checkBoxUseWarp ----
+                    checkBoxUseWarp.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            checkBoxUseWarpActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(checkBoxUseWarp, cc.xywh(15, 1, 3, 1));
 
-                //---- comboBoxStatusHotkey ----
-                comboBoxStatusHotkey.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        comboBoxStatusHotkeyActionPerformed(e);
-                    }
-                });
-                contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 3, 3, 1));
+                    //---- labelStatusHotkey ----
+                    labelStatusHotkey.setText("Status Hotkey");
+                    contentPanel.add(labelStatusHotkey, cc.xywh(1, 3, 3, 1));
 
-                //---- labelWarpMethod ----
-                labelWarpMethod.setText("Warp Method");
-                contentPanel.add(labelWarpMethod, cc.xywh(11, 3, 3, 1));
-                contentPanel.add(comboBoxWarpMethod, cc.xywh(15, 3, 3, 1));
+                    //---- comboBoxStatusHotkey ----
+                    comboBoxStatusHotkey.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            comboBoxStatusHotkeyActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(comboBoxStatusHotkey, cc.xywh(5, 3, 3, 1));
 
-                //---- labelDimension ----
-                labelDimension.setText("Dimension");
-                labelDimension.setIcon(null);
-                contentPanel.add(labelDimension, cc.xywh(1, 5, 3, 1));
+                    //---- labelWarpMethod ----
+                    labelWarpMethod.setText("Warp Method");
+                    contentPanel.add(labelWarpMethod, cc.xywh(11, 3, 3, 1));
+                    contentPanel.add(comboBoxWarpMethod, cc.xywh(15, 3, 3, 1));
 
-                //---- spinnerDimension ----
-                spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
-                contentPanel.add(spinnerDimension, cc.xywh(5, 5, 3, 1));
+                    //---- labelDimension ----
+                    labelDimension.setText("Dimension");
+                    labelDimension.setIcon(null);
+                    contentPanel.add(labelDimension, cc.xywh(1, 5, 3, 1));
 
-                //---- buttonWarpConfig ----
-                buttonWarpConfig.setText("text");
-                contentPanel.add(buttonWarpConfig, cc.xywh(11, 5, 7, 1));
+                    //---- spinnerDimension ----
+                    spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+                    contentPanel.add(spinnerDimension, cc.xywh(5, 5, 3, 1));
 
-                //---- labelSound ----
-                labelSound.setText("Sound");
-                contentPanel.add(labelSound, cc.xy(1, 7));
+                    //---- buttonWarpConfig ----
+                    buttonWarpConfig.setText("text");
+                    contentPanel.add(buttonWarpConfig, cc.xywh(11, 5, 7, 1));
 
-                //---- checkBoxSound ----
-                checkBoxSound.setSelectedIcon(null);
-                contentPanel.add(checkBoxSound, cc.xywh(5, 7, 3, 1));
-                contentPanel.add(separator3, cc.xywh(11, 7, 7, 1));
-                contentPanel.add(separator1, cc.xywh(1, 9, 7, 1));
+                    //---- labelSound ----
+                    labelSound.setText("Sound");
+                    contentPanel.add(labelSound, cc.xy(1, 7));
 
-                //---- labelDetector ----
-                labelDetector.setText("Detector");
-                contentPanel.add(labelDetector, cc.xywh(11, 9, 3, 1));
+                    //---- checkBoxSound ----
+                    checkBoxSound.setSelectedIcon(null);
+                    contentPanel.add(checkBoxSound, cc.xywh(5, 7, 3, 1));
+                    contentPanel.add(separator3, cc.xywh(11, 7, 7, 1));
+                    contentPanel.add(separator1, cc.xywh(1, 9, 7, 1));
 
-                //---- comboBoxDetector ----
-                comboBoxDetector.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        comboBoxSearchMethodActionPerformed(e);
-                    }
-                });
-                contentPanel.add(comboBoxDetector, cc.xywh(15, 9, 3, 1));
+                    //---- labelDetector ----
+                    labelDetector.setText("Detector");
+                    contentPanel.add(labelDetector, cc.xywh(11, 9, 3, 1));
 
-                //---- labelEvaluation ----
-                labelEvaluation.setText("Evaluation Mode");
-                contentPanel.add(labelEvaluation, cc.xywh(1, 11, 3, 1));
+                    //---- comboBoxDetector ----
+                    comboBoxDetector.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            comboBoxSearchMethodActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(comboBoxDetector, cc.xywh(15, 9, 3, 1));
 
-                //---- checkBoxEvaluation ----
-                checkBoxEvaluation.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        checkBoxTrainingActionPerformed(e);
-                    }
-                });
-                contentPanel.add(checkBoxEvaluation, cc.xywh(5, 11, 3, 1));
+                    //---- labelEvaluation ----
+                    labelEvaluation.setText("Evaluation Mode");
+                    contentPanel.add(labelEvaluation, cc.xywh(1, 11, 3, 1));
 
-                //---- buttonDetectorConfig ----
-                buttonDetectorConfig.setText("text");
-                contentPanel.add(buttonDetectorConfig, cc.xywh(11, 11, 7, 1));
+                    //---- checkBoxEvaluation ----
+                    checkBoxEvaluation.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            checkBoxTrainingActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(checkBoxEvaluation, cc.xywh(5, 11, 3, 1));
 
-                //---- labelName ----
-                labelName.setText("Unsername");
-                contentPanel.add(labelName, cc.xywh(1, 13, 3, 1));
-                contentPanel.add(textFieldName, cc.xywh(5, 13, 3, 1));
-                contentPanel.add(separator6, cc.xywh(11, 13, 7, 1));
+                    //---- buttonDetectorConfig ----
+                    buttonDetectorConfig.setText("text");
+                    contentPanel.add(buttonDetectorConfig, cc.xywh(11, 11, 7, 1));
 
-                //---- labelScreenBright ----
-                labelScreenBright.setText("Screen Brightness");
-                contentPanel.add(labelScreenBright, cc.xywh(1, 15, 3, 1));
-                contentPanel.add(textFieldScreenBright, cc.xywh(5, 15, 3, 1));
+                    //---- labelName ----
+                    labelName.setText("Unsername");
+                    contentPanel.add(labelName, cc.xywh(1, 13, 3, 1));
+                    contentPanel.add(textFieldName, cc.xywh(5, 13, 3, 1));
+                    contentPanel.add(separator6, cc.xywh(11, 13, 7, 1));
 
-                //---- buttonDefault ----
-                buttonDefault.setText("Default");
-                buttonDefault.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        buttonDefaultActionPerformed(e);
-                    }
-                });
-                contentPanel.add(buttonDefault, cc.xywh(11, 15, 3, 1));
+                    //---- labelScreenBright ----
+                    labelScreenBright.setText("Screen Brightness");
+                    contentPanel.add(labelScreenBright, cc.xywh(1, 15, 3, 1));
+                    contentPanel.add(textFieldScreenBright, cc.xywh(5, 15, 3, 1));
 
-                //---- buttonSubmit ----
-                buttonSubmit.setText("Submit");
-                buttonSubmit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        buttonSubmitActionPerformed(e);
-                    }
-                });
-                contentPanel.add(buttonSubmit, cc.xywh(15, 15, 3, 1));
+                    //---- buttonDefault ----
+                    buttonDefault.setText("Default");
+                    buttonDefault.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonDefaultActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonDefault, cc.xywh(11, 15, 3, 1));
 
-                //---- labelSettingBright ----
-                labelSettingBright.setText("Setting Brightness");
-                contentPanel.add(labelSettingBright, cc.xywh(1, 17, 3, 1));
-                contentPanel.add(textFieldSettingBright, cc.xywh(5, 17, 3, 1));
+                    //---- buttonSubmit ----
+                    buttonSubmit.setText("Submit");
+                    buttonSubmit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonSubmitActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonSubmit, cc.xywh(15, 15, 3, 1));
 
-                //---- buttonOK ----
-                buttonOK.setText("OK");
-                buttonOK.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        buttonOKActionPerformed(e);
-                    }
-                });
-                contentPanel.add(buttonOK, cc.xywh(11, 17, 3, 1));
+                    //---- labelSettingBright ----
+                    labelSettingBright.setText("Setting Brightness");
+                    contentPanel.add(labelSettingBright, cc.xywh(1, 17, 3, 1));
+                    contentPanel.add(textFieldSettingBright, cc.xywh(5, 17, 3, 1));
 
-                //---- buttonCancel ----
-                buttonCancel.setText("Cancel");
-                buttonCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        buttonCancelActionPerformed(e);
-                    }
-                });
-                contentPanel.add(buttonCancel, cc.xywh(15, 17, 3, 1));
+                    //---- buttonOK ----
+                    buttonOK.setText("OK");
+                    buttonOK.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonOKActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonOK, cc.xywh(11, 17, 3, 1));
+
+                    //---- buttonCancel ----
+                    buttonCancel.setText("Cancel");
+                    buttonCancel.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonCancelActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonCancel, cc.xywh(15, 17, 3, 1));
+                }
+                dialogPane.add(contentPanel);
             }
-            dialogPane.add(contentPanel);
+            mainFrameContentPane.add(dialogPane);
+            mainFrame.setSize(430, 290);
+            mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
-        contentPane.add(dialogPane);
-        setSize(430, 290);
-        setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner non-commercial license
+    protected JFrame mainFrame;
     private JPanel dialogPane;
     private JPanel contentPanel;
     protected JLabel labelActionHotkey;
