@@ -1,5 +1,5 @@
 /*
- * AdvancedWarper.java
+ * DistanceWarper.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.advancedWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.distanceWarper;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -51,7 +51,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.improvedSimpleWarper.g
  * 
  */
 @PluginImplementation
-public class AdvancedWarper implements MouseWarper {
+public class DistanceWarper implements MouseWarper {
 
     /** threshold for the angleFirst */
     private int angleThres;
@@ -87,7 +87,7 @@ public class AdvancedWarper implements MouseWarper {
     private long secondLastKey;
 
     /** stored properties for this plugin */
-    private AdvancedWarperProperties propertie;
+    private DistanceWarperProperties propertie;
 
     /** indicates if any calculations are already running */
     private boolean isProcessing;
@@ -95,7 +95,7 @@ public class AdvancedWarper implements MouseWarper {
     /**
      * creates a new DistanceWarper and initializes some variables
      */
-    public AdvancedWarper() {
+    public DistanceWarper() {
         // initialize variables
         this.angleThres = 0;
         this.distanceThres = 0;
@@ -125,7 +125,7 @@ public class AdvancedWarper implements MouseWarper {
     @Override
     public void start() {
         // load variables from properties
-        this.propertie = AdvancedWarperProperties.getInstance();
+        this.propertie = DistanceWarperProperties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
         this.distanceThres = this.propertie.getDistanceThreshold();
         this.homeR = this.propertie.getHomeRadius();

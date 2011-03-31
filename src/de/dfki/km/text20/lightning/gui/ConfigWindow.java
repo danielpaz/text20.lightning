@@ -90,7 +90,6 @@ public class ConfigWindow {
     }
 
     private void checkBoxTrainingActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void initComponents() {

@@ -185,7 +185,6 @@ public class FixationCatcher {
 
             @Override
             public boolean requireUnfilteredEvents() {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
