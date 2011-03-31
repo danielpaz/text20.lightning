@@ -38,7 +38,7 @@ import org.simpleframework.xml.Attribute;
 public class DistanceWarperProperties implements Serializable {
 
     /** generated serial id */
-    private static final long serialVersionUID = -4766853585658130189L;
+    private static final long serialVersionUID = 167798295112396454L;
 
     @Attribute
     /** angle threshold for mousewarping */
@@ -67,7 +67,7 @@ public class DistanceWarperProperties implements Serializable {
     private DistanceWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/advancedWarperProperties.prop");
+        this.propertiesFile = new File("./plugins/distanceWarperProperties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -88,7 +88,7 @@ public class DistanceWarperProperties implements Serializable {
 
                     // reading successful
                     status = true;
-                    System.out.println("\nAdvancedWarperProperties file was found.");
+                    System.out.println("\nDistanceWarperProperties file was found.");
                     System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
                 }
 
@@ -103,7 +103,7 @@ public class DistanceWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nImprovedWarperProperties file was not found.");
+            System.out.println("\nDistanceWarperProperties file was not found.");
         }
     }
 

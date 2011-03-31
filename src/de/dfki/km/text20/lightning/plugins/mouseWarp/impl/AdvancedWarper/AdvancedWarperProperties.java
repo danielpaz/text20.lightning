@@ -103,7 +103,7 @@ public class AdvancedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nImprovedWarperProperties file was not found.");
+            System.out.println("\nAdvancedWarperProperties file was not found.");
         }
     }
 

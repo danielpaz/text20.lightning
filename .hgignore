@@ -25,3 +25,5 @@ syntax: regexp
 ^plugins/advancedWarperProperties\.prop$
 syntax: regexp
 ^evaluation$
+syntax: regexp
+^plugins$
