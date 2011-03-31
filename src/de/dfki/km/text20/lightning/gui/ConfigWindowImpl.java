@@ -121,6 +121,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
+        // check if the event is fired by a automatic selection
+        if (this.autoSelect) return;
+
         // check which source occurs the action event and start a handle function
         if (event.getSource() == this.buttonOK) {
             this.buttonOKActionPerformed();
@@ -188,8 +191,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     protected void buttonOKActionPerformed() {
         // initialize temporary variables
-        String[] settings = {this.textFieldName.getText(), this.textFieldScreenBright.getText(), this.textFieldSettingBright.getText()};
-        
+        String[] settings = { this.textFieldName.getText(), this.textFieldScreenBright.getText(), this.textFieldSettingBright.getText() };
+
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
@@ -228,14 +231,14 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * manages the visibility of the configbutton
      */
     private void comboBoxDetectorActionPerformed() {
-        this.buttonDetectorConfig.setEnabled(((PluginInformation)this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
+        this.buttonDetectorConfig.setEnabled(((PluginInformation) this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
     }
 
     /**
      * manages the visibility of the configbutton
      */
     private void comboBoxWarpMethodActionPerformed() {
-        this.buttonWarpConfig.setEnabled(((PluginInformation)this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
+        this.buttonWarpConfig.setEnabled(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
     }
 
     /**
@@ -261,6 +264,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
+        this.checkBoxSound.setSelected(this.properties.isSoundActivated());
 
         // manage comboboxes
         this.manageHotkeyComboBox();
@@ -274,10 +278,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Fired if something changed at the actionhotkey combobox. Sets the choosed hotkey as actionhotkey.
      */
     private void comboBoxActionHotkeyActionPerformed() {
-        if (!this.autoSelect) {
-            Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()));
-            this.manageHotkeyComboBox();
-        }
+        Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()));
+        this.manageHotkeyComboBox();
     }
 
     /**
@@ -309,10 +311,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     // TODO: only apply when OK is clicked
     private void comboBoxStatusHotkeyActionPerformed() {
-        if (!this.autoSelect) {
-            Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()));
-            this.manageHotkeyComboBox();
-        }
+        Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()));
+        this.manageHotkeyComboBox();
     }
 
     /**
@@ -386,6 +386,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Takes the list of available plugins and shows them in the combobox.
      */
     private void manageComboBoxSaliencyDetector() {
+        // remove content
+        this.autoSelect = true;
+        this.comboBoxDetector.removeAllItems();
+        this.autoSelect = false;
+
         // add all saliency detectors to the combobox
         for (int i = 0; i < this.internalPluginManager.getSaliencyDetectors().size(); i++) {
             this.comboBoxDetector.addItem(this.internalPluginManager.getSaliencyDetectors().get(i).getInformation());
@@ -400,7 +405,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // initialize button
         this.buttonDetectorConfig.setText(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().getDisplayName() + " Configuration");
-        this.buttonDetectorConfig.setEnabled(this.internalPluginManager.getCurrentMouseWarper().getInformation().isGuiAvailable());
+        this.buttonDetectorConfig.setEnabled(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable());
     }
 
     /**
@@ -409,6 +414,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     private void manageWarpConfig() {
         // preselect values
         this.checkBoxUseWarp.setSelected(this.properties.isUseWarp());
+
+        // remove values
+        this.autoSelect = true;
+        this.comboBoxWarpMethod.removeAllItems();
+        this.autoSelect = false;
 
         // manage combobox
         for (MouseWarper warper : this.internalPluginManager.getMouseWarpers())
@@ -451,7 +461,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         String labelDetectorTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
-        
+
         // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
         this.labelDimension.setToolTipText(labelDimensionTT);
