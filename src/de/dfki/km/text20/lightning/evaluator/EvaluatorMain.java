@@ -481,8 +481,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowActivated(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -490,8 +488,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowClosed(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -511,8 +507,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowDeactivated(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -520,8 +514,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowDeiconified(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -529,8 +521,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowIconified(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -538,8 +528,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowOpened(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     /**

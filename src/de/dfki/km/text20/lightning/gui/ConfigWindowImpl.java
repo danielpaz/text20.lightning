@@ -23,6 +23,8 @@ package de.dfki.km.text20.lightning.gui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -43,7 +45,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
  *
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
+public class ConfigWindowImpl extends ConfigWindow implements ActionListener, WindowListener {
 
     /**
      * manageHotkeyComboBox() changes the items and selection of the actionHotkey and the statusHotkey comboboxes.
@@ -94,6 +96,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.buttonWarpConfig.addActionListener(this);
         this.comboBoxWarpMethod.addActionListener(this);
         this.comboBoxDetector.addActionListener(this);
+        this.mainFrame.addWindowListener(this);
 
         // initialize checkbox
         this.checkBoxEvaluation.setSelected(!MainClass.getInstance().isNormalMode());
@@ -109,8 +112,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.textFieldSettingBright.setText(MainClass.getInstance().getEvaluationSettings()[2]);
 
         // show the gui
-        repaint();
-        setVisible(true);
+        this.mainFrame.repaint();
+        this.mainFrame.setVisible(true);
     }
 
     /* (non-Javadoc)
@@ -197,6 +200,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
         this.properties.setSoundActivated(this.checkBoxSound.isSelected());
+        Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()), true);
+        Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()), true);
 
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId());
@@ -216,7 +221,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         MainClass.getInstance().resetEvaluator(this.textFieldName.getText());
 
         // close the gui
-        this.dispose();
+        this.mainFrame.dispose();
     }
 
     /**
@@ -224,7 +229,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      */
     private void buttonCancelActionPerformed() {
         // close the window
-        this.dispose();
+        this.mainFrame.dispose();
+        
+        // reset temporary keys
+        Hotkey.getInstance().resetTmpKeys();
     }
 
     /**
@@ -265,7 +273,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
-
+        
+        // make hotkey notifying the change
+        Hotkey.getInstance().resetTmpKeys();
+        Hotkey.getInstance().getCurrentHotkey(1, true);
+        Hotkey.getInstance().getCurrentHotkey(2, true);
+        
         // manage comboboxes
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
@@ -278,7 +291,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
      * Fired if something changed at the actionhotkey combobox. Sets the choosed hotkey as actionhotkey.
      */
     private void comboBoxActionHotkeyActionPerformed() {
-        Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()));
+        Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()), false);
         this.manageHotkeyComboBox();
     }
 
@@ -309,9 +322,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
     /**
      * Fired if something changed at the statushotkey combobox. Sets the choosed hotkey as statushotkey.
      */
-    // TODO: only apply when OK is clicked
     private void comboBoxStatusHotkeyActionPerformed() {
-        Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()));
+        Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()), false);
         this.manageHotkeyComboBox();
     }
 
@@ -359,22 +371,22 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
 
         // adds all hotkeys to the specific comboboxes which are not selected by the other function
         for (int i = 0; i < Hotkey.getInstance().getHotkeys().size(); i++) {
-            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(2).toString()))
+            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(2, false).toString()))
                 this.comboBoxActionHotkey.addItem(Hotkey.getInstance().getHotkeys().get(i));
         }
         for (int i = 0; i < Hotkey.getInstance().getHotkeys().size(); i++) {
-            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(1).toString()))
+            if (!Hotkey.getInstance().getHotkeys().get(i).toString().equals(Hotkey.getInstance().getCurrentHotkey(1, false).toString()))
                 this.comboBoxStatusHotkey.addItem(Hotkey.getInstance().getHotkeys().get(i));
         }
 
         // preselect property values
         for (int i = 0; i < this.comboBoxActionHotkey.getItemCount(); i++) {
-            if (Hotkey.getInstance().getCurrentHotkey(1).toString().equals(this.comboBoxActionHotkey.getItemAt(i).toString())) {
+            if (Hotkey.getInstance().getCurrentHotkey(1, false).toString().equals(this.comboBoxActionHotkey.getItemAt(i).toString())) {
                 this.comboBoxActionHotkey.setSelectedIndex(i);
             }
         }
         for (int i = 0; i < this.comboBoxStatusHotkey.getItemCount(); i++) {
-            if (Hotkey.getInstance().getCurrentHotkey(2).toString().equals(this.comboBoxStatusHotkey.getItemAt(i).toString())) {
+            if (Hotkey.getInstance().getCurrentHotkey(2, false).toString().equals(this.comboBoxStatusHotkey.getItemAt(i).toString())) {
                 this.comboBoxStatusHotkey.setSelectedIndex(i);
             }
         }
@@ -469,5 +481,55 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener {
         this.labelDetector.setToolTipText(labelDetectorTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowClosed(WindowEvent e) { 
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowClosing(WindowEvent e) { 
+        Hotkey.getInstance().resetTmpKeys();   
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+     */
+    @Override
+    public void windowOpened(WindowEvent e) {
     }
 }
