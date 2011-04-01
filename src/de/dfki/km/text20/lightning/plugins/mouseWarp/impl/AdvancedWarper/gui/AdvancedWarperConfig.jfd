@@ -55,7 +55,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Angle Threshold</string> 
+             <string>Angle Threshold in Degree</string> 
             </void> 
             <void property="name"> 
              <string>labelAngleThreshold</string> 
@@ -113,7 +113,7 @@
              <string>minimal Speed in Pixel/ms</string> 
             </void> 
             <void property="name"> 
-             <string>labelDistanceThreshold</string> 
+             <string>labelSpeed</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -147,7 +147,7 @@
              </object> 
             </void> 
             <void property="name"> 
-             <string>spinnerDistance</string> 
+             <string>spinnerSpeed</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -173,10 +173,10 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Home Radius</string> 
+             <string>Home Radius in Piexel</string> 
             </void> 
             <void property="name"> 
-             <string>labelHomeRadius</string> 
+             <string>labelReactionTime</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -210,7 +210,7 @@
              </object> 
             </void> 
             <void property="name"> 
-             <string>spinnerHomeRadius</string> 
+             <string>spinnerReactionTime</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 

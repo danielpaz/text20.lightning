@@ -195,14 +195,14 @@ public class EvaluatorWorker {
 
         for (String path : this.overAllPath) {
             if (this.main.writeLog())
-                $(path).file().append("- overall results for this session -\n\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\n");
+                $(path).file().append("- overall results for this session -\r\n\r\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\r\n");
 
             // run through all included ids
             for (int id : this.overAllResults.getIds()) {
 
                 // write result to log
                 if (this.main.writeLog())
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\n");
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\r\n");
 
                 // check if the current value is better then the best value
                 if (veryBestValue > this.overAllResults.getAveragedDistance(id)) {
@@ -213,7 +213,7 @@ public class EvaluatorWorker {
                 }
             }
             if (this.main.writeLog())
-                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\n\n\n- detailed evaluation per usersession -\n\n");
+                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
 
             // log best result
             this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
@@ -236,13 +236,13 @@ public class EvaluatorWorker {
                 // write the evaluation.log
                 if (this.main.writeLog()) {
                     if (i == 0) {
-                        $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + "\nTimestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\n");
-                        $(this.results.get(key).getLogPath()).file().append("Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\nScreen Brightness: " + this.settings.get(key).getScreenBright() + ", Setting Brightness: " + this.settings.get(key).getSettingBright() + "\n");
-                        $(this.results.get(key).getLogPath()).file().append("Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\n");
+                        $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + "\r\nTimestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\r\nScreen Brightness: " + this.settings.get(key).getScreenBright() + ", Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
                     }
-                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\n");
+                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
                     if (i == this.results.get(key).getIds().size() - 1)
-                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey).getInformation().getDisplayName() + "\n\n");
+                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey).getInformation().getDisplayName() + "\r\n\r\n");
                 }
             }
 

@@ -46,11 +46,11 @@ public class AdvancedWarperProperties implements Serializable {
 
     @Attribute
     /** distance threshold for mousewarping */
-    private int distanceThreshold;
+    private double speed;
 
     @Attribute
     /** home radius for mousewarping */
-    private int homeRadius;
+    private int reactionTime;
 
     /** file where porperties are stored */
     private File propertiesFile;
@@ -67,7 +67,7 @@ public class AdvancedWarperProperties implements Serializable {
     private AdvancedWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/advancedWarperProperties.prop");
+        this.propertiesFile = new File("./plugins/AdvancedWarper/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -83,13 +83,13 @@ public class AdvancedWarperProperties implements Serializable {
 
                     // store readed configurations
                     this.angleThreshold = ((AdvancedWarperProperties) this.object).getAngleThreshold();
-                    this.distanceThreshold = ((AdvancedWarperProperties) this.object).getDistanceThreshold();
-                    this.homeRadius = ((AdvancedWarperProperties) this.object).getHomeRadius();
+                    this.speed = ((AdvancedWarperProperties) this.object).getSpeed();
+                    this.reactionTime = ((AdvancedWarperProperties) this.object).getReactionTime();
 
                     // reading successful
                     status = true;
-                    System.out.println("\nAdvancedWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", homeRadius: " + this.homeRadius);
+                    System.out.println("\r\nAdvancedWarper properties file was found.");
+                    System.out.println("angle: " + this.angleThreshold + ", speed: " + this.speed + ", reaction time: " + this.reactionTime + "\r\n");
                 }
 
                 // cleanup
@@ -103,7 +103,7 @@ public class AdvancedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nAdvancedWarperProperties file was not found.");
+            System.out.println("\r\nAdvancedWarper properties file was not found.\n\r");
         }
     }
 
@@ -113,8 +113,8 @@ public class AdvancedWarperProperties implements Serializable {
     public void restoreDefault() {
         // set default values
         this.angleThreshold = 10;
-        this.distanceThreshold = 200;
-        this.homeRadius = 200;
+        this.speed = 1;
+        this.reactionTime = 80;
     }
 
     /**
@@ -146,29 +146,29 @@ public class AdvancedWarperProperties implements Serializable {
     /**
      * @return the distanceThreshold
      */
-    public int getDistanceThreshold() {
-        return this.distanceThreshold;
+    public double getSpeed() {
+        return this.speed;
     }
 
     /**
-     * @param distanceThreshold the distanceThreshold to set
+     * @param speed , the minimal movement speed
      */
-    public void setDistanceThreshold(int distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     /**
      * @return the homeRadius
      */
-    public int getHomeRadius() {
-        return this.homeRadius;
+    public int getReactionTime() {
+        return this.reactionTime;
     }
 
     /**
-     * @param homeRadius the homeRadius to set
+     * @param reactionTime to set
      */
-    public void setHomeRadius(int homeRadius) {
-        this.homeRadius = homeRadius;
+    public void setReactionTime(int reactionTime) {
+        this.reactionTime = reactionTime;
     }
 
     /**
@@ -178,7 +178,7 @@ public class AdvancedWarperProperties implements Serializable {
         try {
 
             // write object
-            new File("plugins").mkdirs();
+            new File("plugins/AdvancedWarper").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 

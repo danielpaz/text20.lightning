@@ -24,6 +24,7 @@ import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -56,11 +57,11 @@ public class AdvancedWarper implements MouseWarper {
     /** threshold for the angleFirst */
     private int angleThres;
 
-    /** threshold for the distance */
-    private double speed;
+    /** threshold for the speed */
+    private double speedThres;
 
-    /** radius around the fixation within the mouse cursor won't be moved */
-    private int homeR;
+    /** needed time to react on the mouse warp */
+    private int reactionTime;
 
     /** time stamp */
     private long timeStamp;
@@ -98,8 +99,8 @@ public class AdvancedWarper implements MouseWarper {
     public AdvancedWarper() {
         // initialize variables
         this.angleThres = 0;
-        this.speed = 0;
-        this.homeR = 0;
+        this.speedThres = 0;
+        this.reactionTime = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = new Point(0, 0);
         this.information = new PluginInformation("Advanced Warper", "Advanced Warper", true);
@@ -127,8 +128,8 @@ public class AdvancedWarper implements MouseWarper {
         // load variables from properties
         this.propertie = AdvancedWarperProperties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
-        this.speed = this.propertie.getSpeed();
-        this.homeR = this.propertie.getHomeRadius();
+        this.speedThres = this.propertie.getSpeed();
+        this.reactionTime = this.propertie.getReactionTime();
 
         // refresh map
         this.refreshMouseMap();
@@ -158,6 +159,7 @@ public class AdvancedWarper implements MouseWarper {
     @Override
     public void addMousePosition(Point position, int interval) {
         double distanceStopFix;
+        double speed;
         int setR;
         Point setPoint = new Point();
         this.isProcessing = true;
@@ -174,9 +176,21 @@ public class AdvancedWarper implements MouseWarper {
         // remove first
         this.mousePositions.remove(this.mousePositions.firstKey());
 
-        // check if fixation is placed and if there are enough positions stored,
-        // 20 is the rate of mouse updates
+        // check if fixation is placed
         if (this.fixation == null) {
+            this.isProcessing = false;
+            return;
+        }
+
+        // calculate setRadius and speed
+        speed = this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) / (this.mousePositions.size() * interval);
+        setR = (int) (speed * this.reactionTime);
+
+        if (speed > 0)
+            System.out.println(speed + " * " + this.reactionTime + " = " + setR);
+
+        // check the speed
+        if (speed < this.speedThres) {
             this.isProcessing = false;
             return;
         }
@@ -185,15 +199,7 @@ public class AdvancedWarper implements MouseWarper {
         distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
 
         // check if the cursor is already in home radius
-        if (distanceStopFix < this.homeR) {
-            this.isProcessing = false;
-            return;
-        }
-
-        // check the distance which the mouse has traveled within the time that
-        // is represented by the tree map
-        // TODO: change to mouse acceleration
-        if ((this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) / (this.mousePositions.size() * interval)) < this.speed) {
+        if (distanceStopFix < setR) {
             this.isProcessing = false;
             return;
         }
@@ -213,9 +219,6 @@ public class AdvancedWarper implements MouseWarper {
             return;
         }
 
-        // store setRadius
-        setR = (int) this.mousePositions.firstEntry().getValue().distance(this.mousePositions.lastEntry().getValue());
-
         // calculate setpoint
         setPoint = this.calculateSetPoint(setR);
 
@@ -226,7 +229,7 @@ public class AdvancedWarper implements MouseWarper {
         }
 
         // TODO: debugging
-        //		this.drawPicture(setPoint);
+        this.drawPicture(setPoint);
 
         // places mouse cursor at the fixation point
         this.robot.mouseMove(setPoint.x, setPoint.y);
@@ -284,7 +287,7 @@ public class AdvancedWarper implements MouseWarper {
 
     /*
      * (non-Javadoc)
-     * 
+     * y
      * @see
      * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation
      * ()
@@ -300,10 +303,11 @@ public class AdvancedWarper implements MouseWarper {
     @SuppressWarnings("boxing")
     private void refreshMouseMap() {
         long iMax = 10;
+        Point currentMousePos = MouseInfo.getPointerInfo().getLocation();
         this.mousePositions.clear();
         this.timeStamp = iMax - 1;
         for (long i = 0; i < iMax; i++) {
-            this.mousePositions.put(i, new Point(0, 0));
+            this.mousePositions.put(i, new Point(currentMousePos));
         }
     }
 
