@@ -135,7 +135,7 @@ public class MainClass {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
-            System.out.println("Unable to load native look and feel.\n");
+            System.out.println("Unable to load native look and feel.\r\n");
         }
 
         // set logging properties
@@ -172,7 +172,7 @@ public class MainClass {
         this.isNormalMode = true;
 
         // indicate start
-        System.out.println("\nSession started.\n");
+        System.out.println("\r\nSession started.\r\n");
         this.channel.status("Session started.");
         this.addToStatistic("Session started.");
         
@@ -206,7 +206,7 @@ public class MainClass {
 
                 // indicate success
                 this.showTrayMessage("Initializing successful.");
-                System.out.println("\nInitializing successful.\n");
+                System.out.println("\r\nInitializing successful.\r\n");
                 this.channel.status("Initializing successful.");
                 this.addToStatistic("Initializing successful.");
 
@@ -344,7 +344,7 @@ public class MainClass {
         this.pluginManager.shutdown();
 
         this.channel.status("Session closed.");
-        System.out.println("\nSession closed.");
+        System.out.println("\r\nSession closed.");
 
         // close the tool
         System.exit(0);
@@ -506,13 +506,13 @@ public class MainClass {
         // check if it is already the
         if (!destination.exists()) {
 
-            System.out.println("\nJIntellytype.dll was not found.");
+            System.out.println("\r\nJIntellytype.dll was not found.");
 
             // try to unzip it to the windows directory
             $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
 
             if (destination.exists()) {
-                System.out.println("... but is now placed.\n");
+                System.out.println("... but is now placed.\r\n");
                 // return successful
                 return true;
             }
@@ -523,7 +523,7 @@ public class MainClass {
             // indicate error 
             String msg = new String("Initializing failed. A necessary DLL-file, 'JIntellitype.dll', could not be copied into your " + destination.getParent() + " directory. Please do it by yourself or run Project Lightning (Desktop) with granted administration rights.");
             this.showTrayMessage(msg);
-            System.out.println("\n" + msg + "\n");
+            System.out.println("\r\n" + msg + "\r\n");
             this.channel.status(msg);
 
             // return not successful

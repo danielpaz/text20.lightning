@@ -75,7 +75,7 @@ public class ImprovedWarperProperties implements Serializable {
     private ImprovedWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/improvedWarperProperties.prop");
+        this.propertiesFile = new File("./plugins/ImprovedWarper/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -98,8 +98,8 @@ public class ImprovedWarperProperties implements Serializable {
 
                     // reading successful
                     status = true;
-                    System.out.println("\nImprovedWarperProperties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius + "\n");
+                    System.out.println("\r\nImprovedWarper properties file was found.");
+                    System.out.println("angle: " + this.angleThreshold + ", distance: " + this.distanceThreshold + ", duration: " + this.durationThreshold + ", homeRadius: " + this.homeRadius + ", setRadius: " + this.setRadius + "\r\n");
                 }
 
                 // cleanup
@@ -113,7 +113,7 @@ public class ImprovedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\nImprovedWarperProperties file was not found.\n");
+            System.out.println("\r\nImprovedWarper properties file was not found.\r\n");
         }
     }
 
@@ -218,7 +218,7 @@ public class ImprovedWarperProperties implements Serializable {
         try {
 
             // write object
-            new File("plugins").mkdirs();
+            new File("plugins/ImprovedWarper").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 

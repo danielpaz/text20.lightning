@@ -242,17 +242,17 @@ public class PrecisionEvaluator {
 
 			// Write XML prologue
 			writer.writeStartDocument();
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// TODO: add a dtd, encodingtag, namespace, ...
 
 			// set identifier
 			writer.writeComment("Project Lightning (Desktop) - evaluation data");
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// start with root element
 			writer.writeStartElement("alldata");
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// write screen brightness
 			writer.writeCharacters("\t");
@@ -260,7 +260,7 @@ public class PrecisionEvaluator {
 			writer.writeCharacters(""
 					+ MainClass.getInstance().getEvaluationSettings()[1]);
 			writer.writeEndElement();
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// write setting brightness
 			writer.writeCharacters("\t");
@@ -268,20 +268,20 @@ public class PrecisionEvaluator {
 			writer.writeCharacters(""
 					+ MainClass.getInstance().getEvaluationSettings()[2]);
 			writer.writeEndElement();
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// write dimension
 			writer.writeCharacters("\t");
 			writer.writeStartElement("dimension");
 			writer.writeCharacters("" + this.properties.getDimension());
 			writer.writeEndElement();
-			writer.writeCharacters("\n");
+			writer.writeCharacters("\r\n");
 
 			// if mouseposition was anytime out of dimension
 			if (this.warning) {
 				writer.writeCharacters("\t");
 				writer.writeComment("mouseposition was anytime out of dimension");
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				this.warning = false;
 			}
 
@@ -291,73 +291,73 @@ public class PrecisionEvaluator {
 				// write datatag
 				writer.writeCharacters("\t");
 				writer.writeStartElement("step");
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 
 				// write timestamp
 				writer.writeCharacters("\t\t");
 				writer.writeStartElement("timestamp");
 				writer.writeCharacters("" + data.getTimestamp());
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 
 				// write fixation
 				writer.writeCharacters("\t\t");
 				writer.writeStartElement("fixation");
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("x");
 				writer.writeCharacters("" + data.getFixation().x);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("y");
 				writer.writeCharacters("" + data.getFixation().y);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t");
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 
 				// write mouse position
 				writer.writeCharacters("\t\t");
 				writer.writeStartElement("mouseposition");
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("x");
 				writer.writeCharacters("" + data.getMousePoint().x);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("y");
 				writer.writeCharacters("" + data.getMousePoint().y);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t");
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 
 				// write pupil size
 				writer.writeCharacters("\t\t");
 				writer.writeStartElement("pupils");
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("left");
 				writer.writeCharacters("" + data.getPupils()[0]);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t\t");
 				writer.writeStartElement("right");
 				writer.writeCharacters("" + data.getPupils()[1]);
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 				writer.writeCharacters("\t\t");
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 
 				// close datatag
 				writer.writeCharacters("\t");
 				writer.writeEndElement();
-				writer.writeCharacters("\n");
+				writer.writeCharacters("\r\n");
 			}
 
 			// Write document end. This closes all open structures

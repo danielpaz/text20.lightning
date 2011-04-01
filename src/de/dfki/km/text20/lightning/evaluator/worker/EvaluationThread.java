@@ -110,7 +110,7 @@ public class EvaluationThread implements Runnable {
                 }
             }
 
-            System.out.println("- File " + file.getName() + " finished.\n");
+            System.out.println("- File " + file.getName() + " finished.\r\n");
         }
 
         // finish the evaluation
