@@ -155,6 +155,9 @@ public class Hotkey implements HotkeyListener {
             // check if the tool is activated
             if (!this.main.isActivated()) return;
 
+            // increase use count
+            this.main.gerReminder().addUse();
+            
             // check if trackingdevice provides correct data and if the
             // initializing was successful
             if (!this.main.isTrackingValid() || !this.main.isAllFine()) {
