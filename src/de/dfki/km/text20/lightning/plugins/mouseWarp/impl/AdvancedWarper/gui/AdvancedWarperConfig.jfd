@@ -173,7 +173,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Home Radius in Piexel</string> 
+             <string>Reaction Time in ms</string> 
             </void> 
             <void property="name"> 
              <string>labelReactionTime</string> 

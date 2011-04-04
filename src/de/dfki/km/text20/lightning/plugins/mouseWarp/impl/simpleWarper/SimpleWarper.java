@@ -109,7 +109,7 @@ public class SimpleWarper implements MouseWarper {
      */
     @SuppressWarnings("boxing")
     @Override
-    public void addMousePosition(Point position, int interval) {
+    public void addMousePosition(Point position, int interval, boolean isFixationValid) {
         double distanceStartFix;
         double distanceStopFix;
 

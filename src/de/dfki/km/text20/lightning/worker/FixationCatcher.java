@@ -35,6 +35,7 @@ import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.Fixatio
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationListener;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataEvent;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataListener;
+import de.dfki.km.text20.services.evaluators.gaze.util.FixationUtil;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDevice;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDeviceProvider;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingEventValidity;

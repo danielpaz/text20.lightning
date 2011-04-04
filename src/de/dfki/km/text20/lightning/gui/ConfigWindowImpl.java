@@ -214,8 +214,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         // set evaluation settings
         this.main.setEvaluationSettings(settings);
 
-        // refresh warper
+        // refresh warper and plugins
         this.main.refreshWarper();
+        
 
         // set mode
         if (this.main.isNormalMode() && this.checkBoxEvaluation.isSelected())
@@ -253,6 +254,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * manages the visibility of the configbutton
      */
     private void comboBoxDetectorActionPerformed() {
+    	this.buttonDetectorConfig.setText(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonDetectorConfig.setEnabled(((PluginInformation) this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
     }
 
@@ -260,6 +262,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * manages the visibility of the configbutton
      */
     private void comboBoxWarpMethodActionPerformed() {
+    	this.buttonWarpConfig.setText(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonWarpConfig.setEnabled(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
     }
 
@@ -477,7 +480,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
     }
 
     /**
-     * adds tool tips to the components
+     * adds tool tips to the components 
      */
     private void manageToolTips() {
         // create tool tip texts
@@ -487,7 +490,14 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         String labelDetectorTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
-
+        String labelEvaluationTT ="<HTML><body>This activates the evaluation mode.<br>This mode is used to collect data<br>which can be evaluated later.</body></HTML>";
+        String labelSoundTT = "<HTML><body>Enables/Disables the sound notifications.</body></HTML>";
+        String labelUserTT = "<HTML><body>Your name to identify the data.</body></HTML>";
+        String labelScreenBrightTT = "<HTML><body>A description of the screen brightness settings.<br>e.g. light, dark, ...</body></HTML>";
+        String labelSettingBrightTT = "<HTML><body>A description of the Setting brightness settings.<br>e.g. light, dark, ...</body></HTML>";
+        
+        
+        
         // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
         this.labelDimension.setToolTipText(labelDimensionTT);
@@ -495,6 +505,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.labelDetector.setToolTipText(labelDetectorTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
+        this.labelSound.setToolTipText(labelSoundTT);
+        this.labelName.setToolTipText(labelUserTT);
+        this.labelScreenBright.setToolTipText(labelScreenBrightTT);
+        this.labelSettingBright.setToolTipText(labelSettingBrightTT);
     }
 
     /* (non-Javadoc)

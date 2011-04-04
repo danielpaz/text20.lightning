@@ -48,7 +48,7 @@ public class FakeWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#addMousePosition(java.awt.Point)
      */
     @Override
-    public void addMousePosition(Point position, int interval) {
+    public void addMousePosition(Point position, int interval, boolean isFixationValid) {
     }
 
     /* (non-Javadoc)

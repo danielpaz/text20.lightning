@@ -117,7 +117,7 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
         // set tooltip text
         String labelAngleThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must do this in an angle within this<br>threshold to activate the mouse warp.<br>The lower this value the more exact you must<br>move your mouse.</body></HTML>";
         String labelSpeedTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal with this speed in pixels per ms<br>to activate the mouse warp. The higher this value<br>the fatser you have to move.</body></HTML>";
-        String labelReactionTimeTT = "<HTML><body>This is your reaction time you would be need to<br>react on the mouse warp. This is<br>used to calculate the point<br>where the cursor will be placed.</body></HTML>";
+        String labelReactionTimeTT = "<HTML><body>This is your reaction time you would be need to<br>react on the mouse warp. This is used to calculate<br>the point where the cursor will be placed.</body></HTML>";
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);

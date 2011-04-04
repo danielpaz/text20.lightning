@@ -48,6 +48,8 @@ public interface MouseWarper extends Plugin, CommonPluginInterface {
      *      current position of the mouse
      * @param interval 
      *      timespan in which new mousepositions will be added
+     * @param isFixationValid
+     * 		true if the eyes are recognized
      */
-    public void addMousePosition(Point position, int interval);
+    public void addMousePosition(Point position, int interval, boolean isFixationValid);
 }
