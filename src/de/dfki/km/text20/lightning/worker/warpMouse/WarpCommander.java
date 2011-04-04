@@ -71,7 +71,7 @@ public class WarpCommander implements Runnable {
             public void actionPerformed(ActionEvent arg0) {
 
                 if (manager.getCurrentMouseWarper() != null)
-                    manager.getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation(), interval);
+                    manager.getCurrentMouseWarper().addMousePosition(MouseInfo.getPointerInfo().getLocation(), interval, MainClass.getInstance().isTrackingValid());
             }
         });
 

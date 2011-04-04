@@ -103,7 +103,7 @@ public class AdvancedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\r\nAdvancedWarper properties file was not found.\n\r");
+            System.out.println("\r\nAdvancedWarper properties file was not found.\r\n");
         }
     }
 
@@ -114,7 +114,7 @@ public class AdvancedWarperProperties implements Serializable {
         // set default values
         this.angleThreshold = 10;
         this.speed = 1;
-        this.reactionTime = 80;
+        this.reactionTime = 200;
     }
 
     /**

@@ -72,7 +72,7 @@ public class AdvancedWarperConfig extends JFrame {
                 contentPanel.add(spinnerSpeed, cc.xy(5, 3));
 
                 //---- labelReactionTime ----
-                labelReactionTime.setText("Home Radius in Piexel");
+                labelReactionTime.setText("Reaction Time in ms");
                 contentPanel.add(labelReactionTime, cc.xywh(1, 5, 3, 1));
 
                 //---- spinnerReactionTime ----

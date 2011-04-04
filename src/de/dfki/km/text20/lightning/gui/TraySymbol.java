@@ -22,6 +22,7 @@
 package de.dfki.km.text20.lightning.gui;
 
 import java.awt.AWTException;
+import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -30,83 +31,103 @@ import java.awt.TrayIcon;
  * The icon which is shown in the system tray.
  * 
  * @author Christoph Käding
- *
+ * 
  */
 public class TraySymbol {
 
-    /** */
-    private TrayIcon trayIcon;
+	/** */
+	private TrayIcon trayIcon;
 
-    /** */
-    private SystemTray systemTray;
+	/** */
+	private SystemTray systemTray;
 
-    /** 
-     * creates the taskicon 
-     */
-    public TraySymbol() {
+	/** */
+	private Image evaluation;
 
-        // initialize tray icon and add it to tray
-        this.trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveNormal.gif")), "Project Lightning (Desktop)");
-        this.trayIcon.setImageAutoSize(true);
+	/** */
+	private Image active;
 
-        if (SystemTray.isSupported()) {
-            this.systemTray = SystemTray.getSystemTray();
-            try {
-                this.trayIcon.setPopupMenu(TrayMenu.getInstance());
-                this.systemTray.add(this.trayIcon);
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	/** */
+	private Image deactivated;
 
-    /**
-     * shows the 'active' symbol in the tray
-     * 
-     * @param normal
-     *      indicates in which mode the tool is 
-     *       
-     * @return true if it was successful
-     */
-    public boolean setActivatedIcon(boolean normal) {
-        if (SystemTray.isSupported()) {
-            if (normal) this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveNormal.gif")));
-            else
-                this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveEvaluation.gif")));
-        } else {
-            return false;
-        }
-        return true;
-    }
+	/**
+	 * creates the taskicon
+	 */
+	public boolean init() {
+		if (!System.getProperty("os.name").toLowerCase().contains("win")
+				|| !SystemTray.isSupported()) {
+			System.out.println("Project Lightning (Desktop) doesn't support "
+					+ System.getProperty("os.name") + ".");
+			return false;
+		}
 
-    /**
-     * shows the 'inactive' symbol in the tray
-     * 
-     * @return true if it was successful
-     */
-    public boolean setDeactivatedIcon() {
-        if (SystemTray.isSupported()) {
-            this.trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("Inactive.gif")));
-        } else {
-            return false;
-        }
-        return true;
-    }
+		// initialize images
+		this.active = Toolkit.getDefaultToolkit().getImage(
+				TraySymbol.class.getResource("ActiveNormal.gif"));
+		this.deactivated = Toolkit.getDefaultToolkit().getImage(
+				TraySymbol.class.getResource("Inactive.gif"));
+		this.evaluation = Toolkit.getDefaultToolkit().getImage(
+				TraySymbol.class.getResource("ActiveEvaluation.gif"));
 
-    /** 
-     * removes the trayicon 
-     */
-    public void remove() {
-        this.systemTray.remove(this.trayIcon);
-    }
+		// initialize tray icon and add it to tray
+		this.trayIcon = new TrayIcon(this.active, "Project Lightning (Desktop)");
+		this.systemTray = SystemTray.getSystemTray();
 
-    /**
-     * shows info messages at the taskicon
-     * 
-     * @param caption 
-     * @param text 
-     */
-    public void showMessage(String caption, String text) {
-        this.trayIcon.displayMessage(caption, text, TrayIcon.MessageType.INFO);
-    }
+		try {
+			this.systemTray.add(this.trayIcon);
+		} catch (AWTException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * adds popupmenu to tray
+	 */
+	public void setPopUpMenu() {
+		this.trayIcon.setPopupMenu(TrayMenu.getInstance());
+	}
+
+	/**
+	 * shows the 'active' symbol in the tray
+	 * 
+	 * @param normal
+	 *            indicates in which mode the tool is
+	 * 
+	 * @return true if it was successful
+	 */
+	public void setActivatedIcon(boolean normal) {
+		if (normal)
+			this.trayIcon.setImage(this.active);
+		else
+			this.trayIcon.setImage(this.evaluation);
+	}
+
+	/**
+	 * shows the 'inactive' symbol in the tray
+	 * 
+	 * @return true if it was successful
+	 */
+	public void setDeactivatedIcon() {
+		this.trayIcon.setImage(this.deactivated);
+	}
+
+	/**
+	 * removes the trayicon
+	 */
+	public void remove() {
+		this.systemTray.remove(this.trayIcon);
+	}
+
+	/**
+	 * shows info messages at the taskicon
+	 * 
+	 * @param caption
+	 * @param text
+	 */
+	public void showMessage(String caption, String text) {
+		this.trayIcon.displayMessage(caption, text, TrayIcon.MessageType.INFO);
+	}
 }

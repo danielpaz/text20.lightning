@@ -54,348 +54,426 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui.Adv
 @PluginImplementation
 public class AdvancedWarper implements MouseWarper {
 
-    /** threshold for the angleFirst */
-    private int angleThres;
+	/** threshold for the angleFirst */
+	private int angleThres;
 
-    /** threshold for the speed */
-    private double speedThres;
+	/** threshold for the speed */
+	private double speedThres;
 
-    /** needed time to react on the mouse warp */
-    private int reactionTime;
+	/** needed time to react on the mouse warp */
+	private int reactionTime;
 
-    /** time stamp */
-    private long timeStamp;
+	/** time stamp */
+	private long timeStamp;
 
-    /** a list of all mouseposition within the durationThreshold */
-    private TreeMap<Long, Point> mousePositions;
+	/** a list of all mouseposition within the durationThreshold */
+	private TreeMap<Long, Point> mousePositions;
 
-    /** last fixation */
-    private Point fixation;
+	/** last fixation */
+	private Point fixation;
 
-    /** necessary to move the mouse */
-    private Robot robot;
+	/** necessary to move the mouse */
+	private Robot robot;
 
-    /** information object */
-    private PluginInformation information;
+	/** information object */
+	private PluginInformation information;
 
-    /** angle between mouse vector and start-fixation-vector */
-    private double angleFirst;
+	/** angle between mouse vector and start-fixation-vector */
+	private double angleFirst;
 
-    /** angle between mouse vector and start-fixation-vector */
-    private double angleSecLast;
+	/** angle between mouse vector and start-fixation-vector */
+	private double angleSecLast;
 
-    /** key of the second last entry of the hashmap */
-    private long secondLastKey;
+	/** key of the second last entry of the hashmap */
+	private long secondLastKey;
 
-    /** stored properties for this plugin */
-    private AdvancedWarperProperties propertie;
+	/** stored properties for this plugin */
+	private AdvancedWarperProperties propertie;
 
-    /** indicates if any calculations are already running */
-    private boolean isProcessing;
+	/** indicates if any calculations are already running */
+	private boolean isProcessing;
 
-    /**
-     * creates a new DistanceWarper and initializes some variables
-     */
-    public AdvancedWarper() {
-        // initialize variables
-        this.angleThres = 0;
-        this.speedThres = 0;
-        this.reactionTime = 0;
-        this.mousePositions = new TreeMap<Long, Point>();
-        this.fixation = new Point(0, 0);
-        this.information = new PluginInformation("Advanced Warper", "Advanced Warper", true);
-        this.angleFirst = 0;
-        this.angleSecLast = 0;
-        this.propertie = null;
-        this.isProcessing = false;
+	/** distance from sthe start to the stop of the mousevector */
+	double distanceStopFix;
 
-        try {
-            this.robot = new Robot();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	/** speed of the mouse */
+	double speed;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int,
-     * int, long)
-     */
-    @Override
-    public void start() {
-        // load variables from properties
-        this.propertie = AdvancedWarperProperties.getInstance();
-        this.angleThres = this.propertie.getAngleThreshold();
-        this.speedThres = this.propertie.getSpeed();
-        this.reactionTime = this.propertie.getReactionTime();
+	/** radius in which the mousecursor will be placed around the fixation */
+	int setR;
 
-        // refresh map
-        this.refreshMouseMap();
-    }
+	/** point where the mousecursor will be placed */
+	Point setPoint;
+	
+	/** current screen resolution */
+	int xMax;
+	
+	/** current screen resolution */
+	int yMax;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#setFixationPoint
-     * (java.awt.Point)
-     */
-    @Override
-    public void setFixationPoint(Point fixation) {
-        if (this.isProcessing) return;
-        this.fixation = fixation;
-    }
+	/**
+	 * creates a new DistanceWarper and initializes some variables
+	 */
+	public AdvancedWarper() {
+		// initialize variables
+		this.angleThres = 0;
+		this.speedThres = 0;
+		this.reactionTime = 0;
+		this.mousePositions = new TreeMap<Long, Point>();
+		this.fixation = null;
+		this.information = new PluginInformation("Advanced Warper",
+				"Advanced Warper", true);
+		this.angleFirst = 0;
+		this.angleSecLast = 0;
+		this.propertie = null;
+		this.isProcessing = false;
+		this.distanceStopFix = 0;
+		this.speed = 0;
+		this.setR = 0;
+		this.setPoint = new Point();
+		this.xMax = 0;
+		this.yMax = 0;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#addMousePosition
-     * (java.awt.Point)
-     */
-    @SuppressWarnings("boxing")
-    @Override
-    public void addMousePosition(Point position, int interval) {
-        double distanceStopFix;
-        double speed;
-        int setR;
-        Point setPoint = new Point();
-        this.isProcessing = true;
+		try {
+			this.robot = new Robot();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-        // key of the second last
-        this.secondLastKey = this.timeStamp;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#initValues(int,
+	 * int, long)
+	 */
+	@Override
+	public void start() {
+		// load variables from properties
+		this.propertie = AdvancedWarperProperties.getInstance();
+		this.angleThres = this.propertie.getAngleThreshold();
+		this.speedThres = this.propertie.getSpeed();
+		this.reactionTime = this.propertie.getReactionTime();
+		this.xMax = Toolkit.getDefaultToolkit().getScreenSize().width;
+		this.yMax = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        // timestamp
-        this.timeStamp = System.currentTimeMillis();
+		// refresh map
+		this.refreshMouseMap();
+	}
 
-        // add to map
-        this.mousePositions.put(this.timeStamp, position);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#setFixationPoint
+	 * (java.awt.Point)
+	 */
+	@Override
+	public void setFixationPoint(Point fixation) {
+		if (this.isProcessing)
+			return;
+		this.fixation = fixation;
+		if(this.fixation.x < 0) this.fixation.x = 0;
+		else if(this.fixation.x > this.xMax) this.fixation.x = this.xMax;
+		if(this.fixation.y < 0) this.fixation.y = 0;
+		else if(this.fixation.y > this.yMax) this.fixation.y = this.yMax;
+	}
 
-        // remove first
-        this.mousePositions.remove(this.mousePositions.firstKey());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#addMousePosition
+	 * (java.awt.Point)
+	 */
+	@SuppressWarnings("boxing")
+	@Override
+	public void addMousePosition(Point position, int interval, boolean isFixationValid) {
+		this.isProcessing = true;
 
-        // check if fixation is placed
-        if (this.fixation == null) {
-            this.isProcessing = false;
-            return;
-        }
+		// TODO: debugging
+//		long tmp = System.currentTimeMillis();
+		
+		// key of the second last
+		this.secondLastKey = this.timeStamp;
 
-        // calculate setRadius and speed
-        speed = this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) / (this.mousePositions.size() * interval);
-        setR = (int) (speed * this.reactionTime);
+		// timestamp
+		this.timeStamp = System.currentTimeMillis();
 
-        if (speed > 0)
-            System.out.println(speed + " * " + this.reactionTime + " = " + setR);
+		// add to map
+		this.mousePositions.put(this.timeStamp, position);
 
-        // check the speed
-        if (speed < this.speedThres) {
-            this.isProcessing = false;
-            return;
-        }
+		// remove first
+		this.mousePositions.remove(this.mousePositions.firstKey());
 
-        // store distance
-        distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
+		// check if fixation is placed
+		if ((this.fixation == null || !isFixationValid)) {
+			this.isProcessing = false;
+			return;
+		}
 
-        // check if the cursor is already in home radius
-        if (distanceStopFix < setR) {
-            this.isProcessing = false;
-            return;
-        }
+		// calculate setRadius and speed
+		this.speed = this.mousePositions.lastEntry().getValue()
+				.distance(this.mousePositions.firstEntry().getValue())
+				/ (this.mousePositions.size() * interval);
+		this.setR = (int) (this.speed * this.reactionTime);
 
-        // checks the angleFirst between mouse movement and vector between start
-        // of the mouse movement and fixation point
-        this.angleFirst = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
-        // System.out.println("angleFirst: " + this.angleFirst);
-        if ((this.angleFirst > this.angleThres)) {
-            this.isProcessing = false;
-            return;
-        }
-        this.angleSecLast = calculateAngle(this.mousePositions.get(this.secondLastKey), this.mousePositions.lastEntry().getValue());
-        // System.out.println("angleSecLast: " + this.angleSecLast);
-        if ((this.angleSecLast > this.angleThres)) {
-            this.isProcessing = false;
-            return;
-        }
+		// TODO: debugging
+		// if (speed > 0)
+		// System.out.println(speed + " * " + this.reactionTime + " = " + setR);
 
-        // calculate setpoint
-        setPoint = this.calculateSetPoint(setR);
+		// check the speed
+		if (this.speed < this.speedThres) {
+			this.isProcessing = false;
+			return;
+		}
 
-        // check if the mouse would be setted behind its current position
-        if (setR > distanceStopFix) {
-            this.isProcessing = false;
-            return;
-        }
+		// store distance
+		this.distanceStopFix = this.mousePositions.lastEntry().getValue()
+				.distance(this.fixation);
 
-        // TODO: debugging
-        this.drawPicture(setPoint);
+		// check if the cursor is already in home radius
+		if (this.distanceStopFix < this.setR) {
+			this.isProcessing = false;
+			return;
+		}
 
-        // places mouse cursor at the fixation point
-        this.robot.mouseMove(setPoint.x, setPoint.y);
+		// checks the angleFirst between mouse movement and vector between start
+		// of the mouse movement and fixation point
+		this.angleFirst = calculateAngle(this.mousePositions.firstEntry()
+				.getValue(), this.mousePositions.lastEntry().getValue());
+		// System.out.println("angleFirst: " + this.angleFirst);
+		if ((this.angleFirst > this.angleThres)) {
+			this.isProcessing = false;
+			return;
+		}
+		this.angleSecLast = calculateAngle(
+				this.mousePositions.get(this.secondLastKey),
+				this.mousePositions.lastEntry().getValue());
+		// System.out.println("angleSecLast: " + this.angleSecLast);
+		if ((this.angleSecLast > this.angleThres)) {
+			this.isProcessing = false;
+			return;
+		}
 
-        // indicate warp
-        System.out.println("Warp - Mouse move to (" + setPoint.x + "," + setPoint.y + ") with offset of " + setR + " pixels");
+		// calculate setpoint
+		this.setPoint = this.calculateSetPoint(this.setR);
 
-        // resets variables
-        this.fixation = null;
-        this.refreshMouseMap();
-        this.isProcessing = false;
-    }
+		// check if the mouse would be setted behind its current position
+		if (this.setR > this.distanceStopFix) {
+			this.isProcessing = false;
+			return;
+		}
 
-    /**
-     * Calculates the angleFirst between mouse-move-vector and start of movement
-     * to fixation. This calculation is treated like it is placed in a cartesian
-     * coordinate system.
-     * 
-     * @param start
-     *            point
-     * @param stop
-     *            point
-     * @return the angle
-     */
-    private double calculateAngle(Point start, Point stop) {
-        // angle in radian measure between x-axis and moving vector of the mouse
-        double mouseTraceAngle = Math.atan2(start.y - stop.y, start.x - stop.x);
+		// TODO: debugging
+		// this.drawPicture(setPoint);
 
-        // angle in radian measure between the x-axis and the vector from start
-        // point of the current mouse vector and the fixation point
-        double gazeVectorAngle = Math.atan2(start.y - this.fixation.y, start.x - this.fixation.x);
+		// places mouse cursor at the fixation point
+		this.robot.mouseMove(this.setPoint.x, this.setPoint.y);
 
-        // angleFirst between this two ones in degrees
-        double angleTmp = (gazeVectorAngle - mouseTraceAngle) * 180 / Math.PI;
+		// indicate warp
+		System.out.println("Warp - Mouse move to ("
+				+ this.setPoint.x
+				+ ","
+				+ this.setPoint.y
+				+ ") over a distance of "
+				+ (int) this.setPoint.distance(this.mousePositions.lastEntry()
+						.getValue()) + " Pixels. Method: Advanced Warper");
 
-        return Math.abs(angleTmp);
-    }
+		// resets variables
+		this.fixation = null;
+		this.refreshMouseMap();
+		this.isProcessing = false;
+		
+		// TODO: debugginh
+//		System.out.println(System.currentTimeMillis() - tmp);
+	}
 
-    /**
-     * Calculates a set point between fixation point and the mouse vector. The distance
-     * is given by setR. The coordinate system is the cartesian coordinate system.
-     */
-    private Point calculateSetPoint(int setR) {
-        // angle in radian measure between this x-axis and the vector from end
-        // of mouse-vector to fixation
-        double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.x);
+	/**
+	 * Calculates the angleFirst between mouse-move-vector and start of movement
+	 * to fixation. This calculation is treated like it is placed in a cartesian
+	 * coordinate system.
+	 * 
+	 * @param start
+	 *            point
+	 * @param stop
+	 *            point
+	 * @return the angle
+	 */
+	private double calculateAngle(Point start, Point stop) {
+		// angle in radian measure between x-axis and moving vector of the mouse
+		double mouseTraceAngle = Math.atan2(start.y - stop.y, start.x - stop.x);
 
-        // calculate x and y by their polar coordinates
-        int x = (int) (setR * Math.cos(phi));
-        int y = (int) (setR * Math.sin(phi));
+		// angle in radian measure between the x-axis and the vector from start
+		// point of the current mouse vector and the fixation point
+		double gazeVectorAngle = Math.atan2(start.y - this.fixation.y, start.x
+				- this.fixation.x);
 
-        // return set point
-        return new Point(this.fixation.x + x, this.fixation.y + y);
-    }
+		// angleFirst between this two ones in degrees
+		double angleTmp = (gazeVectorAngle - mouseTraceAngle) * 180 / Math.PI;
 
-    /*
-     * (non-Javadoc)
-     * y
-     * @see
-     * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation
-     * ()
-     */
-    @Override
-    public PluginInformation getInformation() {
-        return this.information;
-    }
+		return Math.abs(angleTmp);
+	}
 
-    /**
-     * clears the mouse vector and fills it with dummydata
-     */
-    @SuppressWarnings("boxing")
-    private void refreshMouseMap() {
-        long iMax = 10;
-        Point currentMousePos = MouseInfo.getPointerInfo().getLocation();
-        this.mousePositions.clear();
-        this.timeStamp = iMax - 1;
-        for (long i = 0; i < iMax; i++) {
-            this.mousePositions.put(i, new Point(currentMousePos));
-        }
-    }
+	/**
+	 * Calculates a set point between fixation point and the mouse vector. The
+	 * distance is given by setR. The coordinate system is the cartesian
+	 * coordinate system.
+	 */
+	private Point calculateSetPoint(int radius) {
+		// angle in radian measure between this x-axis and the vector from end
+		// of mouse-vector to fixation
+		double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y
+				- this.fixation.y, this.mousePositions.lastEntry().getValue().x
+				- this.fixation.x);
 
-    /**
-     * writes current movement with recognized target to a file this is for
-     * debugging
-     */
-    @SuppressWarnings("unused")
-    private void drawPicture(Point setPoint) {
-        // initialize variables
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        BufferedImage screenShot = null;
-        ArrayList<Long> keys = new ArrayList<Long>(this.mousePositions.keySet());
+		// calculate x and y by their polar coordinates
+		int x = (int) (radius * Math.cos(phi));
+		int y = (int) (radius * Math.sin(phi));
 
-        // create screenshot
-        Rectangle screenShotRect = new Rectangle(0, 0, dimension.width, dimension.height);
-        try {
-            screenShot = new Robot().createScreenCapture(screenShotRect);
-        } catch (AWTException e1) {
-            e1.printStackTrace();
-            return;
-        }
-        File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
+		// return set point
+		return new Point(this.fixation.x + x, this.fixation.y + y);
+	}
 
-        try {
-            // create screenshot graphic
-            Graphics2D graphic = screenShot.createGraphics();
-            graphic.setFont(graphic.getFont().deriveFont(5));
+	/*
+	 * (non-Javadoc) y
+	 * 
+	 * @see
+	 * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#getInformation
+	 * ()
+	 */
+	@Override
+	public PluginInformation getInformation() {
+		return this.information;
+	}
 
-            // visualize fixation point
-            graphic.setColor(new Color(255, 0, 0, 255));
-            graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
-            graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + this.fixation.x, 12 + this.fixation.y);
-            graphic.drawChars(("" + this.angleFirst).toCharArray(), 0, ("" + this.angleFirst).toCharArray().length, 12 + this.fixation.x, 24 + this.fixation.y);
-            graphic.drawChars(("" + this.angleSecLast).toCharArray(), 0, ("" + this.angleSecLast).toCharArray().length, 12 + this.fixation.x, 36 + this.fixation.y);
-            graphic.setColor(new Color(255, 0, 0, 32));
-            graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
+	/**
+	 * clears the mouse vector and fills it with dummydata
+	 */
+	@SuppressWarnings("boxing")
+	private void refreshMouseMap() {
+		long iMax = 10;
+		Point currentMousePos = MouseInfo.getPointerInfo().getLocation();
+		this.mousePositions.clear();
+		this.timeStamp = iMax - 1;
+		for (long i = 0; i < iMax; i++) {
+			this.mousePositions.put(i, new Point(currentMousePos));
+		}
+	}
 
-            // visualize mouse vector
-            for (int i = 0; i < keys.size() - 1; i++) {
-                graphic.setColor(new Color(0, 0, 255, 255));
-                graphic.drawOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawChars(("" + i).toCharArray(), 0, ("" + i).toCharArray().length, (int) this.mousePositions.get(keys.get(i)).getX() + 12, (int) this.mousePositions.get(keys.get(i)).getY() + 12);
-                graphic.setColor(new Color(0, 0, 255, 32));
-                graphic.fillOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawLine((int) this.mousePositions.get(keys.get(i)).getX(), (int) this.mousePositions.get(keys.get(i)).getY(), (int) this.mousePositions.get(keys.get(i + 1)).getX(), (int) this.mousePositions.get(keys.get(i + 1)).getY());
-            }
-            graphic.setColor(new Color(0, 0, 255, 255));
-            graphic.drawOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
-            graphic.drawChars(("" + (this.mousePositions.size() - 1)).toCharArray(), 0, ("" + (this.mousePositions.size() - 1)).toCharArray().length, (int) this.mousePositions.lastEntry().getValue().getX() + 12, (int) this.mousePositions.lastEntry().getValue().getY() + 12);
-            graphic.setColor(new Color(0, 0, 255, 32));
-            graphic.fillOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
+	/**
+	 * writes current movement with recognized target to a file this is for
+	 * debugging
+	 */
+	@SuppressWarnings("unused")
+	private void drawPicture() {
+		// initialize variables
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		BufferedImage screenShot = null;
+		ArrayList<Long> keys = new ArrayList<Long>(this.mousePositions.keySet());
 
-            // calculate and visualize setpoint
-            graphic.setColor(new Color(0, 255, 0, 255));
-            graphic.drawOval(setPoint.x - 5, setPoint.y - 5, 10, 10);
-            graphic.drawChars(("set point").toCharArray(), 0, 9, 12 + setPoint.x, 12 + setPoint.y);
-            graphic.setColor(new Color(0, 255, 0, 32));
-            graphic.fillOval(setPoint.x - 5, setPoint.y - 5, 10, 10);
+		// create screenshot
+		Rectangle screenShotRect = new Rectangle(0, 0, dimension.width,
+				dimension.height);
+		try {
+			screenShot = new Robot().createScreenCapture(screenShotRect);
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+			return;
+		}
+		File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
 
-            // write the image
-            file.mkdirs();
-            ImageIO.write(screenShot, "png", file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			// create screenshot graphic
+			Graphics2D graphic = screenShot.createGraphics();
+			graphic.setFont(graphic.getFont().deriveFont(5));
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
-     */
-    @SuppressWarnings("unused")
-    @Override
-    public void showGui() {
-        // create new gui to show it
-        new AdvancedWarperConfigImpl();
-    }
+			// visualize fixation point
+			graphic.setColor(new Color(255, 0, 0, 255));
+			graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
+			graphic.drawChars(("fixation point").toCharArray(), 0, 14,
+					12 + this.fixation.x, 12 + this.fixation.y);
+			graphic.drawChars(("" + this.angleFirst).toCharArray(), 0,
+					("" + this.angleFirst).toCharArray().length,
+					12 + this.fixation.x, 24 + this.fixation.y);
+			graphic.drawChars(("" + this.angleSecLast).toCharArray(), 0,
+					("" + this.angleSecLast).toCharArray().length,
+					12 + this.fixation.x, 36 + this.fixation.y);
+			graphic.setColor(new Color(255, 0, 0, 32));
+			graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#shutDown()
-     */
-    @Override
-    public void stop() {
-        // write current poperties in a file
-        this.propertie.writeProperties();
-    }
+			// visualize mouse vector
+			for (int i = 0; i < keys.size() - 1; i++) {
+				graphic.setColor(new Color(0, 0, 255, 255));
+				graphic.drawOval((int) this.mousePositions.get(keys.get(i))
+						.getX() - 5, (int) this.mousePositions.get(keys.get(i))
+						.getY() - 5, 10, 10);
+				graphic.drawChars(("" + i).toCharArray(), 0,
+						("" + i).toCharArray().length,
+						(int) this.mousePositions.get(keys.get(i)).getX() + 12,
+						(int) this.mousePositions.get(keys.get(i)).getY() + 12);
+				graphic.setColor(new Color(0, 0, 255, 32));
+				graphic.fillOval((int) this.mousePositions.get(keys.get(i))
+						.getX() - 5, (int) this.mousePositions.get(keys.get(i))
+						.getY() - 5, 10, 10);
+				graphic.drawLine((int) this.mousePositions.get(keys.get(i))
+						.getX(), (int) this.mousePositions.get(keys.get(i))
+						.getY(), (int) this.mousePositions.get(keys.get(i + 1))
+						.getX(), (int) this.mousePositions.get(keys.get(i + 1))
+						.getY());
+			}
+			graphic.setColor(new Color(0, 0, 255, 255));
+			graphic.drawOval((int) this.mousePositions.lastEntry().getValue()
+					.getX() - 5, (int) this.mousePositions.lastEntry()
+					.getValue().getY() - 5, 10, 10);
+			graphic.drawChars(
+					("" + (this.mousePositions.size() - 1)).toCharArray(),
+					0,
+					("" + (this.mousePositions.size() - 1)).toCharArray().length,
+					(int) this.mousePositions.lastEntry().getValue().getX() + 12,
+					(int) this.mousePositions.lastEntry().getValue().getY() + 12);
+			graphic.setColor(new Color(0, 0, 255, 32));
+			graphic.fillOval((int) this.mousePositions.lastEntry().getValue()
+					.getX() - 5, (int) this.mousePositions.lastEntry()
+					.getValue().getY() - 5, 10, 10);
+
+			// calculate and visualize setpoint
+			graphic.setColor(new Color(0, 255, 0, 255));
+			graphic.drawOval(this.setPoint.x - 5, this.setPoint.y - 5, 10, 10);
+			graphic.drawChars(("set point").toCharArray(), 0, 9,
+					12 + this.setPoint.x, 12 + this.setPoint.y);
+			graphic.setColor(new Color(0, 255, 0, 32));
+			graphic.fillOval(this.setPoint.x - 5, this.setPoint.y - 5, 10, 10);
+
+			// write the image
+			file.mkdirs();
+			ImageIO.write(screenShot, "png", file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
+	 */
+	@SuppressWarnings("unused")
+	@Override
+	public void showGui() {
+		// create new gui to show it
+		new AdvancedWarperConfigImpl();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#shutDown()
+	 */
+	@Override
+	public void stop() {
+		// write current poperties in a file
+		this.propertie.writeProperties();
+	}
 }
