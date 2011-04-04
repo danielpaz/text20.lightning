@@ -47,6 +47,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationCatcher;
 import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.evaluationMode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.worker.submitReminder.SubmitReminder;
 import de.dfki.km.text20.lightning.worker.warpMouse.WarpCommander;
 
 /**
@@ -107,6 +108,9 @@ public class MainClass {
 	/** indicates if the tool is initialized successfully */
 	private boolean allFine;
 
+	/** manages submit notification */
+	private SubmitReminder reminder;
+
 	/**
 	 * creates a new instance of the mainclass and initializes it
 	 * 
@@ -117,6 +121,13 @@ public class MainClass {
 		MainClass.getInstance().init();
 
 		// log initial status
+		MainClass.getInstance().addToStatistic(
+				"time: " + MainClass.getInstance().getProperties().getUpTime());
+		MainClass.getInstance()
+				.addToStatistic(
+						"uses: "
+								+ MainClass.getInstance().getProperties()
+										.getUseCount());
 		MainClass.getInstance().addToStatistic(
 				"dimension: "
 						+ MainClass.getInstance().getProperties()
@@ -199,6 +210,7 @@ public class MainClass {
 		this.dllStatus = this.checkDll();
 		this.isActivated = true;
 		this.isNormalMode = true;
+		this.reminder = new SubmitReminder();
 
 		// indicate start
 		System.out.println("\r\nSession started.\r\n");
@@ -220,7 +232,7 @@ public class MainClass {
 
 		// add menu to tray
 		this.trayIcon.setPopUpMenu();
-		
+
 		// check if all things are fine
 		if (this.dllStatus) {
 
@@ -248,6 +260,9 @@ public class MainClass {
 
 				// update status
 				this.allFine = true;
+				
+				// start reminder
+				this.reminder.init();
 			}
 		}
 	}
@@ -350,17 +365,23 @@ public class MainClass {
 		return this.allFine;
 	}
 
+	/** return current submit reminder */
+	public SubmitReminder gerReminder() {
+		return this.reminder;
+	}
+
 	/**
 	 * Shuts down the application
 	 */
 	public void exit() {
-
+		// close reminder
+		this.reminder.close();
+		
 		// store properties to a file
 		this.properties.writeProperties();
 
 		// update statistics
 		this.addToStatistic("Session closed.");
-		this.statistics.publish();
 
 		// close plugins
 		this.internalPluginManager.getCurrentMouseWarper().stop();
