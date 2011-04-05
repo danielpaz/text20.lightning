@@ -27,7 +27,7 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
+import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**

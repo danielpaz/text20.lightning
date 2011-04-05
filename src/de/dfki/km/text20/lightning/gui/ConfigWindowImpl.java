@@ -35,7 +35,7 @@ import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
+import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 

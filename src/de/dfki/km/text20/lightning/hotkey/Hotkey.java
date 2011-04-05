@@ -31,8 +31,8 @@ import com.melloware.jintellitype.JIntellitypeConstants;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
-import de.dfki.km.text20.lightning.worker.clickTo.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.evaluationMode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.worker.clickto.FixationEvaluator;
+import de.dfki.km.text20.lightning.worker.evaluationmode.PrecisionEvaluator;
 
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys
