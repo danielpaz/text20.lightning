@@ -1,5 +1,5 @@
 /*
- * AdvancedWarperConfigImpl.java
+ * VelocityWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,32 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.velocityWarper.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SpinnerNumberModel;
 
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.AdvancedWarperProperties;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.velocityWarper.VelocityWarperProperties;
 
 /**
  * @author Christoph Käding
  * 
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
+public class VelocityWarperConfigImpl extends VelocityWarperConfig implements
         ActionListener {
 
     /** current used properties */
-    private AdvancedWarperProperties properties;
+    private VelocityWarperProperties properties;
 
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
-    public AdvancedWarperConfigImpl() {
+    public VelocityWarperConfigImpl() {
         // initialize properties and preselect spinners
-        this.properties = AdvancedWarperProperties.getInstance();
+        this.properties = VelocityWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
         this.spinnerSpeed.setModel(new SpinnerNumberModel(this.properties.getSpeed(), 0.1, 2.147483647E9, 0.1));
         this.spinnerReactionTime.setValue(this.properties.getReactionTime());
@@ -117,7 +117,7 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
         // set tooltip text
         String labelAngleThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must do this in an angle within this<br>threshold to activate the mouse warp.<br>The lower this value the more exact you must<br>move your mouse.</body></HTML>";
         String labelSpeedTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal with this speed in pixels per ms<br>to activate the mouse warp. The higher this value<br>the fatser you have to move.</body></HTML>";
-        String labelReactionTimeTT = "<HTML><body>This is your reaction time you would be need to<br>react on the mouse warp. This is<br>used to calculate the point<br>where the cursor will be placed.</body></HTML>";
+        String labelReactionTimeTT = "<HTML><body>This is your reaction time you would be need to<br>react on the mouse warp. This is used to calculate<br>the point where the cursor will be placed.</body></HTML>";
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);

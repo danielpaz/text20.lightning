@@ -1,5 +1,5 @@
 /*
- * AdvancedWarper.java
+ * VelocityWarper.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.velocityWarper;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -39,7 +39,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui.AdvancedWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.velocityWarper.gui.VelocityWarperConfigImpl;
 
 /**
  * Simple version of mouse warper which checks angleFirst between
@@ -52,7 +52,7 @@ import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui.Adv
  * 
  */
 @PluginImplementation
-public class AdvancedWarper implements MouseWarper {
+public class VelocityWarper implements MouseWarper {
 
 	/** threshold for the angleFirst */
 	private int angleThres;
@@ -88,7 +88,7 @@ public class AdvancedWarper implements MouseWarper {
 	private long secondLastKey;
 
 	/** stored properties for this plugin */
-	private AdvancedWarperProperties propertie;
+	private VelocityWarperProperties propertie;
 
 	/** indicates if any calculations are already running */
 	private boolean isProcessing;
@@ -97,7 +97,7 @@ public class AdvancedWarper implements MouseWarper {
 	double distanceStopFix;
 
 	/** speed of the mouse */
-	double speed;
+	double velocity;
 
 	/** radius in which the mousecursor will be placed around the fixation */
 	int setR;
@@ -114,21 +114,21 @@ public class AdvancedWarper implements MouseWarper {
 	/**
 	 * creates a new DistanceWarper and initializes some variables
 	 */
-	public AdvancedWarper() {
+	public VelocityWarper() {
 		// initialize variables
 		this.angleThres = 0;
 		this.speedThres = 0;
 		this.reactionTime = 0;
 		this.mousePositions = new TreeMap<Long, Point>();
 		this.fixation = null;
-		this.information = new PluginInformation("Advanced Warper",
-				"Advanced Warper", true);
+		this.information = new PluginInformation("Velocity Warper",
+				"Velocity Warper", true);
 		this.angleFirst = 0;
 		this.angleSecLast = 0;
 		this.propertie = null;
 		this.isProcessing = false;
 		this.distanceStopFix = 0;
-		this.speed = 0;
+		this.velocity = 0;
 		this.setR = 0;
 		this.setPoint = new Point();
 		this.xMax = 0;
@@ -151,7 +151,7 @@ public class AdvancedWarper implements MouseWarper {
 	@Override
 	public void start() {
 		// load variables from properties
-		this.propertie = AdvancedWarperProperties.getInstance();
+		this.propertie = VelocityWarperProperties.getInstance();
 		this.angleThres = this.propertie.getAngleThreshold();
 		this.speedThres = this.propertie.getSpeed();
 		this.reactionTime = this.propertie.getReactionTime();
@@ -214,17 +214,17 @@ public class AdvancedWarper implements MouseWarper {
 		}
 
 		// calculate setRadius and speed
-		this.speed = this.mousePositions.lastEntry().getValue()
+		this.velocity = this.mousePositions.lastEntry().getValue()
 				.distance(this.mousePositions.firstEntry().getValue())
 				/ (this.mousePositions.size() * interval);
-		this.setR = (int) (this.speed * this.reactionTime);
+		this.setR = (int) (this.velocity * this.reactionTime);
 
 		// TODO: debugging
 		// if (speed > 0)
 		// System.out.println(speed + " * " + this.reactionTime + " = " + setR);
 
 		// check the speed
-		if (this.speed < this.speedThres) {
+		if (this.velocity < this.speedThres) {
 			this.isProcessing = false;
 			return;
 		}
@@ -463,7 +463,7 @@ public class AdvancedWarper implements MouseWarper {
 	@Override
 	public void showGui() {
 		// create new gui to show it
-		new AdvancedWarperConfigImpl();
+		new VelocityWarperConfigImpl();
 	}
 
 	/*

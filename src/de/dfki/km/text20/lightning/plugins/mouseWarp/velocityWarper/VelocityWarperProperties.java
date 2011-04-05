@@ -1,5 +1,5 @@
 /*
- * AdvancedWarperProperties.java
+ * VelocityWarperProperties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.velocityWarper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +35,7 @@ import org.simpleframework.xml.Attribute;
  * @author Christoph Käding
  *
  */
-public class AdvancedWarperProperties implements Serializable {
+public class VelocityWarperProperties implements Serializable {
 
     /** generated serial id */
     private static final long serialVersionUID = -4766853585658130189L;
@@ -59,15 +59,15 @@ public class AdvancedWarperProperties implements Serializable {
     private Object object;
     
     /** singleton instance of this properties */
-    private static AdvancedWarperProperties properties;
+    private static VelocityWarperProperties properties;
 
     /**
      * creates properties, tries to load property file
      */
-    private AdvancedWarperProperties() {
+    private VelocityWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/AdvancedWarper/properties.prop");
+        this.propertiesFile = new File("./plugins/VelocityWarper/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -79,16 +79,16 @@ public class AdvancedWarperProperties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof AdvancedWarperProperties) {
+                if (this.object instanceof VelocityWarperProperties) {
 
                     // store readed configurations
-                    this.angleThreshold = ((AdvancedWarperProperties) this.object).getAngleThreshold();
-                    this.speed = ((AdvancedWarperProperties) this.object).getSpeed();
-                    this.reactionTime = ((AdvancedWarperProperties) this.object).getReactionTime();
+                    this.angleThreshold = ((VelocityWarperProperties) this.object).getAngleThreshold();
+                    this.speed = ((VelocityWarperProperties) this.object).getSpeed();
+                    this.reactionTime = ((VelocityWarperProperties) this.object).getReactionTime();
 
                     // reading successful
                     status = true;
-                    System.out.println("\r\nAdvancedWarper properties file was found.");
+                    System.out.println("\r\nVelocityWarper properties file was found.");
                     System.out.println("angle: " + this.angleThreshold + ", speed: " + this.speed + ", reaction time: " + this.reactionTime + "\r\n");
                 }
 
@@ -103,7 +103,7 @@ public class AdvancedWarperProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\r\nAdvancedWarper properties file was not found.\r\n");
+            System.out.println("\r\nVelocityWarper properties file was not found.\r\n");
         }
     }
 
@@ -122,9 +122,9 @@ public class AdvancedWarperProperties implements Serializable {
      * 
      * @return properties
      */
-    public static AdvancedWarperProperties getInstance() {
+    public static VelocityWarperProperties getInstance() {
         if(properties == null) {
-            properties = new AdvancedWarperProperties();
+            properties = new VelocityWarperProperties();
         }
         return properties;
     }
@@ -178,7 +178,7 @@ public class AdvancedWarperProperties implements Serializable {
         try {
 
             // write object
-            new File("plugins/AdvancedWarper").mkdirs();
+            new File("plugins/VelocityWarper").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 

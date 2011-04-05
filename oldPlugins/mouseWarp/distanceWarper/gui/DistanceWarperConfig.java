@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Mar 21 11:10:43 CET 2011
  */
 
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.distanceWarper.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,12 +14,13 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class AdvancedWarperConfig extends JFrame {
-    public AdvancedWarperConfig() {
+public class DistanceWarperConfig extends JFrame {
+    public DistanceWarperConfig() {
         initComponents();
     }
 
     private void buttonDefaultActionPerformed(ActionEvent e) {
+        // TODO add your code here
     }
 
     private void initComponents() {
@@ -29,10 +30,10 @@ public class AdvancedWarperConfig extends JFrame {
         contentPanel = new JPanel();
         labelAngleThreshold = new JLabel();
         spinnerAngle = new JSpinner();
-        labelSpeed = new JLabel();
-        spinnerSpeed = new JSpinner();
-        labelReactionTime = new JLabel();
-        spinnerReactionTime = new JSpinner();
+        labelDistanceThreshold = new JLabel();
+        spinnerDistance = new JSpinner();
+        labelHomeRadius = new JLabel();
+        spinnerHomeRadius = new JSpinner();
         buttonOK = new JButton();
         buttonCancel = new JButton();
         buttonDefault = new JButton();
@@ -40,7 +41,7 @@ public class AdvancedWarperConfig extends JFrame {
 
         //======== this ========
         setResizable(false);
-        setTitle("Advanced Warper");
+        setTitle("Distance Warper");
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -56,28 +57,28 @@ public class AdvancedWarperConfig extends JFrame {
                     "3*(default, $lgap), default"));
 
                 //---- labelAngleThreshold ----
-                labelAngleThreshold.setText("Angle Threshold in Degree");
+                labelAngleThreshold.setText("Angle Threshold");
                 contentPanel.add(labelAngleThreshold, cc.xywh(1, 1, 3, 1));
 
                 //---- spinnerAngle ----
                 spinnerAngle.setModel(new SpinnerNumberModel(10, 0, 180, 1));
                 contentPanel.add(spinnerAngle, cc.xy(5, 1));
 
-                //---- labelSpeed ----
-                labelSpeed.setText("minimal Speed in Pixel/ms");
-                contentPanel.add(labelSpeed, cc.xywh(1, 3, 3, 1));
+                //---- labelDistanceThreshold ----
+                labelDistanceThreshold.setText("Distance Threshold");
+                contentPanel.add(labelDistanceThreshold, cc.xywh(1, 3, 3, 1));
 
-                //---- spinnerSpeed ----
-                spinnerSpeed.setModel(new SpinnerNumberModel(0.0, 0.0, 2.147483647E9, 1.0));
-                contentPanel.add(spinnerSpeed, cc.xy(5, 3));
+                //---- spinnerDistance ----
+                spinnerDistance.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
+                contentPanel.add(spinnerDistance, cc.xy(5, 3));
 
-                //---- labelReactionTime ----
-                labelReactionTime.setText("Reaction Time in ms");
-                contentPanel.add(labelReactionTime, cc.xywh(1, 5, 3, 1));
+                //---- labelHomeRadius ----
+                labelHomeRadius.setText("Home Radius");
+                contentPanel.add(labelHomeRadius, cc.xywh(1, 5, 3, 1));
 
-                //---- spinnerReactionTime ----
-                spinnerReactionTime.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
-                contentPanel.add(spinnerReactionTime, cc.xy(5, 5));
+                //---- spinnerHomeRadius ----
+                spinnerHomeRadius.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
+                contentPanel.add(spinnerHomeRadius, cc.xy(5, 5));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
@@ -111,10 +112,10 @@ public class AdvancedWarperConfig extends JFrame {
     private JPanel contentPanel;
     protected JLabel labelAngleThreshold;
     protected JSpinner spinnerAngle;
-    protected JLabel labelSpeed;
-    protected JSpinner spinnerSpeed;
-    protected JLabel labelReactionTime;
-    protected JSpinner spinnerReactionTime;
+    protected JLabel labelDistanceThreshold;
+    protected JSpinner spinnerDistance;
+    protected JLabel labelHomeRadius;
+    protected JSpinner spinnerHomeRadius;
     protected JButton buttonOK;
     protected JButton buttonCancel;
     protected JButton buttonDefault;

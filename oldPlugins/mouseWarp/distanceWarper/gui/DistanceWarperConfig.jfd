@@ -18,7 +18,7 @@
       </void> 
       <void method="setProperty"> 
        <string>title</string> 
-       <string>Advanced Warper</string> 
+       <string>Distance Warper</string> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
@@ -55,7 +55,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Angle Threshold in Degree</string> 
+             <string>Angle Threshold</string> 
             </void> 
             <void property="name"> 
              <string>labelAngleThreshold</string> 
@@ -110,10 +110,10 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>minimal Speed in Pixel/ms</string> 
+             <string>Distance Threshold</string> 
             </void> 
             <void property="name"> 
-             <string>labelSpeed</string> 
+             <string>labelDistanceThreshold</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -140,14 +140,14 @@
             <void method="setProperty"> 
              <string>model</string> 
              <object class="javax.swing.SpinnerNumberModel"> 
-              <double>0.0</double> 
-              <double>0.0</double> 
-              <double>2.147483647E9</double> 
-              <double>1.0</double> 
+              <int>0</int> 
+              <int>0</int> 
+              <int>2147483647</int> 
+              <int>1</int> 
              </object> 
             </void> 
             <void property="name"> 
-             <string>spinnerSpeed</string> 
+             <string>spinnerDistance</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -173,10 +173,10 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Home Radius in Piexel</string> 
+             <string>Home Radius</string> 
             </void> 
             <void property="name"> 
-             <string>labelReactionTime</string> 
+             <string>labelHomeRadius</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
@@ -210,7 +210,7 @@
              </object> 
             </void> 
             <void property="name"> 
-             <string>spinnerReactionTime</string> 
+             <string>spinnerHomeRadius</string> 
             </void> 
             <void method="auxiliary"> 
              <void method="setProperty"> 
