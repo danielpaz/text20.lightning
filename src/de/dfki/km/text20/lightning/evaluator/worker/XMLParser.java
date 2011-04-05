@@ -29,7 +29,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
  * the XML-files which stores the evaluation datas are processed by this class

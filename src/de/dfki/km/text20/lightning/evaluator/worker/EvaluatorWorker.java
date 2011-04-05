@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.evaluationMode.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
  * The EvaluationWorker runs the given plugin with the given container, collects the data,
