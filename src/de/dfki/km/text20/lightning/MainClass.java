@@ -290,6 +290,13 @@ public class MainClass {
 	}
 
 	/**
+	 * publishes the current statistic file to the server
+	 */
+	public void publishStatistics() {
+	    this.statistics.publish();
+	}
+	
+	/**
 	 * provides internal plugin manager
 	 * 
 	 * @return internal plugin manager
@@ -365,7 +372,11 @@ public class MainClass {
 		return this.allFine;
 	}
 
-	/** return current submit reminder */
+	/** 
+	 * return current submit reminder 
+	 * 
+	 * @return reminder
+	 */
 	public SubmitReminder gerReminder() {
 		return this.reminder;
 	}

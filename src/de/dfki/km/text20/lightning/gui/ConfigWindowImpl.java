@@ -505,6 +505,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.labelDetector.setToolTipText(labelDetectorTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
+        this.labelEvaluation.setToolTipText(labelEvaluationTT);
         this.labelSound.setToolTipText(labelSoundTT);
         this.labelName.setToolTipText(labelUserTT);
         this.labelScreenBright.setToolTipText(labelScreenBrightTT);
