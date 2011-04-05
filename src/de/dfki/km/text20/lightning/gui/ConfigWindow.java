@@ -346,7 +346,7 @@ public class ConfigWindow {
     private JSeparator separator1;
     protected JLabel labelDetector;
     protected JComboBox comboBoxDetector;
-    private JLabel labelEvaluation;
+    protected JLabel labelEvaluation;
     protected JCheckBox checkBoxEvaluation;
     protected JButton buttonDetectorConfig;
     protected JLabel labelName;

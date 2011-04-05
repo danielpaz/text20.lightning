@@ -41,305 +41,322 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
  */
 public class Properties implements Serializable {
 
-	/** generated serial id */
-	private static final long serialVersionUID = 6929704088177718826L;
+    /** generated serial id */
+    private static final long serialVersionUID = 6929704088177718826L;
 
-	/** dimension for the screenshots */
-	@Attribute
-	private int dimension;
+    /** dimension for the screenshots */
+    @Attribute
+    private int dimension;
 
-	/** action hotkey */
-	@Element
-	private HotkeyContainer actionHotkey;
+    /** action hotkey */
+    @Element
+    private HotkeyContainer actionHotkey;
 
-	/** status hotkey */
-	@Element
-	private HotkeyContainer statusHotkey;
+    /** status hotkey */
+    @Element
+    private HotkeyContainer statusHotkey;
 
-	@Attribute
-	/** name of currently used warper */
-	private String warperName;
+    @Attribute
+    /** name of currently used warper */
+    private String warperName;
 
-	@Attribute
-	/** name of currently used detector */
-	private String detectorName;
+    @Attribute
+    /** name of currently used detector */
+    private String detectorName;
 
-	@Attribute
-	/** indicates if mousewarping ins enabled */
-	private boolean useWarp;
+    @Attribute
+    /** indicates if mousewarping ins enabled */
+    private boolean useWarp;
 
-	/** file where porperties are stored */
-	private File propertiesFile;
+    /** file where porperties are stored */
+    private File propertiesFile;
 
-	/** from properties file readed object */
-	private Object object;
+    /** from properties file readed object */
+    private Object object;
 
-	@Attribute
-	/** indicates if the sound is activated */
-	private boolean soundActivated;
+    @Attribute
+    /** indicates if the sound is activated */
+    private boolean soundActivated;
 
-	@Attribute
-	/** time which this tool runs in hours */
-	private double upTime;
+    @Attribute
+    /** time which this tool runs in hours */
+    private double upTime;
 
-	@Attribute
-	/** the number of initiated actions */
-	private int useCount;
+    @Attribute
+    /** the number of initiated actions */
+    private int useCount;
 
-	@Attribute
-	/** indcate if the submission is done */
-	private boolean submitted;
+    @Attribute
+    /** indicate if the first submission is done */
+    private boolean submittedFirst;
 
-	/**
-	 * creates properties, tries to load property file
-	 */
-	public Properties() {
+    @Attribute
+    /** indicate if the second submission is done */
+    private boolean submittedSecond;
 
-		// creates properties file
-		this.propertiesFile = new File("properties.prop");
+    /**
+     * creates properties, tries to load property file
+     */
+    public Properties() {
 
-		// status is used to indicate if the properties object could be readed
-		// probably
-		boolean status = false;
+        // creates properties file
+        this.propertiesFile = new File("properties.prop");
 
-		if (this.propertiesFile.exists()) {
-			try {
+        // status is used to indicate if the properties object could be readed
+        // probably
+        boolean status = false;
 
-				// read object from file
-				ObjectInputStream inputStream = new ObjectInputStream(
-						(new FileInputStream(this.propertiesFile)));
-				this.object = inputStream.readObject();
+        if (this.propertiesFile.exists()) {
+            try {
 
-				if (this.object instanceof Properties) {
+                // read object from file
+                ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
+                this.object = inputStream.readObject();
 
-					// store readed configurations
-					this.dimension = ((Properties) this.object).getDimension();
-					this.actionHotkey = ((Properties) this.object)
-							.getActionHotkey();
-					this.statusHotkey = ((Properties) this.object)
-							.getStatusHotkey();
-					this.useWarp = ((Properties) this.object).isUseWarp();
-					this.warperName = ((Properties) this.object)
-							.getWarperName();
-					this.detectorName = ((Properties) this.object)
-							.getDetectorName();
-					this.soundActivated = ((Properties) this.object)
-							.isSoundActivated();
-					this.upTime = ((Properties) this.object).getUpTime();
-					this.useCount = ((Properties) this.object).getUseCount();
+                if (this.object instanceof Properties) {
 
-					// reading successful
-					status = true;
-					System.out.println("Properties file was found.");
-					System.out.println("uses: " + this.useCount + ", time: "
-							+ this.upTime);
-					System.out.println("dimension: " + this.dimension
-							+ ", actionHotkey: " + this.actionHotkey
-							+ ", statusHotkey: " + this.statusHotkey);
-					System.out.println("use warp: " + this.useWarp
-							+ ", sound activated: " + this.soundActivated);
-					System.out.println("Detector: " + this.detectorName
-							+ ", Warper: " + this.warperName);
-				}
+                    // store readed configurations
+                    this.dimension = ((Properties) this.object).getDimension();
+                    this.actionHotkey = ((Properties) this.object).getActionHotkey();
+                    this.statusHotkey = ((Properties) this.object).getStatusHotkey();
+                    this.useWarp = ((Properties) this.object).isUseWarp();
+                    this.warperName = ((Properties) this.object).getWarperName();
+                    this.detectorName = ((Properties) this.object).getDetectorName();
+                    this.soundActivated = ((Properties) this.object).isSoundActivated();
+                    this.upTime = ((Properties) this.object).getUpTime();
+                    this.useCount = ((Properties) this.object).getUseCount();
+                    this.submittedFirst = ((Properties) this.object).isFirstSubmitted();
+                    this.submittedSecond = ((Properties) this.object).isSecondSubmitted();
 
-				// cleanup
-				inputStream.close();
+                    // reading successful
+                    status = true;
+                    System.out.println("Properties file was found.");
+                    System.out.println("uses: " + this.useCount + ", time: " + this.upTime);
+                    System.out.println("first survey done: " + this.submittedFirst + ", second survey done: " + this.submittedSecond);
+                    System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
+                    System.out.println("use warp: " + this.useWarp + ", sound activated: " + this.soundActivated);
+                    System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName);
+                }
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+                // cleanup
+                inputStream.close();
 
-		// if reading was not successful or properties file was not found
-		if (!status) {
-			this.restoreDefault();
-			System.out.println("Properties file was not found.");
-		}
-	}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-	/**
-	 * restores default values
-	 */
-	public void restoreDefault() {
-		// set default values
-		this.dimension = 200;
-		this.actionHotkey = null;
-		this.statusHotkey = null;
-		this.useWarp = true;
-		this.warperName = "";
-		this.detectorName = "";
-		this.soundActivated = true;
-		this.upTime = 0;
-		this.useCount = 0;
-		this.submitted = false;
-	}
+        // if reading was not successful or properties file was not found
+        if (!status) {
+            this.restoreDefault();
+            System.out.println("Properties file was not found.");
+        }
+    }
 
-	/**
-	 * return dimension of screenshots
-	 * 
-	 * @return dimension
-	 */
-	public int getDimension() {
-		return this.dimension;
-	}
+    /**
+     * restores default values
+     */
+    public void restoreDefault() {
+        // set default values
+        this.dimension = 200;
+        this.actionHotkey = null;
+        this.statusHotkey = null;
+        this.useWarp = true;
+        this.warperName = "";
+        this.detectorName = "";
+        this.soundActivated = true;
+        this.upTime = 0;
+        this.useCount = 0;
+        this.submittedFirst = false;
+        this.submittedSecond = false;
+    }
 
-	/**
-	 * set dimension of screenshots
-	 * 
-	 * @param dimension
-	 */
-	public void setDimension(int dimension) {
-		this.dimension = dimension;
-	}
+    /**
+     * return dimension of screenshots
+     * 
+     * @return dimension
+     */
+    public int getDimension() {
+        return this.dimension;
+    }
 
-	/**
-	 * @return the soundActivated
-	 */
-	public boolean isSoundActivated() {
-		return this.soundActivated;
-	}
+    /**
+     * set dimension of screenshots
+     * 
+     * @param dimension
+     */
+    public void setDimension(int dimension) {
+        this.dimension = dimension;
+    }
 
-	/**
-	 * @param soundActivated
-	 *            the soundActivated to set
-	 */
-	public void setSoundActivated(boolean soundActivated) {
-		this.soundActivated = soundActivated;
-	}
+    /**
+     * @return the soundActivated
+     */
+    public boolean isSoundActivated() {
+        return this.soundActivated;
+    }
 
-	/**
-	 * current action hotkey container
-	 * 
-	 * @return actionHotkey
-	 */
-	public HotkeyContainer getActionHotkey() {
-		return this.actionHotkey;
-	}
+    /**
+     * @param soundActivated
+     *            the soundActivated to set
+     */
+    public void setSoundActivated(boolean soundActivated) {
+        this.soundActivated = soundActivated;
+    }
 
-	/**
-	 * set current hotkey container
-	 * 
-	 * @param actionHotkey
-	 */
-	public void setActionHotkey(HotkeyContainer actionHotkey) {
-		this.actionHotkey = actionHotkey;
-	}
+    /**
+     * current action hotkey container
+     * 
+     * @return actionHotkey
+     */
+    public HotkeyContainer getActionHotkey() {
+        return this.actionHotkey;
+    }
 
-	/**
-	 * current status hotkey container
-	 * 
-	 * @return statusHotkey
-	 */
-	public HotkeyContainer getStatusHotkey() {
-		return this.statusHotkey;
-	}
+    /**
+     * set current hotkey container
+     * 
+     * @param actionHotkey
+     */
+    public void setActionHotkey(HotkeyContainer actionHotkey) {
+        this.actionHotkey = actionHotkey;
+    }
 
-	/**
-	 * set current status hotkey container
-	 * 
-	 * @param statusHotkey
-	 */
-	public void setStatusHotkey(HotkeyContainer statusHotkey) {
-		this.statusHotkey = statusHotkey;
-	}
+    /**
+     * current status hotkey container
+     * 
+     * @return statusHotkey
+     */
+    public HotkeyContainer getStatusHotkey() {
+        return this.statusHotkey;
+    }
 
-	/**
-	 * @return the useWarp
-	 */
-	public boolean isUseWarp() {
-		return this.useWarp;
-	}
+    /**
+     * set current status hotkey container
+     * 
+     * @param statusHotkey
+     */
+    public void setStatusHotkey(HotkeyContainer statusHotkey) {
+        this.statusHotkey = statusHotkey;
+    }
 
-	/**
-	 * @param useWarp
-	 *            the useWarp to set
-	 */
-	public void setUseWarp(boolean useWarp) {
-		this.useWarp = useWarp;
-	}
+    /**
+     * @return the useWarp
+     */
+    public boolean isUseWarp() {
+        return this.useWarp;
+    }
 
-	/**
-	 * @return the currentWarperName
-	 */
-	public String getWarperName() {
-		return this.warperName;
-	}
+    /**
+     * @param useWarp
+     *            the useWarp to set
+     */
+    public void setUseWarp(boolean useWarp) {
+        this.useWarp = useWarp;
+    }
 
-	/**
-	 * @param currentWarperName
-	 *            the currentWarperName to set
-	 */
-	public void setWarperName(String currentWarperName) {
-		this.warperName = currentWarperName;
-	}
+    /**
+     * @return the currentWarperName
+     */
+    public String getWarperName() {
+        return this.warperName;
+    }
 
-	/**
-	 * @return the currentDetectorName
-	 */
-	public String getDetectorName() {
-		return this.detectorName;
-	}
+    /**
+     * @param currentWarperName
+     *            the currentWarperName to set
+     */
+    public void setWarperName(String currentWarperName) {
+        this.warperName = currentWarperName;
+    }
 
-	/**
-	 * @param currentDetectorName
-	 *            the currentDetectorName to set
-	 */
-	public void setDetectorName(String currentDetectorName) {
-		this.detectorName = currentDetectorName;
-	}
+    /**
+     * @return the currentDetectorName
+     */
+    public String getDetectorName() {
+        return this.detectorName;
+    }
 
-	/**
-	 * write properties to propertiesFile
-	 */
-	public void writeProperties() {
-		try {
+    /**
+     * @param currentDetectorName
+     *            the currentDetectorName to set
+     */
+    public void setDetectorName(String currentDetectorName) {
+        this.detectorName = currentDetectorName;
+    }
 
-			// write object
-			ObjectOutputStream outputStream = new ObjectOutputStream(
-					new FileOutputStream(this.propertiesFile));
-			outputStream.writeObject(this);
+    /**
+     * write properties to propertiesFile
+     */
+    public void writeProperties() {
+        try {
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            // write object
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
+            outputStream.writeObject(this);
 
-	/** return the time which this tool has runned in hours */
-	public double getUpTime() {
-		return this.upTime;
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	/** adds given value to upTime */
-	public void addToUpTime(double time) {
-		this.upTime = this.upTime + time;
-	}
+    /** @return the time which this tool has runned in hours */
+    public double getUpTime() {
+        return this.upTime;
+    }
 
-	/** return the initiated uses of this tool */
-	public int getUseCount() {
-		return this.useCount;
-	}
+    /** 
+     * adds given value to upTime
+     *  
+     * @param time 
+     */
+    public void addToUpTime(double time) {
+        this.upTime = this.upTime + time;
+    }
 
-	/** adds given value to useCount */
-	public void incrementUseCount() {
-		this.useCount++;
-	}
+    /** @return the initiated uses of this tool */
+    public int getUseCount() {
+        return this.useCount;
+    }
 
-	/**
-	 * indicates if the submission is done
-	 * 
-	 * @return true if done
-	 */
-	public boolean isSubmitted() {
-		return this.submitted;
-	}
+    /** adds given value to useCount */
+    public void incrementUseCount() {
+        this.useCount++;
+    }
 
-	/**
-	 * sets the submission status
-	 * 
-	 * @param submitted
-	 */
-	public void setSubmitted(boolean submitted) {
-		this.submitted = submitted;
-	}
+    /**
+     * indicates if the submission is done
+     * 
+     * @return true if done
+     */
+    public boolean isFirstSubmitted() {
+        return this.submittedFirst;
+    }
 
+    /**
+     * sets the submission status
+     * 
+     * @param submitted
+     */
+    public void setFirstSubmitted(boolean submitted) {
+        this.submittedFirst = submitted;
+    }
+
+    /**
+     * indicates if the submission is done
+     * 
+     * @return true if done
+     */
+    public boolean isSecondSubmitted() {
+        return this.submittedSecond;
+    }
+
+    /**
+     * sets the submission status
+     * 
+     * @param submitted
+     */
+    public void setSecondSubmitted(boolean submitted) {
+        this.submittedSecond = submitted;
+    }
 }
