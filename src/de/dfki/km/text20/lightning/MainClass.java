@@ -172,19 +172,18 @@ public class MainClass {
 		this.trayIcon = new TraySymbol();
 		if (!this.trayIcon.init())
 			System.exit(0);
-		this.showTrayMessage("Initializing please wait...");
+		//this.showTrayMessage("Initializing please wait...");
 
 		// set logging properties
 		final JSPFProperties props = new JSPFProperties();
 		props.setProperty(Diagnosis.class, "recording.enabled", "true");
 		props.setProperty(Diagnosis.class, "recording.file", "diagnosis.record");
-		props.setProperty(Diagnosis.class, "recording.format",
-				"java/serialization");
-		props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled",
-				"true");
-		props.setProperty(Diagnosis.class, "analysis.stacktraces.depth",
-				"10000");
-
+		props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
+		props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
+		props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
+		props.setProperty(PluginManager.class, "cache.enabled", "true");
+		props.setProperty(PluginManager.class, "cache.mode",    "weak"); 
+		
 		// set statistic properties
 		props.setProperty(Statistics.class, "application.id", "StatisticsTest");
 
@@ -253,14 +252,14 @@ public class MainClass {
 				this.warper.start();
 
 				// indicate success
-				this.showTrayMessage("Initializing successful.");
+				//this.showTrayMessage("Initializing successful.");
 				System.out.println("\r\nInitializing successful.\r\n");
 				this.channel.status("Initializing successful.");
 				this.addToStatistic("Initializing successful.");
 
 				// update status
 				this.allFine = true;
-				
+
 				// start reminder
 				this.reminder.init();
 			}
@@ -293,9 +292,9 @@ public class MainClass {
 	 * publishes the current statistic file to the server
 	 */
 	public void publishStatistics() {
-	    this.statistics.publish();
+		this.statistics.publish();
 	}
-	
+
 	/**
 	 * provides internal plugin manager
 	 * 
@@ -372,8 +371,8 @@ public class MainClass {
 		return this.allFine;
 	}
 
-	/** 
-	 * return current submit reminder 
+	/**
+	 * return current submit reminder
 	 * 
 	 * @return reminder
 	 */
@@ -387,7 +386,7 @@ public class MainClass {
 	public void exit() {
 		// close reminder
 		this.reminder.close();
-		
+
 		// store properties to a file
 		this.properties.writeProperties();
 

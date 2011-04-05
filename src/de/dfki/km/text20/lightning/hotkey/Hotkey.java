@@ -346,6 +346,9 @@ public class Hotkey implements HotkeyListener {
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_UP, "CTRL + UP"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_RIGHT, "CTRL + RIGHT"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_DOWN, "CTRL + DOWN"));
+        this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_TAB, "CTRL + TAB"));
+        this.hotkeys.add(new HotkeyContainer(0, KeyEvent.VK_NUMPAD0, "Numpad 0"));
+        this.hotkeys.add(new HotkeyContainer(0, KeyEvent.VK_NUMPAD5, "Numpad 5"));
         this.hotkeys.add(new HotkeyContainer("F7", "F7"));
         this.hotkeys.add(new HotkeyContainer("F8", "F8"));
         this.hotkeys.add(new HotkeyContainer("F9", "F9"));

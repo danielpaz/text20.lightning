@@ -214,7 +214,7 @@ public class Properties implements Serializable {
     }
 
     /**
-     * set current hotkey container
+     * set current hotkey container		
      * 
      * @param actionHotkey
      */
@@ -313,7 +313,8 @@ public class Properties implements Serializable {
     public void addToUpTime(double time) {
         this.upTime = this.upTime + time;
     }
-
+    
+    
     /** @return the initiated uses of this tool */
     public int getUseCount() {
         return this.useCount;

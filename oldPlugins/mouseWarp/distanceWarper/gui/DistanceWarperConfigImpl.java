@@ -1,5 +1,5 @@
 /*
- * AdvancedWarperConfigImpl.java
+ * DistanceWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,35 +18,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.gui;
+package de.dfki.km.text20.lightning.plugins.mouseWarp.distanceWarper.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.SpinnerNumberModel;
-
-import de.dfki.km.text20.lightning.plugins.mouseWarp.impl.AdvancedWarper.AdvancedWarperProperties;
+import de.dfki.km.text20.lightning.plugins.mouseWarp.distanceWarper.DistanceWarperProperties;
 
 /**
  * @author Christoph Käding
- * 
+ *
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
+public class DistanceWarperConfigImpl extends DistanceWarperConfig implements
         ActionListener {
 
     /** current used properties */
-    private AdvancedWarperProperties properties;
+    private DistanceWarperProperties properties;
 
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
-    public AdvancedWarperConfigImpl() {
+    public DistanceWarperConfigImpl() {
         // initialize properties and preselect spinners
-        this.properties = AdvancedWarperProperties.getInstance();
+        this.properties = DistanceWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerSpeed.setModel(new SpinnerNumberModel(this.properties.getSpeed(), 0.1, 2.147483647E9, 0.1));
-        this.spinnerReactionTime.setValue(this.properties.getReactionTime());
+        this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
+        this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());
 
         // add listener
         this.buttonCancel.addActionListener(this);
@@ -60,11 +58,8 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
         setVisible(true);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -86,28 +81,30 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
     }
 
     /**
-     * Fired when Default-button is clicked. Restores default values from
-     * properties.
+     * Fired when Default-button is clicked.
+     * Restores default values from properties.
      */
     private void buttonDefaultActionPerformed() {
         this.properties.restoreDefault();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerSpeed.setValue(this.properties.getSpeed());
-        this.spinnerReactionTime.setValue(this.properties.getReactionTime());
+        this.spinnerDistance.setValue(this.properties.getDistanceThreshold());
+        this.spinnerHomeRadius.setValue(this.properties.getHomeRadius());
     }
 
     /**
-     * Fired when OK-button is clicked. Sets selected values in properties.
+     * Fired when OK-button is clicked.
+     * Sets selected values in properties.
      */
     private void buttonOKActionPerformed() {
         this.properties.setAngleThreshold(Integer.parseInt(this.spinnerAngle.getValue().toString()));
-        this.properties.setSpeed(Double.parseDouble(this.spinnerSpeed.getValue().toString()));
-        this.properties.setReactionTime(Integer.parseInt(this.spinnerReactionTime.getValue().toString()));
+        this.properties.setDistanceThreshold(Integer.parseInt(this.spinnerDistance.getValue().toString()));
+        this.properties.setHomeRadius(Integer.parseInt(this.spinnerHomeRadius.getValue().toString()));
         dispose();
     }
 
     /**
-     * Fired when Cancel-button is clicked. Closes the gui.
+     * Fired when Cancel-button is clicked.
+     * Closes the gui.
      */
     private void buttonCancelActionPerformed() {
         dispose();
@@ -116,12 +113,12 @@ public class AdvancedWarperConfigImpl extends AdvancedWarperConfig implements
     private void manageToolTips() {
         // set tooltip text
         String labelAngleThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must do this in an angle within this<br>threshold to activate the mouse warp.<br>The lower this value the more exact you must<br>move your mouse.</body></HTML>";
-        String labelSpeedTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal with this speed in pixels per ms<br>to activate the mouse warp. The higher this value<br>the fatser you have to move.</body></HTML>";
-        String labelReactionTimeTT = "<HTML><body>This is your reaction time you would be need to<br>react on the mouse warp. This is used to calculate<br>the point where the cursor will be placed.</body></HTML>";
+        String labelDistanceThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal this way in pixels to<br>activate the mouse warp. The higher this value<br>the more pixels you have to pass.<br>This means you have to move faster.</body></HTML>";
+        String labelHomeRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your cursor is within this radius, your<br>mousecursor will not be warped.</body></HTML>";
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
-        this.labelSpeed.setToolTipText(labelSpeedTT);
-        this.labelReactionTime.setToolTipText(labelReactionTimeTT);
+        this.labelDistanceThreshold.setToolTipText(labelDistanceThresholdTT);
+        this.labelHomeRadius.setToolTipText(labelHomeRadiusTT);
     }
 }

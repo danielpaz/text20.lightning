@@ -1,5 +1,5 @@
 /*
- * AdvancedSobel.java
+ * ImprovedSimpleSobel.java
  *
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -19,7 +19,7 @@
  * MA 02110-1301  USA
  *
  */
-package de.dfki.km.text20.lightning.plugins.saliency.impl.advancedsobel;
+package de.dfki.km.text20.lightning.plugins.saliency.improvedsimplesobel;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -42,7 +42,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
  *
  */
 @PluginImplementation
-public class AdvancedSobel implements SaliencyDetector {
+public class ImprovedSimpleSobel implements SaliencyDetector {
 
     /** information object*/
     private PluginInformation information;
@@ -53,8 +53,8 @@ public class AdvancedSobel implements SaliencyDetector {
     /**
      * creates new simple sobel object
      */
-    public AdvancedSobel() {
-        this.information = new PluginInformation("Advanced Sobel", "Advanced Sobel", false);
+    public ImprovedSimpleSobel() {
+        this.information = new PluginInformation("Improved Simple Sobel", "Improved Simple Sobel", false);
     }
 
     /**
@@ -100,9 +100,6 @@ public class AdvancedSobel implements SaliencyDetector {
         // size of the spiral in one direction
         int size = 1;
 
-        // temporary stored distance between founded point and fixation
-        double storedDistance = Double.MAX_VALUE;
-
         // derivated screenshot
         BufferedImage derivatedScreenShot = derivate(screenShot);
 
@@ -124,11 +121,8 @@ public class AdvancedSobel implements SaliencyDetector {
             // grow in every direction
             switch (direction) {
 
+            // run through line
             case 0:
-                // check if it is possible to find a better offset
-                if (storedDistance < temp.x) return offset;
-
-                // run through line
                 for (int y = 0; (y < size) && (temp.y < derivatedScreenShot.getHeight() / 2 - 1); y++) {
 
                     // move temporary point
@@ -138,16 +132,13 @@ public class AdvancedSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
                         // TODO: comment this out, its only for debugging
-                        //                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
 
                         // check if the point is closer than the current offset
-                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < storedDistance) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
-
-                            // store distance
-                            storedDistance = new Point(point.x + offset.x, point.y + offset.y).distance(point);
 
                             // indicate that a non-black-point was found
                             found = true;
@@ -155,14 +146,15 @@ public class AdvancedSobel implements SaliencyDetector {
                     }
                 }
 
+                // if a point was found, return it
+                if (found) return offset;
+
                 // change direction
                 direction++;
                 direction = direction % 4;
                 break;
 
             case 1:
-                // check if it is possible to find a better offset
-                if (storedDistance < temp.y) return offset;
 
                 // run through line
                 for (int x = 0; (x < size) && (-temp.x < derivatedScreenShot.getHeight() / 2 - 1); x++) {
@@ -174,22 +166,22 @@ public class AdvancedSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
                         // TODO: comment this out, its only for debugging
-                        //                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
 
                         // check if the point is closer than the current offset
-                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < storedDistance) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
-
-                            // store distance
-                            storedDistance = new Point(point.x + offset.x, point.y + offset.y).distance(point);
 
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
+
+                // if a point was found, return it
+                if (found) return offset;
 
                 // change direction
                 direction++;
@@ -200,8 +192,6 @@ public class AdvancedSobel implements SaliencyDetector {
                 break;
 
             case 2:
-                // check if it is possible to find a better offset
-                if (storedDistance < -temp.x) return offset;
 
                 // run through line
                 for (int y = 0; (y < size) && (-temp.y < derivatedScreenShot.getHeight() / 2 - 1); y++) {
@@ -213,16 +203,13 @@ public class AdvancedSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
                         // TODO: comment this out, its only for debugging
-                        //                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
 
                         // check if the point is closer than the current offset
-                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < storedDistance) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
-
-                            // store distance
-                            storedDistance = new Point(point.x + offset.x, point.y + offset.y).distance(point);
 
                             // indicate that a non-black-point was found
                             found = true;
@@ -230,14 +217,15 @@ public class AdvancedSobel implements SaliencyDetector {
                     }
                 }
 
+                // if a point was found, return it
+                if (found) return offset;
+
                 // change direction
                 direction++;
                 direction = direction % 4;
                 break;
 
             case 3:
-                // check if it is possible to find a better offset
-                if (storedDistance < -temp.y) return offset;
 
                 // run through line
                 for (int x = 0; (x < size) && (temp.x < derivatedScreenShot.getHeight() / 2 - 1); x++) {
@@ -249,22 +237,22 @@ public class AdvancedSobel implements SaliencyDetector {
                     if ((derivatedScreenShot.getRGB(point.x + temp.x, point.y + temp.y) & 0xFF) > 0) {
 
                         // TODO: comment this out, its only for debugging
-                        //                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
+//                        this.drawPicture(derivatedScreenShot, new Point(point.x + temp.x, point.y + temp.y));
 
                         // check if the point is closer than the current offset
-                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < storedDistance) {
+                        if (new Point(point.x + temp.x, point.y + temp.y).distance(point) < new Point(point.x + offset.x, point.y + offset.y).distance(point)) {
 
                             // set new offset
                             offset.setLocation(temp);
-
-                            // store distance
-                            storedDistance = new Point(point.x + offset.x, point.y + offset.y).distance(point);
 
                             // indicate that a non-black-point was found
                             found = true;
                         }
                     }
                 }
+
+                // if a point was found, return it
+                if (found) return offset;
 
                 // change direction
                 direction++;
@@ -277,8 +265,7 @@ public class AdvancedSobel implements SaliencyDetector {
         }
 
         // if nothing had found
-        if (!found) offset.setLocation(0, 0);
-
+        offset.setLocation(0, 0);
         return offset;
     }
 
@@ -322,7 +309,7 @@ public class AdvancedSobel implements SaliencyDetector {
     private void drawPicture(BufferedImage screenShot, Point point) {
         // initialize variables
         int dimension = screenShot.getHeight();
-        File file = new File("tmp/ImprovedSimpleSobel_" + this.timestamp + ".png");
+        File file = new File("tmp/IMprovedSimpleSobel_" + this.timestamp + ".png");
         boolean alreadyExists = file.exists();
 
         try {
