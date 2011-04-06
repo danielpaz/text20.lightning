@@ -69,7 +69,7 @@ public class TrayMenu {
             menu.add(configMenu);
 
             // adds change state button to the menu
-            final MenuItem changeState = new MenuItem("Disable");
+            /*final MenuItem changeState = new MenuItem("Disable");
             changeState.addActionListener(new ActionListener() {
 
                 // depending on the current state, the label for the next state is printed and the state is changed 
@@ -100,7 +100,7 @@ public class TrayMenu {
                     }
                 }
             });
-            menu.add(changeMode);
+            menu.add(changeMode);*/
 
             // adds exit to the menu
             final MenuItem exit = new MenuItem("Exit");

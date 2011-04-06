@@ -131,7 +131,7 @@ public class Properties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
-                    System.out.println("uses: " + this.useCount + ", time: " + this.upTime);
+                    System.out.println("uses: " + this.useCount + ", time: " + this.upTime + " hours");
                     System.out.println("first survey done: " + this.submittedFirst + ", second survey done: " + this.submittedSecond);
                     System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("use warp: " + this.useWarp + ", sound activated: " + this.soundActivated);
@@ -161,14 +161,15 @@ public class Properties implements Serializable {
         this.dimension = 200;
         this.actionHotkey = null;
         this.statusHotkey = null;
-        this.useWarp = true;
+        this.useWarp = false;
         this.warperName = "";
         this.detectorName = "";
-        this.soundActivated = true;
+        this.soundActivated = false;
         this.upTime = 0;
         this.useCount = 0;
-        this.submittedFirst = false;
-        this.submittedSecond = false;
+        // TODO: change to false
+        this.submittedFirst = true;
+        this.submittedSecond = true;
     }
 
     /**

@@ -54,7 +54,7 @@ public class StandardSobel implements SaliencyDetector {
      * creates new simple sobel object
      */
     public StandardSobel() {
-        this.information = new PluginInformation("Advanced Sobel", "Advanced Sobel", false);
+        this.information = new PluginInformation("Standard Sobel", "Basic version of the saliency detector.", false);
     }
 
     /**

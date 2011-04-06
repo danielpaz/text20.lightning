@@ -111,10 +111,10 @@ public class FixationEvaluator implements Runnable {
             this.offset = this.manager.getCurrentSaliencyDetector().analyse(this.screenShot);
 
         // update the logfile
-        String logString = "Click - Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
-        System.out.println(logString);
-        MainClass.getInstance().getChannel().status(logString);
-        MainClass.getInstance().addToStatistic(logString);
+        String logString = "Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
+        System.out.println("Click - " + logString);
+        MainClass.getInstance().getChannel().status("Click - " + logString);
+        MainClass.getInstance().addToStatistic("click", logString);
 
         // click to calculated target and reset mouseposition
         this.robot.mouseMove(this.fixation.x + this.offset.x, this.fixation.y + this.offset.y);
@@ -123,7 +123,7 @@ public class FixationEvaluator implements Runnable {
         this.robot.mouseMove(this.location.x, this.location.y);
 
         // TODO: for debugging
-        this.drawPicture();
+        //        this.drawPicture();
 
         // reset fixation point and status
         this.fixation = null;

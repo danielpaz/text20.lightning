@@ -27,3 +27,5 @@ syntax: regexp
 ^evaluation$
 syntax: regexp
 ^plugins$
+syntax: regexp
+^jspf\.plugin\.cache$

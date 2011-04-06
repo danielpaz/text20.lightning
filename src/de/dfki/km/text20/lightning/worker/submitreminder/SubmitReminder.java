@@ -39,8 +39,9 @@ public class SubmitReminder {
     public SubmitReminder() {
         // initialize variables
         // TODO: set useful values
-        this.upTimeThresh = 0;
-        this.useCountThres = 0;
+        this.upTimeThresh = 10;
+        this.useCountThres = 100;
+        this.timestamp = System.currentTimeMillis();
         this.properties = MainClass.getInstance().getProperties();
         this.timer = new Timer((2 * 60 * 1000), new ActionListener() {
 
@@ -67,15 +68,12 @@ public class SubmitReminder {
      * initializes and starts the reminder
      */
     public void init() {
-        // initialize variables
-        this.timestamp = System.currentTimeMillis();
-
         // check for 1st use
         if (!this.properties.isFirstSubmitted()) this.timer.start();
         else
 
         // check execution duration
-        if (!this.properties.isSecondSubmitted() && ((this.properties.getUpTime() > this.upTimeThresh) || this.properties.getUseCount() > this.useCountThres))
+        if (this.properties.isFirstSubmitted() && !this.properties.isSecondSubmitted() && ((this.properties.getUpTime() > this.upTimeThresh) || this.properties.getUseCount() > this.useCountThres))
             this.timer.start();
     }
 
@@ -91,12 +89,25 @@ public class SubmitReminder {
      * initiates the reminder window
      */
     private void showReminder() {
-        final Object[] options = { "Yes", "No, thanks." };
-        JOptionPane.showOptionDialog(null, "Sorry to interrupt you and we only ask once. Would you like to participate " +
-        		"in a usability survey about this tool?", "Text 2.0 Lightning Survey", 
-                                     JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, 
-                                     null, options, options[0]);
+        // initialize variables
+        final Object[] options = { "Yes", "No, thanks" };
+        int choice = -1;
 
+        // first survey part
+        if (!this.properties.isFirstSubmitted()) {
+            choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you and we only ask once. Would you like to participate " + "in a usability survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (choice == 0) {
+                this.startSurvey();
+            }
+            
+        // second survey part
+        } else {
+            choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you a second time. Would you like to participate " + "in the second part of the survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            this.properties.setSecondSubmitted(true);
+            if (choice == 0) {
+                this.startSurvey();
+            }
+        }
     }
 
     /**
