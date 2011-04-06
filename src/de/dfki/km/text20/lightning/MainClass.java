@@ -36,10 +36,11 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
+import net.xeoh.plugins.meta.statistics.Statistics;
+import net.xeoh.plugins.meta.updatecheck.UpdateCheck;
 
 import com.melloware.jintellitype.JIntellitype;
 
-import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
@@ -110,6 +111,9 @@ public class MainClass {
 
     /** manages submit notification */
     private SubmitReminder reminder;
+    
+    /** indicates if during this session datas where already submitted */
+    private boolean submitted;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -145,6 +149,9 @@ public class MainClass {
         props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
         props.setProperty(PluginManager.class, "cache.enabled", "true");
         props.setProperty(PluginManager.class, "cache.mode", "weak");
+        props.setProperty(UpdateCheck.class, "update.url", "http://api.text20.net/common/versioncheck/");
+        props.setProperty(UpdateCheck.class, "product.name", "text20.lightning");
+        props.setProperty(UpdateCheck.class, "product.version", "1.4");
 
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
@@ -169,6 +176,7 @@ public class MainClass {
         this.dllStatus = this.checkDll();
         this.isActivated = true;
         this.isNormalMode = true;
+        this.submitted = false;
         this.reminder = new SubmitReminder();
 
         // indicate start
@@ -225,16 +233,15 @@ public class MainClass {
     }
 
     private void setupStatistics() {
-        // TODO: That won't work like that ...
-        addToStatistic("time: " + getProperties().getUpTime());
-        addToStatistic("uses: " + getProperties().getUseCount());
-        addToStatistic("dimension: " + getProperties().getDimension());
-        addToStatistic("action hotkey: " + getProperties().getActionHotkey());
-        addToStatistic("status hotkey: " + getProperties().getStatusHotkey());
-        addToStatistic("use warp: " + getProperties().isUseWarp());
-        addToStatistic("sound activated" + getProperties().isSoundActivated());
-        addToStatistic("detector: " + getProperties().getDetectorName());
-        addToStatistic("warper: " + getProperties().getWarperName());
+        addToStatistic("time", "" + getProperties().getUpTime());
+        addToStatistic("uses", "" + getProperties().getUseCount());
+        addToStatistic("dimension", "" + getProperties().getDimension());
+        addToStatistic("action hotkey", "" + getProperties().getActionHotkey());
+        addToStatistic("status hotkey", "" + getProperties().getStatusHotkey());
+        addToStatistic("use warp", "" + getProperties().isUseWarp());
+        addToStatistic("sound activated", "" + getProperties().isSoundActivated());
+        addToStatistic("detector", getProperties().getDetectorName());
+        addToStatistic("warper", getProperties().getWarperName());
     }
 
     /**
@@ -256,14 +263,24 @@ public class MainClass {
      * @param text
      */
     public void addToStatistic(String text) {
-        // this.statistics.collect(text);
+        this.statistics.collect(text);
+    }
+
+    /**
+     * adds the given text to the statistics which are provided by plugin
+     * 
+     * @param text
+     * @param key
+     */
+    public void addToStatistic(String key, String text) {
+        this.statistics.collect(key, text);
     }
 
     /**
      * publishes the current statistic file to the server
      */
     public void publishStatistics() {
-        // this.statistics.publish();
+        this.statistics.publish();
     }
 
     /**
@@ -308,7 +325,7 @@ public class MainClass {
         if (this.isActivated) {
 
             // show change in tray
-            this.showTrayMessage("Status: tool is now deactivated");
+            // this.showTrayMessage("Status: tool is now deactivated");
             this.trayIcon.setDeactivatedIcon();
 
             // deactivate plugins
@@ -322,7 +339,7 @@ public class MainClass {
         } else {
 
             // show change in tray
-            this.showTrayMessage("Status: tool is now activated");
+            // this.showTrayMessage("Status: tool is now activated");
             this.trayIcon.setActivatedIcon(this.isNormalMode);
 
             // activate plugins
@@ -412,8 +429,8 @@ public class MainClass {
 
             // update settings to statistic
             this.addToStatistic("evaluation activated");
-            this.addToStatistic("screen brighness: " + this.getEvaluationSettings()[1]);
-            this.addToStatistic("setting brightness: " + this.getEvaluationSettings()[2]);
+            this.addToStatistic("screen brighness", this.getEvaluationSettings()[1]);
+            this.addToStatistic("setting brightness", this.getEvaluationSettings()[2]);
 
             // change mode
             this.isNormalMode = false;
@@ -529,10 +546,27 @@ public class MainClass {
     }
 
     /**
+     * indicates if datas where already submitted
+     * 
+     * @return status
+     */
+    public boolean isSubmitted() {
+		return this.submitted;
+	}
+
+    /**
+     * sets submission status
+     * 
+     * @param submitted
+     */
+	public void setSubmitted(boolean submitted) {
+		this.submitted = submitted;
+	}
+
+	/**
      * plays the error sound
      */
     public void playError() {
-        this.showTrayMessage("Eyes not found!");
         if (!this.properties.isSoundActivated()) return;
         this.soundError.play();
     }

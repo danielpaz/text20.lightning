@@ -155,22 +155,23 @@ public class Hotkey implements HotkeyListener {
             // check if the tool is activated
             if (!this.main.isActivated()) return;
 
-            // increase use count
-            this.main.gerReminder().addUse();
-            
-            // check if trackingdevice provides correct data and if the
             // initializing was successful
-            if (!this.main.isTrackingValid() || !this.main.isAllFine()) {
+            if (!this.main.isAllFine()) return;
+
+            // check if trackingdevice provides correct data and if the
+            if (!this.main.isTrackingValid()) {
+                this.main.showTrayMessage("Eyes not found!");
                 this.main.playError();
                 return;
             }
+
+            // increase use count
+            this.main.gerReminder().addUse();
 
             // decide which mode
             if (this.main.isNormalMode()) {
                 // if the hotkey is typed, the stored fixation will be evaluated
                 if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
-                else
-                    this.main.playError();
                 break;
             }
 
@@ -332,13 +333,14 @@ public class Hotkey implements HotkeyListener {
         this.tmpActionHotkey = null;
         this.tmpStatusHotkey = null;
     }
-    
+
     /**
      * Creates the list of available hotkys.
      */
     // TODO: increase number of hotkeys
     private void initHotkeys() {
         this.hotkeys = new ArrayList<HotkeyContainer>();
+        this.hotkeys.add(new HotkeyContainer(0, KeyEvent.VK_NUMPAD0, "Numpad 0"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_A, "WIN + A"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_C, "WIN + C"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_WIN, KeyEvent.VK_H, "WIN + H"));
@@ -347,7 +349,6 @@ public class Hotkey implements HotkeyListener {
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_RIGHT, "CTRL + RIGHT"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_DOWN, "CTRL + DOWN"));
         this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_TAB, "CTRL + TAB"));
-        this.hotkeys.add(new HotkeyContainer(0, KeyEvent.VK_NUMPAD0, "Numpad 0"));
         this.hotkeys.add(new HotkeyContainer(0, KeyEvent.VK_NUMPAD5, "Numpad 5"));
         this.hotkeys.add(new HotkeyContainer("F7", "F7"));
         this.hotkeys.add(new HotkeyContainer("F8", "F8"));

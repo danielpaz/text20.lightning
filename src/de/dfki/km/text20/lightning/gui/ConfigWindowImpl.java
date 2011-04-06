@@ -45,7 +45,8 @@ import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
  *
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class ConfigWindowImpl extends ConfigWindow implements ActionListener, WindowListener {
+public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
+        WindowListener {
 
     /**
      * manageHotkeyComboBox() changes the items and selection of the actionHotkey and the statusHotkey comboboxes.
@@ -62,7 +63,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
 
     /** renderer to show displaynames in comboboxes */
     private DefaultListCellRenderer renderer;
-    
+
     /** instance of the mainclass */
     private MainClass main;
 
@@ -70,12 +71,13 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * builds the window with all its components and shows it
      */
     public ConfigWindowImpl() {
-    	this.main = MainClass.getInstance();
+        this.main = MainClass.getInstance();
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
+        this.buttonSubmit.setEnabled(!this.main.isSubmitted());
 
         // initialize renderer of comboboxes
         this.renderer = initRenderer();
@@ -148,7 +150,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         }
 
         if (event.getSource() == this.buttonSubmit) {
-            // TODO: add method
+            this.buttonSubmitActionPerformed();
             return;
         }
 
@@ -216,7 +218,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
 
         // refresh warper and plugins
         this.main.refreshWarper();
-        
 
         // set mode
         if (this.main.isNormalMode() && this.checkBoxEvaluation.isSelected())
@@ -227,14 +228,14 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
 
         // update statistics
         this.main.addToStatistic("settings changed");
-        this.main.addToStatistic("dimension: " + this.main.getProperties().getDimension());
-        this.main.addToStatistic("action hotkey: " + this.main.getProperties().getActionHotkey());
-        this.main.addToStatistic("status hotkey: " + this.main.getProperties().getStatusHotkey());
-        this.main.addToStatistic("use warp: " + this.main.getProperties().isUseWarp());
-        this.main.addToStatistic("sound activated" + this.main.getProperties().isSoundActivated());
-        this.main.addToStatistic("detector: " + this.main.getProperties().getDetectorName());
-        this.main.addToStatistic("warper: " + this.main.getProperties().getWarperName());
-        
+        this.main.addToStatistic("dimension", "" + this.main.getProperties().getDimension());
+        this.main.addToStatistic("action hotkey", "" + this.main.getProperties().getActionHotkey());
+        this.main.addToStatistic("status hotkey", "" + this.main.getProperties().getStatusHotkey());
+        this.main.addToStatistic("use warp", "" + this.main.getProperties().isUseWarp());
+        this.main.addToStatistic("sound activated", "" + this.main.getProperties().isSoundActivated());
+        this.main.addToStatistic("detector", this.main.getProperties().getDetectorName());
+        this.main.addToStatistic("warper", this.main.getProperties().getWarperName());
+
         // close the gui
         this.mainFrame.dispose();
     }
@@ -242,10 +243,19 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
     /**
      * Fired if the Cancel button is clicked. Closes the window.
      */
+    private void buttonSubmitActionPerformed() {
+    	this.main.publishStatistics();
+    	this.main.setSubmitted(true);
+    	this.buttonSubmit.setEnabled(false);
+    }
+    
+    /**
+     * Fired if the Cancel button is clicked. Closes the window.
+     */
     private void buttonCancelActionPerformed() {
         // close the window
         this.mainFrame.dispose();
-        
+
         // reset temporary keys
         Hotkey.getInstance().resetTmpKeys();
     }
@@ -254,7 +264,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * manages the visibility of the configbutton
      */
     private void comboBoxDetectorActionPerformed() {
-    	this.buttonDetectorConfig.setText(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getDisplayName() + " Configuration");
+        this.buttonDetectorConfig.setText(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonDetectorConfig.setEnabled(((PluginInformation) this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
     }
 
@@ -262,7 +272,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * manages the visibility of the configbutton
      */
     private void comboBoxWarpMethodActionPerformed() {
-    	this.buttonWarpConfig.setText(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getDisplayName() + " Configuration");
+        this.buttonWarpConfig.setText(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonWarpConfig.setEnabled(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
     }
 
@@ -270,14 +280,14 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * Fired if the Detector Config button is clicked. Shows the configdialog.
      */
     private void buttonDetectorConfigActionPerformed() {
-    	this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation)this.comboBoxDetector.getSelectedItem()).getId()).showGui();
+        this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).showGui();
     }
 
     /**
      * Fired if the Warper Config button is clicked. Shows the configdialog.
      */
     private void buttonWarpConfigActionPerformed() {
-        this.internalPluginManager.getMouseWarpers().get(((PluginInformation)this.comboBoxWarpMethod.getSelectedItem()).getId()).showGui();
+        this.internalPluginManager.getMouseWarpers().get(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId()).showGui();
     }
 
     /**
@@ -290,12 +300,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
-        
+
         // make hotkey notifying the change
         Hotkey.getInstance().resetTmpKeys();
         Hotkey.getInstance().getCurrentHotkey(1, true);
         Hotkey.getInstance().getCurrentHotkey(2, true);
-        
+
         // manage comboboxes
         this.manageHotkeyComboBox();
         this.manageComboBoxSaliencyDetector();
@@ -490,14 +500,13 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         String labelDetectorTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
-        String labelEvaluationTT ="<HTML><body>This activates the evaluation mode.<br>This mode is used to collect data<br>which can be evaluated later.</body></HTML>";
+        String labelEvaluationTT = "<HTML><body>This activates the evaluation mode.<br>This mode is used to collect data<br>which can be evaluated later.</body></HTML>";
         String labelSoundTT = "<HTML><body>Enables/Disables the sound notifications.</body></HTML>";
         String labelUserTT = "<HTML><body>Your name to identify the data.</body></HTML>";
-        String labelScreenBrightTT = "<HTML><body>A description of the screen brightness settings.<br>e.g. light, dark, ...</body></HTML>";
-        String labelSettingBrightTT = "<HTML><body>A description of the Setting brightness settings.<br>e.g. light, dark, ...</body></HTML>";
-        
-        
-        
+        String labelScreenBrightTT = "<HTML><body>A description of the screen brightness.<br>e.g. light, dark, ...</body></HTML>";
+        String labelSettingBrightTT = "<HTML><body>A description of the setting brightness.<br>e.g. light, dark, ...</body></HTML>";
+        String buttonSubmitTT = "<HTML><body>Submits collected statistic data<br>to the statistic-server.</body></HTML>";
+
         // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
         this.labelDimension.setToolTipText(labelDimensionTT);
@@ -510,6 +519,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
         this.labelName.setToolTipText(labelUserTT);
         this.labelScreenBright.setToolTipText(labelScreenBrightTT);
         this.labelSettingBright.setToolTipText(labelSettingBrightTT);
+        this.buttonSubmit.setToolTipText(buttonSubmitTT);
     }
 
     /* (non-Javadoc)
@@ -523,15 +533,15 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener, Wi
      * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
      */
     @Override
-    public void windowClosed(WindowEvent e) { 
+    public void windowClosed(WindowEvent e) {
     }
 
     /* (non-Javadoc)
      * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
      */
     @Override
-    public void windowClosing(WindowEvent e) { 
-        Hotkey.getInstance().resetTmpKeys();   
+    public void windowClosing(WindowEvent e) {
+        Hotkey.getInstance().resetTmpKeys();
     }
 
     /* (non-Javadoc)
