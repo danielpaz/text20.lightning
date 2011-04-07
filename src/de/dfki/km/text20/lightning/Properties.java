@@ -98,7 +98,6 @@ public class Properties implements Serializable {
      * creates properties, tries to load property file
      */
     public Properties() {
-
         // creates properties file
         this.propertiesFile = new File("properties.prop");
 
@@ -131,7 +130,7 @@ public class Properties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
-                    System.out.println("uses: " + this.useCount + ", time: " + this.upTime + " hours");
+                    System.out.println("uses: " + this.useCount + ", time: about " + (((double) Math.round(this.upTime * 100)) / 100) + " hours");
                     System.out.println("first survey done: " + this.submittedFirst + ", second survey done: " + this.submittedSecond);
                     System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("use warp: " + this.useWarp + ", sound activated: " + this.soundActivated);
@@ -148,6 +147,10 @@ public class Properties implements Serializable {
 
         // if reading was not successful or properties file was not found
         if (!status) {
+            this.submittedFirst = false;
+            this.submittedSecond = false;
+            this.upTime = 0;
+            this.useCount = 0;
             this.restoreDefault();
             System.out.println("Properties file was not found.");
         }
@@ -165,11 +168,6 @@ public class Properties implements Serializable {
         this.warperName = "";
         this.detectorName = "";
         this.soundActivated = false;
-        this.upTime = 0;
-        this.useCount = 0;
-        // TODO: change to false
-        this.submittedFirst = true;
-        this.submittedSecond = true;
     }
 
     /**
@@ -314,8 +312,7 @@ public class Properties implements Serializable {
     public void addToUpTime(double time) {
         this.upTime = this.upTime + time;
     }
-    
-    
+
     /** @return the initiated uses of this tool */
     public int getUseCount() {
         return this.useCount;

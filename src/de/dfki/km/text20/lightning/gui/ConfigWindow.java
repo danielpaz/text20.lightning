@@ -337,7 +337,7 @@ public class ConfigWindow {
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 285);
+            mainFrame.setSize(570, 295);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
