@@ -93,6 +93,10 @@ public class Properties implements Serializable {
     @Attribute
     /** indicate if the second submission is done */
     private boolean submittedSecond;
+    
+    @Attribute
+    /** indicates if the tracking recalibration is used */
+    private boolean recalibration;
 
     /**
      * creates properties, tries to load property file
@@ -126,13 +130,15 @@ public class Properties implements Serializable {
                     this.useCount = ((Properties) this.object).getUseCount();
                     this.submittedFirst = ((Properties) this.object).isFirstSubmitted();
                     this.submittedSecond = ((Properties) this.object).isSecondSubmitted();
+                    this.recalibration = ((Properties) this.object).isRecalibration();
 
                     // reading successful
                     status = true;
                     System.out.println("Properties file was found.");
                     System.out.println("uses: " + this.useCount + ", time: about " + (((double) Math.round(this.upTime * 100)) / 100) + " hours");
                     System.out.println("first survey done: " + this.submittedFirst + ", second survey done: " + this.submittedSecond);
-                    System.out.println("dimension: " + this.dimension + ", actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
+                    System.out.println("dimension: " + this.dimension + ", recalibration: " + this.recalibration);
+                    System.out.println("actionHotkey: " + this.actionHotkey + ", statusHotkey: " + this.statusHotkey);
                     System.out.println("use warp: " + this.useWarp + ", sound activated: " + this.soundActivated);
                     System.out.println("Detector: " + this.detectorName + ", Warper: " + this.warperName);
                 }
@@ -168,6 +174,7 @@ public class Properties implements Serializable {
         this.warperName = "";
         this.detectorName = "";
         this.soundActivated = false;
+        this.recalibration = false;
     }
 
     /**
@@ -358,4 +365,19 @@ public class Properties implements Serializable {
     public void setSecondSubmitted(boolean submitted) {
         this.submittedSecond = submitted;
     }
+
+    /**
+     * @return the recalibration
+     */
+    public boolean isRecalibration() {
+        return this.recalibration;
+    }
+
+    /**
+     * @param recalibration the recalibration to set
+     */
+    public void setRecalibration(boolean recalibration) {
+        this.recalibration = recalibration;
+    }
+    
 }
