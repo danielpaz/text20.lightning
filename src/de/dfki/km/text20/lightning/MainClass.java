@@ -48,6 +48,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationWatcher;
 import de.dfki.km.text20.lightning.worker.clickto.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.evaluationmode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.worker.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.worker.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.worker.warpmouse.WarpCommander;
 
@@ -111,9 +112,12 @@ public class MainClass {
 
     /** manages submit notification */
     private SubmitReminder reminder;
-    
+
     /** indicates if during this session datas where already submitted */
     private boolean submitted;
+    
+    /** used to recalibrate the trackingserver */
+    private Recalibrator recalibrator;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -177,6 +181,7 @@ public class MainClass {
         this.isActivated = true;
         this.isNormalMode = true;
         this.submitted = false;
+        this.recalibrator = new Recalibrator();
         this.reminder = new SubmitReminder();
 
         // indicate start
@@ -232,16 +237,20 @@ public class MainClass {
         setupStatistics();
     }
 
-    private void setupStatistics() {
-        addToStatistic("time", "" + getProperties().getUpTime());
-        addToStatistic("uses", "" + getProperties().getUseCount());
-        addToStatistic("dimension", "" + getProperties().getDimension());
-        addToStatistic("action hotkey", "" + getProperties().getActionHotkey());
-        addToStatistic("status hotkey", "" + getProperties().getStatusHotkey());
-        addToStatistic("use warp", "" + getProperties().isUseWarp());
-        addToStatistic("sound activated", "" + getProperties().isSoundActivated());
-        addToStatistic("detector", getProperties().getDetectorName());
-        addToStatistic("warper", getProperties().getWarperName());
+    /**
+     * adds current properties to statistics
+     */
+    public void setupStatistics() {
+        this.addToStatistic("time", "" + this.getProperties().getUpTime());
+        this.addToStatistic("uses", "" + this.getProperties().getUseCount());
+        this.addToStatistic("dimension", "" + this.getProperties().getDimension());
+        this.addToStatistic("recalibration", "" + this.getProperties().isRecalibration());
+        this.addToStatistic("action hotkey", "" + this.getProperties().getActionHotkey());
+        this.addToStatistic("status hotkey", "" + this.getProperties().getStatusHotkey());
+        this.addToStatistic("use warp", "" + this.getProperties().isUseWarp());
+        this.addToStatistic("sound activated", "" + this.getProperties().isSoundActivated());
+        this.addToStatistic("detector", this.getProperties().getDetectorName());
+        this.addToStatistic("warper", this.getProperties().getWarperName());
     }
 
     /**
@@ -547,23 +556,32 @@ public class MainClass {
 
     /**
      * indicates if datas where already submitted
+     * necessary for the gui-button
      * 
      * @return status
      */
     public boolean isSubmitted() {
-		return this.submitted;
-	}
+        return this.submitted;
+    }
 
     /**
      * sets submission status
+     * necessary for the gui-button
      * 
      * @param submitted
      */
-	public void setSubmitted(boolean submitted) {
-		this.submitted = submitted;
-	}
+    public void setSubmitted(boolean submitted) {
+        this.submitted = submitted;
+    }
+   
+    /**
+     * @return the recalibrator
+     */
+    public Recalibrator getRecalibrator() {
+        return this.recalibrator;
+    }
 
-	/**
+    /**
      * plays the error sound
      */
     public void playError() {

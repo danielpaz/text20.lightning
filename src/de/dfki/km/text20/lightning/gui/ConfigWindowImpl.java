@@ -78,6 +78,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
         this.buttonSubmit.setEnabled(!this.main.isSubmitted());
+        this.checkBoxRecalibration.setSelected(this.properties.isRecalibration());
 
         // initialize renderer of comboboxes
         this.renderer = initRenderer();
@@ -206,6 +207,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
         this.properties.setSoundActivated(this.checkBoxSound.isSelected());
+        this.properties.setRecalibration(this.checkBoxRecalibration.isSelected());
         Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()), true);
         Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()), true);
 
@@ -228,13 +230,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
 
         // update statistics
         this.main.addToStatistic("settings changed");
-        this.main.addToStatistic("dimension", "" + this.main.getProperties().getDimension());
-        this.main.addToStatistic("action hotkey", "" + this.main.getProperties().getActionHotkey());
-        this.main.addToStatistic("status hotkey", "" + this.main.getProperties().getStatusHotkey());
-        this.main.addToStatistic("use warp", "" + this.main.getProperties().isUseWarp());
-        this.main.addToStatistic("sound activated", "" + this.main.getProperties().isSoundActivated());
-        this.main.addToStatistic("detector", this.main.getProperties().getDetectorName());
-        this.main.addToStatistic("warper", this.main.getProperties().getWarperName());
+        this.main.setupStatistics();
 
         // close the gui
         this.mainFrame.dispose();
@@ -506,6 +502,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         String labelScreenBrightTT = "<HTML><body>A description of the screen brightness.<br>e.g. light, dark, ...</body></HTML>";
         String labelSettingBrightTT = "<HTML><body>A description of the setting brightness.<br>e.g. light, dark, ...</body></HTML>";
         String buttonSubmitTT = "<HTML><body>Submits collected statistic data<br>to the statistic-server.</body></HTML>";
+        String labelRecalibrationTT = "<HTML><body>Every cursor warp and evaluation<br>step recalibrates the Trackingserver<br>if this checkbochs is selected.</HTML></body>";
 
         // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
@@ -520,6 +517,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.labelScreenBright.setToolTipText(labelScreenBrightTT);
         this.labelSettingBright.setToolTipText(labelSettingBrightTT);
         this.buttonSubmit.setToolTipText(buttonSubmitTT);
+        this.labelRecalibration.setToolTipText(labelRecalibrationTT);
+        
     }
 
     /* (non-Javadoc)

@@ -185,8 +185,11 @@ public class PrecisionEvaluator {
         MainClass.getInstance().getChannel().status("Evaluation - " + logString);
         MainClass.getInstance().addToStatistic("evaluation", logString);
 
+        // update recalibration
+        MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.mousePoint);
+        
         // indicate error
-        if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
+        if ((Math.abs(this.mousePoint.x) > this.properties.getDimension()) || (Math.abs(this.mousePoint.y) > this.properties.getDimension())) {
             this.warning = true;
 
             // reset status

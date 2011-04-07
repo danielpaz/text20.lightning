@@ -63,7 +63,7 @@ public class FixationEvaluator implements Runnable {
     /** current time */
     private long timestamp;
 
-    /** */
+    /** screen shot */
     private BufferedImage screenShot;
 
     /** global used properties */
@@ -72,7 +72,11 @@ public class FixationEvaluator implements Runnable {
     /** internal used plugin manager */
     private InternalPluginManager manager;
 
+    /** indicates if the processing already runs */
     private boolean isProcessing;
+
+    /** instance of the main */
+    private MainClass main;
 
     /**
      * sets the fixation point which is provided by the eyetracker
@@ -113,8 +117,8 @@ public class FixationEvaluator implements Runnable {
         // update the logfile
         String logString = "Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
         System.out.println("Click - " + logString);
-        MainClass.getInstance().getChannel().status("Click - " + logString);
-        MainClass.getInstance().addToStatistic("click", logString);
+        this.main.getChannel().status("Click - " + logString);
+        this.main.addToStatistic("click", logString);
 
         // click to calculated target and reset mouseposition
         this.robot.mouseMove(this.fixation.x + this.offset.x, this.fixation.y + this.offset.y);
@@ -122,6 +126,9 @@ public class FixationEvaluator implements Runnable {
         this.robot.mouseRelease(InputEvent.BUTTON1_MASK);
         this.robot.mouseMove(this.location.x, this.location.y);
 
+        // call recalibrator
+        this.main.getRecalibrator().updateCalibration(this.fixation, this.offset);
+        
         // TODO: for debugging
         //        this.drawPicture();
 
@@ -176,18 +183,19 @@ public class FixationEvaluator implements Runnable {
     @Override
     public void run() {
         // initialize variables
+        this.main = MainClass.getInstance();
         this.fixation = new Point();
         this.location = new Point();
         this.offset = new Point();
-        this.properties = MainClass.getInstance().getProperties();
-        this.manager = MainClass.getInstance().getInternalPluginManager();
+        this.properties = this.main.getProperties();
+        this.manager = this.main.getInternalPluginManager();
         this.isProcessing = false;
 
         try {
             this.robot = new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
-            MainClass.getInstance().exit();
+            this.main.exit();
         }
     }
 }
