@@ -21,6 +21,8 @@
  */
 package de.dfki.km.text20.lightning.worker.evaluationmode;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -137,7 +139,8 @@ public class PrecisionEvaluator {
      * @return true if successful 
      */
     public boolean storeFixation() {
-        if (this.fixationTmp == null || this.isProcessing) return false;
+        if (this.fixationTmp == null || this.isProcessing || this.pupilsTmp == null)
+            return false;
         this.isProcessing = true;
         this.timestamp = System.currentTimeMillis();
         this.fixation = new Point(this.fixationTmp);
@@ -187,7 +190,7 @@ public class PrecisionEvaluator {
 
         // update recalibration
         MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.mousePoint);
-        
+
         // indicate error
         if ((Math.abs(this.mousePoint.x) > this.properties.getDimension()) || (Math.abs(this.mousePoint.y) > this.properties.getDimension())) {
             this.warning = true;
@@ -216,6 +219,7 @@ public class PrecisionEvaluator {
 
         // create file
         File logfile = new File("./evaluation/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".xml");
+        File xsd = new File("./evaluation/data/" + this.user + "/DataPattern.xsd");
 
         try {
             // Create an XML stream writer
@@ -223,10 +227,8 @@ public class PrecisionEvaluator {
             XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, "UTF-8");
 
             // Write XML prologue
-            writer.writeStartDocument();
+            writer.writeStartDocument("UTF-8", "1.0");
             writer.writeCharacters("\r\n");
-
-            // TODO: add a dtd, encodingtag, namespace, ...
 
             // set identifier
             writer.writeComment("Project Lightning (Desktop) - evaluation data");
@@ -234,19 +236,28 @@ public class PrecisionEvaluator {
 
             // start with root element
             writer.writeStartElement("alldata");
+            writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2000/10/XMLSchema-instance");
+            writer.writeAttribute("xsi:noNamespaceSchemaLocation", "DataPattern.xsd");
             writer.writeCharacters("\r\n");
 
             // write screen brightness
             writer.writeCharacters("\t");
-            writer.writeStartElement("screenBrightness");
+            writer.writeStartElement("screenbrightness");
             writer.writeCharacters("" + MainClass.getInstance().getEvaluationSettings()[1]);
             writer.writeEndElement();
             writer.writeCharacters("\r\n");
 
             // write setting brightness
             writer.writeCharacters("\t");
-            writer.writeStartElement("settingBrightness");
+            writer.writeStartElement("settingbrightness");
             writer.writeCharacters("" + MainClass.getInstance().getEvaluationSettings()[2]);
+            writer.writeEndElement();
+            writer.writeCharacters("\r\n");
+
+            // write recalibration
+            writer.writeCharacters("\t");
+            writer.writeStartElement("recalibration");
+            writer.writeCharacters("" + this.properties.isRecalibration());
             writer.writeEndElement();
             writer.writeCharacters("\r\n");
 
@@ -346,6 +357,10 @@ public class PrecisionEvaluator {
             // Close the writer to flush the output
             outputStream.close();
             writer.close();
+
+            // copy xsd if not already there
+            if (!xsd.exists())
+                $(PrecisionEvaluator.class.getResourceAsStream("DataPattern.zip")).zipstream().unzip(xsd.getAbsolutePath());
 
         } catch (XMLStreamException e) {
             e.printStackTrace();
