@@ -1,31 +1,13 @@
 
 syntax: regexp
-^dist$
-syntax: regexp
-^properties$
-syntax: regexp
-^output$
-syntax: regexp
 ^diagnosis\.record$
 syntax: regexp
-^JIntellitype\.dll$
-syntax: regexp
-^training$
-syntax: regexp
-^trackerconfig\.xcfg$
-syntax: regexp
-^tmp$
-syntax: regexp
-^diagnosis\.fallback\.record$
+^jspf\.plugin\.cache$
 syntax: regexp
 ^properties\.prop$
 syntax: regexp
-^plugins/improvedWarperProperties\.prop$
-syntax: regexp
-^plugins/advancedWarperProperties\.prop$
+^dist$
 syntax: regexp
 ^evaluation$
 syntax: regexp
 ^plugins$
-syntax: regexp
-^jspf\.plugin\.cache$

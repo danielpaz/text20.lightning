@@ -93,9 +93,10 @@ public class XMLParser {
     /** indicates if the next entry should be the size of the right pupil */
     private boolean right;
 
-    /** size of pupils
-     *  0 = left
-     *  1 = right
+    /** 
+     * size of pupils
+     * 0 = left
+     * 1 = right
      */
     private float[] pupils;
 

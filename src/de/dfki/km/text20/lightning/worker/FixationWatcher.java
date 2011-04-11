@@ -35,6 +35,7 @@ import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.Fixatio
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationListener;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataEvent;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataListener;
+import de.dfki.km.text20.services.trackingdevices.common.TrackingEvent;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDevice;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDeviceProvider;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingEventValidity;
@@ -72,7 +73,7 @@ public class FixationWatcher {
 
     /** list of things which will be proved to check validity */
     private EyeTrackingEventValidity[] eventValidity;
-    
+
     /** current size of pupils
      *  0 = left
      *  1 = right
@@ -85,7 +86,8 @@ public class FixationWatcher {
      * @param fixationEvaluator
      * @param precisionEvaluator
      */
-    public FixationWatcher(FixationEvaluator fixationEvaluator, PrecisionEvaluator precisionEvaluator) {
+    public FixationWatcher(FixationEvaluator fixationEvaluator,
+                           PrecisionEvaluator precisionEvaluator) {
         // initialize variables
         this.fixationEvaluator = fixationEvaluator;
         this.precisionEvaluator = precisionEvaluator;
@@ -141,8 +143,10 @@ public class FixationWatcher {
                 // check if the fixation should be stored
                 if (!main.isActivated()) return;
                 if (event.getType() != FixationEventType.FIXATION_START) return;
+
+
                 if (!isValid) return;
-                
+
                 // if the tool is activated and a fixation occurs, it will be stored 
                 fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
                 precisionEvaluator.setFixationPoint(event.getFixation().getCenter(), pupils);
@@ -159,26 +163,26 @@ public class FixationWatcher {
             public void newEvaluationEvent(RawDataEvent event) {
                 // check if the tool is running
                 if (!main.isActivated()) return;
-                
+
                 // reset status
                 isValid = true;
-                
+
                 // add current event to storage
                 lastEvents.add(event);
-                
+
                 // cut the storage down
                 if (lastEvents.size() > 10) lastEvents.remove(0);
-                
+
                 // check validity of storage
                 for (RawDataEvent storedEvent : lastEvents) {
                     isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
                 }
-//                System.out.println(isValid);
-                
+                //                System.out.println(isValid);
+
                 // set pupil size
                 pupils[0] = event.getTrackingEvent().getPupilSizeLeft();
                 pupils[1] = event.getTrackingEvent().getPupilSizeRight();
-                
+
                 // set valid
                 main.setTrackingValid(isValid);
             }
