@@ -109,6 +109,7 @@ public class FixationWatcher {
         EyeTrackingDevice device = deviceProvider.openDevice("discover://nearest");
         GazeEvaluatorManager evaluatorManager = this.main.getPluginManager().getPlugin(GazeEvaluatorManager.class);
         this.evaluator = evaluatorManager.createEvaluator(device);
+        this.main.getRecalibrator().init(device);
 
         if (device == null) {
             String msg = new String("Trackingserver was not found! Please start it and restart this tool.");

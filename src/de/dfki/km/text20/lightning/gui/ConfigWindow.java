@@ -111,9 +111,9 @@ public class ConfigWindow {
         labelDetector = new JLabel();
         comboBoxDetector = new JComboBox();
         buttonDetectorConfig = new JButton();
-        checkBoxRecalibration = new JCheckBox();
         labelRecalibration = new JLabel();
-        separator4 = new JSeparator();
+        checkBoxRecalibration = new JCheckBox();
+        buttonClearRecalibration = new JButton();
         panel2 = new JPanel();
         labelEnableMouseWarp = new JLabel();
         checkBoxUseWarp = new JCheckBox();
@@ -129,11 +129,10 @@ public class ConfigWindow {
         textFieldScreenBright = new JTextField();
         labelSettingBright = new JLabel();
         textFieldSettingBright = new JTextField();
-        panel4 = new JPanel();
-        buttonDefault = new JButton();
-        buttonCancel = new JButton();
-        buttonOK = new JButton();
         buttonSubmit = new JButton();
+        buttonDefault = new JButton();
+        buttonOK = new JButton();
+        buttonCancel = new JButton();
         CellConstraints cc = new CellConstraints();
 
         //======== mainFrame ========
@@ -151,16 +150,16 @@ public class ConfigWindow {
                 //======== contentPanel ========
                 {
                     contentPanel.setLayout(new FormLayout(
-                        "2*(20dlu:grow, $lcgap), 3dlu, 2*($lcgap, 20dlu:grow)",
-                        "top:default, $lgap, top:47dlu, $lgap, top:15dlu, $lgap, 35dlu"));
-                    ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {7, 9}});
+                        "3*(20dlu:grow, $lcgap), 20dlu:grow",
+                        "top:default, $lgap, top:47dlu:grow, $lgap, default"));
+                    ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
 
                     //======== panel1 ========
                     {
                         panel1.setBorder(new TitledBorder("Cursor Warping"));
                         panel1.setLayout(new FormLayout(
                             "20dlu:grow, $lcgap, 20dlu:grow",
-                            "6*(default, $lgap), default"));
+                            "7*(default, $lgap), default"));
 
                         //---- labelActionHotkey ----
                         labelActionHotkey.setText("Cursorwarp Key");
@@ -208,7 +207,7 @@ public class ConfigWindow {
 
                         //---- labelDetector ----
                         labelDetector.setText("Text Detector / Warping");
-                        panel1.add(labelDetector, cc.xywh(1, 9, 2, 1));
+                        panel1.add(labelDetector, cc.xywh(1, 9, 2, 3));
 
                         //---- comboBoxDetector ----
                         comboBoxDetector.addActionListener(new ActionListener() {
@@ -221,18 +220,18 @@ public class ConfigWindow {
 
                         //---- buttonDetectorConfig ----
                         buttonDetectorConfig.setText("text");
-                        panel1.add(buttonDetectorConfig, cc.xywh(1, 11, 3, 1));
-                        panel1.add(checkBoxRecalibration, cc.xy(3, 13));
+                        panel1.add(buttonDetectorConfig, cc.xy(3, 11));
 
                         //---- labelRecalibration ----
                         labelRecalibration.setText("Use Recalibration");
-                        panel1.add(labelRecalibration, cc.xy(1, 13));
-                    }
-                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.TOP));
+                        panel1.add(labelRecalibration, cc.xywh(1, 13, 1, 3));
+                        panel1.add(checkBoxRecalibration, cc.xy(3, 13));
 
-                    //---- separator4 ----
-                    separator4.setOrientation(SwingConstants.VERTICAL);
-                    contentPanel.add(separator4, cc.xywh(5, 1, 1, 7));
+                        //---- buttonClearRecalibration ----
+                        buttonClearRecalibration.setText("Clear Recalibration");
+                        panel1.add(buttonClearRecalibration, cc.xy(3, 15));
+                    }
+                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
                     //======== panel2 ========
                     {
@@ -256,14 +255,14 @@ public class ConfigWindow {
 
                         //---- labelWarpMethod ----
                         labelWarpMethod.setText("Warp Method");
-                        panel2.add(labelWarpMethod, cc.xywh(1, 3, 2, 1));
+                        panel2.add(labelWarpMethod, cc.xywh(1, 3, 2, 3));
                         panel2.add(comboBoxWarpMethod, cc.xy(3, 3));
 
                         //---- buttonWarpConfig ----
                         buttonWarpConfig.setText("text");
-                        panel2.add(buttonWarpConfig, cc.xywh(1, 5, 3, 1));
+                        panel2.add(buttonWarpConfig, cc.xy(3, 5));
                     }
-                    contentPanel.add(panel2, cc.xywh(7, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
+                    contentPanel.add(panel2, cc.xywh(5, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
 
                     //======== panel3 ========
                     {
@@ -300,60 +299,52 @@ public class ConfigWindow {
                         panel3.add(labelSettingBright, cc.xywh(1, 7, 2, 1));
                         panel3.add(textFieldSettingBright, cc.xy(3, 7));
                     }
-                    contentPanel.add(panel3, cc.xywh(7, 3, 3, 5, CellConstraints.FILL, CellConstraints.FILL));
+                    contentPanel.add(panel3, cc.xywh(5, 3, 3, 1, CellConstraints.FILL, CellConstraints.FILL));
 
-                    //======== panel4 ========
-                    {
-                        panel4.setLayout(new FormLayout(
-                            "default:grow, $lcgap, default:grow",
-                            "default, $lgap, default"));
+                    //---- buttonSubmit ----
+                    buttonSubmit.setText("Submit");
+                    buttonSubmit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonSubmitActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonSubmit, cc.xy(1, 5));
 
-                        //---- buttonDefault ----
-                        buttonDefault.setText("Default");
-                        buttonDefault.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                buttonDefaultActionPerformed(e);
-                            }
-                        });
-                        panel4.add(buttonDefault, cc.xy(1, 1));
+                    //---- buttonDefault ----
+                    buttonDefault.setText("Default");
+                    buttonDefault.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonDefaultActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonDefault, cc.xy(3, 5));
 
-                        //---- buttonCancel ----
-                        buttonCancel.setText("Cancel");
-                        buttonCancel.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                buttonCancelActionPerformed(e);
-                            }
-                        });
-                        panel4.add(buttonCancel, cc.xy(3, 1));
+                    //---- buttonOK ----
+                    buttonOK.setText("OK");
+                    buttonOK.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonOKActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonOK, cc.xywh(5, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
 
-                        //---- buttonOK ----
-                        buttonOK.setText("OK");
-                        buttonOK.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                buttonOKActionPerformed(e);
-                            }
-                        });
-                        panel4.add(buttonOK, cc.xywh(1, 3, 1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
-
-                        //---- buttonSubmit ----
-                        buttonSubmit.setText("Submit");
-                        buttonSubmit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                buttonSubmitActionPerformed(e);
-                            }
-                        });
-                        panel4.add(buttonSubmit, cc.xy(3, 3));
-                    }
-                    contentPanel.add(panel4, cc.xywh(1, 7, 3, 1, CellConstraints.FILL, CellConstraints.BOTTOM));
+                    //---- buttonCancel ----
+                    buttonCancel.setText("Cancel");
+                    buttonCancel.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            buttonCancelActionPerformed(e);
+                        }
+                    });
+                    contentPanel.add(buttonCancel, cc.xy(7, 5));
                 }
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 310);
+            mainFrame.setSize(570, 320);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -376,9 +367,9 @@ public class ConfigWindow {
     protected JLabel labelDetector;
     protected JComboBox comboBoxDetector;
     protected JButton buttonDetectorConfig;
-    protected JCheckBox checkBoxRecalibration;
     protected JLabel labelRecalibration;
-    private JSeparator separator4;
+    protected JCheckBox checkBoxRecalibration;
+    protected JButton buttonClearRecalibration;
     private JPanel panel2;
     protected JLabel labelEnableMouseWarp;
     protected JCheckBox checkBoxUseWarp;
@@ -394,11 +385,10 @@ public class ConfigWindow {
     protected JTextField textFieldScreenBright;
     protected JLabel labelSettingBright;
     protected JTextField textFieldSettingBright;
-    private JPanel panel4;
-    protected JButton buttonDefault;
-    protected JButton buttonCancel;
-    protected JButton buttonOK;
     protected JButton buttonSubmit;
+    protected JButton buttonDefault;
+    protected JButton buttonOK;
+    protected JButton buttonCancel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
 }

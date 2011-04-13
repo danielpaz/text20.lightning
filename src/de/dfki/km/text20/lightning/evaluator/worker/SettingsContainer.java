@@ -39,18 +39,23 @@ public class SettingsContainer {
     
     /** indicates how often was the mouseposition outside of the dimension */
     private int count;
+    
+    /** indicates if recalibration was used */
+    private boolean recalibration;
 
     /**
      * Creates a new container and initializes its variables.
      * 
      * @param dimension
+     * @param recalibration 
      * @param screenBright
      * @param settingBright
      */
-    public SettingsContainer(int dimension, String screenBright, String settingBright) {
+    public SettingsContainer(int dimension, boolean recalibration, String screenBright, String settingBright) {
         this.dimension = dimension;
         this.screenBright = screenBright;
         this.settingBright = settingBright;
+        this.recalibration = recalibration;
         this.count = 0;
     }
 
@@ -95,5 +100,12 @@ public class SettingsContainer {
      */
     public int getOutOfDim() {
         return this.count;
+    }
+
+    /**
+     * @return the recalibration
+     */
+    public boolean isRecalibration() {
+        return this.recalibration;
     }
 }

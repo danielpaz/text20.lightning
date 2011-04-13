@@ -502,7 +502,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         String labelScreenBrightTT = "<HTML><body>A description of the screen brightness.<br>e.g. light, dark, ...</body></HTML>";
         String labelSettingBrightTT = "<HTML><body>A description of the setting brightness.<br>e.g. light, dark, ...</body></HTML>";
         String buttonSubmitTT = "<HTML><body>Submits collected statistic data<br>to the statistic-server.</body></HTML>";
-        String labelRecalibrationTT = "<HTML><body>Every cursor warp and evaluation<br>step recalibrates the Trackingserver<br>if this checkbochs is selected.</HTML></body>";
+        String labelRecalibrationTT = "<HTML><body>Every cursor warp and evaluation<br>step recalibrates the Trackingserver<br>if this checkboxs is selected.<br>This feature will only work with<br>Trackingserver 1.4 or higher.</HTML></body>";
+        String buttonClearRecalibrationTT = "<HTML><body>This button clears all the recalibrations<br>and sets the tracking device back<br>to defult calibration.</HTML></body>";
+        String buttonDefaultTT = "<HTML><body>Restores default values of some variables.</body></HTML>";
 
         // set tool tips
         this.labelStatusHotkey.setToolTipText(labelStatusHotkeyTT);
@@ -518,6 +520,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.labelSettingBright.setToolTipText(labelSettingBrightTT);
         this.buttonSubmit.setToolTipText(buttonSubmitTT);
         this.labelRecalibration.setToolTipText(labelRecalibrationTT);
+        this.buttonClearRecalibration.setToolTipText(buttonClearRecalibrationTT);
+        this.buttonDefault.setToolTipText(buttonDefaultTT);
         
     }
 

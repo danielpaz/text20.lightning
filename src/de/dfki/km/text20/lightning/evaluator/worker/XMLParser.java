@@ -28,6 +28,12 @@ import java.util.ArrayList;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import org.xml.sax.SAXException;
 
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
@@ -41,9 +47,6 @@ public class XMLParser {
 
     /** readed data */
     private ArrayList<StorageContainer> data;
-
-    /** indicates if the readed comment should be the identifier */
-    private boolean firstComment;
 
     /** indicates if the next entry should be the timestamp */
     private boolean timestamp;
@@ -115,6 +118,15 @@ public class XMLParser {
     /** included setting will be stored in this container */
     private SettingsContainer settingsContainer;
 
+    /** temporary stored calibration */
+    private boolean recalibrationTmp;
+
+    /** indicates if the next value should be the calibration */
+    private boolean recalibration;
+
+    /** indicates if the next value should be the amount of steps */
+    private boolean amount;
+
     /**
      * tries to read the included StorageContainer of the given XML-file
      * 
@@ -128,7 +140,6 @@ public class XMLParser {
                                                 EvaluatorWorker worker) {
         // initialize variables
         this.data = new ArrayList<StorageContainer>();
-        this.firstComment = true;
         this.timestamp = false;
         this.fileName = file.getName();
         this.mouseX = false;
@@ -150,6 +161,9 @@ public class XMLParser {
         this.setting = false;
         this.screenTmp = "";
         this.settingTmp = "";
+        this.recalibration = false;
+        this.recalibrationTmp = false;
+        this.amount = false;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -165,19 +179,12 @@ public class XMLParser {
 
                 // if a starttag is found
                 case XMLStreamConstants.START_ELEMENT:
-                    if (!handleStartElement(reader.getName().toString().trim()))
-                        return new ArrayList<StorageContainer>();
+                    handleStartElement(reader.getName().toString().trim());
                     break;
 
                 // if some characters are found    
                 case XMLStreamConstants.CHARACTERS:
                     if (!handleCharacters(reader.getText().trim()))
-                        return new ArrayList<StorageContainer>();
-                    break;
-
-                // if a comment is found
-                case XMLStreamConstants.COMMENT:
-                    if (!handleComment(reader.getText().trim()))
                         return new ArrayList<StorageContainer>();
                     break;
 
@@ -189,7 +196,7 @@ public class XMLParser {
 
             // update settings map at worker
             worker.addToSettingMap(this.fileName, this.settingsContainer);
-            
+
             // close all
             inputStream.close();
             reader.close();
@@ -216,145 +223,165 @@ public class XMLParser {
      * @return true if successful
      */
     private boolean handleCharacters(String value) {
-        // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
-        if (value.equals("")) return true;
+        try {
+            // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
+            if (value.equals("")) return true;
 
-        // if the readed characters should be the size of the right pupil ...
-        if (this.right) {
+            // if the readed characters should be the size of the right pupil ...
+            if (this.right) {
 
-            // ... store it and ...
-            this.pupils[1] = Float.parseFloat(value);
+                // ... store it and ...
+                this.pupils[1] = Float.parseFloat(value);
 
-            // ... add a new container to the data
-            this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
+                // ... add a new container to the data
+                this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
 
-            // reset variables
-            this.timestamp = false;
-            this.mouseX = false;
-            this.mouseY = false;
-            this.fixX = false;
-            this.fixY = false;
-            this.left = false;
-            this.right = false;
-            this.pupils = new float[2];
-            this.mouseXTmp = 0;
-            this.mouseYTmp = 0;
-            this.timastampTmp = 0;
-            this.fixXTmp = 0;
-            this.fixYTmp = 0;
+                // reset variables
+                this.timestamp = false;
+                this.mouseX = false;
+                this.mouseY = false;
+                this.fixX = false;
+                this.fixY = false;
+                this.left = false;
+                this.right = false;
+                this.pupils = new float[2];
+                this.mouseXTmp = 0;
+                this.mouseYTmp = 0;
+                this.timastampTmp = 0;
+                this.fixXTmp = 0;
+                this.fixYTmp = 0;
 
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the size of the left pupil ...
-        if (this.left) {
-
-            // ... store it
-            this.pupils[0] = Float.parseFloat(value);
-
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the mouseY coordinate ...
-        if (this.mouseY) {
-
-            // ... store it
-            this.mouseYTmp = Integer.parseInt(value);
-
-            // indicate warning
-            if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension) {
-                System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
-                this.settingsContainer.addOutOfDim();
+                // return success
+                return true;
             }
 
-            // return success
-            return true;
-        }
+            // if the readed characters should be the size of the left pupil ...
+            if (this.left) {
 
-        // if the readed characters should be the mouseX coordinate ...
-        if (this.mouseX) {
+                // ... store it
+                this.pupils[0] = Float.parseFloat(value);
 
-            // ... store it
-            this.mouseXTmp = Integer.parseInt(value);
-
-            // indicate warning
-            if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension) {
-                System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
-                this.settingsContainer.addOutOfDim();
+                // return success
+                return true;
             }
-            // return success
-            return true;
+
+            // if the readed characters should be the mouseY coordinate ...
+            if (this.mouseY) {
+
+                // ... store it
+                this.mouseYTmp = Integer.parseInt(value);
+
+                // indicate warning
+                if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension) {
+                    System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
+                    this.settingsContainer.addOutOfDim();
+                }
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the mouseX coordinate ...
+            if (this.mouseX) {
+
+                // ... store it
+                this.mouseXTmp = Integer.parseInt(value);
+
+                // indicate warning
+                if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension) {
+                    System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
+                    this.settingsContainer.addOutOfDim();
+                }
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the fixX coordinate ...
+            if (this.fixY) {
+
+                // ... store it
+                this.fixYTmp = Integer.parseInt(value);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the fixY coordinate ...
+            if (this.fixX) {
+
+                // ... store it
+                this.fixXTmp = Integer.parseInt(value);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the timestamp ...
+            if (this.timestamp) {
+
+                // ... store it
+                this.timastampTmp = Long.parseLong(value);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the amount
+            if (this.amount) return true;
+
+            // if the readed should be the dimension ...
+            if (this.dimension) {
+
+                // ... store it
+                this.dimensionTmp = Integer.parseInt(value);
+
+                System.out.println(this.usedDimension + " " + value);
+
+                // test dimensions
+                if (this.usedDimension < this.dimensionTmp)
+                    System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
+
+                // initialize setting container
+                this.settingsContainer = new SettingsContainer(this.dimensionTmp, this.recalibrationTmp, this.screenTmp, this.settingTmp);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the recalibration ...
+            if (this.recalibration) {
+
+                // ... store it
+                this.recalibrationTmp = Boolean.parseBoolean(value);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the setting brightness ...
+            if (this.setting) {
+
+                // ... store it
+                this.settingTmp = value;
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the screen brightness ...
+            if (this.screen) {
+
+                // ... store it
+                this.screenTmp = value;
+
+                // return success
+                return true;
+            }
+        } catch (Exception e) {
+            // indicate error and return failure
+            System.out.println("parsing failed on '" + value + "' in " + this.fileName);
+            return false;
         }
-
-        // if the readed characters should be the fixX coordinate ...
-        if (this.fixY) {
-
-            // ... store it
-            this.fixYTmp = Integer.parseInt(value);
-
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the fixY coordinate ...
-        if (this.fixX) {
-
-            // ... store it
-            this.fixXTmp = Integer.parseInt(value);
-
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the timestamp ...
-        if (this.timestamp) {
-
-            // ... store it
-            this.timastampTmp = Long.parseLong(value);
-
-            // return success
-            return true;
-        }
-
-        // if the readed should be the dimension ...
-        if (this.dimension) {
-
-            // ... store it
-            this.dimensionTmp = Integer.parseInt(value);
-
-            // test dimensions
-            if (this.usedDimension < this.dimensionTmp)
-                System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
-
-            // initialize setting container
-            this.settingsContainer = new SettingsContainer(this.dimensionTmp, this.screenTmp, this.settingTmp);
-
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the setting brightness ...
-        if (this.setting) {
-
-            // ... store it
-            this.settingTmp = value;
-
-            // return success
-            return true;
-        }
-
-        // if the readed characters should be the screen brightness ...
-        if (this.screen) {
-
-            // ... store it
-            this.screenTmp = value;
-
-            // return success
-            return true;
-        }
-
         // indicate error and return failure
         System.out.println("parsing failed on '" + value + "' in " + this.fileName);
         return false;
@@ -364,128 +391,89 @@ public class XMLParser {
      * called if a starttag is readed
      * 
      * @param value
-     * @return true if successful
      */
-    // TODO: add a counter or something instead of all these booleans
-    private boolean handleStartElement(String value) {
-        // start of container
-        if (value.equals("alldata") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.firstComment && !this.fixX && !this.fixY && !this.left && !this.right && !this.screen && !this.setting)
-            return true;
+    private void handleStartElement(String value) {
 
         // screen brightness tag 
-        if (value.equals("screenBrightness") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && !this.screen && !this.setting) {
+        if (value.equals("screenbrightness")) {
             this.screen = true;
-            return true;
+            return;
         }
 
         // setting brightness tag 
-        if (value.equals("settingBrightness") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && !this.setting) {
+        if (value.equals("settingbrightness")) {
             this.setting = true;
-            return true;
+            return;
         }
 
         // dimension tag 
-        if (value.equals("dimension") && !this.timestamp && !this.mouseX && !this.mouseY && !this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
-            this.dimension = true;
-            return true;
+        if (value.equals("recalibration")) {
+            this.recalibration = true;
+            return;
         }
 
-        // start of each step-container
-        if (value.equals("step") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting)
-            return true;
+        // dimension tag 
+        if (value.equals("dimension")) {
+            this.dimension = true;
+            return;
+        }
+
+        // amount tag 
+        if (value.equals("amount")) {
+            this.amount = true;
+            return;
+        }
 
         // timestamp
-        if (value.equals("timestamp") && !this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("timestamp")) {
             this.timestamp = true;
-            return true;
+            return;
         }
 
-        // fixation tag
-        if (value.equals("fixation") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting)
-            return true;
-
         // fixX 
-        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && !this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("x") && !this.fixX && !this.mouseX) {
             this.fixX = true;
-            return true;
+            return;
         }
 
         // fixY
-        if (value.equals("y") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && !this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("y") && !this.fixY && !this.mouseY) {
             this.fixY = true;
-            return true;
+            return;
         }
 
-        // mouseposition 
-        if (value.equals("mouseposition") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting)
-            return true;
-
         // mouseX
-        if (value.equals("x") && this.timestamp && !this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("x") && !this.mouseX && this.fixX) {
             this.mouseX = true;
-            return true;
+            return;
         }
 
         // mouseY 
-        if (value.equals("y") && this.timestamp && this.mouseX && !this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("y") && !this.mouseY && this.fixY) {
             this.mouseY = true;
-            return true;
+            return;
         }
 
-        // pupils
-        if (value.equals("pupils") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting)
-            return true;
-
         // left
-        if (value.equals("left") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && !this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("left")) {
             this.left = true;
-            return true;
+            return;
         }
 
         // right 
-        if (value.equals("right") && this.timestamp && this.mouseX && this.mouseY && this.dimension && this.fixX && this.fixY && this.left && !this.right && this.screen && this.setting) {
+        if (value.equals("right")) {
             this.right = true;
-            return true;
+            return;
         }
-        // indicate error and return failure
-        System.out.println("parsing failed on '" + value + "' in " + this.fileName);
-        return false;
     }
 
     /**
-     * called if a comment is readed
-     * 
-     * @param value
-     * @return true if successful
-     */
-    private boolean handleComment(String value) {
-        // if it is the first comment and the identifier is not recognized ...
-        if (this.firstComment && !(value.equals("Project Lightning (Desktop) - evaluation data"))) {
-
-            // indicate error and return failure
-            System.out.println(this.fileName + " isn't a valid file");
-            return false;
-        }
-
-        this.firstComment = false;
-
-        // return success
-        return true;
-    }
-
-    /**
-     * counts the contained steps of the given file
-     * 
      * @param file
-     * @return the number of steps
+     * @return the number of steps in given file
      */
     public int count(File file) {
-        // initialize counter
-        int counter = 0;
-
-        // initialize other variables
-        this.firstComment = true;
-
+        // initialize boolean
+        boolean found = false;
         try {
             // initialize reader
             FileInputStream inputStream = new FileInputStream(file);
@@ -498,20 +486,18 @@ public class XMLParser {
                 // ... and if a starttag is found ...
                 case XMLStreamConstants.START_ELEMENT:
 
-                    // ... and it is 'step' ...
-                    if (reader.getName().toString().trim().equals("step"))
-
-                    // ... increase counter
-                        counter++;
+                    // ... and it is 'amount', set found
+                    if (reader.getName().toString().trim().equals("amount"))
+                        found = true;
 
                     break;
 
-                case XMLStreamConstants.COMMENT:
-                    // unsure check if the file is valid
-                    if (this.firstComment && !reader.getText().trim().equals("Project Lightning (Desktop) - evaluation data"))
-                        return 0;
+                // if some characters are found ...    
+                case XMLStreamConstants.CHARACTERS:
 
-                    this.firstComment = false;
+                    // ... and they should be the amount, return it
+                    if (found) return Integer.parseInt(reader.getText().trim());
+
                     break;
 
                 // all other stuff
@@ -529,7 +515,44 @@ public class XMLParser {
             return 0;
         }
 
-        // return number of steps
-        return counter;
+        // return if not found
+        return 0;
+    }
+
+    /**
+     * checks given XML-file 
+     * 
+     * @param xmlFile 
+     * @return true is the given file is valid
+     */
+    public boolean isValid(File xmlFile) {
+        // create xsd file
+        File xsdFile = new File(xmlFile.getAbsolutePath().substring(0, xmlFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "DataPattern.xsd");
+        if (!xsdFile.exists()) {
+            System.out.println(xsdFile.getAbsolutePath() + " not found!");
+            return false;
+        }
+
+        try {
+            // create validation factory
+            String schemaLang = "http://www.w3.org/2001/XMLSchema";
+            SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
+
+            // create validator
+            Schema schema = factory.newSchema(xsdFile);
+            Validator validator = schema.newValidator();
+
+            // at last perform validation:
+            validator.validate(new StreamSource(xmlFile.getAbsolutePath()));
+
+        } catch (SAXException e) {
+            System.out.println(xmlFile.getAbsolutePath() + " is not valid!");
+            System.out.println();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }
