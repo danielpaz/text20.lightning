@@ -166,7 +166,7 @@ public class Hotkey implements HotkeyListener {
             }
 
             // increase use count
-            this.main.gerReminder().addUse();
+            this.main.getReminder().addUse();
 
             // decide which mode
             if (this.main.isNormalMode()) {
@@ -191,23 +191,39 @@ public class Hotkey implements HotkeyListener {
             }
 
             if (!this.evaluationStatus) {
-                // set mouse position which is associated with the last stored
-                // fixation
-                if (this.precisionEvaluator.setMousePosition(MouseInfo.getPointerInfo().getLocation())) {
-
+                // set mouse position which is associated with the last stored fixation and react on its return value
+                switch (this.precisionEvaluator.setMousePosition(MouseInfo.getPointerInfo().getLocation())) {
+                case OK:
                     // indicate success
                     this.main.playDing();
-                    this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...");
-                } else {
+                    this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
+                    // toggle status
+                    this.evaluationStatus = !(this.evaluationStatus);
+
+                    break;
+
+                case ALREADY_PROCESSING:
+                    // do nothing
+                    break;
+
+                case NO_FIXATION:
+                    // theoretical never reached
+                    break;
+
+                case OUT_OFF_DIMENSION:
                     // indicate failure
                     this.main.playError();
-                    this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension or processing was already in progress! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...");
-                }
+                    this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
-                // toggle status
-                this.evaluationStatus = !(this.evaluationStatus);
-                break;
+                    // toggle status
+                    this.evaluationStatus = !(this.evaluationStatus);
+
+                    break;
+
+                default:
+                    break;
+                }
             }
 
             break;

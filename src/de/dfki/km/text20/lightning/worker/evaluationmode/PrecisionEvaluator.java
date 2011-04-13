@@ -159,8 +159,9 @@ public class PrecisionEvaluator {
      * @return true if the position is valid
      */
     @SuppressWarnings("boxing")
-    public boolean setMousePosition(Point mousePosition) {
-        if (this.fixation == null || this.isProcessing) return false;
+    public EvaluationCode setMousePosition(Point mousePosition) {
+        if (this.fixation == null) return EvaluationCode.NO_FIXATION;
+        if (this.isProcessing) return EvaluationCode.ALREADY_PROCESSING;
         this.isProcessing = true;
         this.user = MainClass.getInstance().getEvaluationSettings()[0];
         this.mousePosition = mousePosition;
@@ -192,21 +193,21 @@ public class PrecisionEvaluator {
         MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.mousePoint);
 
         // indicate error
-        if ((Math.abs(this.mousePoint.x) > this.properties.getDimension()) || (Math.abs(this.mousePoint.y) > this.properties.getDimension())) {
+        if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
             this.warning = true;
 
             // reset status
             this.isProcessing = false;
 
             // return failure
-            return false;
+            return EvaluationCode.OUT_OFF_DIMENSION;
         }
 
         // reset status
         this.isProcessing = false;
 
         // return success
-        return true;
+        return EvaluationCode.OK;
     }
 
     /**
@@ -236,7 +237,7 @@ public class PrecisionEvaluator {
 
             // start with root element
             writer.writeStartElement("alldata");
-            writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2000/10/XMLSchema-instance");
+            writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
             writer.writeAttribute("xsi:noNamespaceSchemaLocation", "DataPattern.xsd");
             writer.writeCharacters("\r\n");
 
@@ -275,6 +276,13 @@ public class PrecisionEvaluator {
                 writer.writeCharacters("\r\n");
                 this.warning = false;
             }
+
+            // write count
+            writer.writeCharacters("\t");
+            writer.writeStartElement("amount");
+            writer.writeCharacters("" + this.allData.size());
+            writer.writeEndElement();
+            writer.writeCharacters("\r\n");
 
             // run through all data
             for (StorageContainer data : this.allData) {
@@ -358,9 +366,9 @@ public class PrecisionEvaluator {
             outputStream.close();
             writer.close();
 
-            // copy xsd if not already there
+            // unzip xsd if not already there
             if (!xsd.exists())
-                $(PrecisionEvaluator.class.getResourceAsStream("DataPattern.zip")).zipstream().unzip(xsd.getAbsolutePath());
+                $(PrecisionEvaluator.class.getResourceAsStream("DataPattern.zip")).zipstream().unzip(xsd.getAbsolutePath().substring(0, xsd.getAbsolutePath().lastIndexOf(File.separator) + 1));
 
         } catch (XMLStreamException e) {
             e.printStackTrace();
@@ -381,5 +389,12 @@ public class PrecisionEvaluator {
 
         // reset data
         this.allData.clear();
+    }
+
+    /**
+     * @return current number of datasets
+     */
+    public int getCount() {
+        return this.allData.size();
     }
 }

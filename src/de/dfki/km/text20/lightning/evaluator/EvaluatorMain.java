@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
-import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
@@ -96,6 +95,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** thread in which the evaluation runs */
     private EvaluationThread evaluationThread;
 
+    /** progress of the progress bar*/
+    private int progress;
+
     /**
      * main entry point
      * 
@@ -133,6 +135,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.files = new ArrayList<File>();
         this.information = new ArrayList<PluginInformation>();
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
+        this.progress = 1;
 
         // add action listeners
         this.buttonSelect.addActionListener(this);
@@ -164,6 +167,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
         props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
+        props.setProperty(PluginManager.class, "cache.enabled", "true");
+        props.setProperty(PluginManager.class, "cache.mode", "weak");
 
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
@@ -429,6 +434,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void startEvaluation() {
         // initialize variables
         XMLParser parser = new XMLParser();
+        ArrayList<File> tmp = new ArrayList<File>(this.files);
         int size = 0;
 
         // add selected detectors to array list 
@@ -436,12 +442,23 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             if (selected instanceof PluginInformation)
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
 
+        // validate files
+        for (File file : this.files) {
+            if (!parser.isValid(file)) tmp.remove(file);
+        }
+        this.files = tmp;
+
         // count container 
         for (File file : this.files)
             size = size + parser.count(file);
 
+        // calculate size
+        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * this.saliencyDetectors.size());
+        else
+            size = (size * this.selectedDetectors.size());
+
         // initialize progress bar
-        this.progressBar.setMaximum(size * this.selectedDetectors.size());
+        this.progressBar.setMaximum(size);
         this.progressBar.setStringPainted(true);
 
         // initialize and start evaluationThread
@@ -465,6 +482,15 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonStart.setText("Exit");
     }
 
+    /**
+     * updates current progress of the progress bar
+     */
+    public void updateProgressBar() {
+        this.progressBar.setValue(this.progress++);
+        this.progressBar.paint(this.progressBar.getGraphics());
+
+    }
+    
     /**
      * closes tool cleanly
      */
@@ -542,13 +568,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public ArrayList<SaliencyDetector> getSelectedDetectors() {
         return this.selectedDetectors;
-    }
-
-    /**      
-     * @return the progressBar
-     */
-    public JProgressBar getProgressBar() {
-        return this.progressBar;
     }
 
     /**

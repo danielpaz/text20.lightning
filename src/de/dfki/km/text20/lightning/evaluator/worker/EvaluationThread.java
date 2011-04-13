@@ -23,8 +23,6 @@ package de.dfki.km.text20.lightning.evaluator.worker;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.JProgressBar;
-
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
@@ -46,9 +44,6 @@ public class EvaluationThread implements Runnable {
     /** selected *.xml files */
     private ArrayList<File> files;
 
-    /** the current shown progressbar */
-    private JProgressBar progressBar;
-
     /** given main class */
     private EvaluatorMain mainClass;
 
@@ -67,7 +62,6 @@ public class EvaluationThread implements Runnable {
         this.mainClass = main;
         this.files = main.getFiles();
         this.selectedDetectors = main.getSelectedDetectors();
-        this.progressBar = main.getProgressBar();
         this.worker = main.getWorker();
         this.stop = false;
         this.dimension = main.getDimension();
@@ -87,7 +81,6 @@ public class EvaluationThread implements Runnable {
     public void run() {
         // initialize Variables
         XMLParser parser = new XMLParser();
-        int i = 1;
 
         // run through every file ...
         for (File file : this.files) {
@@ -105,8 +98,7 @@ public class EvaluationThread implements Runnable {
                     if (this.stop) return;
 
                     // update progress bar
-                    this.progressBar.setValue(i++);
-                    this.progressBar.paint(this.progressBar.getGraphics());
+                    this.mainClass.updateProgressBar();
                 }
             }
 

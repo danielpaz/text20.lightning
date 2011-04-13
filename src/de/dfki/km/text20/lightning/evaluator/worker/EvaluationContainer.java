@@ -59,9 +59,13 @@ public class EvaluationContainer {
     /** indicates if the pupilsize should be devided or not */
     private boolean firstGet;
 
-    /** size of pupils
-     *  0 = left
-     *  1 = right
+    /** list of distances between mouse and fixation */
+    private ArrayList<Double> deviation;
+
+    /** 
+     * size of pupils
+     * 0 = left
+     * 1 = right
      */
     private float[] pupilsize;
 
@@ -71,8 +75,10 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param distance
+     * @param distanceMR
      *      distance between mouse position and calculated result 
+     * @param distanceMF 
+     *      distance between mouse position and fixation 
      * @param pupils 
      *      size of the pupils
      * @param log
@@ -82,11 +88,12 @@ public class EvaluationContainer {
      * @param timeStamp
      *      start of the evaluation session
      */
-    public EvaluationContainer(int id, double distance, float[] pupils, String log,
-                               String name, long timeStamp) {
+    public EvaluationContainer(int id, double distanceMR, double distanceMF,
+                               float[] pupils, String log, String name, long timeStamp) {
         // initialize variables
         this.results = new Hashtable<Integer, Double>();
         this.ids = new ArrayList<Integer>();
+        this.deviation = new ArrayList<Double>();
         this.keyId = id;
         this.size = 0;
         this.log = log;
@@ -96,7 +103,7 @@ public class EvaluationContainer {
         this.firstGet = true;
 
         // add first value
-        this.add(id, distance, pupils);
+        this.add(id, distanceMR, distanceMF, pupils);
     }
 
     /**
@@ -105,13 +112,15 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param distance
+     * @param distanceMR
      *      distance between mouse position and calculated result 
+     * @param distanceMF 
+     *      distance between mouse position and fixation
      * @param pupils 
      *      size of the pupils
      */
     @SuppressWarnings("boxing")
-    public void add(int id, double distance, float[] pupils) {
+    public void add(int id, double distanceMR, double distanceMF, float[] pupils) {
         // if the given id is the key id ... 
         if (this.keyId == id) {
             // ... increase size ...
@@ -120,13 +129,16 @@ public class EvaluationContainer {
             // ... and add pupilsize
             this.pupilsize[0] = pupils[0] + this.pupilsize[0];
             this.pupilsize[1] = pupils[1] + this.pupilsize[1];
+
+            // add deviation
+            this.deviation.add(distanceMF);
         }
 
         // if the map contains already the given id, store value in temp
         if (this.results.containsKey(id)) this.temp = this.results.get(id);
 
         // put temp + given value by given id to the map
-        this.results.put(id, this.temp + distance);
+        this.results.put(id, this.temp + distanceMR);
 
         // add id to the list of ids if it is not already there
         if (!this.ids.contains(id)) this.ids.add(id);
@@ -204,5 +216,12 @@ public class EvaluationContainer {
      */
     public int getSize() {
         return this.size;
+    }
+
+    /**
+     * @return the deviation
+     */
+    public ArrayList<Double> getDeviation() {
+        return this.deviation;
     }
 }

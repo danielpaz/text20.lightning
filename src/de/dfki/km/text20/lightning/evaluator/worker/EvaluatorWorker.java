@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.JProgressBar;
 
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
@@ -41,15 +42,18 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
- * The EvaluationWorker runs the given plugin with the given container, collects the data,
- * draws the results in a png-file and writes the log-file.
+ * The EvaluationWorker runs the given plugin with the given container, collects
+ * the data, draws the results in a png-file and writes the log-file.
  * 
  * @author Christoph Käding
- *
+ * 
  */
 public class EvaluatorWorker {
 
-    /** map which stores evaluation container as value with given identifiers as key */
+    /**
+     * map which stores evaluation container as value with given identifiers as
+     * key
+     */
     private Map<String, EvaluationContainer> results;
 
     /** timestamp of the start of this evaluation session */
@@ -76,9 +80,9 @@ public class EvaluatorWorker {
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
-     * @param main      
+     * @param main
      * @param currentTimeStamp
-     * @param channel 
+     * @param channel
      */
     public EvaluatorWorker(EvaluatorMain main, long currentTimeStamp,
                            DiagnosisChannel<String> channel) {
@@ -95,12 +99,12 @@ public class EvaluatorWorker {
     /**
      * evaluates the given container with the given detector
      * 
-     * @param file 
-     *      which includes the data, used to create identifier etc
+     * @param file
+     *            which includes the data, used to create identifier etc
      * @param detector
-     *      which should be used
+     *            which should be used
      * @param container
-     *      which should be used
+     *            which should be used
      */
     public void evaluate(File file, SaliencyDetector detector, StorageContainer container) {
         // initialize variables
@@ -147,19 +151,20 @@ public class EvaluatorWorker {
             this.drawPicture(detector, point, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
 
         // add results to over all storage
-        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), "", user, this.currentTimeStamp);
+        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), 0, container.getPupils(), "", user, this.currentTimeStamp);
         else
-            this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils());
+            this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint), 0, container.getPupils());
 
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
 
             // add distance to the already existing identifier
-            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils());
+            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getMousePoint().distance(container.getFixation()), container.getPupils());
         } else {
 
-            // creates net map entry by identifier and adds new evaluation container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getPupils(), path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log", user, Long.parseLong(xmlTimeStamp)));
+            // creates net map entry by identifier and adds new evaluation
+            // container to it
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getMousePoint().distance(container.getFixation()), container.getPupils(), path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log", user, Long.parseLong(xmlTimeStamp)));
         }
 
     }
@@ -167,19 +172,20 @@ public class EvaluatorWorker {
     /**
      * provides map to make entries
      * 
-     * @param key 
-     * @param value       
+     * @param key
+     * @param value
      */
     public void addToSettingMap(String key, SettingsContainer value) {
         this.settings.put(key, value);
     }
 
     /**
-     * A call of this method indicates that the evaluation is finished and the result file can be updated.
+     * A call of this method indicates that the evaluation is finished and the
+     * result file can be updated.
      * 
-     * @param detectors 
+     * @param detectors
      * 
-     * @return name of best ranked detector 
+     * @return name of best ranked detector
      */
     @SuppressWarnings("boxing")
     public String getBestResult(ArrayList<SaliencyDetector> detectors) {
@@ -189,13 +195,18 @@ public class EvaluatorWorker {
 
         // initialize variables
         double bestValue = Double.MAX_VALUE;
-        int bestKey = -1;
+        ArrayList<Integer> bestKey = new ArrayList<Integer>();
         double veryBestValue = Double.MAX_VALUE;
-        int veryBestKey = -1;
+        ArrayList<Integer> veryBestKey = new ArrayList<Integer>();
+        String bestMethods = "";
 
         for (String path : this.overAllPath) {
-            if (this.main.writeLog())
-                $(path).file().append("- overall results for this session -\r\n\r\nTimestamp: " + this.overAllResults.getTimeStamp() + ", Number of DataSets overall: " + this.overAllResults.getSize() + "\r\n");
+            if (this.main.writeLog()) {
+                $(path).file().append("- overall results for this session -\r\n\r\n#Overview#\r\n");
+                $(path).file().append("- Timestamp: " + this.overAllResults.getTimeStamp() + "\r\n");
+                $(path).file().append("- Number of DataSets overall: " + this.overAllResults.getSize() + "\r\n");
+                $(path).file().append("\r\n#Results#\r\n");
+            }
 
             // run through all included ids
             for (int id : this.overAllResults.getIds()) {
@@ -204,71 +215,135 @@ public class EvaluatorWorker {
                 if (this.main.writeLog())
                     $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\r\n");
 
+                // check if the current value is equal then the best value
+                if (veryBestValue == this.overAllResults.getAveragedDistance(id))
+                    veryBestKey.add(id);
+
                 // check if the current value is better then the best value
                 if (veryBestValue > this.overAllResults.getAveragedDistance(id)) {
 
                     // store new best value
-                    veryBestKey = id;
+                    veryBestKey.clear();
+                    veryBestKey.add(id);
                     veryBestValue = this.overAllResults.getAveragedDistance(id);
                 }
             }
-            if (this.main.writeLog())
-                $(path).file().append("-> best result for " + detectors.get(veryBestKey).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
+            if (this.main.writeLog()) {
+                // single best key
+                if (veryBestKey.size() == 1) {
+                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
 
-            // log best result
-            this.channel.status("best result: " + detectors.get(veryBestKey).getInformation().getDisplayName() + " with " + this.overAllResults.getSize() + "datasets");
-        }
-
-        // run through the keyset of the result map
-        for (String key : this.results.keySet()) {
-
-            // run through the ids of every entry of the result map
-            for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
-
-                // check if the current value is better then the best value, the best value is only for this identifier
-                if (bestValue > this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i))) {
-
-                    // store new best value
-                    bestKey = this.results.get(key).getIds().get(i);
-                    bestValue = this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i));
-                }
-
-                // write the evaluation.log
-                if (this.main.writeLog()) {
-                    if (i == 0) {
-                        $(this.results.get(key).getLogPath()).file().append("Session - User: " + this.results.get(key).getName() + "\r\nTimestamp: " + this.results.get(key).getTimeStamp() + ", Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\r\nScreen Brightness: " + this.settings.get(key).getScreenBright() + ", Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
+                    // multiple best keys
+                } else {
+                    $(path).file().append("-> best results for ");
+                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
+                        $(path).file().append(detectors.get(i).getInformation().getDisplayName() + ", ");
                     }
-                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
-                    if (i == this.results.get(key).getIds().size() - 1)
-                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey).getInformation().getDisplayName() + "\r\n\r\n");
+                    $(path).file().append(detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName());
+                    $(path).file().append(" and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
                 }
             }
+            
+            // create best results string
+            if (veryBestKey.size() == 1) {
+                bestMethods = detectors.get(veryBestKey.get(0)).getInformation().getDisplayName();
 
-            // reset values
-            bestValue = Double.MAX_VALUE;
-            bestKey = -1;
+                // multiple best keys
+            } else {
+                for (int i = 0; i < veryBestKey.size() - 2; i++) {
+                    bestMethods = bestMethods + detectors.get(i).getInformation().getDisplayName() + ", ";
+                }
+                bestMethods = bestMethods + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
+                bestMethods = bestMethods + " and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
+            }
+
+            // log best result
+            this.channel.status("best result: " + bestMethods + " with " + this.overAllResults.getSize() + "datasets");
+        }
+
+        // write the evaluation.log
+        if (this.main.writeLog()) {
+            // run through the keyset of the result map
+            for (String key : this.results.keySet()) {
+
+                // run through the ids of every entry of the result map
+                for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
+
+                    // check if the current value is equal then the best value
+                    if (bestValue == this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)))
+                        bestKey.add(this.results.get(key).getIds().get(i));
+
+                    // check if the current value is better then the best value, the
+                    // best value is only for this identifier
+                    if (bestValue > this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i))) {
+
+                        // store new best value
+                        bestKey.clear();
+                        bestKey.add(this.results.get(key).getIds().get(i));
+                        bestValue = this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i));
+                    }
+
+                    // first entry
+                    if (i == 0) {
+                        $(this.results.get(key).getLogPath()).file().append("#Session#\r\n- User: " + this.results.get(key).getName() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Timestamp: " + this.results.get(key).getTimeStamp() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Screen Brightness: " + this.settings.get(key).getScreenBright() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Recalibration was used: " + this.settings.get(key).isRecalibration() + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
+                        $(this.results.get(key).getLogPath()).file().append("\r\n#Results#\r\n");
+                    }
+
+                    // middle entries
+                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                    // last entry
+                    if (i == this.results.get(key).getIds().size() - 1) {
+                        // single best key
+                        if (bestKey.size() == 1) {
+                            $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey.get(0)).getInformation().getDisplayName() + "\r\n\r\n\r\n");
+
+                            // multiple best keys
+                        } else {
+                            $(this.results.get(key).getLogPath()).file().append("-> best results for ");
+                            for (int j = 0; j < bestKey.size() - 2; j++) {
+                                $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(j)).getInformation().getDisplayName() + ", ");
+                            }
+                            $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
+                            $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n\r\n\r\n");
+                        }
+                    }
+                    
+                    // update progress bar
+                    this.main.updateProgressBar();
+                }
+
+                // reset values
+                bestValue = Double.MAX_VALUE;
+                bestKey.clear();
+            }
         }
 
         // return the name of the very best detector
-        return detectors.get(veryBestKey).getInformation().getDisplayName();
+        return bestMethods;
     }
 
     /**
      * draws the png-file withe the calculated results
      * 
      * @param detector
-     *      used to get the name
+     *            used to get the name
      * @param point
-     *      where the detector recognized a target
+     *            where the detector recognized a target
      * @param path
-     *      where the image will be written
+     *            where the image will be written
      * @param screenShot
-     *      screenshot where the data will be written in,
-     *      maybe it will be not used when the screenshot is already drawn to a file
+     *            screenshot where the data will be written in, maybe it will be
+     *            not used when the screenshot is already drawn to a file
      * @param mousePoint
-     *      target that is pointed by the mouse
+     *            target that is pointed by the mouse
      */
     private void drawPicture(SaliencyDetector detector, Point point, String path,
                              BufferedImage screenShot, Point mousePoint) {
@@ -279,7 +354,8 @@ public class EvaluatorWorker {
         boolean alreadyExists = file.exists();
 
         try {
-            // if the screenshot file already exists, the given screenshot is overwritten by the existing one to update new data 
+            // if the screenshot file already exists, the given screenshot is
+            // overwritten by the existing one to update new data
             if (alreadyExists) screenShot = ImageIO.read(file);
 
             // create screenshot graphic
@@ -287,14 +363,14 @@ public class EvaluatorWorker {
             graphic.setFont(graphic.getFont().deriveFont(5));
 
             if (!alreadyExists) {
-                // visualize fixation point 
+                // visualize fixation point
                 graphic.setColor(new Color(255, 255, 0, 255));
                 graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
                 graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
                 graphic.setColor(new Color(255, 255, 0, 32));
                 graphic.fillOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
 
-                // visualize mouse point 
+                // visualize mouse point
                 graphic.setColor(new Color(255, 0, 0, 255));
                 graphic.drawOval(mousePoint.x - 5, mousePoint.y - 5, 10, 10);
                 graphic.drawChars(("mouse target").toCharArray(), 0, 12, 12 + mousePoint.x, 12 + mousePoint.y);
