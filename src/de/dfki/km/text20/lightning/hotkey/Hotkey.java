@@ -196,7 +196,7 @@ public class Hotkey implements HotkeyListener {
                 case OK:
                     // indicate success
                     this.main.playDing();
-                    this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
+                    this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
                     // toggle status
                     this.evaluationStatus = !(this.evaluationStatus);
@@ -214,7 +214,7 @@ public class Hotkey implements HotkeyListener {
                 case OUT_OFF_DIMENSION:
                     // indicate failure
                     this.main.playError();
-                    this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
+                    this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
                     // toggle status
                     this.evaluationStatus = !(this.evaluationStatus);

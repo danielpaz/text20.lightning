@@ -169,7 +169,7 @@ public class PrecisionEvaluator {
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x + this.properties.getDimension() / 2, this.mousePosition.y - this.fixation.y + this.properties.getDimension() / 2);
+        this.mousePoint.setLocation(this.mousePosition.x - this.fixation.x, this.mousePosition.y - this.fixation.y);
 
         // collect data
         this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.mousePosition), this.pupils));
@@ -193,7 +193,7 @@ public class PrecisionEvaluator {
         MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.mousePoint);
 
         // indicate error
-        if ((this.mousePoint.x > this.properties.getDimension()) || (this.mousePoint.y > this.properties.getDimension())) {
+        if ((Math.abs(this.mousePoint.x) > this.properties.getDimension() / 2) || (Math.abs(this.mousePoint.y) > this.properties.getDimension() / 2)) {
             this.warning = true;
 
             // reset status
