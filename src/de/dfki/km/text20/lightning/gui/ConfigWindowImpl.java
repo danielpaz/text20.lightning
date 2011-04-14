@@ -81,6 +81,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.main = MainClass.getInstance();
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
+        this.main.resetEvaluator();
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
@@ -257,7 +258,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.main.toggleMode();
         if (!this.main.isNormalMode() && !this.checkBoxEvaluation.isSelected())
             this.main.toggleMode();
-        this.main.resetEvaluator(this.textFieldName.getText());
 
         // update statistics
         this.main.addToStatistic("settings changed");

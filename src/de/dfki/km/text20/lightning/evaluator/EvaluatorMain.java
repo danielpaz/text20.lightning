@@ -50,7 +50,6 @@ import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
  * @author Christoph Käding
