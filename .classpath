@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="dependencies/jintellitype-1.3.6.jar"/>
 	<classpathentry kind="lib" path="dependencies/jspf.updatecheck.jar"/>
 	<classpathentry kind="lib" path="dependencies/text20.jar"/>
+	<classpathentry kind="lib" path="dependencies/jxl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

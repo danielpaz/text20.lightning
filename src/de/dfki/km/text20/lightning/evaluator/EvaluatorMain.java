@@ -453,7 +453,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             size = size + parser.count(file);
 
         // calculate size
-        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * this.saliencyDetectors.size());
+        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * 2);
         else
             size = (size * this.selectedDetectors.size());
 

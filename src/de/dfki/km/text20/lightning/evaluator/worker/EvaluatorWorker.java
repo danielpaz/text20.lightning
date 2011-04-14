@@ -31,11 +31,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.JProgressBar;
 
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.Number;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
@@ -77,6 +87,9 @@ public class EvaluatorWorker {
     /** last file with error, used to kill double-error-output */
     private String errorKey;
 
+    /** current used format */
+    private WritableCellFormat format;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
@@ -86,6 +99,7 @@ public class EvaluatorWorker {
      */
     public EvaluatorWorker(EvaluatorMain main, long currentTimeStamp,
                            DiagnosisChannel<String> channel) {
+        // initialize some variables
         this.results = new Hashtable<String, EvaluationContainer>();
         this.settings = new Hashtable<String, SettingsContainer>();
         this.currentTimeStamp = currentTimeStamp;
@@ -94,6 +108,15 @@ public class EvaluatorWorker {
         this.overAllPath = new ArrayList<String>();
         this.main = main;
         this.errorKey = "";
+
+        // excel-stuff
+        WritableFont arial10pt = new WritableFont(WritableFont.ARIAL, 10);
+        this.format = new WritableCellFormat(arial10pt);
+        try {
+            this.format.setWrap(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -139,6 +162,7 @@ public class EvaluatorWorker {
             if (screenFile.getName().equals(this.errorKey)) return;
             System.out.println("ERROR: raster out of format at file: " + screenFile.getName());
             this.errorKey = screenFile.getName();
+            this.settings.get(identifier).addOutOfRaster();
             return;
         }
 
@@ -151,20 +175,20 @@ public class EvaluatorWorker {
             this.drawPicture(detector, point, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
 
         // add results to over all storage
-        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), 0, container.getPupils(), "", user, this.currentTimeStamp);
+        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, "", user, this.currentTimeStamp);
         else
-            this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint), 0, container.getPupils());
+            this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint), container);
 
         // check if the identifier is already in the map
         if (this.results.containsKey(identifier)) {
 
             // add distance to the already existing identifier
-            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getMousePoint().distance(container.getFixation()), container.getPupils());
+            this.results.get(identifier).add(detector.getInformation().getId(), point.distance(translatedMousePoint), container);
         } else {
 
             // creates net map entry by identifier and adds new evaluation
             // container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container.getMousePoint().distance(container.getFixation()), container.getPupils(), path + "/evaluated/Session_" + this.currentTimeStamp + "/evaluation.log", user, Long.parseLong(xmlTimeStamp)));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + xmlTimeStamp + ".log", user, Long.parseLong(xmlTimeStamp)));
         }
 
     }
@@ -181,7 +205,7 @@ public class EvaluatorWorker {
 
     /**
      * A call of this method indicates that the evaluation is finished and the
-     * result file can be updated.
+     * result files can be written.
      * 
      * @param detectors
      * 
@@ -189,13 +213,10 @@ public class EvaluatorWorker {
      */
     @SuppressWarnings("boxing")
     public String getBestResult(ArrayList<SaliencyDetector> detectors) {
-
         // test if some data are collected
         if (this.results.size() == 0) return "...nothing";
 
         // initialize variables
-        double bestValue = Double.MAX_VALUE;
-        ArrayList<Integer> bestKey = new ArrayList<Integer>();
         double veryBestValue = Double.MAX_VALUE;
         ArrayList<Integer> veryBestKey = new ArrayList<Integer>();
         String bestMethods = "";
@@ -231,7 +252,7 @@ public class EvaluatorWorker {
             if (this.main.writeLog()) {
                 // single best key
                 if (veryBestKey.size() == 1) {
-                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
+                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName());
 
                     // multiple best keys
                 } else {
@@ -240,10 +261,10 @@ public class EvaluatorWorker {
                         $(path).file().append(detectors.get(i).getInformation().getDisplayName() + ", ");
                     }
                     $(path).file().append(detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName() + "\r\n\r\n\r\n- detailed evaluation per usersession -\r\n\r\n");
+                    $(path).file().append(" and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName());
                 }
             }
-            
+
             // create best results string
             if (veryBestKey.size() == 1) {
                 bestMethods = detectors.get(veryBestKey.get(0)).getInformation().getDisplayName();
@@ -261,69 +282,12 @@ public class EvaluatorWorker {
             this.channel.status("best result: " + bestMethods + " with " + this.overAllResults.getSize() + "datasets");
         }
 
-        // write the evaluation.log
         if (this.main.writeLog()) {
-            // run through the keyset of the result map
-            for (String key : this.results.keySet()) {
+            // write the individual *.log and *.xls
+            this.writeIndividualResults(detectors);
 
-                // run through the ids of every entry of the result map
-                for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
-
-                    // check if the current value is equal then the best value
-                    if (bestValue == this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)))
-                        bestKey.add(this.results.get(key).getIds().get(i));
-
-                    // check if the current value is better then the best value, the
-                    // best value is only for this identifier
-                    if (bestValue > this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i))) {
-
-                        // store new best value
-                        bestKey.clear();
-                        bestKey.add(this.results.get(key).getIds().get(i));
-                        bestValue = this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i));
-                    }
-
-                    // first entry
-                    if (i == 0) {
-                        $(this.results.get(key).getLogPath()).file().append("#Session#\r\n- User: " + this.results.get(key).getName() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Timestamp: " + this.results.get(key).getTimeStamp() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Screen Brightness: " + this.settings.get(key).getScreenBright() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Recalibration was used: " + this.settings.get(key).isRecalibration() + "\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
-                        $(this.results.get(key).getLogPath()).file().append("\r\n#Results#\r\n");
-                    }
-
-                    // middle entries
-                    $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
-
-                    // last entry
-                    if (i == this.results.get(key).getIds().size() - 1) {
-                        // single best key
-                        if (bestKey.size() == 1) {
-                            $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey.get(0)).getInformation().getDisplayName() + "\r\n\r\n\r\n");
-
-                            // multiple best keys
-                        } else {
-                            $(this.results.get(key).getLogPath()).file().append("-> best results for ");
-                            for (int j = 0; j < bestKey.size() - 2; j++) {
-                                $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(j)).getInformation().getDisplayName() + ", ");
-                            }
-                            $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
-                            $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n\r\n\r\n");
-                        }
-                    }
-                    
-                    // update progress bar
-                    this.main.updateProgressBar();
-                }
-
-                // reset values
-                bestValue = Double.MAX_VALUE;
-                bestKey.clear();
-            }
+            // write over all xml for derivation in association with brightness
+            this.writeOverAllXls();
         }
 
         // return the name of the very best detector
@@ -391,6 +355,228 @@ public class EvaluatorWorker {
             ImageIO.write(screenShot, "png", file);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * writes individual result files
+     * 
+     * @param detectors
+     */
+    @SuppressWarnings("boxing")
+    private void writeIndividualResults(ArrayList<SaliencyDetector> detectors) {
+        // initialize variables
+        double bestValue = Double.MAX_VALUE;
+        ArrayList<Integer> bestKey = new ArrayList<Integer>();
+
+        // initialize xls-stuff
+        WorkbookSettings wbSettings = new WorkbookSettings();
+        wbSettings.setLocale(new Locale("en", "EN"));
+        WritableWorkbook workbook;
+
+        // run through the keyset of the result map
+        for (String key : this.results.keySet()) {
+
+            // run through the ids of every entry of the result map
+            for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
+
+                // check if the current value is equal then the best value
+                if (bestValue == this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)))
+                    bestKey.add(this.results.get(key).getIds().get(i));
+
+                // check if the current value is better then the best value, the
+                // best value is only for this identifier
+                if (bestValue > this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i))) {
+
+                    // store new best value
+                    bestKey.clear();
+                    bestKey.add(this.results.get(key).getIds().get(i));
+                    bestValue = this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i));
+                }
+
+                // first entry
+                if (i == 0) {
+                    $(this.results.get(key).getLogPath()).file().append("#Session#\r\n- User: " + this.results.get(key).getName() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Timestamp: " + this.results.get(key).getTimeStamp() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + ", OutOfRatserCount: " + this.settings.get(key).getOutOfRaster() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Screen Brightness: " + this.settings.get(key).getScreenBright() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Recalibration was used: " + this.settings.get(key).isRecalibration() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("\r\n#Results#\r\n");
+                }
+
+                // middle entries
+                $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                // last entry
+                if (i == this.results.get(key).getIds().size() - 1) {
+                    // single best key
+                    if (bestKey.size() == 1) {
+                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey.get(0)).getInformation().getDisplayName() + "\r\n");
+
+                        // multiple best keys
+                    } else {
+                        $(this.results.get(key).getLogPath()).file().append("-> best results for ");
+                        for (int j = 0; j < bestKey.size() - 2; j++) {
+                            $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(j)).getInformation().getDisplayName() + ", ");
+                        }
+                        $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
+                        $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
+                    }
+
+                    // write distance file
+                    $(this.results.get(key).getLogPath()).file().append("\r\n#Data#\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("Fixation-x\tFixation-y\tMouse-x\t\tMouse-y\t\tPupil-left\t\tPupil-right\t\tDistance-Mouse-Fixation\r\n");
+                    for (StorageContainer container : this.results.get(key).getContainer())
+                        $(this.results.get(key).getLogPath()).file().append(container.getFixation().x + "\t\t" + container.getFixation().y + "\t\t" + container.getMousePoint().x + "\t\t" + container.getMousePoint().y + "\t\t" + container.getPupils()[0] + "\t\t" + container.getPupils()[1] + "\t\t" + container.getFixation().distance(container.getMousePoint()) + "\r\n");
+                }
+            }
+
+            // reset values
+            bestValue = Double.MAX_VALUE;
+            bestKey.clear();
+
+            // write xls-file
+            try {
+                // initialize
+                workbook = Workbook.createWorkbook(new File(this.results.get(key).getLogPath().replace(".log", ".xls")), wbSettings);
+                workbook.createSheet("Evaluation", 0);
+                WritableSheet excelSheet = workbook.getSheet(0);
+
+                // add captions
+                excelSheet.addCell(new Label(0, 0, "Fixation-x", this.format));
+                excelSheet.addCell(new Label(1, 0, "Fixation-y", this.format));
+                excelSheet.addCell(new Label(2, 0, "Mouse-x", this.format));
+                excelSheet.addCell(new Label(3, 0, "Mouse-y", this.format));
+                excelSheet.addCell(new Label(4, 0, "Pupil-left", this.format));
+                excelSheet.addCell(new Label(5, 0, "Pupil-right", this.format));
+                excelSheet.addCell(new Label(6, 0, "Distance-Mouse-Fixation", this.format));
+
+                // iterate trough data
+                for (int i = 0; i < this.results.get(key).getContainer().size(); i++) {
+                    excelSheet.addCell(new Number(0, i + 1, this.results.get(key).getContainer().get(i).getFixation().x, this.format));
+                    excelSheet.addCell(new Number(1, i + 1, this.results.get(key).getContainer().get(i).getFixation().y, this.format));
+                    excelSheet.addCell(new Number(2, i + 1, this.results.get(key).getContainer().get(i).getMousePoint().x, this.format));
+                    excelSheet.addCell(new Number(3, i + 1, this.results.get(key).getContainer().get(i).getMousePoint().y, this.format));
+                    excelSheet.addCell(new Number(4, i + 1, this.results.get(key).getContainer().get(i).getPupils()[0], this.format));
+                    excelSheet.addCell(new Number(5, i + 1, this.results.get(key).getContainer().get(i).getPupils()[1], this.format));
+                    excelSheet.addCell(new Number(6, i + 1, this.results.get(key).getContainer().get(i).getFixation().distance(this.results.get(key).getContainer().get(i).getMousePoint()), this.format));
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (WriteException e) {
+                e.printStackTrace();
+            }
+            // update progress bar
+            this.main.updateProgressBar();
+        }
+    }
+
+    /**
+     * writes the summary xls
+     */
+    private void writeOverAllXls() {
+        /*
+         * x-direction: screen brightness
+         * y-direction: setting brightness
+         */
+        DerivationContainer[][] data = new DerivationContainer[5][5];
+
+        // initialize xls-stuff
+        WorkbookSettings wbSettings = new WorkbookSettings();
+        wbSettings.setLocale(new Locale("en", "EN"));
+        WritableWorkbook workbook;
+
+        // initialize array
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                data[x][y] = new DerivationContainer();
+            }
+        }
+
+        // run through the keyset of the result map to summarize derivation settingspecific
+        for (String key : this.results.keySet()) {
+            for (StorageContainer container : this.results.get(key).getContainer()) {
+                data[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+            }
+            this.main.updateProgressBar();
+        }
+
+        // run trough all locations
+        for (String path : this.overAllPath) {
+
+            // write xls-file
+            try {
+                // initialize
+                workbook = Workbook.createWorkbook(new File(path.replace(".log", ".xls")), wbSettings);
+                workbook.createSheet("Evaluation", 0);
+                WritableSheet excelSheet = workbook.getSheet(0);
+                int offset = 2;
+
+                // add label
+                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset - 2, "Derivation", this.format));
+
+                // add captions
+                this.writeCaptions(excelSheet, offset);
+
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offset + 3, data[x][y].getAveragedDerivation(), this.format));
+                    }
+                }
+
+                // rise offset
+                offset = 10 + StorageContainer.getBrightnessOptions().size();
+
+                // add label
+                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset - 2, "Pupils", this.format));
+
+                // add captions
+                this.writeCaptions(excelSheet, offset);
+
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offset + 3, ((data[x][y].getAveragedPupils()[0] + data[x][y].getAveragedPupils()[1]) / 2), this.format));
+                    }
+                }
+                // write and close
+                workbook.write();
+                workbook.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (WriteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * adds captions to xls
+     * 
+     * @param excelSheet
+     * @param offset
+     * @throws RowsExceededException
+     * @throws WriteException
+     */
+    @SuppressWarnings("boxing")
+    private void writeCaptions(WritableSheet excelSheet, int offset)
+                                                                    throws RowsExceededException,
+                                                                    WriteException {
+        excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2), 0 + offset, "screen brightness", this.format));
+        excelSheet.addCell(new Label(0, (StorageContainer.getBrightnessOptions().size() / 2) + offset, "setting brightness", this.format));
+        for (int i = 0; i < StorageContainer.getBrightnessOptions().size(); i++) {
+            excelSheet.addCell(new Label(2 + i, 1 + offset, StorageContainer.getBrightnessOptions().get(i), this.format));
+            excelSheet.addCell(new Label(1, 2 + i + offset, StorageContainer.getBrightnessOptions().get(i), this.format));
         }
     }
 }

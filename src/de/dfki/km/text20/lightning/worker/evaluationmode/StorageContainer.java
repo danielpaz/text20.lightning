@@ -22,6 +22,8 @@ package de.dfki.km.text20.lightning.worker.evaluationmode;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -56,6 +58,9 @@ public class StorageContainer implements Serializable {
      */
     @ElementArray
     private float[] pupils;
+    
+    /** current list of usable brigthness settings */
+    private static Map<Integer, String> brightness;
 
     /**
      * Creates new container an initializes its values.
@@ -113,5 +118,19 @@ public class StorageContainer implements Serializable {
     public void setPupils(float[] pupils) {
         this.pupils[0] = pupils[0];
         this.pupils[1] = pupils[1];
+    }
+    
+    /**
+     * @return available brightness options
+     */
+    @SuppressWarnings("boxing")
+    public static Map<Integer, String> getBrightnessOptions() {
+        brightness = new HashMap<Integer, String>();
+        brightness.put(0, "not choosen");
+        brightness.put(1, "dark");
+        brightness.put(2, "medium-dark");
+        brightness.put(3, "medium-light");
+        brightness.put(4, "light");
+        return brightness;
     }
 }

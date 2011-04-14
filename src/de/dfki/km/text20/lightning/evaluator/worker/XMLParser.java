@@ -107,13 +107,13 @@ public class XMLParser {
     private boolean screen;
 
     /** temporary stored screen brightness */
-    private String screenTmp;
+    private int screenTmp;
 
     /** indicates if the next entry should be the setting brightness */
     private boolean setting;
 
     /** temporary stored setting brightness */
-    private String settingTmp;
+    private int settingTmp;
 
     /** included setting will be stored in this container */
     private SettingsContainer settingsContainer;
@@ -126,6 +126,9 @@ public class XMLParser {
 
     /** indicates if the next value should be the amount of steps */
     private boolean amount;
+
+    /** indicates if the mouse was out of dimension */
+    private boolean outOfDim;
 
     /**
      * tries to read the included StorageContainer of the given XML-file
@@ -159,11 +162,12 @@ public class XMLParser {
         this.pupils = new float[2];
         this.screen = false;
         this.setting = false;
-        this.screenTmp = "";
-        this.settingTmp = "";
+        this.screenTmp = 0;
+        this.settingTmp = 0;
         this.recalibration = false;
         this.recalibrationTmp = false;
         this.amount = false;
+        this.outOfDim = false;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -236,6 +240,9 @@ public class XMLParser {
                 // ... add a new container to the data
                 this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
 
+                // check ood
+                if (this.outOfDim) this.settingsContainer.addOutOfDim();
+
                 // reset variables
                 this.timestamp = false;
                 this.mouseX = false;
@@ -244,6 +251,7 @@ public class XMLParser {
                 this.fixY = false;
                 this.left = false;
                 this.right = false;
+                this.outOfDim = false;
                 this.pupils = new float[2];
                 this.mouseXTmp = 0;
                 this.mouseYTmp = 0;
@@ -272,9 +280,9 @@ public class XMLParser {
                 this.mouseYTmp = Integer.parseInt(value);
 
                 // indicate warning
-                if ((this.mouseYTmp - this.fixYTmp + this.dimensionTmp / 2) > this.usedDimension) {
+                if (Math.abs(this.mouseYTmp - this.fixYTmp) > (this.usedDimension / 2)) {
                     System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
-                    this.settingsContainer.addOutOfDim();
+                    this.outOfDim = true;
                 }
 
                 // return success
@@ -288,9 +296,9 @@ public class XMLParser {
                 this.mouseXTmp = Integer.parseInt(value);
 
                 // indicate warning
-                if ((this.mouseXTmp - this.fixXTmp + this.dimensionTmp / 2) > this.usedDimension) {
+                if (Math.abs(this.mouseXTmp - this.fixXTmp) > (this.usedDimension / 2)) {
                     System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
-                    this.settingsContainer.addOutOfDim();
+                    this.outOfDim = true;
                 }
                 // return success
                 return true;
@@ -335,8 +343,6 @@ public class XMLParser {
                 // ... store it
                 this.dimensionTmp = Integer.parseInt(value);
 
-                System.out.println(this.usedDimension + " " + value);
-
                 // test dimensions
                 if (this.usedDimension < this.dimensionTmp)
                     System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
@@ -362,7 +368,7 @@ public class XMLParser {
             if (this.setting) {
 
                 // ... store it
-                this.settingTmp = value;
+                this.settingTmp = Integer.parseInt(value);
 
                 // return success
                 return true;
@@ -372,7 +378,7 @@ public class XMLParser {
             if (this.screen) {
 
                 // ... store it
-                this.screenTmp = value;
+                this.screenTmp = Integer.parseInt(value);
 
                 // return success
                 return true;

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
+import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
+
 /**
  * Container which stores the calculated results for each method.
  * 
@@ -60,7 +62,7 @@ public class EvaluationContainer {
     private boolean firstGet;
 
     /** list of distances between mouse and fixation */
-    private ArrayList<Double> deviation;
+    private ArrayList<StorageContainer> container;
 
     /** 
      * size of pupils
@@ -75,10 +77,8 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param distanceMR
+     * @param distance
      *      distance between mouse position and calculated result 
-     * @param distanceMF 
-     *      distance between mouse position and fixation 
      * @param pupils 
      *      size of the pupils
      * @param log
@@ -88,12 +88,12 @@ public class EvaluationContainer {
      * @param timeStamp
      *      start of the evaluation session
      */
-    public EvaluationContainer(int id, double distanceMR, double distanceMF,
-                               float[] pupils, String log, String name, long timeStamp) {
+    public EvaluationContainer(int id, double distance, StorageContainer container,
+                               String log, String name, long timeStamp) {
         // initialize variables
         this.results = new Hashtable<Integer, Double>();
         this.ids = new ArrayList<Integer>();
-        this.deviation = new ArrayList<Double>();
+        this.container = new ArrayList<StorageContainer>();
         this.keyId = id;
         this.size = 0;
         this.log = log;
@@ -103,7 +103,7 @@ public class EvaluationContainer {
         this.firstGet = true;
 
         // add first value
-        this.add(id, distanceMR, distanceMF, pupils);
+        this.add(id, distance, container);
     }
 
     /**
@@ -112,33 +112,31 @@ public class EvaluationContainer {
      * 
      * @param id 
      *      of the method
-     * @param distanceMR
+     * @param distance
      *      distance between mouse position and calculated result 
-     * @param distanceMF 
-     *      distance between mouse position and fixation
      * @param pupils 
      *      size of the pupils
      */
     @SuppressWarnings("boxing")
-    public void add(int id, double distanceMR, double distanceMF, float[] pupils) {
+    public void add(int id, double distance, StorageContainer storageContainer) {
         // if the given id is the key id ... 
         if (this.keyId == id) {
             // ... increase size ...
             this.size++;
 
             // ... and add pupilsize
-            this.pupilsize[0] = pupils[0] + this.pupilsize[0];
-            this.pupilsize[1] = pupils[1] + this.pupilsize[1];
+            this.pupilsize[0] = storageContainer.getPupils()[0] + this.pupilsize[0];
+            this.pupilsize[1] = storageContainer.getPupils()[1] + this.pupilsize[1];
 
-            // add deviation
-            this.deviation.add(distanceMF);
+            // add container
+            this.container.add(storageContainer);
         }
 
         // if the map contains already the given id, store value in temp
         if (this.results.containsKey(id)) this.temp = this.results.get(id);
 
         // put temp + given value by given id to the map
-        this.results.put(id, this.temp + distanceMR);
+        this.results.put(id, this.temp + distance);
 
         // add id to the list of ids if it is not already there
         if (!this.ids.contains(id)) this.ids.add(id);
@@ -221,7 +219,7 @@ public class EvaluationContainer {
     /**
      * @return the deviation
      */
-    public ArrayList<Double> getDeviation() {
-        return this.deviation;
+    public ArrayList<StorageContainer> getContainer() {
+        return this.container;
     }
 }
