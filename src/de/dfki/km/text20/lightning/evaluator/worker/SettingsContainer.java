@@ -20,6 +20,9 @@
  */
 package de.dfki.km.text20.lightning.evaluator.worker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Container which stores the experiment settings of each XML-file.
  * 
@@ -32,13 +35,16 @@ public class SettingsContainer {
     private int dimension;
 
     /** included screen brightness */
-    private String screenBright;
+    private int screenBright;
 
     /** included setting brightness */
-    private String settingBright;
+    private int settingBright;
     
-    /** indicates how often was the mouseposition outside of the dimension */
-    private int count;
+    /** indicates how often the mouseposition was outside of the dimension */
+    private int outOfDim;
+    
+    /** indicates how often was the screenrect was outside of the screenshot */
+    private int outOfRect;
     
     /** indicates if recalibration was used */
     private boolean recalibration;
@@ -51,12 +57,13 @@ public class SettingsContainer {
      * @param screenBright
      * @param settingBright
      */
-    public SettingsContainer(int dimension, boolean recalibration, String screenBright, String settingBright) {
+    public SettingsContainer(int dimension, boolean recalibration, int screenBright, int settingBright) {
         this.dimension = dimension;
         this.screenBright = screenBright;
         this.settingBright = settingBright;
         this.recalibration = recalibration;
-        this.count = 0;
+        this.outOfDim = 0;
+        this.outOfRect = 0;
     }
 
     /**
@@ -73,7 +80,7 @@ public class SettingsContainer {
      * 
      * @return the screenBright
      */
-    public String getScreenBright() {
+    public int getScreenBright() {
         return this.screenBright;
     }
 
@@ -82,7 +89,7 @@ public class SettingsContainer {
      * 
      * @return the settingBright
      */
-    public String getSettingBright() {
+    public int getSettingBright() {
         return this.settingBright;
     }
 
@@ -90,18 +97,33 @@ public class SettingsContainer {
      * increase MouseOutOfDimension-counter
      */
     public void addOutOfDim() {
-        this.count++;
+        this.outOfDim++;
     }
     
     /**
      * returns current MouseOutOfDimension-counter
      * 
-     * @return count
+     * @return outOfDim
      */
     public int getOutOfDim() {
-        return this.count;
+        return this.outOfDim;
     }
 
+    /**
+     * increase MouseOutOfDimension-counter
+     */
+    public void addOutOfRaster() {
+        this.outOfRect++;
+    }
+    
+    /**
+     * returns current ScreenrectOutOfDimension-counter
+     * 
+     * @return outOfRect
+     */
+    public int getOutOfRaster() {
+        return this.outOfRect;
+    }
     /**
      * @return the recalibration
      */

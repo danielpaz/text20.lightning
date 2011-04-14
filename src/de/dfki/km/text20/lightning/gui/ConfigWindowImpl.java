@@ -71,6 +71,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * builds the window with all its components and shows it
      */
     public ConfigWindowImpl() {
+        // initialize variables
         this.main = MainClass.getInstance();
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
@@ -104,6 +105,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxWarpMethod.addActionListener(this);
         this.comboBoxDetector.addActionListener(this);
         this.mainFrame.addWindowListener(this);
+        this.buttonClearRecalibration.addActionListener(this);
 
         // initialize checkbox
         this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
@@ -194,6 +196,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.comboBoxWarpMethodActionPerformed();
             return;
         }
+
+        if (event.getSource() == this.buttonClearRecalibration) {
+            this.buttonClearActionPerformed();
+            return;
+        }
     }
 
     /**
@@ -256,6 +263,17 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         Hotkey.getInstance().resetTmpKeys();
     }
 
+    /**
+     * Fired if the clear calibration button is clicked.
+     */
+    private void buttonClearActionPerformed() {
+        // clear calibration
+        this.main.getRecalibrator().clearRecalibration();
+
+        // deactivate button
+        this.buttonClearRecalibration.setEnabled(false);
+    }
+    
     /**
      * manages the visibility of the configbutton
      */
