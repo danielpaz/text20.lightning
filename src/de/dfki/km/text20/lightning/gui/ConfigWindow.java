@@ -108,9 +108,6 @@ public class ConfigWindow {
         checkBoxSound = new JCheckBox();
         labelDimension = new JLabel();
         spinnerDimension = new JSpinner();
-        labelDetector = new JLabel();
-        comboBoxDetector = new JComboBox();
-        buttonDetectorConfig = new JButton();
         labelRecalibration = new JLabel();
         checkBoxRecalibration = new JCheckBox();
         buttonClearRecalibration = new JButton();
@@ -126,9 +123,16 @@ public class ConfigWindow {
         labelName = new JLabel();
         textFieldName = new JTextField();
         labelScreenBright = new JLabel();
-        textFieldScreenBright = new JTextField();
+        comboBoxScreenBright = new JComboBox();
         labelSettingBright = new JLabel();
-        textFieldSettingBright = new JTextField();
+        comboBoxSettingBright = new JComboBox();
+        labelOutputPath = new JLabel();
+        buttonSelect = new JButton();
+        textFieldOutputPath = new JTextField();
+        panel4 = new JPanel();
+        labelDetector = new JLabel();
+        comboBoxDetector = new JComboBox();
+        buttonDetectorConfig = new JButton();
         buttonSubmit = new JButton();
         buttonDefault = new JButton();
         buttonOK = new JButton();
@@ -151,15 +155,15 @@ public class ConfigWindow {
                 {
                     contentPanel.setLayout(new FormLayout(
                         "3*(20dlu:grow, $lcgap), 20dlu:grow",
-                        "top:default, $lgap, top:47dlu:grow, $lgap, default"));
+                        "top:default, $lgap, top:48dlu, $lgap, default:grow, $lgap, default"));
                     ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
 
                     //======== panel1 ========
                     {
-                        panel1.setBorder(new TitledBorder("Cursor Warping"));
+                        panel1.setBorder(new TitledBorder("General Options"));
                         panel1.setLayout(new FormLayout(
                             "20dlu:grow, $lcgap, 20dlu:grow",
-                            "7*(default, $lgap), default"));
+                            "5*(default, $lgap), default"));
 
                         //---- labelActionHotkey ----
                         labelActionHotkey.setText("Cursorwarp Key");
@@ -205,33 +209,16 @@ public class ConfigWindow {
                         spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
                         panel1.add(spinnerDimension, cc.xy(3, 7));
 
-                        //---- labelDetector ----
-                        labelDetector.setText("Text Detector / Warping");
-                        panel1.add(labelDetector, cc.xywh(1, 9, 2, 3));
-
-                        //---- comboBoxDetector ----
-                        comboBoxDetector.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                comboBoxSearchMethodActionPerformed(e);
-                            }
-                        });
-                        panel1.add(comboBoxDetector, cc.xy(3, 9));
-
-                        //---- buttonDetectorConfig ----
-                        buttonDetectorConfig.setText("text");
-                        panel1.add(buttonDetectorConfig, cc.xy(3, 11));
-
                         //---- labelRecalibration ----
                         labelRecalibration.setText("Use Recalibration");
-                        panel1.add(labelRecalibration, cc.xywh(1, 13, 1, 3));
-                        panel1.add(checkBoxRecalibration, cc.xy(3, 13));
+                        panel1.add(labelRecalibration, cc.xywh(1, 9, 1, 3));
+                        panel1.add(checkBoxRecalibration, cc.xy(3, 9));
 
                         //---- buttonClearRecalibration ----
                         buttonClearRecalibration.setText("Clear Recalibration");
-                        panel1.add(buttonClearRecalibration, cc.xy(3, 15));
+                        panel1.add(buttonClearRecalibration, cc.xy(3, 11));
                     }
-                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
+                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.TOP));
 
                     //======== panel2 ========
                     {
@@ -269,7 +256,7 @@ public class ConfigWindow {
                         panel3.setBorder(new TitledBorder("Evaluation "));
                         panel3.setLayout(new FormLayout(
                             "80dlu:grow, $lcgap, 80dlu:grow",
-                            "3*(default, $lgap), default"));
+                            "5*(default, $lgap), default"));
 
                         //---- labelEvaluation ----
                         labelEvaluation.setText("Evaluation Mode");
@@ -292,14 +279,49 @@ public class ConfigWindow {
                         //---- labelScreenBright ----
                         labelScreenBright.setText("Screen Brightness");
                         panel3.add(labelScreenBright, cc.xywh(1, 5, 2, 1));
-                        panel3.add(textFieldScreenBright, cc.xy(3, 5));
+                        panel3.add(comboBoxScreenBright, cc.xy(3, 5));
 
                         //---- labelSettingBright ----
                         labelSettingBright.setText("Setting Brightness");
                         panel3.add(labelSettingBright, cc.xywh(1, 7, 2, 1));
-                        panel3.add(textFieldSettingBright, cc.xy(3, 7));
+                        panel3.add(comboBoxSettingBright, cc.xy(3, 7));
+
+                        //---- labelOutputPath ----
+                        labelOutputPath.setText("Output Path");
+                        panel3.add(labelOutputPath, cc.xy(1, 9));
+
+                        //---- buttonSelect ----
+                        buttonSelect.setText("Select");
+                        panel3.add(buttonSelect, cc.xy(3, 9));
+                        panel3.add(textFieldOutputPath, cc.xywh(1, 11, 3, 1));
                     }
-                    contentPanel.add(panel3, cc.xywh(5, 3, 3, 1, CellConstraints.FILL, CellConstraints.FILL));
+                    contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
+
+                    //======== panel4 ========
+                    {
+                        panel4.setBorder(new TitledBorder("Cursor Warping"));
+                        panel4.setLayout(new FormLayout(
+                            "20dlu:grow, $lcgap, 20dlu:grow",
+                            "default, $lgap, default"));
+
+                        //---- labelDetector ----
+                        labelDetector.setText("Text Detector / Warping");
+                        panel4.add(labelDetector, cc.xywh(1, 1, 2, 3));
+
+                        //---- comboBoxDetector ----
+                        comboBoxDetector.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                comboBoxSearchMethodActionPerformed(e);
+                            }
+                        });
+                        panel4.add(comboBoxDetector, cc.xy(3, 1));
+
+                        //---- buttonDetectorConfig ----
+                        buttonDetectorConfig.setText("text");
+                        panel4.add(buttonDetectorConfig, cc.xy(3, 3));
+                    }
+                    contentPanel.add(panel4, cc.xywh(1, 5, 3, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
 
                     //---- buttonSubmit ----
                     buttonSubmit.setText("Submit");
@@ -309,7 +331,7 @@ public class ConfigWindow {
                             buttonSubmitActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonSubmit, cc.xy(1, 5));
+                    contentPanel.add(buttonSubmit, cc.xy(1, 7));
 
                     //---- buttonDefault ----
                     buttonDefault.setText("Default");
@@ -319,7 +341,7 @@ public class ConfigWindow {
                             buttonDefaultActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonDefault, cc.xy(3, 5));
+                    contentPanel.add(buttonDefault, cc.xy(3, 7));
 
                     //---- buttonOK ----
                     buttonOK.setText("OK");
@@ -329,7 +351,7 @@ public class ConfigWindow {
                             buttonOKActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonOK, cc.xywh(5, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
+                    contentPanel.add(buttonOK, cc.xywh(5, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
 
                     //---- buttonCancel ----
                     buttonCancel.setText("Cancel");
@@ -339,12 +361,12 @@ public class ConfigWindow {
                             buttonCancelActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonCancel, cc.xy(7, 5));
+                    contentPanel.add(buttonCancel, cc.xy(7, 7));
                 }
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 320);
+            mainFrame.setSize(570, 370);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -364,9 +386,6 @@ public class ConfigWindow {
     protected JCheckBox checkBoxSound;
     protected JLabel labelDimension;
     protected JSpinner spinnerDimension;
-    protected JLabel labelDetector;
-    protected JComboBox comboBoxDetector;
-    protected JButton buttonDetectorConfig;
     protected JLabel labelRecalibration;
     protected JCheckBox checkBoxRecalibration;
     protected JButton buttonClearRecalibration;
@@ -382,9 +401,16 @@ public class ConfigWindow {
     protected JLabel labelName;
     protected JTextField textFieldName;
     protected JLabel labelScreenBright;
-    protected JTextField textFieldScreenBright;
+    protected JComboBox comboBoxScreenBright;
     protected JLabel labelSettingBright;
-    protected JTextField textFieldSettingBright;
+    protected JComboBox comboBoxSettingBright;
+    protected JLabel labelOutputPath;
+    protected JButton buttonSelect;
+    protected JTextField textFieldOutputPath;
+    private JPanel panel4;
+    protected JLabel labelDetector;
+    protected JComboBox comboBoxDetector;
+    protected JButton buttonDetectorConfig;
     protected JButton buttonSubmit;
     protected JButton buttonDefault;
     protected JButton buttonOK;

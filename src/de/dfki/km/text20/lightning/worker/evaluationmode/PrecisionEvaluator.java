@@ -176,7 +176,7 @@ public class PrecisionEvaluator {
 
         // write image
         try {
-            File outputfile = new File("./evaluation/data/" + this.user + "/" + this.user + "_" + this.timestamp + ".png");
+            File outputfile = new File(MainClass.getInstance().getEvaluationSettings()[3] + "/evaluation/data/" + this.user + "/" + this.user + "_" + this.timestamp + ".png");
             outputfile.mkdirs();
             ImageIO.write(this.screenShot, "png", outputfile);
         } catch (Exception e) {
@@ -219,8 +219,8 @@ public class PrecisionEvaluator {
         if (this.allData.size() == 0) return;
 
         // create file
-        File logfile = new File("./evaluation/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".xml");
-        File xsd = new File("./evaluation/data/" + this.user + "/DataPattern.xsd");
+        File logfile = new File(MainClass.getInstance().getEvaluationSettings()[3] + "/evaluation/data/" + this.user + "/" + this.user + "_" + System.currentTimeMillis() + ".xml");
+        File xsd = new File(MainClass.getInstance().getEvaluationSettings()[3] + "/evaluation/data/" + this.user + "/DataPattern.xsd");
 
         try {
             // Create an XML stream writer
