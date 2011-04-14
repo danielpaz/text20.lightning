@@ -50,6 +50,7 @@ import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
  * @author Christoph Käding
@@ -490,7 +491,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.progressBar.paint(this.progressBar.getGraphics());
 
     }
-    
+
     /**
      * closes tool cleanly
      */

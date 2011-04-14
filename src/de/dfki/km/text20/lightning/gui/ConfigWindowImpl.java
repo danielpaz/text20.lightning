@@ -134,7 +134,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
                 if (getSelectedFile().isFile()) return;
                 super.approveSelection();
                 textFieldOutputPath.setText(this.getSelectedFile().getAbsolutePath());
-
             }
         };
         this.chooser.setMultiSelectionEnabled(false);

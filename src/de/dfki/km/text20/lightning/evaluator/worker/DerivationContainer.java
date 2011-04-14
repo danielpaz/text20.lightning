@@ -30,14 +30,21 @@ package de.dfki.km.text20.lightning.evaluator.worker;
  */
 public class DerivationContainer {
 
+    /** number of adds */
     private int counter;
 
+    /** summarized distance */
     private double derivation;
-
+ 
+    /** summarized pupil sizes */
     private float[] pupilsize;
 
+    /** indicates if pupilsize should be calculated or not */
     private boolean firstGet;
 
+    /**
+     * creates a new object and initializes variables
+     */
     public DerivationContainer() {
         this.counter = 0;
         this.derivation = 0;
@@ -47,6 +54,12 @@ public class DerivationContainer {
         this.firstGet = true;
     }
 
+    /**
+     * adds distance and pupils to storage
+     * 
+     * @param distance
+     * @param pupils
+     */
     public void addDistance(double distance, float pupils[]) {
         this.derivation = this.derivation + distance;
         this.pupilsize[0] = this.pupilsize[0] + pupils[0];
@@ -54,6 +67,9 @@ public class DerivationContainer {
         this.counter++;
     }
 
+    /**
+     * @return averaged derivation
+     */
     public double getAveragedDerivation() {
         if (this.counter > 0) return (this.derivation / this.counter);
         return 0;
