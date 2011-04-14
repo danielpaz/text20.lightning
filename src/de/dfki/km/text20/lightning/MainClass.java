@@ -528,25 +528,38 @@ public class MainClass {
 	}
 
 	/**
-	 * @return the evaluationSettings 0 = user name 1 = screen brightness 2 =
-	 *         setting brightness
+	 * @return the evaluationSettings 
+	 * 0 = user name 
+	 * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
+	 * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
+	 * 3 = output path
 	 */
 	public String[] getEvaluationSettings() {
 		if (this.evaluationSettings == null) {
-			this.evaluationSettings = new String[3];
+			this.evaluationSettings = new String[4];
 			this.evaluationSettings[0] = "DefaultUser";
-			this.evaluationSettings[1] = "not choosen";
-			this.evaluationSettings[2] = "not choosen";
+			this.evaluationSettings[1] = "0";
+			this.evaluationSettings[2] = "0";
+			this.evaluationSettings[3] = ".";
 		}
 		return this.evaluationSettings;
 	}
 
 	/**
 	 * @param settings
-	 *            0 = user name 1 = screen brightness 2 = setting brightness
+	 * 0 = user name 
+	 * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
+	 * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
+	 * 3 = output path
 	 */
 	public void setEvaluationSettings(String[] settings) {
-		this.evaluationSettings = settings;
+	    String tmpString = this.evaluationSettings[3];
+			    
+	    this.evaluationSettings = settings;
+		
+		File tmpFile = new File (this.evaluationSettings[3]);
+		if(tmpFile.exists() && !tmpFile.isDirectory()) 
+		    this.evaluationSettings[3] = tmpString;
 	}
 
 	/**

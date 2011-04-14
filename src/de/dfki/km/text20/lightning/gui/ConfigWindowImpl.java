@@ -25,8 +25,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 
 import de.dfki.km.text20.lightning.MainClass;
@@ -36,6 +38,7 @@ import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
+import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
@@ -66,6 +69,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
 
     /** instance of the mainclass */
     private MainClass main;
+
+    /** file chooser for output path */
+    private JFileChooser chooser;
 
     /**
      * builds the window with all its components and shows it
@@ -106,6 +112,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxDetector.addActionListener(this);
         this.mainFrame.addWindowListener(this);
         this.buttonClearRecalibration.addActionListener(this);
+        this.buttonSelect.addActionListener(this);
 
         // initialize checkbox
         this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
@@ -115,10 +122,23 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // initializes tooltips
         this.manageToolTips();
 
-        // initialize current traings settings
+        // initialize current evaluation settings
         this.textFieldName.setText(this.main.getEvaluationSettings()[0]);
-        this.textFieldScreenBright.setText(this.main.getEvaluationSettings()[1]);
-        this.textFieldSettingBright.setText(this.main.getEvaluationSettings()[2]);
+        this.manageBrightnessComboBox();
+        this.textFieldOutputPath.setText(new File(this.main.getEvaluationSettings()[3]).getAbsolutePath());
+
+        // initialize file chooser
+        this.chooser = new JFileChooser() {
+            @SuppressWarnings("unqualified-field-access")
+            public void approveSelection() {
+                if (getSelectedFile().isFile()) return;
+                super.approveSelection();
+                textFieldOutputPath.setText(this.getSelectedFile().getAbsolutePath());
+
+            }
+        };
+        this.chooser.setMultiSelectionEnabled(false);
+        this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         // show the gui
         this.mainFrame.repaint();
@@ -201,6 +221,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.buttonClearActionPerformed();
             return;
         }
+
+        if (event.getSource() == this.buttonSelect) {
+            this.buttonSelectActionPerformed();
+            return;
+        }
     }
 
     /**
@@ -208,7 +233,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      */
     protected void buttonOKActionPerformed() {
         // initialize temporary variables
-        String[] settings = { this.textFieldName.getText(), this.textFieldScreenBright.getText(), this.textFieldSettingBright.getText() };
+        String[] settings = { this.textFieldName.getText(), "" + this.comboBoxScreenBright.getSelectedIndex(), "" + this.comboBoxSettingBright.getSelectedIndex(), this.textFieldOutputPath.getText() };
 
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
@@ -247,11 +272,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * Fired if the Cancel button is clicked. Closes the window.
      */
     private void buttonSubmitActionPerformed() {
-    	this.main.publishStatistics();
-    	this.main.setSubmitted(true);
-    	this.buttonSubmit.setEnabled(false);
+        this.main.publishStatistics();
+        this.main.setSubmitted(true);
+        this.buttonSubmit.setEnabled(false);
     }
-    
+
     /**
      * Fired if the Cancel button is clicked. Closes the window.
      */
@@ -273,7 +298,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // deactivate button
         this.buttonClearRecalibration.setEnabled(false);
     }
-    
+
     /**
      * manages the visibility of the configbutton
      */
@@ -351,13 +376,23 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.textFieldName.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.textFieldScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.textFieldSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.comboBoxScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.comboBoxSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.labelOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.buttonSelect.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.textFieldOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
         this.checkBoxUseWarpActionPerformed();
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
+    }
+
+    /**
+     * Fired if the Select button is clicked. Shows the file chooser.
+     */
+    private void buttonSelectActionPerformed() {
+        this.chooser.showOpenDialog(this.mainFrame);
     }
 
     /**
@@ -398,6 +433,21 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
                 return this;
             }
         };
+    }
+
+    /**
+     * manages brightness comboboxes
+     */
+    private void manageBrightnessComboBox() {
+        // add options
+        for (String option : StorageContainer.getBrightnessOptions().values()) {
+            this.comboBoxScreenBright.addItem(option);
+            this.comboBoxSettingBright.addItem(option);
+        }
+
+        //preselect options
+        this.comboBoxScreenBright.setSelectedIndex(Integer.parseInt(this.main.getEvaluationSettings()[1]));
+        this.comboBoxSettingBright.setSelectedIndex(Integer.parseInt(this.main.getEvaluationSettings()[2]));
     }
 
     /**
@@ -540,7 +590,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.labelRecalibration.setToolTipText(labelRecalibrationTT);
         this.buttonClearRecalibration.setToolTipText(buttonClearRecalibrationTT);
         this.buttonDefault.setToolTipText(buttonDefaultTT);
-        
+
     }
 
     /* (non-Javadoc)
