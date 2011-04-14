@@ -220,12 +220,14 @@ public class EvaluatorWorker {
         double veryBestValue = Double.MAX_VALUE;
         ArrayList<Integer> veryBestKey = new ArrayList<Integer>();
         String bestMethods = "";
+        String veryBestMethods = "";
 
         for (String path : this.overAllPath) {
             if (this.main.writeLog()) {
                 $(path).file().append("- overall results for this session -\r\n\r\n#Overview#\r\n");
                 $(path).file().append("- Timestamp: " + this.overAllResults.getTimeStamp() + "\r\n");
                 $(path).file().append("- Number of DataSets overall: " + this.overAllResults.getSize() + "\r\n");
+                $(path).file().append("- Number of different Locations: " + this.overAllPath.size() + "\r\n");
                 $(path).file().append("\r\n#Results#\r\n");
             }
 
@@ -258,10 +260,10 @@ public class EvaluatorWorker {
                 } else {
                     $(path).file().append("-> best results for ");
                     for (int i = 0; i < veryBestKey.size() - 2; i++) {
-                        $(path).file().append(detectors.get(i).getInformation().getDisplayName() + ", ");
+                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
                     }
-                    $(path).file().append(detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName());
+                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
+                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName());
                 }
             }
 
@@ -278,9 +280,14 @@ public class EvaluatorWorker {
                 bestMethods = bestMethods + " and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
             }
 
-            // log best result
-            this.channel.status("best result: " + bestMethods + " with " + this.overAllResults.getSize() + "datasets");
+            veryBestMethods = bestMethods;
+            bestMethods = "";
+            veryBestKey.clear();
+            veryBestValue = Double.MAX_VALUE;
         }
+        
+        // log best result
+        this.channel.status("best result: " + veryBestMethods + " with " + this.overAllResults.getSize() + "datasets");
 
         if (this.main.writeLog()) {
             // write the individual *.log and *.xls
@@ -291,7 +298,7 @@ public class EvaluatorWorker {
         }
 
         // return the name of the very best detector
-        return bestMethods;
+        return veryBestMethods;
     }
 
     /**
@@ -487,7 +494,9 @@ public class EvaluatorWorker {
          * x-direction: screen brightness
          * y-direction: setting brightness
          */
-        DerivationContainer[][] data = new DerivationContainer[5][5];
+        DerivationContainer[][] dataAll = new DerivationContainer[5][5];
+        DerivationContainer[][] dataWith = new DerivationContainer[5][5];
+        DerivationContainer[][] dataWithout = new DerivationContainer[5][5];
 
         // initialize xls-stuff
         WorkbookSettings wbSettings = new WorkbookSettings();
@@ -497,14 +506,19 @@ public class EvaluatorWorker {
         // initialize array
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
-                data[x][y] = new DerivationContainer();
+                dataAll[x][y] = new DerivationContainer();
+                dataWith[x][y] = new DerivationContainer();
+                dataWithout[x][y] = new DerivationContainer();
             }
         }
 
         // run through the keyset of the result map to summarize derivation settingspecific
         for (String key : this.results.keySet()) {
             for (StorageContainer container : this.results.get(key).getContainer()) {
-                data[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                dataAll[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                if (this.settings.get(key).isRecalibration()) dataWith[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                else
+                    dataWithout[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
             }
             this.main.updateProgressBar();
         }
@@ -518,34 +532,49 @@ public class EvaluatorWorker {
                 workbook = Workbook.createWorkbook(new File(path.replace(".log", ".xls")), wbSettings);
                 workbook.createSheet("Evaluation", 0);
                 WritableSheet excelSheet = workbook.getSheet(0);
-                int offset = 2;
+                int offset = 0;
 
                 // add label
-                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset - 2, "Derivation", this.format));
+                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Derivation without Recalibration", this.format));
 
                 // add captions
-                this.writeCaptions(excelSheet, offset);
+                this.writeCaptions(excelSheet, offset + 2);
 
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offset + 3, data[x][y].getAveragedDerivation(), this.format));
+                        excelSheet.addCell(new Number(x + 2, y + offset + 4, dataWithout[x][y].getAveragedDerivation(), this.format));
+                    }
+                }
+
+                offset = offset + 6 + StorageContainer.getBrightnessOptions().size();
+
+                // add label
+                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Derivation with Recalibration", this.format));
+
+                // add captions
+                this.writeCaptions(excelSheet, offset + 2);
+
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offset + 4, dataWith[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
                 // rise offset
-                offset = 10 + StorageContainer.getBrightnessOptions().size();
+                offset = offset + 6 + StorageContainer.getBrightnessOptions().size();
 
                 // add label
-                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset - 2, "Pupils", this.format));
+                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Pupils", this.format));
 
                 // add captions
-                this.writeCaptions(excelSheet, offset);
+                this.writeCaptions(excelSheet, offset + 2);
 
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offset + 3, ((data[x][y].getAveragedPupils()[0] + data[x][y].getAveragedPupils()[1]) / 2), this.format));
+                        excelSheet.addCell(new Number(x + 2, y + offset + 4, ((dataAll[x][y].getAveragedPupils()[0] + dataAll[x][y].getAveragedPupils()[1]) / 2), this.format));
                     }
                 }
                 // write and close
@@ -572,10 +601,10 @@ public class EvaluatorWorker {
     private void writeCaptions(WritableSheet excelSheet, int offset)
                                                                     throws RowsExceededException,
                                                                     WriteException {
-        excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2), 0 + offset, "screen brightness", this.format));
-        excelSheet.addCell(new Label(0, (StorageContainer.getBrightnessOptions().size() / 2) + offset, "setting brightness", this.format));
+        excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 2), offset, "screen brightness", this.format));
+        excelSheet.addCell(new Label(0, (StorageContainer.getBrightnessOptions().size() / 2 + 2) + offset, "setting brightness", this.format));
         for (int i = 0; i < StorageContainer.getBrightnessOptions().size(); i++) {
-            excelSheet.addCell(new Label(2 + i, 1 + offset, StorageContainer.getBrightnessOptions().get(i), this.format));
+            excelSheet.addCell(new Label(2 + i, offset + 1, StorageContainer.getBrightnessOptions().get(i), this.format));
             excelSheet.addCell(new Label(1, 2 + i + offset, StorageContainer.getBrightnessOptions().get(i), this.format));
         }
     }
