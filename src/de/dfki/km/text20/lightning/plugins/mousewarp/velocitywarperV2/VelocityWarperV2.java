@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV2;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -39,7 +39,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.gui.VelocityWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV2.gui.VelocityWarperV2ConfigImpl;
 
 /**
  * Simple version of mouse warper which checks angleFirst between
@@ -52,7 +52,7 @@ import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.gui.Velocity
  * 
  */
 @PluginImplementation
-public class VelocityWarper implements MouseWarper {
+public class VelocityWarperV2 implements MouseWarper {
 
     /** threshold for the angleFirst */
     private int angleThres;
@@ -88,7 +88,7 @@ public class VelocityWarper implements MouseWarper {
     private long secondLastKey;
 
     /** stored properties for this plugin */
-    private VelocityWarperProperties propertie;
+    private VelocityWarperV2Properties propertie;
 
     /** indicates if any calculations are already running */
     private boolean isProcessing;
@@ -111,17 +111,20 @@ public class VelocityWarper implements MouseWarper {
     /** current screen resolution */
     private int yMax;
 
+    private double vMax;
+
     /**
      * creates a new DistanceWarper and initializes some variables
      */
-    public VelocityWarper() {
+    public VelocityWarperV2() {
         // initialize variables
         this.angleThres = 0;
         this.speedThres = 0;
         this.reactionTime = 0;
+        this.vMax = 0;
         this.mousePositions = new TreeMap<Long, Point>();
         this.fixation = null;
-        this.information = new PluginInformation("Velocity Warper", "Uses mouse velocityStartMid to calculate warpjump. BETA", true);
+        this.information = new PluginInformation("Velocity Warper V2", "Uses mouse velocityStartMid to calculate warpjump. BETA", true);
         this.angleFirst = 0;
         this.angleSecLast = 0;
         this.propertie = null;
@@ -150,12 +153,13 @@ public class VelocityWarper implements MouseWarper {
     @Override
     public void start() {
         // load variables from properties
-        this.propertie = VelocityWarperProperties.getInstance();
+        this.propertie = VelocityWarperV2Properties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
         this.speedThres = this.propertie.getSpeed();
         this.reactionTime = this.propertie.getReactionTime();
         this.xMax = Toolkit.getDefaultToolkit().getScreenSize().width;
         this.yMax = Toolkit.getDefaultToolkit().getScreenSize().height;
+        this.vMax = this.propertie.getvMax();
 
         // refresh map
         this.refreshMouseMap();
@@ -216,11 +220,11 @@ public class VelocityWarper implements MouseWarper {
         this.setR = (int) (this.velocity * this.reactionTime);
 
         // TODO: debugging
-        // if (speed > 0)
-        // System.out.println(speed + " * " + this.reactionTime + " = " + setR);
+        if (this.velocity > 0)
+            System.out.println(this.velocity + " * " + this.reactionTime + " = " + this.setR);
 
         // check the speed
-        if (this.velocity < this.speedThres) {
+        if ((this.velocity < this.speedThres) || (this.velocity > this.vMax)) {
             this.isProcessing = false;
             return;
         }
@@ -256,10 +260,10 @@ public class VelocityWarper implements MouseWarper {
         this.robot.mouseMove(this.setPoint.x, this.setPoint.y);
 
         // indicate warp
-        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.lastEntry().getValue()) + " Pixels. Method: Velocity Warper");
+        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.lastEntry().getValue()) + " Pixels. Method: Velocity Warper V2");
 
         // TODO: debugging
-        // this.drawPicture(setPoint);
+        this.drawPicture();
 
         // resets variables
         this.fixation = null;
@@ -358,7 +362,7 @@ public class VelocityWarper implements MouseWarper {
             e1.printStackTrace();
             return;
         }
-        File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
+        File file = new File("tmp/warp_V2_" + System.currentTimeMillis() + ".png");
 
         try {
             // create screenshot graphic
@@ -413,7 +417,7 @@ public class VelocityWarper implements MouseWarper {
     @Override
     public void showGui() {
         // create new gui to show it
-        new VelocityWarperConfigImpl();
+        new VelocityWarperV2ConfigImpl();
     }
 
     /*

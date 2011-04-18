@@ -899,12 +899,12 @@
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
-               <string>gridX</string> 
-               <int>1</int> 
-              </void> 
-              <void method="setProperty"> 
                <string>gridY</string> 
                <int>9</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridHeight</string> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -965,7 +965,7 @@
                <int>11</int> 
               </void> 
               <void method="setProperty"> 
-               <string>gridWidth</string> 
+               <string>gridX</string> 
                <int>3</int> 
               </void> 
              </object> 

@@ -288,12 +288,12 @@ public class ConfigWindow {
 
                         //---- labelOutputPath ----
                         labelOutputPath.setText("Output Path");
-                        panel3.add(labelOutputPath, cc.xy(1, 9));
+                        panel3.add(labelOutputPath, cc.xywh(1, 9, 1, 3));
 
                         //---- buttonSelect ----
                         buttonSelect.setText("Select");
                         panel3.add(buttonSelect, cc.xy(3, 9));
-                        panel3.add(textFieldOutputPath, cc.xywh(1, 11, 3, 1));
+                        panel3.add(textFieldOutputPath, cc.xy(3, 11));
                     }
                     contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 

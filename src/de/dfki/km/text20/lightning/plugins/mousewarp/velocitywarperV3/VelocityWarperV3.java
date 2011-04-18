@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -32,14 +32,13 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
-import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.gui.VelocityWarperConfigImpl;
+import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3.gui.VelocityWarperV3ConfigImpl;
 
 /**
  * Simple version of mouse warper which checks angleFirst between
@@ -52,7 +51,7 @@ import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.gui.Velocity
  * 
  */
 @PluginImplementation
-public class VelocityWarper implements MouseWarper {
+public class VelocityWarperV3 implements MouseWarper {
 
     /** threshold for the angleFirst */
     private int angleThres;
@@ -63,11 +62,8 @@ public class VelocityWarper implements MouseWarper {
     /** needed time to react on the mouse warp */
     private int reactionTime;
 
-    /** time stamp */
-    private long timeStamp;
-
-    /** a list of all mouseposition within the durationThreshold */
-    private TreeMap<Long, Point> mousePositions;
+    /** a list of all stored mouseposition */
+    private ArrayList<Point> mousePositions;
 
     /** last fixation */
     private Point fixation;
@@ -81,14 +77,8 @@ public class VelocityWarper implements MouseWarper {
     /** angle between mouse vector and start-fixation-vector */
     private double angleFirst;
 
-    /** angle between mouse vector and start-fixation-vector */
-    private double angleSecLast;
-
-    /** key of the second last entry of the hashmap */
-    private long secondLastKey;
-
     /** stored properties for this plugin */
-    private VelocityWarperProperties propertie;
+    private VelocityWarperV3Properties propertie;
 
     /** indicates if any calculations are already running */
     private boolean isProcessing;
@@ -114,16 +104,15 @@ public class VelocityWarper implements MouseWarper {
     /**
      * creates a new DistanceWarper and initializes some variables
      */
-    public VelocityWarper() {
+    public VelocityWarperV3() {
         // initialize variables
         this.angleThres = 0;
         this.speedThres = 0;
         this.reactionTime = 0;
-        this.mousePositions = new TreeMap<Long, Point>();
+        this.mousePositions = new ArrayList<Point>();
         this.fixation = null;
-        this.information = new PluginInformation("Velocity Warper", "Uses mouse velocityStartMid to calculate warpjump. BETA", true);
+        this.information = new PluginInformation("Velocity Warper V3", "Uses mouse velocityStartMid to calculate warpjump. BETA", true);
         this.angleFirst = 0;
-        this.angleSecLast = 0;
         this.propertie = null;
         this.isProcessing = false;
         this.distanceStopFix = 0;
@@ -150,7 +139,7 @@ public class VelocityWarper implements MouseWarper {
     @Override
     public void start() {
         // load variables from properties
-        this.propertie = VelocityWarperProperties.getInstance();
+        this.propertie = VelocityWarperV3Properties.getInstance();
         this.angleThres = this.propertie.getAngleThreshold();
         this.speedThres = this.propertie.getSpeed();
         this.reactionTime = this.propertie.getReactionTime();
@@ -185,7 +174,6 @@ public class VelocityWarper implements MouseWarper {
      * de.dfki.km.text20.lightning.plugins.mouseWarp.MouseWarper#addMousePosition
      * (java.awt.Point)
      */
-    @SuppressWarnings("boxing")
     @Override
     public void addMousePosition(Point position, int interval, boolean isFixationValid) {
         this.isProcessing = true;
@@ -193,17 +181,11 @@ public class VelocityWarper implements MouseWarper {
         // TODO: debugging
         //		long tmp = System.currentTimeMillis();
 
-        // key of the second last
-        this.secondLastKey = this.timeStamp;
-
-        // timestamp
-        this.timeStamp = System.currentTimeMillis();
-
         // add to map
-        this.mousePositions.put(this.timeStamp, position);
+        this.mousePositions.add(position);
 
         // remove first
-        this.mousePositions.remove(this.mousePositions.firstKey());
+        this.mousePositions.remove(0);
 
         // check if fixation is placed
         if ((this.fixation == null || !isFixationValid)) {
@@ -211,13 +193,18 @@ public class VelocityWarper implements MouseWarper {
             return;
         }
 
+        // check if mouse moved before this add
+        if (this.mousePositions.get(0).distance(this.mousePositions.get(1)) == 0) {
+            this.isProcessing = false;
+            return;
+        }
+
         // calculate setRadius and speed
-        this.velocity = this.mousePositions.lastEntry().getValue().distance(this.mousePositions.firstEntry().getValue()) / ((this.mousePositions.size() - 1) * interval);
-        this.setR = (int) (this.velocity * this.reactionTime);
+        this.velocity = this.mousePositions.get(1).distance(this.mousePositions.get(2)) / ((this.mousePositions.size() - 1) * interval);
+        this.setR = (int) Math.pow((this.velocity * this.reactionTime), (this.velocity));
 
         // TODO: debugging
-        // if (speed > 0)
-        // System.out.println(speed + " * " + this.reactionTime + " = " + setR);
+        if (this.velocity > 0) System.out.println(this.velocity + " | " + this.setR);
 
         // check the speed
         if (this.velocity < this.speedThres) {
@@ -226,7 +213,7 @@ public class VelocityWarper implements MouseWarper {
         }
 
         // store distance
-        this.distanceStopFix = this.mousePositions.lastEntry().getValue().distance(this.fixation);
+        this.distanceStopFix = this.mousePositions.get(2).distance(this.fixation);
 
         // check if the cursor is already in home radius
         if (this.distanceStopFix < this.setR) {
@@ -236,15 +223,9 @@ public class VelocityWarper implements MouseWarper {
 
         // checks the angleFirst between mouse movement and vector between start
         // of the mouse movement and fixation point
-        this.angleFirst = calculateAngle(this.mousePositions.firstEntry().getValue(), this.mousePositions.lastEntry().getValue());
+        this.angleFirst = calculateAngle(this.mousePositions.get(1), this.mousePositions.get(2));
         // System.out.println("angleFirst: " + this.angleFirst);
         if ((this.angleFirst > this.angleThres)) {
-            this.isProcessing = false;
-            return;
-        }
-        this.angleSecLast = calculateAngle(this.mousePositions.get(this.secondLastKey), this.mousePositions.lastEntry().getValue());
-        // System.out.println("angleSecLast: " + this.angleSecLast);
-        if ((this.angleSecLast > this.angleThres)) {
             this.isProcessing = false;
             return;
         }
@@ -256,17 +237,17 @@ public class VelocityWarper implements MouseWarper {
         this.robot.mouseMove(this.setPoint.x, this.setPoint.y);
 
         // indicate warp
-        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.lastEntry().getValue()) + " Pixels. Method: Velocity Warper");
+        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.get(2)) + " Pixels. Method: Velocity Warper V3");
 
         // TODO: debugging
-        // this.drawPicture(setPoint);
+        this.drawPicture();
 
         // resets variables
         this.fixation = null;
         this.refreshMouseMap();
         this.isProcessing = false;
 
-        // TODO: debugginh
+        // TODO: debugging
         //		System.out.println(System.currentTimeMillis() - tmp);
     }
 
@@ -303,7 +284,7 @@ public class VelocityWarper implements MouseWarper {
     private Point calculateSetPoint(int radius) {
         // angle in radian measure between this x-axis and the vector from end
         // of mouse-vector to fixation
-        double phi = Math.atan2(this.mousePositions.lastEntry().getValue().y - this.fixation.y, this.mousePositions.lastEntry().getValue().x - this.fixation.x);
+        double phi = Math.atan2(this.mousePositions.get(2).y - this.fixation.y, this.mousePositions.get(2).x - this.fixation.x);
 
         // calculate x and y by their polar coordinates
         int x = (int) (radius * Math.cos(phi));
@@ -328,15 +309,12 @@ public class VelocityWarper implements MouseWarper {
     /**
      * clears the mouse vector and fills it with dummydata
      */
-    @SuppressWarnings("boxing")
     private void refreshMouseMap() {
-        long iMax = 10;
         Point currentMousePos = MouseInfo.getPointerInfo().getLocation();
         this.mousePositions.clear();
-        this.timeStamp = iMax - 1;
-        for (long i = 0; i < iMax; i++) {
-            this.mousePositions.put(i, new Point(currentMousePos));
-        }
+        this.mousePositions.add(currentMousePos);
+        this.mousePositions.add(currentMousePos);
+        this.mousePositions.add(currentMousePos);
     }
 
     /**
@@ -348,7 +326,6 @@ public class VelocityWarper implements MouseWarper {
         // initialize variables
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         BufferedImage screenShot = null;
-        ArrayList<Long> keys = new ArrayList<Long>(this.mousePositions.keySet());
 
         // create screenshot
         Rectangle screenShotRect = new Rectangle(0, 0, dimension.width, dimension.height);
@@ -358,7 +335,7 @@ public class VelocityWarper implements MouseWarper {
             e1.printStackTrace();
             return;
         }
-        File file = new File("tmp/warp_" + System.currentTimeMillis() + ".png");
+        File file = new File("tmp/warp_V3_" + System.currentTimeMillis() + ".png");
 
         try {
             // create screenshot graphic
@@ -370,24 +347,27 @@ public class VelocityWarper implements MouseWarper {
             graphic.drawOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
             graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + this.fixation.x, 12 + this.fixation.y);
             graphic.drawChars(("" + this.angleFirst).toCharArray(), 0, ("" + this.angleFirst).toCharArray().length, 12 + this.fixation.x, 24 + this.fixation.y);
-            graphic.drawChars(("" + this.angleSecLast).toCharArray(), 0, ("" + this.angleSecLast).toCharArray().length, 12 + this.fixation.x, 36 + this.fixation.y);
             graphic.setColor(new Color(255, 0, 0, 32));
             graphic.fillOval(this.fixation.x - 5, this.fixation.y - 5, 10, 10);
 
             // visualize mouse vector
-            for (int i = 0; i < keys.size() - 1; i++) {
-                graphic.setColor(new Color(0, 0, 255, 255));
-                graphic.drawOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawChars(("" + i).toCharArray(), 0, ("" + i).toCharArray().length, (int) this.mousePositions.get(keys.get(i)).getX() + 12, (int) this.mousePositions.get(keys.get(i)).getY() + 12);
-                graphic.setColor(new Color(0, 0, 255, 32));
-                graphic.fillOval((int) this.mousePositions.get(keys.get(i)).getX() - 5, (int) this.mousePositions.get(keys.get(i)).getY() - 5, 10, 10);
-                graphic.drawLine((int) this.mousePositions.get(keys.get(i)).getX(), (int) this.mousePositions.get(keys.get(i)).getY(), (int) this.mousePositions.get(keys.get(i + 1)).getX(), (int) this.mousePositions.get(keys.get(i + 1)).getY());
-            }
             graphic.setColor(new Color(0, 0, 255, 255));
-            graphic.drawOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
-            graphic.drawChars(("" + (this.mousePositions.size() - 1)).toCharArray(), 0, ("" + (this.mousePositions.size() - 1)).toCharArray().length, (int) this.mousePositions.lastEntry().getValue().getX() + 12, (int) this.mousePositions.lastEntry().getValue().getY() + 12);
+            graphic.drawOval((int) this.mousePositions.get(0).getX() - 5, (int) this.mousePositions.get(0).getY() - 5, 10, 10);
+            graphic.drawChars(("0").toCharArray(), 0, ("0").toCharArray().length, (int) this.mousePositions.get(0).getX() + 12, (int) this.mousePositions.get(0).getY() + 12);
             graphic.setColor(new Color(0, 0, 255, 32));
-            graphic.fillOval((int) this.mousePositions.lastEntry().getValue().getX() - 5, (int) this.mousePositions.lastEntry().getValue().getY() - 5, 10, 10);
+            graphic.fillOval((int) this.mousePositions.get(0).getX() - 5, (int) this.mousePositions.get(0).getY() - 5, 10, 10);
+            graphic.drawLine((int) this.mousePositions.get(0).getX(), (int) this.mousePositions.get(0).getY(), (int) this.mousePositions.get(1).getX(), (int) this.mousePositions.get(1).getY());
+            graphic.setColor(new Color(0, 0, 255, 255));
+            graphic.drawOval((int) this.mousePositions.get(1).getX() - 5, (int) this.mousePositions.get(1).getY() - 5, 10, 10);
+            graphic.drawChars(("1").toCharArray(), 0, ("1").toCharArray().length, (int) this.mousePositions.get(1).getX() + 12, (int) this.mousePositions.get(1).getY() + 12);
+            graphic.setColor(new Color(0, 0, 255, 32));
+            graphic.fillOval((int) this.mousePositions.get(1).getX() - 5, (int) this.mousePositions.get(1).getY() - 5, 10, 10);
+            graphic.drawLine((int) this.mousePositions.get(1).getX(), (int) this.mousePositions.get(1).getY(), (int) this.mousePositions.get(2).getX(), (int) this.mousePositions.get(2).getY());
+            graphic.setColor(new Color(0, 0, 255, 255));
+            graphic.drawOval((int) this.mousePositions.get(2).getX() - 5, (int) this.mousePositions.get(2).getY() - 5, 10, 10);
+            graphic.drawChars(("2").toCharArray(), 0, ("2").toCharArray().length, (int) this.mousePositions.get(2).getX() + 12, (int) this.mousePositions.get(2).getY() + 12);
+            graphic.setColor(new Color(0, 0, 255, 32));
+            graphic.fillOval((int) this.mousePositions.get(2).getX() - 5, (int) this.mousePositions.get(2).getY() - 5, 10, 10);
 
             // calculate and visualize setpoint
             graphic.setColor(new Color(0, 255, 0, 255));
@@ -413,7 +393,7 @@ public class VelocityWarper implements MouseWarper {
     @Override
     public void showGui() {
         // create new gui to show it
-        new VelocityWarperConfigImpl();
+        new VelocityWarperV3ConfigImpl();
     }
 
     /*
