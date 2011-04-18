@@ -11,3 +11,5 @@ syntax: regexp
 ^evaluation$
 syntax: regexp
 ^plugins$
+syntax: regexp
+^tmp$

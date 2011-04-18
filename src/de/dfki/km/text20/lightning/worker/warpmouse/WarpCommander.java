@@ -35,8 +35,6 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
  * This timer can be started ore stopped by this class. 
  * By stopping the timer mouse warping is disabled.
  * 
- * changing the 100ms means also change this value in gui and the plugins.
- * 
  * @author Christoph Käding 
  * 
  */

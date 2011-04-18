@@ -494,9 +494,9 @@ public class EvaluatorWorker {
          * x-direction: screen brightness
          * y-direction: setting brightness
          */
-        DerivationContainer[][] dataAll = new DerivationContainer[5][5];
-        DerivationContainer[][] dataWith = new DerivationContainer[5][5];
-        DerivationContainer[][] dataWithout = new DerivationContainer[5][5];
+        DerivationContainer[][] dataAll = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
+        DerivationContainer[][] dataWith = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
+        DerivationContainer[][] dataWithout = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
 
         // initialize xls-stuff
         WorkbookSettings wbSettings = new WorkbookSettings();
@@ -504,8 +504,8 @@ public class EvaluatorWorker {
         WritableWorkbook workbook;
 
         // initialize array
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
+        for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
+            for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
                 dataAll[x][y] = new DerivationContainer();
                 dataWith[x][y] = new DerivationContainer();
                 dataWithout[x][y] = new DerivationContainer();
