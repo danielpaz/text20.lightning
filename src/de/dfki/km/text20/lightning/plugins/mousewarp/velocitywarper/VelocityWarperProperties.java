@@ -1,5 +1,5 @@
 /*
- * VelocityWarperProperties.java
+ * VelocityWarperV1Properties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -46,7 +46,7 @@ public class VelocityWarperProperties implements Serializable {
 
     @Attribute
     /** distance threshold for mousewarping */
-    private double speed;
+    private double velocity;
 
     @Attribute
     /** home radius for mousewarping */
@@ -83,13 +83,13 @@ public class VelocityWarperProperties implements Serializable {
 
                     // store readed configurations
                     this.angleThreshold = ((VelocityWarperProperties) this.object).getAngleThreshold();
-                    this.speed = ((VelocityWarperProperties) this.object).getSpeed();
+                    this.velocity = ((VelocityWarperProperties) this.object).getSpeed();
                     this.reactionTime = ((VelocityWarperProperties) this.object).getReactionTime();
 
                     // reading successful
                     status = true;
                     System.out.println("\r\nVelocityWarper properties file was found.");
-                    System.out.println("angle: " + this.angleThreshold + ", speed: " + this.speed + ", reaction time: " + this.reactionTime + "\r\n");
+                    System.out.println("angle: " + this.angleThreshold + ", velocity: " + this.velocity + ", reaction time: " + this.reactionTime + "\r\n");
                 }
 
                 // cleanup
@@ -113,8 +113,8 @@ public class VelocityWarperProperties implements Serializable {
     public void restoreDefault() {
         // set default values
         this.angleThreshold = 10;
-        this.speed = 1;
-        this.reactionTime = 200;
+        this.velocity = 15;
+        this.reactionTime = 15;
     }
 
     /**
@@ -147,14 +147,14 @@ public class VelocityWarperProperties implements Serializable {
      * @return the distanceThreshold
      */
     public double getSpeed() {
-        return this.speed;
+        return this.velocity;
     }
 
     /**
-     * @param speed , the minimal movement speed
+     * @param velocity , the minimal movement velocity
      */
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    public void setSpeed(double velocity) {
+        this.velocity = velocity;
     }
 
     /**

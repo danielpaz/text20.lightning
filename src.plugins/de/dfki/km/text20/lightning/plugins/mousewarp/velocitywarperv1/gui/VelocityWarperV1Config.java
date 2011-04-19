@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Mar 21 11:10:43 CET 2011
  */
 
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.gui;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv1.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,8 +14,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class VelocityWarperConfig extends JFrame {
-    public VelocityWarperConfig() {
+public class VelocityWarperV1Config extends JFrame {
+    public VelocityWarperV1Config() {
         initComponents();
     }
 

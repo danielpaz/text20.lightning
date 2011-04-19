@@ -1,5 +1,5 @@
 /*
- * AccelerationWarperConfigImpl.java
+ * VelocityWarperV1ConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,34 +18,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.accelerationwarper.gui;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv1.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SpinnerNumberModel;
 
-import de.dfki.km.text20.lightning.plugins.mousewarp.accelerationwarper.AccelerationWarperProperties;
+import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv1.VelocityWarperV1Properties;
 
 /**
  * @author Christoph Käding
  * 
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class AccelerationWarperConfigImpl extends AccelerationWarperConfig implements
+public class VelocityWarperV1ConfigImpl extends VelocityWarperV1Config implements
         ActionListener {
 
     /** current used properties */
-    private AccelerationWarperProperties properties;
+    private VelocityWarperV1Properties properties;
 
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
-    public AccelerationWarperConfigImpl() {
+    public VelocityWarperV1ConfigImpl() {
         // initialize properties and preselect spinners
-        this.properties = AccelerationWarperProperties.getInstance();
+        this.properties = VelocityWarperV1Properties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerAcceleration.setModel(new SpinnerNumberModel(this.properties.getAcceleration(), 0.01, 2.147483647E9, 0.01));
+        this.spinnerSpeed.setModel(new SpinnerNumberModel(this.properties.getSpeed(), 0.1, 2.147483647E9, 0.1));
         this.spinnerReactionTime.setValue(this.properties.getReactionTime());
 
         // add listener
@@ -92,7 +92,7 @@ public class AccelerationWarperConfigImpl extends AccelerationWarperConfig imple
     private void buttonDefaultActionPerformed() {
         this.properties.restoreDefault();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerAcceleration.setValue(this.properties.getAcceleration());
+        this.spinnerSpeed.setValue(this.properties.getSpeed());
         this.spinnerReactionTime.setValue(this.properties.getReactionTime());
     }
 
@@ -101,7 +101,7 @@ public class AccelerationWarperConfigImpl extends AccelerationWarperConfig imple
      */
     private void buttonOKActionPerformed() {
         this.properties.setAngleThreshold(Integer.parseInt(this.spinnerAngle.getValue().toString()));
-        this.properties.setAcceleration(Double.parseDouble(this.spinnerAcceleration.getValue().toString()));
+        this.properties.setSpeed(Double.parseDouble(this.spinnerSpeed.getValue().toString()));
         this.properties.setReactionTime(Integer.parseInt(this.spinnerReactionTime.getValue().toString()));
         dispose();
     }
@@ -121,7 +121,7 @@ public class AccelerationWarperConfigImpl extends AccelerationWarperConfig imple
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
-        this.labelAcceleration.setToolTipText(labelSpeedTT);
+        this.labelSpeed.setToolTipText(labelSpeedTT);
         this.labelReactionTime.setToolTipText(labelReactionTimeTT);
     }
 }

@@ -246,7 +246,7 @@ public class ConfigWindow {
                         panel2.add(comboBoxWarpMethod, cc.xy(3, 3));
 
                         //---- buttonWarpConfig ----
-                        buttonWarpConfig.setText("text");
+                        buttonWarpConfig.setText("Configuration");
                         panel2.add(buttonWarpConfig, cc.xy(3, 5));
                     }
                     contentPanel.add(panel2, cc.xywh(5, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
@@ -318,7 +318,7 @@ public class ConfigWindow {
                         panel4.add(comboBoxDetector, cc.xy(3, 1));
 
                         //---- buttonDetectorConfig ----
-                        buttonDetectorConfig.setText("text");
+                        buttonDetectorConfig.setText("Configuration");
                         panel4.add(buttonDetectorConfig, cc.xy(3, 3));
                     }
                     contentPanel.add(panel4, cc.xywh(1, 5, 3, 1, CellConstraints.DEFAULT, CellConstraints.FILL));

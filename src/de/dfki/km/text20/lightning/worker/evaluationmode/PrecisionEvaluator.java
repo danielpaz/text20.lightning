@@ -184,7 +184,7 @@ public class PrecisionEvaluator {
         }
 
         // update logfile
-        String logString = new String("Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension());
+        String logString = new String("Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.mousePosition.x + "," + this.mousePosition.y + "), Dimension: " + this.properties.getDimension() + ", Recalibration is used: " + this.properties.isRecalibration());
         System.out.println("Evaluation - " + logString);
         MainClass.getInstance().getChannel().status("Evaluation - " + logString);
         MainClass.getInstance().addToStatistic("evaluation", logString);
