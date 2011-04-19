@@ -20,8 +20,6 @@
  */
 package de.dfki.km.text20.lightning.evaluator.worker;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Container which stores the experiment settings of each XML-file.

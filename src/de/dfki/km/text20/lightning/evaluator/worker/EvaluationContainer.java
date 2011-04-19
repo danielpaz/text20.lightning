@@ -79,8 +79,8 @@ public class EvaluationContainer {
      *      of the method
      * @param distance
      *      distance between mouse position and calculated result 
-     * @param pupils 
-     *      size of the pupils
+     * @param container 
+     *      current storage container
      * @param log
      *      absolute path of the logfile
      * @param name
@@ -114,8 +114,8 @@ public class EvaluationContainer {
      *      of the method
      * @param distance
      *      distance between mouse position and calculated result 
-     * @param pupils 
-     *      size of the pupils
+     * @param storageContainer
+     *      current storage container 
      */
     @SuppressWarnings("boxing")
     public void add(int id, double distance, StorageContainer storageContainer) {

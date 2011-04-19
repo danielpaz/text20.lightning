@@ -20,7 +20,6 @@
  */
 package de.dfki.km.text20.lightning.worker.recalibrator;
 
-import java.awt.MouseInfo;
 import java.awt.Point;
 
 import de.dfki.km.text20.lightning.MainClass;
@@ -82,8 +81,6 @@ public class Recalibrator {
     public void updateCalibration(Point fixation, Point offset) {
         if(this.properties == null) return;
         if(!this.properties.isRecalibration()) return;
-        
-        Point mousepos = MouseInfo.getPointerInfo().getLocation();
         
         this.pattern = new OptionRecalibrationPattern();
         this.pattern.addPoint(fixation, offset.x, offset.y, System.currentTimeMillis());
