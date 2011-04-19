@@ -590,7 +590,7 @@
               <string>javax.swing.JButton</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>text</string> 
+               <string>Configuration</string> 
               </void> 
               <void property="name"> 
                <string>buttonWarpConfig</string> 
@@ -1090,7 +1090,7 @@
               <string>javax.swing.JButton</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>text</string> 
+               <string>Configuration</string> 
               </void> 
               <void property="name"> 
                <string>buttonDetectorConfig</string> 

@@ -1,5 +1,5 @@
 /*
- * VelocityWarperConfigImpl.java
+ * VelocityWarperV1ConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,14 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV2.gui;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv2.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SpinnerNumberModel;
 
-import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV2.VelocityWarperV2Properties;
+import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv2.VelocityWarperV2Properties;
 
 /**
  * @author Christoph Käding

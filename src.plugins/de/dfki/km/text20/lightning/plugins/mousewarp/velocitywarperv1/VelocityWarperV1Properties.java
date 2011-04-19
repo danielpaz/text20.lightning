@@ -1,5 +1,5 @@
 /*
- * VelocityWarperProperties.java
+ * VelocityWarperV1Properties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv1;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +35,7 @@ import org.simpleframework.xml.Attribute;
  * @author Christoph Käding
  *
  */
-public class VelocityWarperV3Properties implements Serializable {
+public class VelocityWarperV1Properties implements Serializable {
 
     /** generated serial id */
     private static final long serialVersionUID = -4766853585658130189L;
@@ -59,15 +59,15 @@ public class VelocityWarperV3Properties implements Serializable {
     private Object object;
     
     /** singleton instance of this properties */
-    private static VelocityWarperV3Properties properties;
+    private static VelocityWarperV1Properties properties;
 
     /**
      * creates properties, tries to load property file
      */
-    private VelocityWarperV3Properties() {
+    private VelocityWarperV1Properties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/VelocityWarper/properties.prop");
+        this.propertiesFile = new File("./plugins/VelocityWarperV1/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -79,16 +79,16 @@ public class VelocityWarperV3Properties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof VelocityWarperV3Properties) {
+                if (this.object instanceof VelocityWarperV1Properties) {
 
                     // store readed configurations
-                    this.angleThreshold = ((VelocityWarperV3Properties) this.object).getAngleThreshold();
-                    this.speed = ((VelocityWarperV3Properties) this.object).getSpeed();
-                    this.reactionTime = ((VelocityWarperV3Properties) this.object).getReactionTime();
+                    this.angleThreshold = ((VelocityWarperV1Properties) this.object).getAngleThreshold();
+                    this.speed = ((VelocityWarperV1Properties) this.object).getSpeed();
+                    this.reactionTime = ((VelocityWarperV1Properties) this.object).getReactionTime();
 
                     // reading successful
                     status = true;
-                    System.out.println("\r\nVelocityWarperV3 properties file was found.");
+                    System.out.println("\r\nVelocityWarperV1 properties file was found.");
                     System.out.println("angle: " + this.angleThreshold + ", speed: " + this.speed + ", reaction time: " + this.reactionTime + "\r\n");
                 }
 
@@ -103,7 +103,7 @@ public class VelocityWarperV3Properties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\r\nVelocityWarperV3 properties file was not found.\r\n");
+            System.out.println("\r\nVelocityWarperV1 properties file was not found.\r\n");
         }
     }
 
@@ -122,9 +122,9 @@ public class VelocityWarperV3Properties implements Serializable {
      * 
      * @return properties
      */
-    public static VelocityWarperV3Properties getInstance() {
+    public static VelocityWarperV1Properties getInstance() {
         if(properties == null) {
-            properties = new VelocityWarperV3Properties();
+            properties = new VelocityWarperV1Properties();
         }
         return properties;
     }
@@ -178,7 +178,7 @@ public class VelocityWarperV3Properties implements Serializable {
         try {
 
             // write object
-            new File("plugins/VelocityWarperV3").mkdirs();
+            new File("plugins/VelocityWarperV1").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 

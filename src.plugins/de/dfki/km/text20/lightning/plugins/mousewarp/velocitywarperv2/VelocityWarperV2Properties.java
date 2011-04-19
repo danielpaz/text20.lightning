@@ -1,5 +1,5 @@
 /*
- * VelocityWarperProperties.java
+ * VelocityWarperV1Properties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV2;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv2;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,7 +71,7 @@ public class VelocityWarperV2Properties implements Serializable {
     private VelocityWarperV2Properties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/VelocityWarper/properties.prop");
+        this.propertiesFile = new File("./plugins/VelocityWarperV2/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;

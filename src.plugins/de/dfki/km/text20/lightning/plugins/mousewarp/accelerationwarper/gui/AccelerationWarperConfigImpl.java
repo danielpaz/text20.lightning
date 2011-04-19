@@ -1,5 +1,5 @@
 /*
- * VelocityWarperConfigImpl.java
+ * CombinedWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,35 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3.gui;
+package de.dfki.km.text20.lightning.plugins.mousewarp.accelerationwarper.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SpinnerNumberModel;
 
-import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3.VelocityWarperV3Properties;
+import de.dfki.km.text20.lightning.plugins.mousewarp.accelerationwarper.AccelerationWarperProperties;
 
 /**
  * @author Christoph Käding
  * 
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class VelocityWarperV3ConfigImpl extends VelocityWarperV3Config implements
+public class AccelerationWarperConfigImpl extends AccelerationWarperConfig implements
         ActionListener {
 
     /** current used properties */
-    private VelocityWarperV3Properties properties;
+    private AccelerationWarperProperties properties;
 
     /**
      * creates new DistanceWarperConfigImpl-object and initializes variables
      */
-    public VelocityWarperV3ConfigImpl() {
+    public AccelerationWarperConfigImpl() {
         // initialize properties and preselect spinners
-        this.properties = VelocityWarperV3Properties.getInstance();
+        this.properties = AccelerationWarperProperties.getInstance();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerSpeed.setModel(new SpinnerNumberModel(this.properties.getSpeed(), 0.1, 2.147483647E9, 0.1));
+        this.spinnerAcceleration.setModel(new SpinnerNumberModel(this.properties.getAcceleration(), 0.001, 2.147483647E9, 0.001));
         this.spinnerReactionTime.setValue(this.properties.getReactionTime());
+        
+        // TODO: fix in jfd
+        this.spinnerAcceleration.setEnabled(true);
 
         // add listener
         this.buttonCancel.addActionListener(this);
@@ -92,7 +95,7 @@ public class VelocityWarperV3ConfigImpl extends VelocityWarperV3Config implement
     private void buttonDefaultActionPerformed() {
         this.properties.restoreDefault();
         this.spinnerAngle.setValue(this.properties.getAngleThreshold());
-        this.spinnerSpeed.setValue(this.properties.getSpeed());
+        this.spinnerAcceleration.setValue(this.properties.getAcceleration());
         this.spinnerReactionTime.setValue(this.properties.getReactionTime());
     }
 
@@ -101,7 +104,7 @@ public class VelocityWarperV3ConfigImpl extends VelocityWarperV3Config implement
      */
     private void buttonOKActionPerformed() {
         this.properties.setAngleThreshold(Integer.parseInt(this.spinnerAngle.getValue().toString()));
-        this.properties.setSpeed(Double.parseDouble(this.spinnerSpeed.getValue().toString()));
+        this.properties.setAcceleration(Double.parseDouble(this.spinnerAcceleration.getValue().toString()));
         this.properties.setReactionTime(Integer.parseInt(this.spinnerReactionTime.getValue().toString()));
         dispose();
     }
@@ -121,7 +124,7 @@ public class VelocityWarperV3ConfigImpl extends VelocityWarperV3Config implement
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);
-        this.labelSpeed.setToolTipText(labelSpeedTT);
+        this.labelAcceleration.setToolTipText(labelSpeedTT);
         this.labelReactionTime.setToolTipText(labelReactionTimeTT);
     }
 }

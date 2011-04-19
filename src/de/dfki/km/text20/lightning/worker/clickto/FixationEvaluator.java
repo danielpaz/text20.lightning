@@ -115,7 +115,7 @@ public class FixationEvaluator implements Runnable {
             this.offset = this.manager.getCurrentSaliencyDetector().analyse(this.screenShot);
 
         // update the logfile
-        String logString = "Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName();
+        String logString = "Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Offset: (" + this.offset.x + "," + this.offset.y + "), Dimension: " + this.properties.getDimension() + ", Method: " + this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName() + ", Recalibration is used: " + this.properties.isRecalibration();
         System.out.println("Click - " + logString);
         this.main.getChannel().status("Click - " + logString);
         this.main.addToStatistic("click", logString);

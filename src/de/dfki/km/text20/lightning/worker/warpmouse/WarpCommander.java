@@ -59,7 +59,7 @@ public class WarpCommander implements Runnable {
         // initialize variables
         this.properties = MainClass.getInstance().getProperties();
         this.manager = MainClass.getInstance().getInternalPluginManager();
-        final int interval = 20;
+        final int interval = 10;
 
         // initialize timer
         this.timer = new Timer(interval, new ActionListener() {

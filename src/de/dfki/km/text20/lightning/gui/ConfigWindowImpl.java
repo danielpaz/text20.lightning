@@ -302,7 +302,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * manages the visibility of the configbutton
      */
     private void comboBoxDetectorActionPerformed() {
-        this.buttonDetectorConfig.setText(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getDisplayName() + " Configuration");
+        //        this.buttonDetectorConfig.setText(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonDetectorConfig.setEnabled(((PluginInformation) this.comboBoxDetector.getSelectedItem()).isGuiAvailable());
     }
 
@@ -310,7 +310,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * manages the visibility of the configbutton
      */
     private void comboBoxWarpMethodActionPerformed() {
-        this.buttonWarpConfig.setText(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getDisplayName() + " Configuration");
+        //        this.buttonWarpConfig.setText(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getDisplayName() + " Configuration");
         this.buttonWarpConfig.setEnabled(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).isGuiAvailable());
     }
 
@@ -506,7 +506,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxDetector.setRenderer(this.renderer);
 
         // initialize button
-        this.buttonDetectorConfig.setText(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().getDisplayName() + " Configuration");
+        //        this.buttonDetectorConfig.setText(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().getDisplayName() + " Configuration");
         this.buttonDetectorConfig.setEnabled(this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable());
     }
 
@@ -534,7 +534,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxWarpMethod.setRenderer(this.renderer);
 
         // set button text
-        this.buttonWarpConfig.setText(this.internalPluginManager.getCurrentMouseWarper().getInformation().getDisplayName() + " Configuration");
+        //        this.buttonWarpConfig.setText(this.internalPluginManager.getCurrentMouseWarper().getInformation().getDisplayName() + " Configuration");
 
         // set enabled
         this.checkBoxUseWarpActionPerformed();

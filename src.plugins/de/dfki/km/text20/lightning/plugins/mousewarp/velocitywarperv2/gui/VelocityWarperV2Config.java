@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Mar 21 11:10:43 CET 2011
  */
 
-package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperV3.gui;
+package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarperv2.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,8 +14,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class VelocityWarperV3Config extends JFrame {
-    public VelocityWarperV3Config() {
+public class VelocityWarperV2Config extends JFrame {
+    public VelocityWarperV2Config() {
         initComponents();
     }
 
@@ -33,6 +33,8 @@ public class VelocityWarperV3Config extends JFrame {
         spinnerSpeed = new JSpinner();
         labelReactionTime = new JLabel();
         spinnerReactionTime = new JSpinner();
+        labelMaxSpeed = new JLabel();
+        spinnerMaxSpeed = new JSpinner();
         buttonOK = new JButton();
         buttonCancel = new JButton();
         buttonDefault = new JButton();
@@ -53,7 +55,7 @@ public class VelocityWarperV3Config extends JFrame {
             {
                 contentPanel.setLayout(new FormLayout(
                     "2*(50dlu, $lcgap), 50dlu",
-                    "3*(default, $lgap), default"));
+                    "4*(default, $lgap), default"));
 
                 //---- labelAngleThreshold ----
                 labelAngleThreshold.setText("Angle Threshold in Degree");
@@ -79,13 +81,18 @@ public class VelocityWarperV3Config extends JFrame {
                 spinnerReactionTime.setModel(new SpinnerNumberModel(0, 0, 2147483647, 1));
                 contentPanel.add(spinnerReactionTime, cc.xy(5, 5));
 
+                //---- labelMaxSpeed ----
+                labelMaxSpeed.setText("max speed");
+                contentPanel.add(labelMaxSpeed, cc.xywh(1, 7, 3, 1));
+                contentPanel.add(spinnerMaxSpeed, cc.xy(5, 7));
+
                 //---- buttonOK ----
                 buttonOK.setText("OK");
-                contentPanel.add(buttonOK, cc.xy(1, 7));
+                contentPanel.add(buttonOK, cc.xy(1, 9));
 
                 //---- buttonCancel ----
                 buttonCancel.setText("Cancel");
-                contentPanel.add(buttonCancel, cc.xy(3, 7));
+                contentPanel.add(buttonCancel, cc.xy(3, 9));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
@@ -95,7 +102,7 @@ public class VelocityWarperV3Config extends JFrame {
                         buttonDefaultActionPerformed(e);
                     }
                 });
-                contentPanel.add(buttonDefault, cc.xy(5, 7));
+                contentPanel.add(buttonDefault, cc.xy(5, 9));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
         }
@@ -115,6 +122,8 @@ public class VelocityWarperV3Config extends JFrame {
     protected JSpinner spinnerSpeed;
     protected JLabel labelReactionTime;
     protected JSpinner spinnerReactionTime;
+    protected JLabel labelMaxSpeed;
+    protected JSpinner spinnerMaxSpeed;
     protected JButton buttonOK;
     protected JButton buttonCancel;
     protected JButton buttonDefault;

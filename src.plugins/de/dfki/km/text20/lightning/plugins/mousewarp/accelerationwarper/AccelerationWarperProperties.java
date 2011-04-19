@@ -1,5 +1,5 @@
 /*
- * AccelerationWarperProperties.java
+ * CombinedWarperProperties.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -67,7 +67,7 @@ public class AccelerationWarperProperties implements Serializable {
     private AccelerationWarperProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/VelocityWarper/properties.prop");
+        this.propertiesFile = new File("./plugins/AccelerationWarper/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
