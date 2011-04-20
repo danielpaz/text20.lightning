@@ -179,7 +179,7 @@ public class VelocityWarper implements MouseWarper {
 
         // refresh map
         this.refreshMouseMap();
-        this.mid = this.mousePositions.size() / 2;
+        this.mid = this.mousePositions.size() / 4;
         this.timer.start();
     }
 

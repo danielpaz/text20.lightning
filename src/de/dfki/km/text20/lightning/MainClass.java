@@ -289,7 +289,26 @@ public class MainClass {
      * publishes the current statistic file to the server
      */
     public void publishStatistics() {
-        this.statistics.publish();
+        Thread thread = new Thread(new Runnable() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void run() {
+                if (statistics.publish(new String[] { "participant", "pwd" }, "//localhost/feedback?")) {
+                    showTrayMessage("Submitting statistics was successful.");
+                    addToStatistic("Submitting statistics was successful.");
+                    getChannel().status("Submitting statistics was successful.");
+                    setupStatistics();
+                } else {
+                    showTrayMessage("Submitting statistics failed!");
+                    addToStatistic("Submitting statistics failed!");
+                    getChannel().status("Submitting statistics failed!");
+                }
+
+            }
+        });
+
+        thread.run();
     }
 
     /**
@@ -456,7 +475,7 @@ public class MainClass {
 
             // change mode
             this.isNormalMode = true;
-            
+
             // reset evaluator
             this.resetEvaluator();
 
