@@ -271,9 +271,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * Fired if the Cancel button is clicked. Closes the window.
      */
     private void buttonSubmitActionPerformed() {
-        this.main.publishStatistics();
-        this.main.setSubmitted(true);
         this.buttonSubmit.setEnabled(false);
+        this.main.setSubmitted(true);
+        this.main.publishStatistics();
     }
 
     /**
