@@ -46,7 +46,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
  * @author Christoph Käding
  *
  */
-public class FixationEvaluator implements Runnable {
+public class FixationEvaluator {
 
     /** Point of fixation which is provided by the eyetracker */
     private Point fixation;
@@ -77,6 +77,27 @@ public class FixationEvaluator implements Runnable {
 
     /** instance of the main */
     private MainClass main;
+
+    /**
+     * creates new object and initializes variables
+     */
+    public FixationEvaluator() {
+        // initialize variables
+        this.main = MainClass.getInstance();
+        this.fixation = new Point();
+        this.location = new Point();
+        this.offset = new Point();
+        this.properties = this.main.getProperties();
+        this.manager = this.main.getInternalPluginManager();
+        this.isProcessing = false;
+
+        try {
+            this.robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+            this.main.exit();
+        }
+    }
 
     /**
      * sets the fixation point which is provided by the eyetracker
@@ -128,7 +149,7 @@ public class FixationEvaluator implements Runnable {
 
         // call recalibrator
         this.main.getRecalibrator().updateCalibration(this.fixation, this.offset);
-        
+
         // TODO: for debugging
         //        this.drawPicture();
 
@@ -174,28 +195,6 @@ public class FixationEvaluator implements Runnable {
             ImageIO.write(this.screenShot, "png", file);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Runnable#run()
-     */
-    @Override
-    public void run() {
-        // initialize variables
-        this.main = MainClass.getInstance();
-        this.fixation = new Point();
-        this.location = new Point();
-        this.offset = new Point();
-        this.properties = this.main.getProperties();
-        this.manager = this.main.getInternalPluginManager();
-        this.isProcessing = false;
-
-        try {
-            this.robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-            this.main.exit();
         }
     }
 }
