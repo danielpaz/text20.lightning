@@ -139,7 +139,7 @@ public class MainClass {
         } catch (Exception ex) {
             System.out.println("Unable to load native look and feel.\r\n");
         }
-
+        
         // initialize tray
         this.trayIcon = new TraySymbol();
         if (!this.trayIcon.init()) System.exit(0);
@@ -177,6 +177,7 @@ public class MainClass {
         this.statistics = this.pluginManager.getPlugin(Statistics.class);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
+        Thread pluginThread = new Thread(this.internalPluginManager);
         this.dllStatus = this.checkDll();
         this.isActivated = true;
         this.isNormalMode = true;
@@ -193,9 +194,6 @@ public class MainClass {
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
         this.evaluator = new PrecisionEvaluator();
         this.warper = new WarpCommander();
-        Thread warpThread = new Thread(this.warper);
-        warpThread.start();
-        Thread evaluationThread = new Thread(fixationEvaluator);
 
         // main component which listen on trackingevents
         FixationWatcher fixationCatcher = new FixationWatcher(fixationEvaluator, this.evaluator);
@@ -215,8 +213,10 @@ public class MainClass {
 
             if (fixationCatcher.getStatus()) {
 
+                // start plugin tread
+                pluginThread.start();
+                
                 // start listening
-                evaluationThread.start();
                 fixationCatcher.startWatching();
                 this.warper.start();
 

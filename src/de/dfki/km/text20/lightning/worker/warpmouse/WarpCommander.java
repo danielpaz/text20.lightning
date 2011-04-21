@@ -38,7 +38,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
  * @author Christoph Käding 
  * 
  */
-public class WarpCommander implements Runnable {
+public class WarpCommander {
 
     /** timer which clocks the mouse position tracking */
     private Timer timer;
@@ -53,9 +53,6 @@ public class WarpCommander implements Runnable {
      * creates a new WarpCommander and initializes the timer and the currently used warp plugin.
      */
     public WarpCommander() {
-    }
-
-    public void run() {
         // initialize variables
         this.properties = MainClass.getInstance().getProperties();
         this.manager = MainClass.getInstance().getInternalPluginManager();

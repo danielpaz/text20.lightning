@@ -35,7 +35,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
  * 
  * @author Christoph Käding
  */
-public class InternalPluginManager {
+public class InternalPluginManager implements Runnable {
 
     /** utility which can create a list of all available plugins */
     private PluginManagerUtil pluginManagerUtil;
@@ -55,57 +55,16 @@ public class InternalPluginManager {
     /** current elected mouse warper */
     private int currentMouseWarperId;
 
+    /** current used plugin manager */
+    private PluginManager manager;
+
     /**
      * creates a new MethodManager object and loads plugins
      * 
      * @param manager  
      */
     public InternalPluginManager(PluginManager manager) {
-        this.properties = MainClass.getInstance().getProperties();
-        boolean found = false;
-
-        // initialize plugin lists
-        this.pluginManagerUtil = new PluginManagerUtil(manager);
-        this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
-        this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
-
-        // generate id and set former used plugin if this is available or set default value ,if it is needed, for ...
-        // ...saliency detectors
-        for (int i = 0; i < this.saliencyDetectors.size(); i++) {
-            this.saliencyDetectors.get(i).getInformation().setId(i);
-            if (this.properties.getDetectorName().equals(this.saliencyDetectors.get(i).getInformation().getDisplayName())) {
-                this.currentSaliencyDetectorId = i;
-                this.properties.setDetectorName(this.saliencyDetectors.get(i).getInformation().getDisplayName());
-                found = true;
-            }
-        }
-        if (!this.properties.getDetectorName().equals("") && !found)
-            System.out.println("former used detector " + this.properties.getDetectorName() + " couldn't be found...");
-        if ((this.saliencyDetectors.size() > 0) && !found) {
-            this.currentSaliencyDetectorId = 0;
-            this.properties.setDetectorName(this.saliencyDetectors.get(0).getInformation().getDisplayName());
-        }
-
-        // ...mouse warpers
-        found = false;
-        for (int i = 0; i < this.mouseWarpers.size(); i++) {
-            this.mouseWarpers.get(i).getInformation().setId(i);
-            if (this.properties.getWarperName().equals(this.mouseWarpers.get(i).getInformation().getDisplayName())) {
-                this.currentMouseWarperId = i;
-                this.properties.setWarperName(this.mouseWarpers.get(i).getInformation().getDisplayName());
-                found = true;
-            }
-        }
-        if (!this.properties.getWarperName().equals("") && !found)
-            System.out.println("former used warper " + this.properties.getWarperName() + " couldn't be found...");
-        if ((this.mouseWarpers.size() > 0) && !found) {
-            this.currentMouseWarperId = 0;
-            this.properties.setWarperName(this.mouseWarpers.get(0).getInformation().getDisplayName());
-        }
-        
-        // start plugins
-        this.mouseWarpers.get(this.currentMouseWarperId).start();
-        this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();
+        this.manager = manager;
     }
 
     /**
@@ -166,5 +125,59 @@ public class InternalPluginManager {
         this.currentMouseWarperId = choice;
         this.properties.setWarperName(this.mouseWarpers.get(choice).getInformation().getDisplayName());
         this.mouseWarpers.get(this.currentMouseWarperId).start();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run() {
+        // initialize variables
+        this.properties = MainClass.getInstance().getProperties();
+        boolean found = false;
+
+        // initialize plugin lists
+        this.pluginManagerUtil = new PluginManagerUtil(this.manager);
+        this.saliencyDetectors = new ArrayList<SaliencyDetector>(this.pluginManagerUtil.getPlugins(SaliencyDetector.class));
+        this.mouseWarpers = new ArrayList<MouseWarper>(this.pluginManagerUtil.getPlugins(MouseWarper.class));
+
+        // generate id and set former used plugin if this is available or set default value ,if it is needed, for ...
+        // ...saliency detectors
+        for (int i = 0; i < this.saliencyDetectors.size(); i++) {
+            this.saliencyDetectors.get(i).getInformation().setId(i);
+            if (this.properties.getDetectorName().equals(this.saliencyDetectors.get(i).getInformation().getDisplayName())) {
+                this.currentSaliencyDetectorId = i;
+                this.properties.setDetectorName(this.saliencyDetectors.get(i).getInformation().getDisplayName());
+                found = true;
+            }
+        }
+        if (!this.properties.getDetectorName().equals("") && !found)
+            System.out.println("former used detector " + this.properties.getDetectorName() + " couldn't be found...");
+        if ((this.saliencyDetectors.size() > 0) && !found) {
+            this.currentSaliencyDetectorId = 0;
+            this.properties.setDetectorName(this.saliencyDetectors.get(0).getInformation().getDisplayName());
+        }
+
+        // ...mouse warpers
+        found = false;
+        for (int i = 0; i < this.mouseWarpers.size(); i++) {
+            this.mouseWarpers.get(i).getInformation().setId(i);
+            if (this.properties.getWarperName().equals(this.mouseWarpers.get(i).getInformation().getDisplayName())) {
+                this.currentMouseWarperId = i;
+                this.properties.setWarperName(this.mouseWarpers.get(i).getInformation().getDisplayName());
+                found = true;
+            }
+        }
+        if (!this.properties.getWarperName().equals("") && !found)
+            System.out.println("former used warper " + this.properties.getWarperName() + " couldn't be found...");
+        if ((this.mouseWarpers.size() > 0) && !found) {
+            this.currentMouseWarperId = 0;
+            this.properties.setWarperName(this.mouseWarpers.get(0).getInformation().getDisplayName());
+        }
+
+        // start plugins
+        this.mouseWarpers.get(this.currentMouseWarperId).start();
+        this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();
+
     }
 }
