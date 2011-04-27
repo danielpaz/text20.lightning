@@ -57,6 +57,9 @@ public class InternalPluginManager implements Runnable {
 
     /** current used plugin manager */
     private PluginManager manager;
+    
+    /** boolean to synchronize initialization */
+    private boolean done;
 
     /**
      * creates a new MethodManager object and loads plugins
@@ -65,6 +68,7 @@ public class InternalPluginManager implements Runnable {
      */
     public InternalPluginManager(PluginManager manager) {
         this.manager = manager;
+        this.done = false;
     }
 
     /**
@@ -127,6 +131,15 @@ public class InternalPluginManager implements Runnable {
         this.mouseWarpers.get(this.currentMouseWarperId).start();
     }
 
+    /**
+     * indicates the status
+     * 
+     * @return true if done
+     */
+    public boolean isDone() {
+        return this.done;
+    }
+    
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
@@ -179,5 +192,7 @@ public class InternalPluginManager implements Runnable {
         this.mouseWarpers.get(this.currentMouseWarperId).start();
         this.saliencyDetectors.get(this.currentSaliencyDetectorId).start();
 
+        // set boolean
+        this.done = true;
     }
 }
