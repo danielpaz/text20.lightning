@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -54,10 +55,9 @@ public class TextDetector implements SaliencyDetector {
     /* (non-Javadoc)
      * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#showGui()
      */
-    @SuppressWarnings("unused")
     @Override
-    public void showGui() {
-        new TextDetectorConfigImpl();
+    public JFrame getGui() {
+        return new TextDetectorConfigImpl();
     }
 
     /* (non-Javadoc)

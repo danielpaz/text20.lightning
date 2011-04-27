@@ -24,6 +24,8 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.util.TreeMap;
 
+import javax.swing.JFrame;
+
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
@@ -206,7 +208,8 @@ public class SimpleWarper implements MouseWarper {
      * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
      */
     @Override
-    public void showGui() {
+    public JFrame getGui() {
+        return null;
     }
 
     /* (non-Javadoc)

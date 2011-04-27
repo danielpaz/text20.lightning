@@ -55,9 +55,6 @@ public class VelocityWarperConfigImpl extends VelocityWarperConfig implements
 
         // add tooltips
         this.manageToolTips();
-
-        // shows the gui
-        setVisible(true);
     }
 
     /*

@@ -29,7 +29,9 @@ import java.io.File;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
@@ -53,7 +55,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
 
     /**
      * manageHotkeyComboBox() changes the items and selection of the actionHotkey and the statusHotkey comboboxes.
-     * These two boxes have thier own actionlisteners which call manageHotkeyComboBox(). So an endless ring of calls is created when anything is changed.
+     * These two boxes have their own actionlisteners which call manageHotkeyComboBox(). So an endless ring of calls is created when anything is changed.
      * This boolean shows if the action event is fired by an automatic or manual selection of these comboboxes.
      */
     private boolean autoSelect;
@@ -73,6 +75,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     /** file chooser for output path */
     private JFileChooser chooser;
 
+    /** frame for configuration guis of plugins */
+    private JFrame child;
+
+    /** timer for window focus */
+    private Timer timer;
+
     /**
      * builds the window with all its components and shows it
      */
@@ -82,6 +90,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
         this.main.resetEvaluator();
+        this.child = null;
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
@@ -139,6 +148,19 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         };
         this.chooser.setMultiSelectionEnabled(false);
         this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        // initialize timer
+        this.timer = new Timer(50, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                mainFrame.setFocusable(true);
+                mainFrame.setEnabled(true);
+            }
+        });
 
         // show the gui
         this.mainFrame.repaint();
@@ -318,14 +340,22 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * Fired if the Detector Config button is clicked. Shows the configdialog.
      */
     private void buttonDetectorConfigActionPerformed() {
-        this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).showGui();
+        this.child = this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).getGui();
+        this.child.setVisible(true);
+        this.mainFrame.setFocusable(false);
+        this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
      * Fired if the Warper Config button is clicked. Shows the configdialog.
      */
     private void buttonWarpConfigActionPerformed() {
-        this.internalPluginManager.getMouseWarpers().get(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId()).showGui();
+        this.child = this.internalPluginManager.getMouseWarpers().get(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId()).getGui();
+        this.child.setVisible(true);
+        this.mainFrame.setFocusable(false);
+        this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
