@@ -139,7 +139,7 @@ public class MainClass {
         } catch (Exception ex) {
             System.out.println("Unable to load native look and feel.\r\n");
         }
-        
+
         // initialize tray
         this.trayIcon = new TraySymbol();
         if (!this.trayIcon.init()) System.exit(0);
@@ -157,6 +157,7 @@ public class MainClass {
         props.setProperty(UpdateCheck.class, "product.name", "text20.lightning");
         props.setProperty(UpdateCheck.class, "product.version", "1.4");
 
+        
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
 
@@ -215,7 +216,24 @@ public class MainClass {
 
                 // start plugin tread
                 pluginThread.start();
-                
+
+                // wait for initializing plugins
+                for (int i = 0; i < 100; i++) {
+                    if (this.internalPluginManager.isDone()) break;
+                    try {
+                        Thread.sleep(10);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (!this.internalPluginManager.isDone()) {
+                    this.showTrayMessage("An error occurs while initializing plugins.");
+                    System.out.println("\r\nAn error occurs while initializing plugins.\r\n");
+                    this.channel.status("An error occurs while initializing plugins.");
+                    this.addToStatistic("An error occurs while initializing plugins.");
+                    return;
+                }
+
                 // start listening
                 fixationCatcher.startWatching();
                 this.warper.start();
@@ -409,19 +427,20 @@ public class MainClass {
         // update statistics
         this.addToStatistic("Session closed.");
 
-        // close plugins
-        this.internalPluginManager.getCurrentMouseWarper().stop();
-        this.internalPluginManager.getCurrentSaliencyDetector().stop();
-
         // make the evaluator known that the evaluation is over
         this.evaluator.leaveEvaluation();
 
-        if (this.dllStatus) {
-            // deactivate the hotkeys
+        if (this.dllStatus)
+        // deactivate the hotkeys
             JIntellitype.getInstance().cleanUp();
 
+        if (this.allFine) {
             // deactivate warper
             this.warper.stop();
+
+            // close plugins
+            this.internalPluginManager.getCurrentSaliencyDetector().stop();
+            this.internalPluginManager.getCurrentMouseWarper().stop();
         }
 
         // removes icon from system tray

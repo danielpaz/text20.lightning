@@ -1,5 +1,5 @@
 /*
- * VelocityWarperV1ConfigImpl.java
+ * VelocityWarperConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -32,7 +32,7 @@ import de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper.VelocityWarp
  * 
  */
 @SuppressWarnings({ "serial", "boxing" })
-public class VelocityWarperConfigImpl extends VelocityWarperV3Config implements
+public class VelocityWarperConfigImpl extends VelocityWarperConfig implements
         ActionListener {
 
     /** current used properties */

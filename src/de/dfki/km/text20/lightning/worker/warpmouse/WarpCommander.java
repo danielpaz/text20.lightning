@@ -50,7 +50,7 @@ public class WarpCommander {
     private Properties properties;
 
     /**
-     * creates a new WarpCommander and initializes the timer and the currently used warp plugin.
+     * creates a new WarpCommander and initializes the timer.
      */
     public WarpCommander() {
         // initialize variables

@@ -1,5 +1,5 @@
 /*
- * VelocityWarperV1.java
+ * VelocityWarper.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -19,6 +19,8 @@
  * MA 02110-1301  USA
  */
 package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper;
+
+import static net.jcores.CoreKeeper.$;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -118,6 +120,9 @@ public class VelocityWarper implements MouseWarper {
     /** internal timer interval */
     private int setIntervall;
 
+    /** warped distance */
+    private double distance;
+
     /**
      * creates a new DistanceWarper and initializes some variables
      */
@@ -142,6 +147,7 @@ public class VelocityWarper implements MouseWarper {
         this.yMax = 0;
         this.setIntervall = 1;
         this.mid = 0;
+        this.distance = 0;
 
         try {
             this.robot = new Robot();
@@ -421,5 +427,7 @@ public class VelocityWarper implements MouseWarper {
         // write current poperties in a file
         this.timer.stop();
         this.propertie.writeProperties();
+        if (this.distance > 0)
+            $("./plugins/VelocityWarper/distance.log").file().append(System.currentTimeMillis() + ": " + this.distance + "\r\n");
     }
 }
