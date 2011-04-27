@@ -24,6 +24,8 @@ package de.dfki.km.text20.lightning.plugins.saliency.dummy;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JFrame;
+
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
@@ -67,7 +69,8 @@ public class FakePositionFinder implements SaliencyDetector {
      * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
      */
     @Override
-    public void showGui() {
+    public JFrame getGui() {
+        return null;
     }
 
     /* (non-Javadoc)

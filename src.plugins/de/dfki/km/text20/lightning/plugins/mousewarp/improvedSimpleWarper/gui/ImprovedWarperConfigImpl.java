@@ -55,9 +55,6 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
 
         // add tooltips
         this.manageToolTips();
-
-        // shows the gui
-        setVisible(true);
     }
 
     /* (non-Javadoc)

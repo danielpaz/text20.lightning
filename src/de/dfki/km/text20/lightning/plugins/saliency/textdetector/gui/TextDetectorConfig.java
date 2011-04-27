@@ -6,13 +6,14 @@ package de.dfki.km.text20.lightning.plugins.saliency.textdetector.gui;
 
 import java.awt.*;
 import javax.swing.*;
+
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 
 /**
  * @author Ralf Biedert
  */
-public class TextDetectorConfig {
+public class TextDetectorConfig extends JFrame {
     public TextDetectorConfig() {
         initComponents();
     }
@@ -65,9 +66,7 @@ public class TextDetectorConfig {
 
                 //======== contentPanel ========
                 {
-                    contentPanel.setLayout(new FormLayout(
-                        "2*(60dlu, $lcgap), 60dlu:grow",
-                        "6*(default, $lgap), 3dlu, 5*($lgap, default), $lgap, bottom:default:grow"));
+                    contentPanel.setLayout(new FormLayout("2*(60dlu, $lcgap), 60dlu:grow", "6*(default, $lgap), 3dlu, 5*($lgap, default), $lgap, bottom:default:grow"));
 
                     //---- labelLetterHeight ----
                     labelLetterHeight.setText("min letter height in Pixel");

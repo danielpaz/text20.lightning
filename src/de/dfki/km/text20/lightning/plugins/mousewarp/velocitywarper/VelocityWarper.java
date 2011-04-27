@@ -38,6 +38,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.Timer;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -410,11 +411,10 @@ public class VelocityWarper implements MouseWarper {
      * 
      * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
      */
-    @SuppressWarnings("unused")
     @Override
-    public void showGui() {
+    public JFrame getGui() {
         // create new gui to show it
-        new VelocityWarperConfigImpl();
+        return new VelocityWarperConfigImpl();
     }
 
     /*

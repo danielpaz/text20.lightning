@@ -53,9 +53,6 @@ public class DistanceWarperConfigImpl extends DistanceWarperConfig implements
 
         // add tooltips
         this.manageToolTips();
-
-        // shows the gui
-        setVisible(true);
     }
 
     /* (non-Javadoc)

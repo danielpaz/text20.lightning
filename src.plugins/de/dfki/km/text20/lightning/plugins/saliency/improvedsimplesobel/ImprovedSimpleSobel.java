@@ -30,6 +30,7 @@ import java.awt.image.ColorConvertOp;
 import java.io.File;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
@@ -281,7 +282,8 @@ public class ImprovedSimpleSobel implements SaliencyDetector {
      * @see de.dfki.km.text20.lightning.plugins.CommonPluginInterface#getGui()
      */
     @Override
-    public void showGui() {
+    public JFrame getGui() {
+        return null;
     }
 
     /* (non-Javadoc)

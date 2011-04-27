@@ -20,6 +20,8 @@
  */
 package de.dfki.km.text20.lightning.plugins;
 
+import javax.swing.JFrame;
+
 /**
  * Interface for all common functions which are necessary for any plugin. 
  * 
@@ -29,9 +31,9 @@ package de.dfki.km.text20.lightning.plugins;
 public interface CommonPluginInterface {
 
     /** 
-     * opens plugin specific gui for configuration 
+     * @return plugin specific gui for configuration
      */ 
-    public void showGui();
+    public JFrame getGui();
 
     /**
      * indicates that the work for this plugin starts

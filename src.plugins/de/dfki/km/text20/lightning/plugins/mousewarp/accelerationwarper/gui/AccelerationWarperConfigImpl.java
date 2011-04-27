@@ -58,9 +58,6 @@ public class AccelerationWarperConfigImpl extends AccelerationWarperConfig imple
 
         // add tooltips
         this.manageToolTips();
-
-        // shows the gui
-        setVisible(true);
     }
 
     /*
