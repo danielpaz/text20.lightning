@@ -221,6 +221,24 @@ public class TextDetectorWorker {
      */
     @SuppressWarnings("rawtypes")
     public Point textAnalyse(LinkedList boxes, int height) {
-        return new Point(0, 0);
+        Point fixation = new Point(height / 2, height / 2);
+        Point offset = new Point(0, 0);
+        Point tmp = new Point();
+        double minDistance = Double.MAX_VALUE;
+
+        for (Object textRegion : boxes) {
+            if (textRegion instanceof TextRegion) {
+                for (int i = 0; i < ((TextRegion) textRegion).width(); i++) {
+                    tmp.setLocation(((TextRegion) textRegion).x1 + i, ((TextRegion) textRegion).y1 + ((TextRegion) textRegion).height() / 2);
+                    if (tmp.distance(fixation) < minDistance) {
+                        offset.setLocation(tmp);
+                        minDistance = tmp.distance(fixation);
+                    }
+                }
+            }
+        }
+        offset.translate(-height / 2, -height / 2);
+
+        return offset;
     }
 }
