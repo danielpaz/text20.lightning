@@ -95,7 +95,6 @@ public class FixationEvaluator {
             this.robot = new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
-            this.main.exit();
         }
     }
 

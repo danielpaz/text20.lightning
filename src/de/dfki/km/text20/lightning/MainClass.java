@@ -119,7 +119,7 @@ public class MainClass {
     /** used to recalibrate the trackingserver */
     private Recalibrator recalibrator;
 
-    /** shutdown thread */
+    /** ShutDownHook */
     private Thread hook;
 
     /**
@@ -189,9 +189,8 @@ public class MainClass {
         this.reminder = new SubmitReminder();
         this.hook = new Thread() {
 
-            @SuppressWarnings("synthetic-access")
             public void run() {
-                main.exit();
+                exit(false);
             }
         };
 
@@ -427,36 +426,42 @@ public class MainClass {
 
     /**
      * Shuts down the application
+     * 
+     * @param type 
+     * 
+     * true = exit by gui
+     * false = exit by JVM-shutdown
      */
-    public void exit() {
-        try {
+    public void exit(boolean type) {
+
+        // close reminder
+        this.reminder.close();
+
+        // store properties to a file
+        this.properties.writeProperties();
+
+        // update statistics
+        this.addToStatistic("Session closed.");
+
+        // make the evaluator known that the evaluation is over
+        this.evaluator.leaveEvaluation();
+
+        if (this.dllStatus && type)
+        // deactivate the hotkeys
+            JIntellitype.getInstance().cleanUp();
+
+        if (this.allFine) {
+            // deactivate warper
+            if (type) this.warper.stop();
+
+            // close plugins
+            this.internalPluginManager.getCurrentSaliencyDetector().stop();
+            this.internalPluginManager.getCurrentMouseWarper().stop();
+        }
+
+        if (type) {
             // remove hook
             Runtime.getRuntime().removeShutdownHook(this.hook);
-
-            // close reminder
-            this.reminder.close();
-
-            // store properties to a file
-            this.properties.writeProperties();
-
-            // update statistics
-            this.addToStatistic("Session closed.");
-
-            // make the evaluator known that the evaluation is over
-            this.evaluator.leaveEvaluation();
-
-            if (this.dllStatus)
-            // deactivate the hotkeys
-                JIntellitype.getInstance().cleanUp();
-
-            if (this.allFine) {
-                // deactivate warper
-                this.warper.stop();
-
-                // close plugins
-                this.internalPluginManager.getCurrentSaliencyDetector().stop();
-                this.internalPluginManager.getCurrentMouseWarper().stop();
-            }
 
             // removes icon from system tray
             this.trayIcon.remove();
@@ -467,15 +472,9 @@ public class MainClass {
             this.channel.status("Session closed.");
             System.out.println("\r\nSession closed.");
 
-            $("blabla.txt").file().append("funzt");
-
             // close the tool
             System.exit(0);
-            
-        } catch (Exception e) {
-            $("error.log").file().append(System.currentTimeMillis() + " - " + e.toString() + "\r\n");
-            System.exit(0);
-        }
+        } 
     }
 
     /**
