@@ -112,10 +112,10 @@ public class TextDetector implements SaliencyDetector {
                 e.printStackTrace();
             }
         }
-//        if (coverage > this.properties.getThreshold()) {
-//            System.out.println("text search");
-//            return this.worker.textAnalyse(boxes, screenShot.getHeight());
-//        }
+        if (coverage > this.properties.getThreshold()) {
+            System.out.println("text search");
+            return this.worker.textAnalyse(boxes, screenShot.getHeight());
+        }
         System.out.println("normal search");
         return this.worker.normalAnalyse(myget.getContrastImage());
 
