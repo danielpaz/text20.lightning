@@ -41,6 +41,9 @@ public class TextDetectorProperties implements Serializable {
     private static final long serialVersionUID = -7009680382311094022L;
 
     @Attribute
+    private double threshold;
+
+    @Attribute
     private int letterHeight;
 
     @Attribute
@@ -57,7 +60,7 @@ public class TextDetectorProperties implements Serializable {
 
     @Attribute
     private boolean useDelete;
-    
+
     @Attribute
     private double destinyFact;
 
@@ -103,6 +106,7 @@ public class TextDetectorProperties implements Serializable {
                 if (this.object instanceof TextDetectorProperties) {
 
                     // store readed configurations
+                    this.threshold = ((TextDetectorProperties) this.object).getThreshold();
                     this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
                     this.stemSize = ((TextDetectorProperties) this.object).getStemSize();
                     this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
@@ -118,7 +122,7 @@ public class TextDetectorProperties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("\r\nTextDetector properties file was found.");
-                    System.out.println("letter height: " + this.letterHeight + ", stem size: " + this.stemSize + "%, line size: " + this.lineSize + ", debug: " + this.debug+ ", merge: " + this.useMerge+ ", delete: " + this.useDelete);
+                    System.out.println("text coverage threshold: " + this.threshold + ", letter height: " + this.letterHeight + ", stem size: " + this.stemSize + "%, line size: " + this.lineSize + ", debug: " + this.debug + ", merge: " + this.useMerge + ", delete: " + this.useDelete);
                     System.out.println("destiny factor: " + this.destinyFact + ", mass: " + this.mass + ", distance 1: " + this.dist1 + ", distance factor: " + this.distFact + ", distance 2: " + this.dist2);
                 }
 
@@ -142,6 +146,7 @@ public class TextDetectorProperties implements Serializable {
      */
     public void restoreDefault() {
         // set default values
+        this.threshold = 17;
         this.letterHeight = 7;
         this.stemSize = 0;
         this.lineSize = 100;
@@ -153,6 +158,20 @@ public class TextDetectorProperties implements Serializable {
         this.dist1 = 4;
         this.distFact = 1;
         this.dist2 = 20;
+    }
+
+    /**
+     * @return the threshold
+     */
+    public double getThreshold() {
+        return this.threshold;
+    }
+
+    /**
+     * @param threshold the threshold to set
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 
     /**

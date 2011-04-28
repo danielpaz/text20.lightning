@@ -13,3 +13,5 @@ syntax: regexp
 ^plugins$
 syntax: regexp
 ^tmp$
+syntax: regexp
+^blabla\.txt$
