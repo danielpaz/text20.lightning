@@ -109,7 +109,7 @@ public class TrayMenu {
                 // calls exit method of the main class
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainClass.getInstance().exit();
+                    MainClass.getInstance().exit(true);
                 }
             });
             menu.add(exit);
