@@ -103,6 +103,9 @@ public class GetImageText {
 
     // modified by Christoph Käding
     private boolean useDelete;
+    
+    // modified by Christoph Käding
+    private BufferedImage contrastjpg;
 
     /**
      * Default constructor
@@ -202,6 +205,11 @@ public class GetImageText {
         return blue + (green << 8) + (red << 16);
     }
 
+    // modified by Christoph Käding
+    public BufferedImage getContrastImage(){
+        return this.contrastjpg;
+    }
+    
     /**
      * Discard boxes that do not appear to contain text
      */
@@ -410,11 +418,10 @@ public class GetImageText {
             // modified by Christoph Käding
             //            FileOutputStream out = new FileOutputStream( "contrast.jpg" );
             //            JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder( out );
-            BufferedImage contrastjpg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            this.contrastjpg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
             for (int i = 0; i < image.getWidth(); i++)
                 for (int j = 0; j < image.getHeight(); j++)
-                    contrastjpg.setRGB(i, j, 0xffffff * contrast[i][j]);
-            // modified by Christoph Käding
+                    this.contrastjpg.setRGB(i, j, 0xffffff * contrast[i][j]);
             //            encoder.encode( contrastjpg );
             //            out.close();
             //            ImageIO.write(contrastjpg, "png", new File("./tmp/" + System.currentTimeMillis() + "_area_contranst.png"));

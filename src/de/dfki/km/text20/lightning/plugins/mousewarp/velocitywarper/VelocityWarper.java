@@ -263,8 +263,11 @@ public class VelocityWarper implements MouseWarper {
         // places mouse cursor at the setpoint
         this.robot.mouseMove(this.setPoint.x, this.setPoint.y);
 
+        // calculate distance
+        this.distance = this.distance + this.setPoint.distance(this.mousePositions.get(this.mousePositions.size() - 1));
+
         // indicate warp
-        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.get(2)) + " Pixels and a offset of " + this.setR + " Pixels. Method: Velocity Warper V3, Velocity: " + ((double) (Math.round(this.velocityStartEnd * 100)) / 100) + " Pixel/ms");
+        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.get(this.mousePositions.size() - 1)) + " Pixels and an offset of " + this.setR + " Pixels. Method: Velocity Warper V3, Velocity: " + ((double) (Math.round(this.velocityStartEnd * 100)) / 100) + " Pixel/ms");
 
         // TODO: debugging
         //        this.drawPicture();

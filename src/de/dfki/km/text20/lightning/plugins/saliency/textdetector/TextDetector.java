@@ -45,6 +45,10 @@ public class TextDetector implements SaliencyDetector {
 
     private TextDetectorProperties properties;
 
+    private TextDetectorWorker worker;
+
+    private long timeStamp;
+
     /**
      * 
      */
@@ -66,6 +70,8 @@ public class TextDetector implements SaliencyDetector {
     @Override
     public void start() {
         this.properties = TextDetectorProperties.getInstance();
+        this.timeStamp = System.currentTimeMillis();
+        this.worker = new TextDetectorWorker();
     }
 
     /* (non-Javadoc)
@@ -82,19 +88,37 @@ public class TextDetector implements SaliencyDetector {
     @SuppressWarnings("rawtypes")
     @Override
     public Point analyse(BufferedImage screenShot) {
+        // initialize variables
+        int textSize = 0;
+        double coverage = 0;
         GetImageText myget = new GetImageText(screenShot, this.properties.getDestinyFact(), this.properties.getMass(), this.properties.getDist1(), this.properties.getDistFact(), this.properties.getDist2(), this.properties.getLetterHeight(), this.properties.getStemSize(), this.properties.getLineSize(), this.properties.isUseMerge(), this.properties.isUseDelete());
         LinkedList boxes = myget.getTextBoxes();
-        BufferedImage result = myget.isolateText(boxes);
+
+        // calculate coverage
+        for (Object textRegion : boxes) {
+            if (textRegion instanceof TextRegion) {
+                textSize = textSize + (((TextRegion) textRegion).width() * ((TextRegion) textRegion).height());
+            }
+        }
+        coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
+
+        System.out.print("coverage: " + ((double) Math.round(coverage * 100) / 100) + "% -> ");
 
         if (this.properties.isDebug()) {
             try {
-                new File("./plugins/TextDetector/debug").mkdirs();
-                ImageIO.write(result, "png", new File("./plugins/TextDetector/debug/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
+                new File("./plugins/TextDetector/debug/Session_" + this.timeStamp).mkdirs();
+                ImageIO.write(myget.isolateText(boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return new Point(0, 0);
+//        if (coverage > this.properties.getThreshold()) {
+//            System.out.println("text search");
+//            return this.worker.textAnalyse(boxes, screenShot.getHeight());
+//        }
+        System.out.println("normal search");
+        return this.worker.normalAnalyse(myget.getContrastImage());
+
     }
 
     /* (non-Javadoc)

@@ -150,15 +150,15 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         // initialize timer
-        this.timer = new Timer(50, new ActionListener() {
+        this.timer = new Timer(500, new ActionListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (child.isShowing()) return;
                 timer.stop();
-                mainFrame.setFocusable(true);
                 mainFrame.setEnabled(true);
+                mainFrame.requestFocus();
             }
         });
 
@@ -342,7 +342,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     private void buttonDetectorConfigActionPerformed() {
         this.child = this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).getGui();
         this.child.setVisible(true);
-        this.mainFrame.setFocusable(false);
         this.mainFrame.setEnabled(false);
         this.timer.start();
     }
@@ -353,7 +352,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     private void buttonWarpConfigActionPerformed() {
         this.child = this.internalPluginManager.getMouseWarpers().get(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId()).getGui();
         this.child.setVisible(true);
-        this.mainFrame.setFocusable(false);
         this.mainFrame.setEnabled(false);
         this.timer.start();
     }

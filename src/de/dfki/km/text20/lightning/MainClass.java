@@ -119,6 +119,9 @@ public class MainClass {
     /** used to recalibrate the trackingserver */
     private Recalibrator recalibrator;
 
+    /** shutdown thread */
+    private Thread hook;
+
     /**
      * creates a new instance of the mainclass and initializes it
      * 
@@ -157,7 +160,6 @@ public class MainClass {
         props.setProperty(UpdateCheck.class, "product.name", "text20.lightning");
         props.setProperty(UpdateCheck.class, "product.version", "1.4");
 
-        
         // set statistic properties
         props.setProperty(Statistics.class, "application.id", "StatisticsTest");
 
@@ -185,6 +187,13 @@ public class MainClass {
         this.submitted = false;
         this.recalibrator = new Recalibrator();
         this.reminder = new SubmitReminder();
+        this.hook = new Thread() {
+
+            @SuppressWarnings("synthetic-access")
+            public void run() {
+                main.exit();
+            }
+        };
 
         // indicate start
         this.channel.status("Session started.");
@@ -249,9 +258,11 @@ public class MainClass {
 
                 // start reminder
                 this.reminder.init();
+
+                // add shutdownhook
+                Runtime.getRuntime().addShutdownHook(this.hook);
             }
         }
-
         setupStatistics();
     }
 
@@ -418,42 +429,52 @@ public class MainClass {
      * Shuts down the application
      */
     public void exit() {
-        // close reminder
-        this.reminder.close();
+        try {
+            // remove hook
+            Runtime.getRuntime().removeShutdownHook(this.hook);
 
-        // store properties to a file
-        this.properties.writeProperties();
+            // close reminder
+            this.reminder.close();
 
-        // update statistics
-        this.addToStatistic("Session closed.");
+            // store properties to a file
+            this.properties.writeProperties();
 
-        // make the evaluator known that the evaluation is over
-        this.evaluator.leaveEvaluation();
+            // update statistics
+            this.addToStatistic("Session closed.");
 
-        if (this.dllStatus)
-        // deactivate the hotkeys
-            JIntellitype.getInstance().cleanUp();
+            // make the evaluator known that the evaluation is over
+            this.evaluator.leaveEvaluation();
 
-        if (this.allFine) {
-            // deactivate warper
-            this.warper.stop();
+            if (this.dllStatus)
+            // deactivate the hotkeys
+                JIntellitype.getInstance().cleanUp();
 
-            // close plugins
-            this.internalPluginManager.getCurrentSaliencyDetector().stop();
-            this.internalPluginManager.getCurrentMouseWarper().stop();
+            if (this.allFine) {
+                // deactivate warper
+                this.warper.stop();
+
+                // close plugins
+                this.internalPluginManager.getCurrentSaliencyDetector().stop();
+                this.internalPluginManager.getCurrentMouseWarper().stop();
+            }
+
+            // removes icon from system tray
+            this.trayIcon.remove();
+
+            // disables plugins
+            this.pluginManager.shutdown();
+
+            this.channel.status("Session closed.");
+            System.out.println("\r\nSession closed.");
+
+            $("blabla.txt").file().append("funzt");
+
+            // close the tool
+            System.exit(0);
+        } catch (Exception e) {
+            $("error.log").file().append(System.currentTimeMillis() + " - " + e.toString() + "\r\n");
+            System.exit(0);
         }
-
-        // removes icon from system tray
-        this.trayIcon.remove();
-
-        // disables plugins
-        this.pluginManager.shutdown();
-
-        this.channel.status("Session closed.");
-        System.out.println("\r\nSession closed.");
-
-        // close the tool
-        System.exit(0);
     }
 
     /**
