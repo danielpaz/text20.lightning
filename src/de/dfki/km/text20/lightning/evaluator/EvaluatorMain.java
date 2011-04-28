@@ -32,8 +32,13 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
 import net.xeoh.plugins.base.PluginManager;
@@ -98,6 +103,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** progress of the progress bar*/
     private int progress;
 
+    /** timer for window focus */
+    private Timer timer;
+
+    /** frame for configuration guis of plugins */
+    private JFrame child;
+
     /**
      * main entry point
      * 
@@ -142,6 +153,17 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonStart.addActionListener(this);
         this.buttonRemove.addActionListener(this);
         this.mainFrame.addWindowListener(this);
+        this.checkBoxConfiguration.addActionListener(this);
+        this.buttonConfiguration.addActionListener(this);
+        this.listDetectors.addListSelectionListener(new ListSelectionListener() {
+            
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if(listDetectors.getSelectedValue() instanceof PluginInformation)
+                    buttonConfiguration.setEnabled(((PluginInformation) listDetectors.getSelectedValue()).isGuiAvailable());                
+            }
+        });
 
         // set enable/disable and text to some components
         this.buttonStart.setEnabled(false);
@@ -152,6 +174,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonStart.setEnabled(false);
         this.listDetectors.setEnabled(false);
         this.progressBar.setEnabled(false);
+        this.checkBoxConfiguration.setEnabled(false);
+        this.buttonConfiguration.setEnabled(false);
 
         // initialize status
         this.running = false;
@@ -205,6 +229,20 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // log start
         this.channel.status("Session started.");
 
+        // initialize timer and child
+        this.child = null;
+        this.timer = new Timer(500, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                mainFrame.setEnabled(true);
+                mainFrame.requestFocus();
+            }
+        });
+
         // set the window visible
         this.mainFrame.setVisible(true);
     }
@@ -227,6 +265,16 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         if (event.getSource() == this.buttonRemove) {
             this.buttonRemoveActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.checkBoxConfiguration) {
+            this.checkboxConfigActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.buttonConfiguration) {
+            this.buttonConfigActionPerformed();
             return;
         }
     }
@@ -265,6 +313,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.checkBoxSummary.setEnabled(false);
             this.labelDimension.setEnabled(false);
             this.spinnerDimension.setEnabled(false);
+            this.checkBoxConfiguration.setEnabled(false);
+            this.buttonConfiguration.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -286,6 +336,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.checkBoxSummary.setEnabled(true);
             this.labelDimension.setEnabled(true);
             this.spinnerDimension.setEnabled(true);
+            this.checkBoxConfiguration.setEnabled(true);
+            this.buttonConfiguration.setEnabled(true);
         }
     }
 
@@ -306,6 +358,43 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.listFiles.setListData(this.files.toArray());
     }
 
+    /**
+     * fired when the checkboxConfig is clicked
+     * sets the gui in config mode
+     */
+    private void checkboxConfigActionPerformed() {
+        // set selection mode
+        if (this.checkBoxConfiguration.isSelected()) {
+            this.listDetectors.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            this.labelDescription.setText("ConfigMode: Select any detector and click the 'Configuration'-button.");
+        } else {
+            this.listDetectors.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
+        }
+
+        // enable/disable elements
+        this.buttonRemove.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.buttonSelect.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.listFiles.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.checkBoxImages.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.checkBoxSummary.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.labelDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.spinnerDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.buttonConfiguration.setEnabled(this.checkBoxConfiguration.isSelected());
+    }
+
+    /**
+     * fired when the buttonConfig is clicked
+     * opens the gui for selected detectors
+     */
+    private void buttonConfigActionPerformed() {
+        if (this.listDetectors.getSelectedValue() instanceof PluginInformation)
+            this.child = this.saliencyDetectors.get(((PluginInformation) this.listDetectors.getSelectedValue()).getId()).getGui();
+        this.child.setVisible(true);
+        this.mainFrame.setEnabled(false);
+        this.timer.start();
+    }
+    
     /**
      * initializes filechooser
      * 
@@ -334,6 +423,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 listDetectors.setEnabled(true);
                 buttonStart.setEnabled(true);
                 progressBar.setEnabled(true);
+                checkBoxConfiguration.setEnabled(true);
             }
         };
 

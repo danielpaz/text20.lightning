@@ -471,6 +471,7 @@ public class MainClass {
 
             // close the tool
             System.exit(0);
+            
         } catch (Exception e) {
             $("error.log").file().append(System.currentTimeMillis() + " - " + e.toString() + "\r\n");
             System.exit(0);
