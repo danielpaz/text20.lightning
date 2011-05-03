@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.saliency.textdetector;
+package de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,13 +35,10 @@ import org.simpleframework.xml.Attribute;
  * @author Christoph Käding
  *
  */
-public class TextDetectorProperties implements Serializable {
+public class CoverageDetectorProperties implements Serializable {
 
     /** generated serial id */
     private static final long serialVersionUID = -7009680382311094022L;
-
-    @Attribute
-    private double threshold;
 
     @Attribute
     private int letterHeight;
@@ -83,15 +80,15 @@ public class TextDetectorProperties implements Serializable {
     private Object object;
 
     /** singleton instance of this properties */
-    private static TextDetectorProperties properties;
+    private static CoverageDetectorProperties properties;
 
     /**
      * creates properties, tries to load property file
      */
-    private TextDetectorProperties() {
+    private CoverageDetectorProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/TextDetector/properties.prop");
+        this.propertiesFile = new File("./plugins/CoverageDetector/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -103,26 +100,25 @@ public class TextDetectorProperties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof TextDetectorProperties) {
+                if (this.object instanceof CoverageDetectorProperties) {
 
                     // store readed configurations
-                    this.threshold = ((TextDetectorProperties) this.object).getThreshold();
-                    this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
-                    this.stemSize = ((TextDetectorProperties) this.object).getStemSize();
-                    this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
-                    this.debug = ((TextDetectorProperties) this.object).isDebug();
-                    this.useMerge = ((TextDetectorProperties) this.object).isUseMerge();
-                    this.useDelete = ((TextDetectorProperties) this.object).isUseDelete();
-                    this.destinyFact = ((TextDetectorProperties) this.object).getDestinyFact();
-                    this.mass = ((TextDetectorProperties) this.object).getMass();
-                    this.dist1 = ((TextDetectorProperties) this.object).getDist1();
-                    this.distFact = ((TextDetectorProperties) this.object).getDistFact();
-                    this.dist2 = ((TextDetectorProperties) this.object).getDist2();
+                    this.letterHeight = ((CoverageDetectorProperties) this.object).getLetterHeight();
+                    this.stemSize = ((CoverageDetectorProperties) this.object).getStemSize();
+                    this.lineSize = ((CoverageDetectorProperties) this.object).getLineSize();
+                    this.debug = ((CoverageDetectorProperties) this.object).isDebug();
+                    this.useMerge = ((CoverageDetectorProperties) this.object).isUseMerge();
+                    this.useDelete = ((CoverageDetectorProperties) this.object).isUseDelete();
+                    this.destinyFact = ((CoverageDetectorProperties) this.object).getDestinyFact();
+                    this.mass = ((CoverageDetectorProperties) this.object).getMass();
+                    this.dist1 = ((CoverageDetectorProperties) this.object).getDist1();
+                    this.distFact = ((CoverageDetectorProperties) this.object).getDistFact();
+                    this.dist2 = ((CoverageDetectorProperties) this.object).getDist2();
 
                     // reading successful
                     status = true;
-                    System.out.println("\r\nTextDetector properties file was found.");
-                    System.out.println("text coverage threshold: " + this.threshold + ", letter height: " + this.letterHeight + ", stem size: " + this.stemSize + "%, line size: " + this.lineSize + ", debug: " + this.debug + ", merge: " + this.useMerge + ", delete: " + this.useDelete);
+                    System.out.println("\r\nCoverageDetector properties file was found.");
+                    System.out.println("letter height: " + this.letterHeight + ", stem size: " + this.stemSize + "%, line size: " + this.lineSize + ", debug: " + this.debug + ", merge: " + this.useMerge + ", delete: " + this.useDelete);
                     System.out.println("destiny factor: " + this.destinyFact + ", mass: " + this.mass + ", distance 1: " + this.dist1 + ", distance factor: " + this.distFact + ", distance 2: " + this.dist2);
                 }
 
@@ -137,7 +133,7 @@ public class TextDetectorProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\r\nTextDetector properties file was not found.\r\n");
+            System.out.println("\r\nCoverageDetector properties file was not found.\r\n");
         }
     }
 
@@ -146,7 +142,6 @@ public class TextDetectorProperties implements Serializable {
      */
     public void restoreDefault() {
         // set default values
-        this.threshold = 10;
         this.letterHeight = 7;
         this.stemSize = 0;
         this.lineSize = 100;
@@ -158,20 +153,6 @@ public class TextDetectorProperties implements Serializable {
         this.dist1 = 4;
         this.distFact = 1;
         this.dist2 = 20;
-    }
-
-    /**
-     * @return the threshold
-     */
-    public double getThreshold() {
-        return this.threshold;
-    }
-
-    /**
-     * @param threshold the threshold to set
-     */
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
     }
 
     /**
@@ -333,9 +314,9 @@ public class TextDetectorProperties implements Serializable {
      * 
      * @return properties
      */
-    public static TextDetectorProperties getInstance() {
+    public static CoverageDetectorProperties getInstance() {
         if (properties == null) {
-            properties = new TextDetectorProperties();
+            properties = new CoverageDetectorProperties();
         }
         return properties;
     }
@@ -345,9 +326,8 @@ public class TextDetectorProperties implements Serializable {
      */
     public void writeProperties() {
         try {
-
             // write object
-            new File("plugins/TextDetector").mkdirs();
+            new File("plugins/CoverageDetector").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 

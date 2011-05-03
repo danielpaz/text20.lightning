@@ -59,6 +59,9 @@ public class StorageContainer implements Serializable {
     @ElementArray
     private float[] pupils;
     
+    /** text coverage of current screenshot */
+    private double textCoverage;
+    
     /** current list of usable brigthness settings */
     private static Map<Integer, String> brightness;
 
@@ -121,10 +124,37 @@ public class StorageContainer implements Serializable {
     }
     
     /**
+     * @return the textCoverage
+     */
+    public double getTextCoverage() {
+        return this.textCoverage;
+    }
+
+    /**
+     * @param textCoverage the textCoverage to set
+     */
+    public void setTextCoverage(double textCoverage) {
+        this.textCoverage = textCoverage;
+    }
+
+    /**
      * @return available brightness options
      */
     @SuppressWarnings("boxing")
-    public static Map<Integer, String> getBrightnessOptions() {
+    public static Map<Integer, String> getScreenBrightnessOptions() {
+        brightness = new HashMap<Integer, String>();
+        brightness.put(0, "not choosen");
+        brightness.put(1, "dark");
+        brightness.put(2, "medium-dark");
+        brightness.put(3, "medium-light");
+        brightness.put(4, "light");
+        return brightness;
+    }
+    /**
+     * @return available brightness options
+     */
+    @SuppressWarnings("boxing")
+    public static Map<Integer, String> getSettingBrightnessOptions() {
         brightness = new HashMap<Integer, String>();
         brightness.put(0, "not choosen");
         brightness.put(1, "dark");

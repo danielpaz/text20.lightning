@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
+import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
@@ -81,18 +82,27 @@ public class EvaluationThread implements Runnable {
     public void run() {
         // initialize Variables
         XMLParser parser = new XMLParser();
+        CoverageAnalyser analyser = this.mainClass.getCoverageAnalyser();
 
         // run through every file ...
         for (File file : this.files) {
 
-            // ... and through every container in it ...
-            for (StorageContainer container : parser.readFile(file, this.dimension, this.worker)) {
+            System.out.println("- File " + file.getName() + " is the next one.");
+            
+            // ... and every detector
+            for (SaliencyDetector detector : this.selectedDetectors) {
 
-                // ... and every detector
-                for (SaliencyDetector detector : this.selectedDetectors) {
+                // start current detector
+                detector.start();
+                
+                // indicate current detector
+                System.out.println("- Detector: " + detector.getInformation().getDisplayName());
+                
+                // ... and through every container in it ...
+                for (StorageContainer container : parser.readFile(file, this.dimension, this.worker)) {
 
                     // process evaluation
-                    this.worker.evaluate(file, detector, container);
+                    this.worker.evaluate(analyser, file, detector, container);
 
                     // stops the processing if needed
                     if (this.stop) return;
@@ -100,6 +110,9 @@ public class EvaluationThread implements Runnable {
                     // update progress bar
                     this.mainClass.updateProgressBar();
                 }
+                
+                // stop current detector
+                detector.stop();
             }
 
             System.out.println("- File " + file.getName() + " finished.\r\n");
