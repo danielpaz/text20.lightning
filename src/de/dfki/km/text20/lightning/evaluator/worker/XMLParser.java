@@ -281,7 +281,7 @@ public class XMLParser {
 
                 // indicate warning
                 if (Math.abs(this.mouseYTmp - this.fixYTmp) > (this.usedDimension / 2)) {
-                    System.out.println("WARNING: y-coordinate " + value + " is out of dimension! File: " + this.fileName);
+                    System.out.println("WARNING: y-coordinate " + value + " is out of dimension!");
                     this.outOfDim = true;
                 }
 
@@ -297,7 +297,7 @@ public class XMLParser {
 
                 // indicate warning
                 if (Math.abs(this.mouseXTmp - this.fixXTmp) > (this.usedDimension / 2)) {
-                    System.out.println("WARNING: x-coordinate " + value + " is out of dimension! File: " + this.fileName);
+                    System.out.println("WARNING: x-coordinate " + value + " is out of dimension!");
                     this.outOfDim = true;
                 }
                 // return success
