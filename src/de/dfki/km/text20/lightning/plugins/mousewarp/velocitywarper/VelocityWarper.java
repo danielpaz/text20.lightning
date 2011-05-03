@@ -183,6 +183,7 @@ public class VelocityWarper implements MouseWarper {
         this.reactionTime = this.propertie.getReactionTime();
         this.xMax = Toolkit.getDefaultToolkit().getScreenSize().width;
         this.yMax = Toolkit.getDefaultToolkit().getScreenSize().height;
+        this.distance = 0;
 
         // refresh map
         this.refreshMouseMap();
@@ -218,7 +219,7 @@ public class VelocityWarper implements MouseWarper {
     public void addMousePosition(Point position, int interval, boolean isFixationValid) {
         this.isProcessing = true;
         this.timer.stop();
-
+        
         // check if fixation is placed
         if ((this.fixation == null || !isFixationValid)) {
             this.isProcessing = false;
@@ -429,6 +430,7 @@ public class VelocityWarper implements MouseWarper {
     public void stop() {
         // write current poperties in a file
         this.timer.stop();
+        this.fixation = null;
         this.propertie.writeProperties();
         if (this.distance > 0)
             $("./plugins/VelocityWarper/distance.log").file().append(System.currentTimeMillis() + ": " + this.distance + "\r\n");

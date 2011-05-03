@@ -271,7 +271,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
 
         // initialize coverage spinner
-        this.treshold = 15;
+        this.treshold = 10;
         this.spinnerThresh.setModel(new SpinnerNumberModel(this.treshold, 0, 100, 0.1));
         
         // initialize listDetectors
@@ -455,11 +455,11 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.checkBoxSummary.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.labelDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.comboBoxTextPlugin.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.buttonTextConfig.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.labelThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.spinnerThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.buttonConfiguration.setEnabled(this.checkBoxConfiguration.isSelected());
-        this.comboBoxTextPlugin.setEnabled(this.checkBoxConfiguration.isSelected());
-        this.buttonTextConfig.setEnabled(this.checkBoxConfiguration.isSelected());
-        this.labelThresh.setEnabled(this.checkBoxConfiguration.isSelected());
-        this.spinnerThresh.setEnabled(this.checkBoxConfiguration.isSelected());
     }
 
     /**

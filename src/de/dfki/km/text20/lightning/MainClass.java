@@ -370,6 +370,7 @@ public class MainClass {
      * refreshes warper
      */
     public void refreshWarper() {
+        if (!this.isNormalMode) return;
         this.warper.stop();
         this.warper.start();
     }
@@ -474,7 +475,7 @@ public class MainClass {
 
             // close the tool
             System.exit(0);
-        } 
+        }
     }
 
     /**

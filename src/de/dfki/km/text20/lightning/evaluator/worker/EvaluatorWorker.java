@@ -168,7 +168,7 @@ public class EvaluatorWorker {
             screenShot = screenShot.getSubimage(container.getFixation().x, container.getFixation().y, this.main.getDimension(), this.main.getDimension());
         } catch (RasterFormatException e) {
             if (screenFile.getName().equals(this.errorKey)) return;
-            System.out.println("ERROR: raster out of format at file: " + screenFile.getName());
+            System.out.println("ERROR: raster out of format!");
             this.errorKey = screenFile.getName();
             this.settings.get(identifier).addOutOfRaster();
             return;
@@ -191,7 +191,7 @@ public class EvaluatorWorker {
             this.drawPicture(detector, point, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + container.getTimestamp() + "_evaluated.png", screenShot, translatedMousePoint);
 
         // add results to over all storage
-        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, "", user, this.currentTimeStamp);
+        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, this.main.getCoverageThreshold(), "", user, this.currentTimeStamp);
         else
             this.overAllResults.add(detector.getInformation().getId(), point.distance(translatedMousePoint), container);
 
@@ -204,7 +204,7 @@ public class EvaluatorWorker {
 
             // creates net map entry by identifier and adds new evaluation
             // container to it
-            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + xmlTimeStamp + ".log", user, Long.parseLong(xmlTimeStamp)));
+            this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedMousePoint), container, this.main.getCoverageThreshold(), path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + xmlTimeStamp + ".log", user, Long.parseLong(xmlTimeStamp)));
         }
 
     }
@@ -242,35 +242,38 @@ public class EvaluatorWorker {
             if (this.main.writeLog()) {
                 $(path).file().append("- overall results for this session -\r\n\r\n#Overview#\r\n");
                 $(path).file().append("- Timestamp: " + this.overAllResults.getTimeStamp() + "\r\n");
-                $(path).file().append("- Number of DataSets overall: " + this.overAllResults.getSize() + "\r\n");
                 $(path).file().append("- Number of different Locations: " + this.overAllPath.size() + "\r\n");
-                $(path).file().append("\r\n#Results#\r\n");
+                $(path).file().append("- Number of DataSets overall: " + this.overAllResults.getSizeOverAll() + "\r\n");
+                $(path).file().append("- Text Coverage Threshold: " + this.main.getCoverageThreshold() + "%\r\n");
+                $(path).file().append("- Datasets with a Text Coverage higher than threshold: " + this.overAllResults.getSizeHigher() + "\r\n");
+                $(path).file().append("- Datasets with a Text Coverage lower than threshold: " + this.overAllResults.getSizeLower() + "\r\n");
+                $(path).file().append("\r\n#Results, over all#\r\n");
             }
 
-            // run through all included ids
+            // run through all included ids, over all
             for (int id : this.overAllResults.getIds()) {
 
                 // write result to log
                 if (this.main.writeLog())
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistance(id) * 100) / 100) + " Pixel distance averaged.\r\n");
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceOverAll(id) * 100) / 100) + " Pixel distance averaged.\r\n");
 
                 // check if the current value is equal then the best value
-                if (veryBestValue == this.overAllResults.getAveragedDistance(id))
+                if (veryBestValue == this.overAllResults.getAveragedDistanceOverAll(id))
                     veryBestKey.add(id);
 
                 // check if the current value is better then the best value
-                if (veryBestValue > this.overAllResults.getAveragedDistance(id)) {
+                if (veryBestValue > this.overAllResults.getAveragedDistanceOverAll(id)) {
 
                     // store new best value
                     veryBestKey.clear();
                     veryBestKey.add(id);
-                    veryBestValue = this.overAllResults.getAveragedDistance(id);
+                    veryBestValue = this.overAllResults.getAveragedDistanceOverAll(id);
                 }
             }
             if (this.main.writeLog()) {
                 // single best key
                 if (veryBestKey.size() == 1) {
-                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName());
+                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
 
                     // multiple best keys
                 } else {
@@ -279,7 +282,7 @@ public class EvaluatorWorker {
                         $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
                     }
                     $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName());
+                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
                 }
             }
 
@@ -292,18 +295,104 @@ public class EvaluatorWorker {
                 for (int i = 0; i < veryBestKey.size() - 2; i++) {
                     bestMethods = bestMethods + detectors.get(i).getInformation().getDisplayName() + ", ";
                 }
-                bestMethods = bestMethods + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
+                bestMethods = bestMethods + detectors.get(veryBestKey.size() - 2).getInformation().getDisplayName();
                 bestMethods = bestMethods + " and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
             }
 
+            // reset
             veryBestMethods = bestMethods;
             bestMethods = "";
             veryBestKey.clear();
             veryBestValue = Double.MAX_VALUE;
+
+            if (this.main.writeLog()) {
+
+                // write header
+                $(path).file().append("\r\n#Results, higher than threshold#\r\n");
+
+                // run through all included ids, higher than
+                for (int id : this.overAllResults.getIds()) {
+
+                    // write result to log
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceHigher(id) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                    // check if the current value is equal then the best value
+                    if (veryBestValue == this.overAllResults.getAveragedDistanceHigher(id))
+                        veryBestKey.add(id);
+
+                    // check if the current value is better then the best value
+                    if (veryBestValue > this.overAllResults.getAveragedDistanceHigher(id)) {
+
+                        // store new best value
+                        veryBestKey.clear();
+                        veryBestKey.add(id);
+                        veryBestValue = this.overAllResults.getAveragedDistanceHigher(id);
+                    }
+                }
+
+                // single best key
+                if (veryBestKey.size() == 1) {
+                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
+
+                    // multiple best keys
+                } else {
+                    $(path).file().append("-> best results for ");
+                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
+                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
+                    }
+                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
+                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
+                }
+
+                // reset
+                veryBestKey.clear();
+                veryBestValue = Double.MAX_VALUE;
+
+                // write header
+                $(path).file().append("\r\n#Results, lower than threshold#\r\n");
+
+                // run through all included ids, higher than
+                for (int id : this.overAllResults.getIds()) {
+
+                    // write result to log
+                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceLower(id) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                    // check if the current value is equal then the best value
+                    if (veryBestValue == this.overAllResults.getAveragedDistanceLower(id))
+                        veryBestKey.add(id);
+
+                    // check if the current value is better then the best value
+                    if (veryBestValue > this.overAllResults.getAveragedDistanceLower(id)) {
+
+                        // store new best value
+                        veryBestKey.clear();
+                        veryBestKey.add(id);
+                        veryBestValue = this.overAllResults.getAveragedDistanceLower(id);
+                    }
+                }
+
+                // single best key
+                if (veryBestKey.size() == 1) {
+                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
+
+                    // multiple best keys
+                } else {
+                    $(path).file().append("-> best results for ");
+                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
+                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
+                    }
+                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
+                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
+                }
+
+                // reset
+                veryBestKey.clear();
+                veryBestValue = Double.MAX_VALUE;
+            }
         }
 
         // log best result
-        this.channel.status("best result: " + veryBestMethods + " with " + this.overAllResults.getSize() + "datasets");
+        this.channel.status("best result: " + veryBestMethods + " with " + this.overAllResults.getSizeOverAll() + "datasets");
 
         if (this.main.writeLog()) {
             // write the individual *.log and *.xls
@@ -400,38 +489,41 @@ public class EvaluatorWorker {
         // run through the keyset of the result map
         for (String key : this.results.keySet()) {
 
-            // run through the ids of every entry of the result map
+            // run through the ids of every entry of the result map, over all
             for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
 
                 // check if the current value is equal then the best value
-                if (bestValue == this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)))
+                if (bestValue == this.results.get(key).getAveragedDistanceOverAll(this.results.get(key).getIds().get(i)))
                     bestKey.add(this.results.get(key).getIds().get(i));
 
                 // check if the current value is better then the best value, the
                 // best value is only for this identifier
-                if (bestValue > this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i))) {
+                if (bestValue > this.results.get(key).getAveragedDistanceOverAll(this.results.get(key).getIds().get(i))) {
 
                     // store new best value
                     bestKey.clear();
                     bestKey.add(this.results.get(key).getIds().get(i));
-                    bestValue = this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i));
+                    bestValue = this.results.get(key).getAveragedDistanceOverAll(this.results.get(key).getIds().get(i));
                 }
 
                 // first entry
                 if (i == 0) {
                     $(this.results.get(key).getLogPath()).file().append("#Session#\r\n- User: " + this.results.get(key).getName() + "\r\n");
                     $(this.results.get(key).getLogPath()).file().append("- Timestamp: " + this.results.get(key).getTimeStamp() + "\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("- Number of DataSets: " + this.results.get(key).getSize() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Number of DataSets: " + this.results.get(key).getSizeOverAll() + "\r\n");
                     $(this.results.get(key).getLogPath()).file().append("- Dimension: " + this.settings.get(key).getDimension() + ", OutOfDimensionCount: " + this.settings.get(key).getOutOfDim() + ", OutOfRatserCount: " + this.settings.get(key).getOutOfRaster() + "\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("- Screen Brightness: " + this.settings.get(key).getScreenBright() + "\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("- Setting Brightness: " + this.settings.get(key).getSettingBright() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Screen Brightness: " + this.settings.get(key).getScreenBright() + " -> " + StorageContainer.getScreenBrightnessOptions().get(this.settings.get(key).getScreenBright()) + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Setting Brightness: " + this.settings.get(key).getSettingBright() + " -> " + StorageContainer.getSettingBrightnessOptions().get(this.settings.get(key).getSettingBright()) + "\r\n");
                     $(this.results.get(key).getLogPath()).file().append("- Recalibration was used: " + this.settings.get(key).isRecalibration() + "\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupils()[0] + "mm left, " + this.results.get(key).getAveragedPupils()[1] + "mm right\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("\r\n#Results#\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Text Coverage Threshold: " + this.main.getCoverageThreshold() + "%\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Datasets with a Text Coverage higher than threshold: " + this.results.get(key).getSizeHigher() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Datasets with a Text Coverage lower than threshold: " + this.results.get(key).getSizeLower() + "\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("\r\n#Results, over all#\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupilsOverAll()[0] + "mm left, " + this.results.get(key).getAveragedPupilsOverAll()[1] + "mm right\r\n");
                 }
 
                 // middle entries
-                $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistance(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
+                $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistanceOverAll(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
 
                 // last entry
                 if (i == this.results.get(key).getIds().size() - 1) {
@@ -448,14 +540,110 @@ public class EvaluatorWorker {
                         $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
                         $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
                     }
-
-                    // write distance file
-                    $(this.results.get(key).getLogPath()).file().append("\r\n#Data#\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("Fixation-x\tFixation-y\tMouse-x\t\tMouse-y\t\tPupil-left\t\tPupil-right\t\tText Coverage\tDistance-Mouse-Fixation\r\n");
-                    for (StorageContainer container : this.results.get(key).getContainer())
-                        $(this.results.get(key).getLogPath()).file().append(container.getFixation().x + "  \t\t" + container.getFixation().y + "  \t\t" + container.getMousePoint().x + "  \t\t" + container.getMousePoint().y + "  \t\t" + container.getPupils()[0] + "  \t\t" + container.getPupils()[1] + "  \t\t" + ((double)Math.round(container.getTextCoverage()*10000)/10000) + "    \t\t" + container.getFixation().distance(container.getMousePoint()) + "\r\n");
                 }
             }
+
+            // reset
+            bestValue = Double.MAX_VALUE;
+            bestKey.clear();
+
+            // run through the ids of every entry of the result map, higher
+            for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
+
+                // check if the current value is equal then the best value
+                if (bestValue == this.results.get(key).getAveragedDistanceHigher(this.results.get(key).getIds().get(i)))
+                    bestKey.add(this.results.get(key).getIds().get(i));
+
+                // check if the current value is better then the best value, the
+                // best value is only for this identifier
+                if (bestValue > this.results.get(key).getAveragedDistanceHigher(this.results.get(key).getIds().get(i))) {
+
+                    // store new best value
+                    bestKey.clear();
+                    bestKey.add(this.results.get(key).getIds().get(i));
+                    bestValue = this.results.get(key).getAveragedDistanceHigher(this.results.get(key).getIds().get(i));
+                }
+
+                // first entry
+                if (i == 0) {
+                    $(this.results.get(key).getLogPath()).file().append("\r\n#Results, higher than threshold#\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupilsHigher()[0] + "mm left, " + this.results.get(key).getAveragedPupilsHigher()[1] + "mm right\r\n");
+                }
+
+                // middle entries
+                $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistanceHigher(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                // last entry
+                if (i == this.results.get(key).getIds().size() - 1) {
+                    // single best key
+                    if (bestKey.size() == 1) {
+                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey.get(0)).getInformation().getDisplayName() + "\r\n");
+
+                        // multiple best keys
+                    } else {
+                        $(this.results.get(key).getLogPath()).file().append("-> best results for ");
+                        for (int j = 0; j < bestKey.size() - 2; j++) {
+                            $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(j)).getInformation().getDisplayName() + ", ");
+                        }
+                        $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
+                        $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
+                    }
+                }
+            }
+
+            // reset
+            bestValue = Double.MAX_VALUE;
+            bestKey.clear();
+
+            // run through the ids of every entry of the result map, lower
+            for (int i = 0; i < this.results.get(key).getIds().size(); i++) {
+
+                // check if the current value is equal then the best value
+                if (bestValue == this.results.get(key).getAveragedDistanceLower(this.results.get(key).getIds().get(i)))
+                    bestKey.add(this.results.get(key).getIds().get(i));
+
+                // check if the current value is better then the best value, the
+                // best value is only for this identifier
+                if (bestValue > this.results.get(key).getAveragedDistanceLower(this.results.get(key).getIds().get(i))) {
+
+                    // store new best value
+                    bestKey.clear();
+                    bestKey.add(this.results.get(key).getIds().get(i));
+                    bestValue = this.results.get(key).getAveragedDistanceLower(this.results.get(key).getIds().get(i));
+                }
+
+                // first entry
+                if (i == 0) {
+                    $(this.results.get(key).getLogPath()).file().append("\r\n#Results, lower than threshold#\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("- Averaged Pupilsize: " + this.results.get(key).getAveragedPupilsLower()[0] + "mm left, " + this.results.get(key).getAveragedPupilsLower()[1] + "mm right\r\n");
+                }
+
+                // middle entries
+                $(this.results.get(key).getLogPath()).file().append(detectors.get(this.results.get(key).getIds().get(i)).getInformation().getDisplayName() + ": " + ((double) Math.round(this.results.get(key).getAveragedDistanceLower(this.results.get(key).getIds().get(i)) * 100) / 100) + " Pixel distance averaged.\r\n");
+
+                // last entry
+                if (i == this.results.get(key).getIds().size() - 1) {
+                    // single best key
+                    if (bestKey.size() == 1) {
+                        $(this.results.get(key).getLogPath()).file().append("-> best result for " + detectors.get(bestKey.get(0)).getInformation().getDisplayName() + "\r\n");
+
+                        // multiple best keys
+                    } else {
+                        $(this.results.get(key).getLogPath()).file().append("-> best results for ");
+                        for (int j = 0; j < bestKey.size() - 2; j++) {
+                            $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(j)).getInformation().getDisplayName() + ", ");
+                        }
+                        $(this.results.get(key).getLogPath()).file().append(detectors.get(bestKey.get(bestKey.size() - 2)).getInformation().getDisplayName());
+                        $(this.results.get(key).getLogPath()).file().append(" and " + detectors.get(bestKey.get(bestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
+                    }
+                }
+            }
+
+            // write distance
+            $(this.results.get(key).getLogPath()).file().append("\r\n#Data#\r\n");
+            $(this.results.get(key).getLogPath()).file().append("Fixation-x\tFixation-y\tMouse-x\t\tMouse-y\t\tPupil-left\t\tPupil-right\t\tText Coverage\tDistance-Mouse-Fixation\r\n");
+            for (StorageContainer container : this.results.get(key).getContainer())
+                $(this.results.get(key).getLogPath()).file().append(container.getFixation().x + "  \t\t" + container.getFixation().y + "  \t\t" + container.getMousePoint().x + "  \t\t" + container.getMousePoint().y + "  \t\t" + container.getPupils()[0] + "  \t\t" + container.getPupils()[1] + "  \t\t" + ((double) Math.round(container.getTextCoverage() * 1000) / 1000) + "     \t\t" + container.getFixation().distance(container.getMousePoint()) + "\r\n");
 
             // reset values
             bestValue = Double.MAX_VALUE;
@@ -516,12 +704,12 @@ public class EvaluatorWorker {
          * x-direction: screen brightness
          * y-direction: setting brightness
          */
-        DerivationContainer[][] dataAllOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
-        DerivationContainer[][] dataAllUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
-        DerivationContainer[][] dataWithOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
-        DerivationContainer[][] dataWithUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
-        DerivationContainer[][] dataWithoutOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
-        DerivationContainer[][] dataWithoutUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataAllHigher = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataAllLower = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithHigher = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithLower = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithoutHigher = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithoutLower = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
 
         // initialize xls-stuff
         WorkbookSettings wbSettings = new WorkbookSettings();
@@ -531,12 +719,12 @@ public class EvaluatorWorker {
         // initialize array
         for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
             for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                dataAllOver[x][y] = new DerivationContainer();
-                dataAllUnder[x][y] = new DerivationContainer();
-                dataWithOver[x][y] = new DerivationContainer();
-                dataWithUnder[x][y] = new DerivationContainer();
-                dataWithoutOver[x][y] = new DerivationContainer();
-                dataWithoutUnder[x][y] = new DerivationContainer();
+                dataAllHigher[x][y] = new DerivationContainer();
+                dataAllLower[x][y] = new DerivationContainer();
+                dataWithHigher[x][y] = new DerivationContainer();
+                dataWithLower[x][y] = new DerivationContainer();
+                dataWithoutHigher[x][y] = new DerivationContainer();
+                dataWithoutLower[x][y] = new DerivationContainer();
             }
         }
 
@@ -544,18 +732,18 @@ public class EvaluatorWorker {
         for (String key : this.results.keySet()) {
             for (StorageContainer container : this.results.get(key).getContainer()) {
                 if (container.getTextCoverage() > threshold) {
-                    dataAllOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    dataAllHigher[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     if (this.settings.get(key).isRecalibration()) {
-                        dataWithOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                        dataWithHigher[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     } else {
-                        dataWithoutOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                        dataWithoutHigher[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     }
                 } else {
-                    dataAllUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    dataAllLower[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     if (this.settings.get(key).isRecalibration()) {
-                        dataWithUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                        dataWithLower[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     } else {
-                        dataWithoutUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                        dataWithoutLower[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
                     }
                 }
             }
@@ -584,14 +772,14 @@ public class EvaluatorWorker {
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithoutOver[x][y].getAveragedDerivation(), this.format));
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithoutHigher[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2 + offsetX, y + offsetY + 6, dataWithoutUnder[x][y].getAveragedDerivation(), this.format));
+                        excelSheet.addCell(new Number(x + 2 + offsetX, y + offsetY + 6, dataWithoutLower[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
@@ -606,14 +794,14 @@ public class EvaluatorWorker {
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithOver[x][y].getAveragedDerivation(), this.format));
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithHigher[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, dataWithUnder[x][y].getAveragedDerivation(), this.format));
+                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, dataWithLower[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
@@ -629,14 +817,14 @@ public class EvaluatorWorker {
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, ((dataAllOver[x][y].getAveragedPupils()[0] + dataAllOver[x][y].getAveragedPupils()[1]) / 2), this.format));
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, ((dataAllHigher[x][y].getAveragedPupils()[0] + dataAllHigher[x][y].getAveragedPupils()[1]) / 2), this.format));
                     }
                 }
 
                 // iterate trough data
                 for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
                     for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, ((dataAllUnder[x][y].getAveragedPupils()[0] + dataAllUnder[x][y].getAveragedPupils()[1]) / 2), this.format));
+                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, ((dataAllLower[x][y].getAveragedPupils()[0] + dataAllLower[x][y].getAveragedPupils()[1]) / 2), this.format));
                     }
                 }
 
