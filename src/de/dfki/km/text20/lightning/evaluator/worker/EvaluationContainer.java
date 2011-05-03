@@ -88,7 +88,7 @@ public class EvaluationContainer {
      * @param timeStamp
      *      start of the evaluation session
      */
-    public EvaluationContainer(int id, double distance, StorageContainer container,
+    public EvaluationContainer(int id, double distance, StorageContainer container, 
                                String log, String name, long timeStamp) {
         // initialize variables
         this.results = new Hashtable<Integer, Double>();

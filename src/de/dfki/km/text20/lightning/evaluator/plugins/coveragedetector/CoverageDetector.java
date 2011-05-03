@@ -18,9 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.saliency.textdetector;
+package de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,30 +29,28 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
+import de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector.gui.CoverageDetectorConfigImpl;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
-import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.plugins.saliency.textdetector.gui.TextDetectorConfigImpl;
 
 /**
  * @author Christoph Käding
  *
  */
 @PluginImplementation
-public class TextDetector implements SaliencyDetector {
+public class CoverageDetector implements CoverageAnalyser {
 
     private PluginInformation information;
 
-    private TextDetectorProperties properties;
-
-    private TextDetectorWorker worker;
+    private CoverageDetectorProperties properties;
 
     private long timeStamp;
 
     /**
      * 
      */
-    public TextDetector() {
-        this.information = new PluginInformation("Text Detector", "alpha 0.1", true);
+    public CoverageDetector() {
+        this.information = new PluginInformation("Coverage Detector", "alpha 0.1", true);
     }
 
     /* (non-Javadoc)
@@ -61,7 +58,7 @@ public class TextDetector implements SaliencyDetector {
      */
     @Override
     public JFrame getGui() {
-        return new TextDetectorConfigImpl();
+        return new CoverageDetectorConfigImpl();
     }
 
     /* (non-Javadoc)
@@ -69,9 +66,8 @@ public class TextDetector implements SaliencyDetector {
      */
     @Override
     public void start() {
-        this.properties = TextDetectorProperties.getInstance();
+        this.properties = CoverageDetectorProperties.getInstance();
         this.timeStamp = System.currentTimeMillis();
-        this.worker = new TextDetectorWorker();
     }
 
     /* (non-Javadoc)
@@ -87,38 +83,28 @@ public class TextDetector implements SaliencyDetector {
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public Point analyse(BufferedImage screenShot) {
+    public double analyse(BufferedImage screenShot) {
         // initialize variables
         int textSize = 0;
-        double coverage = 0;
         GetImageText analyzer = new GetImageText(screenShot, this.properties.getDestinyFact(), this.properties.getMass(), this.properties.getDist1(), this.properties.getDistFact(), this.properties.getDist2(), this.properties.getLetterHeight(), this.properties.getStemSize(), this.properties.getLineSize(), this.properties.isUseMerge(), this.properties.isUseDelete());
         LinkedList boxes = analyzer.getTextBoxes();
 
+        if (this.properties.isDebug()) {
+            try {
+                new File("./plugins/CoverageDetector/debug/Session_" + this.timeStamp).mkdirs();
+                ImageIO.write(analyzer.isolateText(boxes), "png", new File("./plugins/CoverageDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
         // calculate coverage
         for (Object textRegion : boxes) {
             if (textRegion instanceof TextRegion) {
                 textSize = textSize + (((TextRegion) textRegion).width() * ((TextRegion) textRegion).height());
             }
         }
-        coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
-
-        System.out.print("coverage: " + ((double) Math.round(coverage * 100) / 100) + "% -> ");
-
-        if (this.properties.isDebug()) {
-            try {
-                new File("./plugins/TextDetector/debug/Session_" + this.timeStamp).mkdirs();
-                ImageIO.write(analyzer.isolateText(boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (coverage > this.properties.getThreshold()) {
-            System.out.println("text search");
-            return this.worker.textAnalyse(boxes, screenShot.getHeight());
-        }
-        System.out.println("normal search");
-        return this.worker.normalAnalyse(analyzer.getContrastImage());
-
+        return ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
     }
 
     /* (non-Javadoc)

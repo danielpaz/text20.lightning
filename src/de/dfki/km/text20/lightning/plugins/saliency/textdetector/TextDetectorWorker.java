@@ -228,13 +228,14 @@ public class TextDetectorWorker {
 
         for (Object textRegion : boxes) {
             if (textRegion instanceof TextRegion) {
-                for (int i = 0; i < ((TextRegion) textRegion).width(); i++) {
-                    tmp.setLocation(((TextRegion) textRegion).x1 + i, ((TextRegion) textRegion).y1 + ((TextRegion) textRegion).height() / 2);
-                    if (tmp.distance(fixation) < minDistance) {
-                        offset.setLocation(tmp);
-                        minDistance = tmp.distance(fixation);
+                if ((Math.abs(((TextRegion) textRegion).y1 - height / 2) <= minDistance) || (Math.abs(((TextRegion) textRegion).y2 - height / 2) <= minDistance))
+                    for (int i = 0; i < ((TextRegion) textRegion).width(); i++) {
+                        tmp.setLocation(((TextRegion) textRegion).x1 + i, ((TextRegion) textRegion).y1 + ((TextRegion) textRegion).height() / 2);
+                        if (tmp.distance(fixation) < minDistance) {
+                            offset.setLocation(tmp);
+                            minDistance = tmp.distance(fixation);
+                        }
                     }
-                }
             }
         }
         offset.translate(-height / 2, -height / 2);

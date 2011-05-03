@@ -18,30 +18,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.plugins.saliency.textdetector.gui;
+package de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SpinnerNumberModel;
 
-import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
+import de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector.CoverageDetectorProperties;
 
 /**
  * @author Christoph Käding
  *
  */
 @SuppressWarnings("serial")
-public class TextDetectorConfigImpl extends TextDetectorConfig implements ActionListener {
+public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implements ActionListener {
 
-    private TextDetectorProperties properties;
+    private CoverageDetectorProperties properties;
 
     /**
      * 
      */
-    public TextDetectorConfigImpl() {
+    public CoverageDetectorConfigImpl() {
         // initialize variables
-        this.properties = TextDetectorProperties.getInstance();
+        this.properties = CoverageDetectorProperties.getInstance();
         
         // add listener
         this.buttonCancel.addActionListener(this);
@@ -81,7 +81,6 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         this.properties.setDebug(this.checkBoxDebug.isSelected());
         this.properties.setUseMerge(this.checkBoxMerge.isSelected());
         this.properties.setUseDelete(this.checkBoxDelete.isSelected());
-        this.properties.setThreshold(Double.parseDouble(this.spinnerThreshold.getValue().toString()));
 
         // dispose
         this.dispose();
@@ -150,6 +149,5 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         this.checkBoxDebug.setSelected(this.properties.isDebug());
         this.labelDelete.setEnabled(this.checkBoxMerge.isSelected());
         this.checkBoxDelete.setEnabled(this.checkBoxMerge.isSelected());
-        this.spinnerThreshold.setModel(new SpinnerNumberModel(this.properties.getThreshold(), 0, 100, 0.1));
     }
 }

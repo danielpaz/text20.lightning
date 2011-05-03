@@ -467,10 +467,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      */
     private void manageBrightnessComboBox() {
         // add options
-        for (String option : StorageContainer.getBrightnessOptions().values()) {
+        for (String option : StorageContainer.getScreenBrightnessOptions().values())
             this.comboBoxScreenBright.addItem(option);
+        for (String option : StorageContainer.getSettingBrightnessOptions().values())
             this.comboBoxSettingBright.addItem(option);
-        }
 
         //preselect options
         this.comboBoxScreenBright.setSelectedIndex(Integer.parseInt(this.main.getEvaluationSettings()[1]));

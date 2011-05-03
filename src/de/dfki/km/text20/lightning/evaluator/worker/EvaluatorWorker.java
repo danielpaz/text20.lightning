@@ -48,6 +48,7 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
+import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
 
@@ -90,6 +91,9 @@ public class EvaluatorWorker {
     /** current used format */
     private WritableCellFormat format;
 
+    /** last checked container */
+    StorageContainer formerContainer;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
@@ -108,6 +112,7 @@ public class EvaluatorWorker {
         this.overAllPath = new ArrayList<String>();
         this.main = main;
         this.errorKey = "";
+        this.formerContainer = null;
 
         // excel-stuff
         WritableFont arial10pt = new WritableFont(WritableFont.ARIAL, 10);
@@ -122,6 +127,8 @@ public class EvaluatorWorker {
     /**
      * evaluates the given container with the given detector
      * 
+     * @param analyser 
+     *            used coverage analyser
      * @param file
      *            which includes the data, used to create identifier etc
      * @param detector
@@ -129,7 +136,8 @@ public class EvaluatorWorker {
      * @param container
      *            which should be used
      */
-    public void evaluate(File file, SaliencyDetector detector, StorageContainer container) {
+    public void evaluate(CoverageAnalyser analyser, File file, SaliencyDetector detector,
+                         StorageContainer container) {
         // initialize variables
         BufferedImage screenShot = null;
         Point point = new Point();
@@ -164,6 +172,14 @@ public class EvaluatorWorker {
             this.errorKey = screenFile.getName();
             this.settings.get(identifier).addOutOfRaster();
             return;
+        }
+
+        // analyze text coverage
+        if (this.main.writeLog()) {
+            if (this.formerContainer == null) container.setTextCoverage(analyser.analyse(screenShot));
+            else if (!this.formerContainer.equals(container))
+                container.setTextCoverage(analyser.analyse(screenShot));
+            this.formerContainer = container;
         }
 
         // calculate offset by running the detector
@@ -285,7 +301,7 @@ public class EvaluatorWorker {
             veryBestKey.clear();
             veryBestValue = Double.MAX_VALUE;
         }
-        
+
         // log best result
         this.channel.status("best result: " + veryBestMethods + " with " + this.overAllResults.getSize() + "datasets");
 
@@ -435,9 +451,9 @@ public class EvaluatorWorker {
 
                     // write distance file
                     $(this.results.get(key).getLogPath()).file().append("\r\n#Data#\r\n");
-                    $(this.results.get(key).getLogPath()).file().append("Fixation-x\tFixation-y\tMouse-x\t\tMouse-y\t\tPupil-left\t\tPupil-right\t\tDistance-Mouse-Fixation\r\n");
+                    $(this.results.get(key).getLogPath()).file().append("Fixation-x\tFixation-y\tMouse-x\t\tMouse-y\t\tPupil-left\t\tPupil-right\t\tText Coverage\tDistance-Mouse-Fixation\r\n");
                     for (StorageContainer container : this.results.get(key).getContainer())
-                        $(this.results.get(key).getLogPath()).file().append(container.getFixation().x + "\t\t" + container.getFixation().y + "\t\t" + container.getMousePoint().x + "\t\t" + container.getMousePoint().y + "\t\t" + container.getPupils()[0] + "\t\t" + container.getPupils()[1] + "\t\t" + container.getFixation().distance(container.getMousePoint()) + "\r\n");
+                        $(this.results.get(key).getLogPath()).file().append(container.getFixation().x + "  \t\t" + container.getFixation().y + "  \t\t" + container.getMousePoint().x + "  \t\t" + container.getMousePoint().y + "  \t\t" + container.getPupils()[0] + "  \t\t" + container.getPupils()[1] + "  \t\t" + ((double)Math.round(container.getTextCoverage()*10000)/10000) + "    \t\t" + container.getFixation().distance(container.getMousePoint()) + "\r\n");
                 }
             }
 
@@ -459,6 +475,7 @@ public class EvaluatorWorker {
                 excelSheet.addCell(new Label(3, 0, "Mouse-y", this.format));
                 excelSheet.addCell(new Label(4, 0, "Pupil-left", this.format));
                 excelSheet.addCell(new Label(5, 0, "Pupil-right", this.format));
+                excelSheet.addCell(new Label(5, 0, "Text Coverage", this.format));
                 excelSheet.addCell(new Label(6, 0, "Distance-Mouse-Fixation", this.format));
 
                 // iterate trough data
@@ -469,6 +486,7 @@ public class EvaluatorWorker {
                     excelSheet.addCell(new Number(3, i + 1, this.results.get(key).getContainer().get(i).getMousePoint().y, this.format));
                     excelSheet.addCell(new Number(4, i + 1, this.results.get(key).getContainer().get(i).getPupils()[0], this.format));
                     excelSheet.addCell(new Number(5, i + 1, this.results.get(key).getContainer().get(i).getPupils()[1], this.format));
+                    excelSheet.addCell(new Number(5, i + 1, this.results.get(key).getContainer().get(i).getTextCoverage(), this.format));
                     excelSheet.addCell(new Number(6, i + 1, this.results.get(key).getContainer().get(i).getFixation().distance(this.results.get(key).getContainer().get(i).getMousePoint()), this.format));
                 }
 
@@ -490,13 +508,20 @@ public class EvaluatorWorker {
      * writes the summary xls
      */
     private void writeOverAllXls() {
+        double threshold = this.main.getCoverageThreshold();
+        int offsetY = 0;
+        int offsetX = StorageContainer.getScreenBrightnessOptions().size() + 3;
+
         /*
          * x-direction: screen brightness
          * y-direction: setting brightness
          */
-        DerivationContainer[][] dataAll = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
-        DerivationContainer[][] dataWith = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
-        DerivationContainer[][] dataWithout = new DerivationContainer[StorageContainer.getBrightnessOptions().size()][StorageContainer.getBrightnessOptions().size()];
+        DerivationContainer[][] dataAllOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataAllUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithoutOver = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
+        DerivationContainer[][] dataWithoutUnder = new DerivationContainer[StorageContainer.getScreenBrightnessOptions().size()][StorageContainer.getSettingBrightnessOptions().size()];
 
         // initialize xls-stuff
         WorkbookSettings wbSettings = new WorkbookSettings();
@@ -504,21 +529,35 @@ public class EvaluatorWorker {
         WritableWorkbook workbook;
 
         // initialize array
-        for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
-            for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                dataAll[x][y] = new DerivationContainer();
-                dataWith[x][y] = new DerivationContainer();
-                dataWithout[x][y] = new DerivationContainer();
+        for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+            for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                dataAllOver[x][y] = new DerivationContainer();
+                dataAllUnder[x][y] = new DerivationContainer();
+                dataWithOver[x][y] = new DerivationContainer();
+                dataWithUnder[x][y] = new DerivationContainer();
+                dataWithoutOver[x][y] = new DerivationContainer();
+                dataWithoutUnder[x][y] = new DerivationContainer();
             }
         }
 
         // run through the keyset of the result map to summarize derivation settingspecific
         for (String key : this.results.keySet()) {
             for (StorageContainer container : this.results.get(key).getContainer()) {
-                dataAll[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
-                if (this.settings.get(key).isRecalibration()) dataWith[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
-                else
-                    dataWithout[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                if (container.getTextCoverage() > threshold) {
+                    dataAllOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    if (this.settings.get(key).isRecalibration()) {
+                        dataWithOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    } else {
+                        dataWithoutOver[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    }
+                } else {
+                    dataAllUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    if (this.settings.get(key).isRecalibration()) {
+                        dataWithUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    } else {
+                        dataWithoutUnder[this.settings.get(key).getScreenBright()][this.settings.get(key).getSettingBright()].addDistance(container.getFixation().distance(container.getMousePoint()), container.getPupils());
+                    }
+                }
             }
             this.main.updateProgressBar();
         }
@@ -532,51 +571,75 @@ public class EvaluatorWorker {
                 workbook = Workbook.createWorkbook(new File(path.replace(".log", ".xls")), wbSettings);
                 workbook.createSheet("Evaluation", 0);
                 WritableSheet excelSheet = workbook.getSheet(0);
-                int offset = 0;
 
                 // add label
-                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Derivation without Recalibration", this.format));
+                excelSheet.addCell(new Label(0, 0, "Text Coverage Threshold: " + threshold + "%", this.format));
+
+                // add label
+                excelSheet.addCell(new Label((StorageContainer.getScreenBrightnessOptions().size() + 2), offsetY, "Derivation without Recalibration", this.format));
 
                 // add captions
-                this.writeCaptions(excelSheet, offset + 2);
+                this.writeCaptions(excelSheet, offsetX, offsetY + 2);
 
                 // iterate trough data
-                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
-                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offset + 4, dataWithout[x][y].getAveragedDerivation(), this.format));
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithoutOver[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
-                offset = offset + 6 + StorageContainer.getBrightnessOptions().size();
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2 + offsetX, y + offsetY + 6, dataWithoutUnder[x][y].getAveragedDerivation(), this.format));
+                    }
+                }
+
+                offsetY = offsetY + 8 + StorageContainer.getSettingBrightnessOptions().size();
 
                 // add label
-                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Derivation with Recalibration", this.format));
+                excelSheet.addCell(new Label((StorageContainer.getScreenBrightnessOptions().size() + 2), offsetY, "Derivation with Recalibration", this.format));
 
                 // add captions
-                this.writeCaptions(excelSheet, offset + 2);
+                this.writeCaptions(excelSheet, offsetX, offsetY + 2);
 
                 // iterate trough data
-                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
-                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offset + 4, dataWith[x][y].getAveragedDerivation(), this.format));
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, dataWithOver[x][y].getAveragedDerivation(), this.format));
+                    }
+                }
+
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, dataWithUnder[x][y].getAveragedDerivation(), this.format));
                     }
                 }
 
                 // rise offset
-                offset = offset + 6 + StorageContainer.getBrightnessOptions().size();
+                offsetY = offsetY + 8 + StorageContainer.getSettingBrightnessOptions().size();
 
                 // add label
-                excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 1), offset, "Pupils", this.format));
+                excelSheet.addCell(new Label((StorageContainer.getScreenBrightnessOptions().size() + 2), offsetY, "Pupils", this.format));
 
                 // add captions
-                this.writeCaptions(excelSheet, offset + 2);
+                this.writeCaptions(excelSheet, offsetX, offsetY + 2);
 
                 // iterate trough data
-                for (int x = 0; x < StorageContainer.getBrightnessOptions().size(); x++) {
-                    for (int y = 0; y < StorageContainer.getBrightnessOptions().size(); y++) {
-                        excelSheet.addCell(new Number(x + 2, y + offset + 4, ((dataAll[x][y].getAveragedPupils()[0] + dataAll[x][y].getAveragedPupils()[1]) / 2), this.format));
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(x + 2, y + offsetY + 6, ((dataAllOver[x][y].getAveragedPupils()[0] + dataAllOver[x][y].getAveragedPupils()[1]) / 2), this.format));
                     }
                 }
+
+                // iterate trough data
+                for (int x = 0; x < StorageContainer.getScreenBrightnessOptions().size(); x++) {
+                    for (int y = 0; y < StorageContainer.getSettingBrightnessOptions().size(); y++) {
+                        excelSheet.addCell(new Number(offsetX + x + 2, y + offsetY + 6, ((dataAllUnder[x][y].getAveragedPupils()[0] + dataAllUnder[x][y].getAveragedPupils()[1]) / 2), this.format));
+                    }
+                }
+
                 // write and close
                 workbook.write();
                 workbook.close();
@@ -593,19 +656,31 @@ public class EvaluatorWorker {
      * adds captions to xls
      * 
      * @param excelSheet
-     * @param offset
+     * @param offsetY
      * @throws RowsExceededException
      * @throws WriteException
      */
     @SuppressWarnings("boxing")
-    private void writeCaptions(WritableSheet excelSheet, int offset)
-                                                                    throws RowsExceededException,
-                                                                    WriteException {
-        excelSheet.addCell(new Label((StorageContainer.getBrightnessOptions().size() / 2 + 2), offset, "screen brightness", this.format));
-        excelSheet.addCell(new Label(0, (StorageContainer.getBrightnessOptions().size() / 2 + 2) + offset, "setting brightness", this.format));
-        for (int i = 0; i < StorageContainer.getBrightnessOptions().size(); i++) {
-            excelSheet.addCell(new Label(2 + i, offset + 1, StorageContainer.getBrightnessOptions().get(i), this.format));
-            excelSheet.addCell(new Label(1, 2 + i + offset, StorageContainer.getBrightnessOptions().get(i), this.format));
+    private void writeCaptions(WritableSheet excelSheet, int offsetX, int offsetY)
+                                                                                  throws RowsExceededException,
+                                                                                  WriteException {
+        excelSheet.addCell(new Label(StorageContainer.getScreenBrightnessOptions().size() / 2, offsetY, "text coverage higher than threshold", this.format));
+        excelSheet.addCell(new Label(StorageContainer.getScreenBrightnessOptions().size() / 2 + offsetX, +offsetY, "text coverage lower than threshold", this.format));
+
+        excelSheet.addCell(new Label(StorageContainer.getScreenBrightnessOptions().size() / 2 + 2, offsetY + 2, "screen brightness", this.format));
+        excelSheet.addCell(new Label(0, StorageContainer.getSettingBrightnessOptions().size() / 2 + 2 + offsetY + 2, "setting brightness", this.format));
+
+        excelSheet.addCell(new Label(StorageContainer.getScreenBrightnessOptions().size() / 2 + 2 + offsetX, offsetY + 2, "screen brightness", this.format));
+        excelSheet.addCell(new Label(offsetX, StorageContainer.getSettingBrightnessOptions().size() / 2 + 2 + offsetY + 2, "setting brightness", this.format));
+
+        for (int i = 0; i < StorageContainer.getScreenBrightnessOptions().size(); i++) {
+            excelSheet.addCell(new Label(2 + i, offsetY + 3, StorageContainer.getScreenBrightnessOptions().get(i), this.format));
+            excelSheet.addCell(new Label(2 + i + offsetX, offsetY + 3, StorageContainer.getScreenBrightnessOptions().get(i), this.format));
         }
+        for (int i = 0; i < StorageContainer.getSettingBrightnessOptions().size(); i++) {
+            excelSheet.addCell(new Label(1, 4 + i + offsetY, StorageContainer.getSettingBrightnessOptions().get(i), this.format));
+            excelSheet.addCell(new Label(1 + offsetX, 4 + i + offsetY, StorageContainer.getSettingBrightnessOptions().get(i), this.format));
+        }
+
     }
 }

@@ -35,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -50,6 +51,7 @@ import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
+import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
@@ -76,11 +78,20 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** list of available detectors */
     private ArrayList<SaliencyDetector> saliencyDetectors;
 
+    /** list of available detectors */
+    private ArrayList<CoverageAnalyser> coverageDetectors;
+
     /** list of plugin information of the available detectors */
-    private ArrayList<PluginInformation> information;
+    private ArrayList<PluginInformation> saliencyInformation;
+
+    /** list of plugin information of the available detectors */
+    private ArrayList<PluginInformation> coverageInformation;
 
     /** list of the from listDetectors selected detectors */
     private ArrayList<SaliencyDetector> selectedDetectors;
+
+    /** current choosed coverage analyser */
+    private CoverageAnalyser currentAnalyser;
 
     /** evaluation worker which runs the detectors */
     private EvaluatorWorker worker;
@@ -108,6 +119,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** frame for configuration guis of plugins */
     private JFrame child;
+    
+    /** threshold for text coverage */
+    private double treshold;
 
     /**
      * main entry point
@@ -144,7 +158,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void init() {
         // initialize arraylists
         this.files = new ArrayList<File>();
-        this.information = new ArrayList<PluginInformation>();
+        this.saliencyInformation = new ArrayList<PluginInformation>();
+        this.coverageInformation = new ArrayList<PluginInformation>();
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
         this.progress = 1;
 
@@ -155,13 +170,15 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.mainFrame.addWindowListener(this);
         this.checkBoxConfiguration.addActionListener(this);
         this.buttonConfiguration.addActionListener(this);
+        this.comboBoxTextPlugin.addActionListener(this);
+        this.buttonTextConfig.addActionListener(this);
         this.listDetectors.addListSelectionListener(new ListSelectionListener() {
-            
+
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if(listDetectors.getSelectedValue() instanceof PluginInformation)
-                    buttonConfiguration.setEnabled(((PluginInformation) listDetectors.getSelectedValue()).isGuiAvailable());                
+                if (listDetectors.getSelectedValue() instanceof PluginInformation)
+                    buttonConfiguration.setEnabled(((PluginInformation) listDetectors.getSelectedValue()).isGuiAvailable() && checkBoxConfiguration.isSelected());
             }
         });
 
@@ -212,15 +229,53 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.saliencyDetectors = new ArrayList<SaliencyDetector>(new PluginManagerUtil(this.pluginManager).getPlugins(SaliencyDetector.class));
         for (int i = 0; i < this.saliencyDetectors.size(); i++) {
             this.saliencyDetectors.get(i).getInformation().setId(i);
-            this.information.add(this.saliencyDetectors.get(i).getInformation());
+            this.saliencyInformation.add(this.saliencyDetectors.get(i).getInformation());
+        }
+
+        // initialize coverage analyzer
+        this.coverageDetectors = new ArrayList<CoverageAnalyser>(new PluginManagerUtil(this.pluginManager).getPlugins(CoverageAnalyser.class));
+        for (int i = 0; i < this.coverageDetectors.size(); i++) {
+            this.coverageDetectors.get(i).getInformation().setId(i);
+            this.coverageInformation.add(this.coverageDetectors.get(i).getInformation());
         }
 
         // create new worker and channel
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.worker = new EvaluatorWorker(this, this.currentTimeStamp, this.channel);
 
+        // initialize coverage combobox
+        for (CoverageAnalyser analyzer : this.coverageDetectors)
+            this.comboBoxTextPlugin.addItem(analyzer.getInformation());
+        this.comboBoxTextPlugin.setRenderer(new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value,
+                                                          int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                // set new displayed attribute
+                if (value instanceof PluginInformation) {
+                    setText(((PluginInformation) value).getDisplayName());
+                    setToolTipText(((PluginInformation) value).getToolTip());
+                }
+
+                return this;
+            }
+        });
+
+        // initialize coverage configuration button
+        this.buttonTextConfig.setEnabled(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).isGuiAvailable());
+
+        // initialize analyzer
+        this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
+
+        // initialize coverage spinner
+        this.treshold = 15;
+        this.spinnerThresh.setModel(new SpinnerNumberModel(this.treshold, 0, 100, 0.1));
+        
         // initialize listDetectors
-        this.listDetectors.setListData(this.information.toArray());
+        this.listDetectors.setListData(this.saliencyInformation.toArray());
         this.listDetectors.setCellRenderer(this.initRenderer());
 
         // initialize evaluation evaluationThread
@@ -277,6 +332,16 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonConfigActionPerformed();
             return;
         }
+
+        if (event.getSource() == this.buttonTextConfig) {
+            this.buttonTextConfigActionPerformed();
+            return;
+        }
+
+        if (event.getSource() == this.comboBoxTextPlugin) {
+            this.comboboxAnalyzerActionPerformed();
+            return;
+        }
     }
 
     /**
@@ -315,6 +380,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.spinnerDimension.setEnabled(false);
             this.checkBoxConfiguration.setEnabled(false);
             this.buttonConfiguration.setEnabled(false);
+            this.comboBoxTextPlugin.setEnabled(false);
+            this.buttonTextConfig.setEnabled(false);
+            this.labelThresh.setEnabled(false);
+            this.spinnerThresh.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -338,6 +407,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.spinnerDimension.setEnabled(true);
             this.checkBoxConfiguration.setEnabled(true);
             this.buttonConfiguration.setEnabled(true);
+            this.comboBoxTextPlugin.setEnabled(true);
+            this.buttonTextConfig.setEnabled(true);
+            this.labelThresh.setEnabled(true);
+            this.spinnerThresh.setEnabled(true);
         }
     }
 
@@ -363,6 +436,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * sets the gui in config mode
      */
     private void checkboxConfigActionPerformed() {
+        this.listDetectors.clearSelection();
+        
         // set selection mode
         if (this.checkBoxConfiguration.isSelected()) {
             this.listDetectors.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -381,6 +456,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.labelDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.buttonConfiguration.setEnabled(this.checkBoxConfiguration.isSelected());
+        this.comboBoxTextPlugin.setEnabled(this.checkBoxConfiguration.isSelected());
+        this.buttonTextConfig.setEnabled(this.checkBoxConfiguration.isSelected());
+        this.labelThresh.setEnabled(this.checkBoxConfiguration.isSelected());
+        this.spinnerThresh.setEnabled(this.checkBoxConfiguration.isSelected());
     }
 
     /**
@@ -394,7 +473,31 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.mainFrame.setEnabled(false);
         this.timer.start();
     }
-    
+
+    /**
+     * fired when the buttonConfig is clicked
+     * opens the gui for coverage analyzer
+     */
+    private void buttonTextConfigActionPerformed() {
+        if (this.comboBoxTextPlugin.getSelectedItem() instanceof PluginInformation)
+            this.child = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId()).getGui();
+        this.child.setVisible(true);
+        this.mainFrame.setEnabled(false);
+        this.timer.start();
+    }
+
+    /**
+     * fired when the selection of the analyzer combobox is changed
+     * enables/disables config button and changes currentAnalyser
+     */
+    private void comboboxAnalyzerActionPerformed() {
+        // initialize coverage configuration button
+        this.buttonTextConfig.setEnabled(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).isGuiAvailable());
+
+        // initialize analyzer
+        this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
+    }
+
     /**
      * initializes filechooser
      * 
@@ -494,7 +597,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * the whole plugin information is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * the whole plugin saliencyInformation is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
      * 
      * @return a changed default renderer
      */
@@ -526,7 +629,15 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         XMLParser parser = new XMLParser();
         ArrayList<File> tmp = new ArrayList<File>(this.files);
         int size = 0;
-
+        
+        // set threshold
+        this.treshold = Double.parseDouble(this.spinnerThresh.getValue().toString());
+        
+        // start coverage analyzer
+        this.currentAnalyser.start();
+        System.out.println();
+        System.out.println();
+        
         // add selected detectors to array list 
         for (Object selected : this.listDetectors.getSelectedValues())
             if (selected instanceof PluginInformation)
@@ -585,6 +696,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * closes tool cleanly
      */
     private void exit() {
+        this.currentAnalyser.stop();
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
         this.mainFrame.dispose();
@@ -611,6 +723,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowClosing(WindowEvent arg0) {
+        if (this.running) this.currentAnalyser.stop();
         this.running = false;
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
@@ -686,5 +799,19 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public int getDimension() {
         return Integer.parseInt(this.spinnerDimension.getValue().toString());
+    }
+    
+    /**
+     * @return current choosed analyser
+     */
+    public CoverageAnalyser getCoverageAnalyser () {
+        return this.currentAnalyser;
+    }
+    
+    /**
+     * @return current threshold
+     */
+    public double getCoverageThreshold() {
+        return this.treshold;
     }
 }
