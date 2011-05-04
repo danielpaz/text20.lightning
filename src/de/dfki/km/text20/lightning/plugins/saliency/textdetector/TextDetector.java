@@ -35,26 +35,34 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.textdetector.gui.TextDetectorConfigImpl;
 
 /**
+ * Detector which analyses the text coverage of the given screenshot. If this coverage is higher than the threshold
+ * a special textsearch is processed. If not, a method similar to StandartSobel is started.
+ * 
  * @author Christoph Käding
- *
  */
 @PluginImplementation
 public class TextDetector implements SaliencyDetector {
 
+    /** stored information about this plugin */
     private PluginInformation information;
 
+    /** stored configuration */
     private TextDetectorProperties properties;
 
+    /** worker class */
     private TextDetectorWorker worker;
 
+    /** current time stamp */
     private long timeStamp;
 
-    private GetImageText analyzer;
+    /** text analyser */
+    private GetImageText analyser;
 
+    /** text boxes inside the screen shot */
     private LinkedList<TextRegion> boxes;
 
     /**
-     * 
+     * creates new instance and initializes its variables
      */
     public TextDetector() {
         this.information = new PluginInformation("Text Detector", "alpha 0.1", true);
@@ -95,8 +103,10 @@ public class TextDetector implements SaliencyDetector {
         // initialize variables
         int textSize = 0;
         double coverage = 0;
-        this.analyzer = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
-        for (Object textRegion : this.analyzer.getTextBoxes()) {
+        this.analyser = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
+        
+        // get text boxes
+        for (Object textRegion : this.analyser.getTextBoxes()) {
             if (textRegion instanceof TextRegion) {
                 this.boxes.add((TextRegion) textRegion);
             }
@@ -108,25 +118,24 @@ public class TextDetector implements SaliencyDetector {
         }
         coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
 
-        System.out.print("coverage: " + ((double) Math.round(coverage * 100) / 100) + "% -> ");
-
         // reset boxes
         this.boxes.clear();
         
+        // write image if debug is enabled
         if (this.properties.isDebug()) {
             try {
                 new File("./plugins/TextDetector/debug/Session_" + this.timeStamp).mkdirs();
-                ImageIO.write(this.analyzer.isolateText(this.boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
+                ImageIO.write(this.analyser.isolateText(this.boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        
+        // decide which method should be used and return its results
         if (coverage > this.properties.getThreshold()) {
-            System.out.println("text search");
-            return this.worker.textAnalyse(this.analyzer.getShrinkedBoxes(), screenShot.getHeight());
+            return this.worker.textAnalyse(this.analyser.getShrinkedBoxes(), screenShot.getHeight());
         }
-        System.out.println("normal search");
-        return this.worker.normalAnalyse(this.analyzer.getContrastImage());
+        return this.worker.normalAnalyse(this.analyser.getContrastImage());
     }
 
     /* (non-Javadoc)

@@ -164,7 +164,7 @@ public class EvaluationWindow {
                     new Insets(0, 0, 0, 0), 0, 0));
             }
             mainFrameContentPane.add(dialogPane, BorderLayout.CENTER);
-            mainFrame.setSize(395, 455);
+            mainFrame.setSize(505, 455);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

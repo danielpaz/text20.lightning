@@ -32,6 +32,7 @@ public class TextDetectorWorker {
 
     /**
      * equal to StandartSobel
+     * searches nearest non-black point
      * 
      * @param screenShot
      * @return offset
@@ -215,22 +216,32 @@ public class TextDetectorWorker {
     }
 
     /**
+     * iterates through all boxes and gives nearest point inside those boxes back
+     * 
      * @param boxes 
      * @param height 
      * @return offset
      */
     @SuppressWarnings("rawtypes")
     public Point textAnalyse(LinkedList boxes, int height) {
+        // initialze variables
         Point fixation = new Point(height / 2, height / 2);
         Point offset = new Point(0, 0);
         Point tmp = new Point();
         double minDistance = Double.MAX_VALUE;
 
+        // run through all boxes
         for (Object textRegion : boxes) {
             if (textRegion instanceof TextRegion) {
+                
+                // check if current box could contain points with a better distance
                 if ((Math.abs(((TextRegion) textRegion).y1 - height / 2) <= minDistance) || (Math.abs(((TextRegion) textRegion).y2 - height / 2) <= minDistance))
+                    
+                    // run through all point in the vertical half of the box
                     for (int i = 0; i < ((TextRegion) textRegion).width(); i++) {
                         tmp.setLocation(((TextRegion) textRegion).x1 + i, ((TextRegion) textRegion).y1 + ((TextRegion) textRegion).height() / 2);
+                        
+                        // check distance and store it and the associated point if it is lower than stored one
                         if (tmp.distance(fixation) < minDistance) {
                             offset.setLocation(tmp);
                             minDistance = tmp.distance(fixation);
@@ -238,6 +249,8 @@ public class TextDetectorWorker {
                     }
             }
         }
+        
+        // translate offset
         offset.translate(-height / 2, -height / 2);
 
         return offset;

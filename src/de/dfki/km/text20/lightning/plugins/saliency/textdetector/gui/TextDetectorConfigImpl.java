@@ -28,8 +28,9 @@ import javax.swing.SpinnerNumberModel;
 import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
 
 /**
+ * gui for TextDetector configuration
+ * 
  * @author Christoph Käding
- *
  */
 @SuppressWarnings("serial")
 public class TextDetectorConfigImpl extends TextDetectorConfig implements ActionListener {
@@ -37,7 +38,7 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
     private TextDetectorProperties properties;
 
     /**
-     * 
+     * creates new instance and initializes its variables
      */
     public TextDetectorConfigImpl() {
         // initialize variables
@@ -62,6 +63,10 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         else if (event.getSource() == this.buttonOK) this.buttonOkActionPerformed();
     }
 
+    /**
+     * fired if the ok-button is clicked
+     * stores the values to propertie
+     */
     private void buttonOkActionPerformed() {
         // set values
         this.properties.setSensitivity(Double.parseDouble(this.spinnerSensitivity.getValue().toString()));
@@ -74,10 +79,18 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         this.dispose();
     }
 
+    /** 
+     * fired if the cancel-button is clicked
+     * closes gui
+     */
     private void buttonCancelActionPerformed() {
         this.dispose();
     }
 
+    /**
+     * fired if the default-button is clicked
+     * restored default values
+     */
     private void buttonDefaultActionPerformed() {
         // restore defaults
         this.properties.restoreDefault();
@@ -86,6 +99,9 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         this.initializeValues();
     }
 
+    /**
+     * initializes all gui-elements
+     */
     @SuppressWarnings("boxing")
     private void initializeValues() {
         this.spinnerSensitivity.setModel(new SpinnerNumberModel(this.properties.getSenitivity(), 0.1, Double.MAX_VALUE, 0.1));

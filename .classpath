@@ -11,6 +11,5 @@
 	<classpathentry kind="lib" path="dependencies/text20.jar"/>
 	<classpathentry kind="lib" path="dependencies/jxl.jar"/>
 	<classpathentry kind="lib" path="dependencies/mysql-connector-java-5.1.15-bin.jar"/>
-	<classpathentry kind="lib" path="dependencies/OpenCV.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
