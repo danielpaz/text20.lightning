@@ -29,6 +29,8 @@ import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 
+import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
+
 /**
  * stores configurations, write them to a file on exit and tries to load them on startup 
  * 
@@ -44,34 +46,13 @@ public class CoverageDetectorProperties implements Serializable {
     private int letterHeight;
 
     @Attribute
-    private int stemSize;
-
-    @Attribute
     private int lineSize;
 
     @Attribute
     private boolean debug;
 
     @Attribute
-    private boolean useMerge;
-
-    @Attribute
-    private boolean useDelete;
-
-    @Attribute
-    private double destinyFact;
-
-    @Attribute
-    private int mass;
-
-    @Attribute
-    private int dist1;
-
-    @Attribute
-    private double distFact;
-
-    @Attribute
-    private int dist2;
+    private double sensitivity;
 
     /** file where porperties are stored */
     private File propertiesFile;
@@ -100,26 +81,17 @@ public class CoverageDetectorProperties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof CoverageDetectorProperties) {
+                if (this.object instanceof TextDetectorProperties) {
 
                     // store readed configurations
-                    this.letterHeight = ((CoverageDetectorProperties) this.object).getLetterHeight();
-                    this.stemSize = ((CoverageDetectorProperties) this.object).getStemSize();
-                    this.lineSize = ((CoverageDetectorProperties) this.object).getLineSize();
-                    this.debug = ((CoverageDetectorProperties) this.object).isDebug();
-                    this.useMerge = ((CoverageDetectorProperties) this.object).isUseMerge();
-                    this.useDelete = ((CoverageDetectorProperties) this.object).isUseDelete();
-                    this.destinyFact = ((CoverageDetectorProperties) this.object).getDestinyFact();
-                    this.mass = ((CoverageDetectorProperties) this.object).getMass();
-                    this.dist1 = ((CoverageDetectorProperties) this.object).getDist1();
-                    this.distFact = ((CoverageDetectorProperties) this.object).getDistFact();
-                    this.dist2 = ((CoverageDetectorProperties) this.object).getDist2();
+                    this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
+                    this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
+                    this.debug = ((TextDetectorProperties) this.object).isDebug();
 
                     // reading successful
                     status = true;
-                    System.out.println("\r\nCoverageDetector properties file was found.");
-                    System.out.println("letter height: " + this.letterHeight + ", stem size: " + this.stemSize + "%, line size: " + this.lineSize + ", debug: " + this.debug + ", merge: " + this.useMerge + ", delete: " + this.useDelete);
-                    System.out.println("destiny factor: " + this.destinyFact + ", mass: " + this.mass + ", distance 1: " + this.dist1 + ", distance factor: " + this.distFact + ", distance 2: " + this.dist2);
+                    System.out.println("\r\nTextDetector properties file was found.");
+                    System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", senitivity: " + this.sensitivity + ", debug: " + this.debug);
                 }
 
                 // cleanup
@@ -143,16 +115,9 @@ public class CoverageDetectorProperties implements Serializable {
     public void restoreDefault() {
         // set default values
         this.letterHeight = 7;
-        this.stemSize = 0;
         this.lineSize = 100;
         this.debug = false;
-        this.useMerge = false;
-        this.useDelete = false;
-        this.destinyFact = 0.5;
-        this.mass = 15;
-        this.dist1 = 4;
-        this.distFact = 1;
-        this.dist2 = 20;
+        this.sensitivity = 1.5;
     }
 
     /**
@@ -167,20 +132,6 @@ public class CoverageDetectorProperties implements Serializable {
      */
     public void setLetterHeight(int letterHeight) {
         this.letterHeight = letterHeight;
-    }
-
-    /**
-     * @return the stemSize
-     */
-    public int getStemSize() {
-        return this.stemSize;
-    }
-
-    /**
-     * @param stemSize the stemSize to set
-     */
-    public void setStemSize(int stemSize) {
-        this.stemSize = stemSize;
     }
 
     /**
@@ -212,101 +163,17 @@ public class CoverageDetectorProperties implements Serializable {
     }
 
     /**
-     * @return the useMerge
+     * @return the sensitivity
      */
-    public boolean isUseMerge() {
-        return this.useMerge;
+    public double getSenitivity() {
+        return this.sensitivity;
     }
 
     /**
-     * @param useMerge the useMerge to set
+     * @param sensitivity the sensitivity to set
      */
-    public void setUseMerge(boolean useMerge) {
-        this.useMerge = useMerge;
-    }
-
-    /**
-     * @return the useDelete
-     */
-    public boolean isUseDelete() {
-        return this.useDelete;
-    }
-
-    /**
-     * @param useDelete the useDelete to set
-     */
-    public void setUseDelete(boolean useDelete) {
-        this.useDelete = useDelete;
-    }
-
-    /**
-     * @return the destinyFact
-     */
-    public double getDestinyFact() {
-        return this.destinyFact;
-    }
-
-    /**
-     * @param destinyFact the destinyFact to set
-     */
-    public void setDestinyFact(double destinyFact) {
-        this.destinyFact = destinyFact;
-    }
-
-    /**
-     * @return the mass
-     */
-    public int getMass() {
-        return this.mass;
-    }
-
-    /**
-     * @param mass the mass to set
-     */
-    public void setMass(int mass) {
-        this.mass = mass;
-    }
-
-    /**
-     * @return the dist1
-     */
-    public int getDist1() {
-        return this.dist1;
-    }
-
-    /**
-     * @param dist1 the dist1 to set
-     */
-    public void setDist1(int dist1) {
-        this.dist1 = dist1;
-    }
-
-    /**
-     * @return the distFact
-     */
-    public double getDistFact() {
-        return this.distFact;
-    }
-
-    /**
-     * @param distFact the distFact to set
-     */
-    public void setDistFact(double distFact) {
-        this.distFact = distFact;
-    }
-
-    /**
-     * @return the dist2
-     */
-    public int getDist2() {
-        return this.dist2;
-    }
-
-    /**
-     * @param dist2 the dist2 to set
-     */
-    public void setDist2(int dist2) {
-        this.dist2 = dist2;
+    public void setSensitivity(double sensitivity) {
+        this.sensitivity = sensitivity;
     }
 
     /**
@@ -326,8 +193,9 @@ public class CoverageDetectorProperties implements Serializable {
      */
     public void writeProperties() {
         try {
+
             // write object
-            new File("plugins/CoverageDetector").mkdirs();
+            new File("plugins/TextDetector").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 
