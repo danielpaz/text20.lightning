@@ -328,21 +328,16 @@ public class StandardSobel implements SaliencyDetector {
         boolean alreadyExists = file.exists();
 
         try {
-            // if the screenshot file already exists, the given screenshot is overwritten by the existing one to update new data 
-            if (alreadyExists) screenShot = ImageIO.read(file);
-
             // create screenshot graphic
             Graphics2D graphic = screenShot.createGraphics();
             graphic.setFont(graphic.getFont().deriveFont(5));
 
-            if (!alreadyExists) {
-                // visualize fixation point 
-                graphic.setColor(new Color(255, 255, 0, 255));
-                graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
-                graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
-                graphic.setColor(new Color(255, 255, 0, 32));
-                graphic.fillOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
-            }
+            // visualize fixation point 
+            graphic.setColor(new Color(255, 255, 0, 255));
+            graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
+            graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
+            graphic.setColor(new Color(255, 255, 0, 32));
+            graphic.fillOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
 
             // visualize calculations
             graphic.setColor(new Color(0, 128, 128, 255));

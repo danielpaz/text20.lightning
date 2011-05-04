@@ -12,6 +12,7 @@ import com.jgoodies.forms.layout.*;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class CoverageDetectorConfig extends JFrame {
     public CoverageDetectorConfig() {
         initComponents();

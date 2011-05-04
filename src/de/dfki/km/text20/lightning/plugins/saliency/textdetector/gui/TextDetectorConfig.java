@@ -12,6 +12,7 @@ import com.jgoodies.forms.layout.*;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class TextDetectorConfig extends JFrame {
     public TextDetectorConfig() {
         initComponents();

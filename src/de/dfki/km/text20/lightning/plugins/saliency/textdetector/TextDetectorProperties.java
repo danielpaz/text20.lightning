@@ -40,18 +40,23 @@ public class TextDetectorProperties implements Serializable {
     /** generated serial id */
     private static final long serialVersionUID = -7009680382311094022L;
 
+    /** threshold for text coverage */
     @Attribute
     private double threshold;
 
+    /** minimal height to recognize letters */
     @Attribute
     private int letterHeight;
 
+    /** minimal size to identify lines */
     @Attribute
     private int lineSize;
 
+    /** indicates if debug images should be written */
     @Attribute
     private boolean debug;
 
+    /** sensitivity of text recognition */
     @Attribute
     private double sensitivity;
 

@@ -27,7 +27,7 @@ import de.dfki.km.text20.lightning.plugins.CommonPluginInterface;
 import net.xeoh.plugins.base.Plugin;
 
 /**
- * Interface for different algorithms of text coverage analyze.
+ * Interface for different algorithms of text coverage analyse.
  * 
  * @author Christoph Käding
  */

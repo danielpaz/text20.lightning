@@ -28,8 +28,9 @@ import javax.swing.SpinnerNumberModel;
 import de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector.CoverageDetectorProperties;
 
 /**
+ * gui for text coverage
+ * 
  * @author Christoph Käding
- *
  */
 @SuppressWarnings("serial")
 public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implements
@@ -38,7 +39,7 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
     private CoverageDetectorProperties properties;
 
     /**
-     * 
+     * creates new instance and initializes its variables
      */
     public CoverageDetectorConfigImpl() {
         // initialize variables
@@ -63,6 +64,10 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
         else if (event.getSource() == this.buttonOK) this.buttonOkActionPerformed();
     }
 
+    /**
+     * fired if the ok-button is clicked
+     * stores the values to propertie
+     */
     private void buttonOkActionPerformed() {
         // set values
         this.properties.setSensitivity(Double.parseDouble(this.spinnerSensitivity.getValue().toString()));
@@ -74,10 +79,18 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
         this.dispose();
     }
 
+    /** 
+     * fired if the cancel-button is clicked
+     * closes gui
+     */
     private void buttonCancelActionPerformed() {
         this.dispose();
     }
 
+    /**
+     * fired if the default-button is clicked
+     * restored default values
+     */
     private void buttonDefaultActionPerformed() {
         // restore defaults
         this.properties.restoreDefault();
@@ -86,6 +99,9 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
         this.initializeValues();
     }
 
+    /**
+     * initializes all gui-elements
+     */
     @SuppressWarnings("boxing")
     private void initializeValues() {
         this.spinnerSensitivity.setModel(new SpinnerNumberModel(this.properties.getSenitivity(), 0.1, Double.MAX_VALUE, 0.1));
