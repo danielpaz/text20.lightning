@@ -87,6 +87,7 @@ public class CoverageDetectorProperties implements Serializable {
                     this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
                     this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
                     this.debug = ((TextDetectorProperties) this.object).isDebug();
+                    this.sensitivity = ((TextDetectorProperties) this.object).getSenitivity();
 
                     // reading successful
                     status = true;

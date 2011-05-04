@@ -271,7 +271,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
 
         // initialize coverage spinner
-        this.treshold = 10;
+        this.treshold = 15;
         this.spinnerThresh.setModel(new SpinnerNumberModel(this.treshold, 0, 100, 0.1));
         
         // initialize listDetectors

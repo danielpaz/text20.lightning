@@ -16,7 +16,11 @@
 package de.dfki.km.text20.lightning.plugins.saliency.textdetector;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
+
+import javax.imageio.ImageIO;
 
 /**
  * Two dimensional box
@@ -104,6 +108,12 @@ public class GetImageText {
     // modified by Christoph Käding
     private BufferedImage contrastjpg;
 
+    // modified by Christoph Käding
+    private LinkedList storedBoxes;
+
+    // modified by Christoph Käding
+    private int [][] storedContrast;
+
     /**
      * Default constructor
      * @param img The image containing text
@@ -120,6 +130,7 @@ public class GetImageText {
         this.stemSize = 70;
         this.letterHeight = 10;
         this.sensitivity = 1.5;
+        this.storedBoxes = new LinkedList<TextRegion>();
     }
 
     /**
@@ -139,6 +150,7 @@ public class GetImageText {
         this.letterHeight = 10;
         this.lineSize = 100;
         this.sensitivity = 1.5;
+        this.storedBoxes = new LinkedList<TextRegion>();
     }
 
     /**
@@ -163,6 +175,7 @@ public class GetImageText {
         this.letterHeight = letterHeight;
         this.lineSize = lineSize;
         this.sensitivity = sensitivity;
+        this.storedBoxes = new LinkedList<TextRegion>();
     }
 
     /**
@@ -511,9 +524,22 @@ public class GetImageText {
         //        System.out.println( boxes.size() + " bounding boxes after merge" );
         //        boxes = discardNonText( boxes, contrast );
         //        System.out.println( boxes.size() + " bounding boxes after delete" );
-        return (shrink(boxes, contrast));
+
+        this.storedBoxes = boxes;
+        this.storedContrast = contrast;
+        
+        return boxes;
     }
 
+    /**
+     * modified by Christoph Käding
+     * 
+     * @return the shrinked text boxes
+     */
+    public LinkedList<TextRegion> getShrinkedBoxes() {
+        return this.shrink(this.storedBoxes, this.storedContrast);
+    }
+    
     /**
      * Isolate text
      * @return a <code>BufferedImage</code> value
