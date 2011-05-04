@@ -89,12 +89,13 @@ public class TextDetectorProperties implements Serializable {
                     this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
                     this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
                     this.debug = ((TextDetectorProperties) this.object).isDebug();
+                    this.sensitivity = ((TextDetectorProperties) this.object).getSenitivity();
 
                     // reading successful
                     status = true;
                     System.out.println("\r\nTextDetector properties file was found.");
                     System.out.println("text coverage threshold: " + this.threshold + ", debug: " + this.debug);
-                    System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", senitivity: " + this.sensitivity);
+                    System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", sensitivity: " + this.sensitivity);
                 }
 
                 // cleanup

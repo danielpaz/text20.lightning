@@ -511,7 +511,7 @@ public class GetImageText {
         //        System.out.println( boxes.size() + " bounding boxes after merge" );
         //        boxes = discardNonText( boxes, contrast );
         //        System.out.println( boxes.size() + " bounding boxes after delete" );
-        return (shrink(boxes, contrast));
+        return boxes;
     }
 
     /**
