@@ -91,7 +91,7 @@ public class TextDetector implements SaliencyDetector {
         // initialize variables
         int textSize = 0;
         double coverage = 0;
-        GetImageText analyzer = new GetImageText(screenShot, this.properties.getDestinyFact(), this.properties.getMass(), this.properties.getDist1(), this.properties.getDistFact(), this.properties.getDist2(), this.properties.getLetterHeight(), this.properties.getStemSize(), this.properties.getLineSize(), this.properties.isUseMerge(), this.properties.isUseDelete());
+        GetImageText analyzer = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
         LinkedList boxes = analyzer.getTextBoxes();
 
         // calculate coverage

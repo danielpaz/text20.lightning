@@ -86,7 +86,7 @@ public class CoverageDetector implements CoverageAnalyser {
     public double analyse(BufferedImage screenShot) {
         // initialize variables
         int textSize = 0;
-        GetImageText analyzer = new GetImageText(screenShot, this.properties.getDestinyFact(), this.properties.getMass(), this.properties.getDist1(), this.properties.getDistFact(), this.properties.getDist2(), this.properties.getLetterHeight(), this.properties.getStemSize(), this.properties.getLineSize(), this.properties.isUseMerge(), this.properties.isUseDelete());
+        GetImageText analyzer = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
         LinkedList boxes = analyzer.getTextBoxes();
 
         if (this.properties.isDebug()) {
@@ -97,7 +97,7 @@ public class CoverageDetector implements CoverageAnalyser {
                 e.printStackTrace();
             }
         }
-        
+
         // calculate coverage
         for (Object textRegion : boxes) {
             if (textRegion instanceof TextRegion) {
