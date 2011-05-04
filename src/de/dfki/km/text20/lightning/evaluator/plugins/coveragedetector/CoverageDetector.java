@@ -114,7 +114,6 @@ public class CoverageDetector implements CoverageAnalyser {
         // reset boxes
         this.boxes.clear();
         
-        System.out.println(((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize);
         return ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
     }
 
