@@ -41,6 +41,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
 import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
+import de.dfki.km.text20.lightning.worker.evaluationmode.gui.EvaluationMainWindowImpl;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
@@ -128,6 +129,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
         this.checkBockEvaluationActionPerformed();
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
+        this.checkBoxEvaluationGui.setSelected(this.main.getEvaluationSettings()[4].equals("1"));
 
         // initializes tooltips
         this.manageToolTips();
@@ -253,9 +255,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     /**
      * Fired if the OK button is clicked. All changes were applied.
      */
+    @SuppressWarnings("unused")
     protected void buttonOKActionPerformed() {
         // initialize temporary variables
-        String[] settings = { this.textFieldName.getText(), "" + this.comboBoxScreenBright.getSelectedIndex(), "" + this.comboBoxSettingBright.getSelectedIndex(), this.textFieldOutputPath.getText() };
+        int useGui = 0;
+        if (this.checkBoxEvaluationGui.isSelected()) useGui = 1;
+        String[] settings = { this.textFieldName.getText(), "" + this.comboBoxScreenBright.getSelectedIndex(), "" + this.comboBoxSettingBright.getSelectedIndex(), this.textFieldOutputPath.getText(), "" + useGui };
 
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
@@ -413,6 +418,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
+        this.labelSpecialGui.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.checkBoxEvaluationGui.setEnabled(this.checkBoxEvaluation.isSelected());
     }
 
     /**

@@ -48,6 +48,7 @@ import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.worker.FixationWatcher;
 import de.dfki.km.text20.lightning.worker.clickto.FixationEvaluator;
 import de.dfki.km.text20.lightning.worker.evaluationmode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.worker.evaluationmode.gui.EvaluationMainWindowImpl;
 import de.dfki.km.text20.lightning.worker.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.worker.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.worker.warpmouse.WarpCommander;
@@ -490,6 +491,7 @@ public class MainClass {
     /**
      * Toggles mode between normal an evaluation mode.
      */
+    @SuppressWarnings("unused")
     public void toggleMode() {
         if (this.isNormalMode) {
 
@@ -508,6 +510,9 @@ public class MainClass {
             this.warper.stop();
             this.internalPluginManager.getCurrentMouseWarper().stop();
             this.internalPluginManager.getCurrentSaliencyDetector().stop();
+            
+            // open gui if selected
+            if(this.evaluationSettings[4].equals("1")) new EvaluationMainWindowImpl(this.evaluator);
 
         } else {
 
@@ -573,14 +578,16 @@ public class MainClass {
      * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
      * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
      * 3 = output path
+     * 4 = use special gui
      */
     public String[] getEvaluationSettings() {
         if (this.evaluationSettings == null) {
-            this.evaluationSettings = new String[4];
+            this.evaluationSettings = new String[5];
             this.evaluationSettings[0] = "DefaultUser";
             this.evaluationSettings[1] = "0";
             this.evaluationSettings[2] = "0";
             this.evaluationSettings[3] = ".";
+            this.evaluationSettings[4] = "1";
         }
         return this.evaluationSettings;
     }
