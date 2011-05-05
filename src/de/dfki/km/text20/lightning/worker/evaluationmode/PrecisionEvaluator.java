@@ -367,7 +367,7 @@ public class PrecisionEvaluator {
 
             // unzip xsd if not already there
             if (!xsd.exists())
-                $(PrecisionEvaluator.class.getResourceAsStream("DataPattern.zip")).zipstream().unzip(xsd.getAbsolutePath().substring(0, xsd.getAbsolutePath().lastIndexOf(File.separator) + 1));
+                $(PrecisionEvaluator.class.getResourceAsStream("resources/DataPattern.zip")).zipstream().unzip(xsd.getAbsolutePath().substring(0, xsd.getAbsolutePath().lastIndexOf(File.separator) + 1));
 
         } catch (XMLStreamException e) {
             e.printStackTrace();

@@ -120,6 +120,8 @@ public class ConfigWindow {
         panel3 = new JPanel();
         labelEvaluation = new JLabel();
         checkBoxEvaluation = new JCheckBox();
+        labelSpecialGui = new JLabel();
+        checkBoxEvaluationGui = new JCheckBox();
         labelName = new JLabel();
         textFieldName = new JTextField();
         labelScreenBright = new JLabel();
@@ -256,7 +258,7 @@ public class ConfigWindow {
                         panel3.setBorder(new TitledBorder("Evaluation "));
                         panel3.setLayout(new FormLayout(
                             "80dlu:grow, $lcgap, 80dlu:grow",
-                            "5*(default, $lgap), default"));
+                            "6*(default, $lgap), default"));
 
                         //---- labelEvaluation ----
                         labelEvaluation.setText("Evaluation Mode");
@@ -271,29 +273,34 @@ public class ConfigWindow {
                         });
                         panel3.add(checkBoxEvaluation, cc.xy(3, 1));
 
+                        //---- labelSpecialGui ----
+                        labelSpecialGui.setText("use special GUI");
+                        panel3.add(labelSpecialGui, cc.xy(1, 3));
+                        panel3.add(checkBoxEvaluationGui, cc.xy(3, 3));
+
                         //---- labelName ----
                         labelName.setText("Username");
-                        panel3.add(labelName, cc.xywh(1, 3, 2, 1));
-                        panel3.add(textFieldName, cc.xy(3, 3));
+                        panel3.add(labelName, cc.xywh(1, 5, 2, 1));
+                        panel3.add(textFieldName, cc.xy(3, 5));
 
                         //---- labelScreenBright ----
                         labelScreenBright.setText("Screen Brightness");
-                        panel3.add(labelScreenBright, cc.xywh(1, 5, 2, 1));
-                        panel3.add(comboBoxScreenBright, cc.xy(3, 5));
+                        panel3.add(labelScreenBright, cc.xywh(1, 7, 2, 1));
+                        panel3.add(comboBoxScreenBright, cc.xy(3, 7));
 
                         //---- labelSettingBright ----
                         labelSettingBright.setText("Setting Brightness");
-                        panel3.add(labelSettingBright, cc.xywh(1, 7, 2, 1));
-                        panel3.add(comboBoxSettingBright, cc.xy(3, 7));
+                        panel3.add(labelSettingBright, cc.xywh(1, 9, 2, 1));
+                        panel3.add(comboBoxSettingBright, cc.xy(3, 9));
 
                         //---- labelOutputPath ----
                         labelOutputPath.setText("Output Path");
-                        panel3.add(labelOutputPath, cc.xywh(1, 9, 1, 3));
+                        panel3.add(labelOutputPath, cc.xywh(1, 11, 1, 3));
 
                         //---- buttonSelect ----
                         buttonSelect.setText("Select");
-                        panel3.add(buttonSelect, cc.xy(3, 9));
-                        panel3.add(textFieldOutputPath, cc.xy(3, 11));
+                        panel3.add(buttonSelect, cc.xy(3, 11));
+                        panel3.add(textFieldOutputPath, cc.xy(3, 13));
                     }
                     contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
@@ -366,7 +373,7 @@ public class ConfigWindow {
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 370);
+            mainFrame.setSize(570, 405);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -398,6 +405,8 @@ public class ConfigWindow {
     private JPanel panel3;
     protected JLabel labelEvaluation;
     protected JCheckBox checkBoxEvaluation;
+    protected JLabel labelSpecialGui;
+    protected JCheckBox checkBoxEvaluationGui;
     protected JLabel labelName;
     protected JTextField textFieldName;
     protected JLabel labelScreenBright;
