@@ -52,9 +52,10 @@ import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
 import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
+import de.dfki.km.text20.lightning.evaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
-import de.dfki.km.text20.lightning.evaluator.worker.XMLParser;
+import de.dfki.km.text20.lightning.evaluator.worker.PupilXMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
@@ -119,7 +120,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** frame for configuration guis of plugins */
     private JFrame child;
-    
+
     /** threshold for text coverage */
     private double treshold;
 
@@ -273,7 +274,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize coverage spinner
         this.treshold = 15;
         this.spinnerThresh.setModel(new SpinnerNumberModel(this.treshold, 0, 100, 0.1));
-        
+
         // initialize listDetectors
         this.listDetectors.setListData(this.saliencyInformation.toArray());
         this.listDetectors.setCellRenderer(this.initRenderer());
@@ -437,7 +438,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     private void checkboxConfigActionPerformed() {
         this.listDetectors.clearSelection();
-        
+
         // set selection mode
         if (this.checkBoxConfiguration.isSelected()) {
             this.listDetectors.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -626,42 +627,54 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     private void startEvaluation() {
         // initialize variables
-        XMLParser parser = new XMLParser();
+        DataXMLParser dataParser = new DataXMLParser();
+        PupilXMLParser pupilParser = new PupilXMLParser();
         ArrayList<File> tmp = new ArrayList<File>(this.files);
         int size = 0;
-        
+
         // set threshold
         this.treshold = Double.parseDouble(this.spinnerThresh.getValue().toString());
-        
+
         // start coverage analyzer
         this.currentAnalyser.start();
         System.out.println();
         System.out.println();
-        
+
         // add selected detectors to array list 
         for (Object selected : this.listDetectors.getSelectedValues())
             if (selected instanceof PluginInformation)
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
 
+        // kill pupil files
+        for (File file : this.files) {
+            if (file.getAbsolutePath().endsWith("_pupils.xml")) tmp.remove(file);
+        }
+        this.files = new ArrayList<File>(tmp);
+
         // validate files
         for (File file : this.files) {
-            if (!parser.isValid(file)) tmp.remove(file);
+            if (!dataParser.isValid(file)) tmp.remove(file);
+            else if (!pupilParser.isValid(new File(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("_") + 1) + "pupils.xml")))
+                tmp.remove(file);
         }
         this.files = tmp;
 
         // count container 
         for (File file : this.files)
-            size = size + parser.count(file);
+            size = size + dataParser.count(file);
 
         // calculate size
-        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * 2);
+        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * 4);
         else
-            size = (size * this.selectedDetectors.size());
+            size = (size * this.selectedDetectors.size()) + (this.files.size() * 2);
 
         // initialize progress bar
         this.progressBar.setMaximum(size);
         this.progressBar.setStringPainted(true);
 
+        System.out.println();
+        System.out.println();
+        
         // initialize and start evaluationThread
         this.evaluationThread.init(this);
         Thread thread = new Thread(this.evaluationThread);
@@ -689,7 +702,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public void updateProgressBar() {
         this.progressBar.setValue(this.progress++);
         this.progressBar.paint(this.progressBar.getGraphics());
-
     }
 
     /**
@@ -800,14 +812,14 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public int getDimension() {
         return Integer.parseInt(this.spinnerDimension.getValue().toString());
     }
-    
+
     /**
      * @return current choosed analyser
      */
-    public CoverageAnalyser getCoverageAnalyser () {
+    public CoverageAnalyser getCoverageAnalyser() {
         return this.currentAnalyser;
     }
-    
+
     /**
      * @return current threshold
      */

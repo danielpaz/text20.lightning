@@ -1,5 +1,5 @@
 /*
- * EvaluationContainer.java
+ * PupilContainer.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -20,45 +20,40 @@
  */
 package de.dfki.km.text20.lightning.evaluator.worker;
 
+import java.util.HashMap;
+
 /**
- * This container stores setting-specific distances between fixation and mouse. 
- * It is possible that different SettingContainer could include the same setting,
- * so an common container is needed.
+ * Storage for pupil data
  * 
  * @author Christoph Käding
- *
  */
-public class DerivationContainer {
+public class PupilContainer {
 
-    /** number of adds */
-    private int counter;
-
-    /** summarized distance */
-    private double derivation;
+    /** stored data */
+    private HashMap<Long, float[]> pupilData;
 
     /**
-     * creates a new object and initializes variables
+     * crates new instance and initialize variables
      */
-    public DerivationContainer() {
-        this.counter = 0;
-        this.derivation = 0;
+    public PupilContainer() {
+        this.pupilData = new HashMap<Long, float[]>();
     }
 
     /**
-     * adds distance and pupils to storage
+     * adds data to hashmap
      * 
-     * @param distance
+     * @param timestamp
+     * @param pupils
      */
-    public void addDistance(double distance) {
-        this.derivation = this.derivation + distance;
-        this.counter++;
+    @SuppressWarnings("boxing")
+    public void addData(long timestamp, float[] pupils) {
+        this.pupilData.put(timestamp, pupils);
     }
 
     /**
-     * @return averaged derivation
+     * @return the pupilData
      */
-    public double getAveragedDerivation() {
-        if (this.counter > 0) return (this.derivation / this.counter);
-        return 0;
+    public HashMap<Long, float[]> getData() {
+        return this.pupilData;
     }
 }

@@ -15,3 +15,5 @@ syntax: regexp
 ^tmp$
 syntax: regexp
 ^blabla\.txt$
+syntax: regexp
+^JIntellitype\.dll$

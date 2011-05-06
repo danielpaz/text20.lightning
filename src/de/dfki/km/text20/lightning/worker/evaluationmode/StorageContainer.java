@@ -44,20 +44,13 @@ public class StorageContainer implements Serializable {
     @Element
     private Point fixation;
 
-    /** mouse position */
+    /** related position */
     @Element
-    private Point mousePoint;
+    private Point relatedPoint;
 
     /** timestamp of the evaluation step */
     @Attribute
     private long timestamp;
-
-    /** size of pupils
-     *  0 = left
-     *  1 = right
-     */
-    @ElementArray
-    private float[] pupils;
     
     /** text coverage of current screenshot */
     private double textCoverage;
@@ -70,22 +63,20 @@ public class StorageContainer implements Serializable {
      * 
      * @param timestamp
      * @param fixation 
-     * @param mousePoint
+     * @param relatedPoint
      * @param pubils 
      */
-    public StorageContainer(long timestamp, Point fixation, Point mousePoint,
-                            float[] pubils) {
+    public StorageContainer(long timestamp, Point fixation, Point relatedPoint) {
         this.timestamp = timestamp;
-        this.mousePoint = mousePoint;
+        this.relatedPoint = relatedPoint;
         this.fixation = fixation;
-        this.pupils = pubils;
     }
 
     /**
-     * @return the mousePoint
+     * @return the relatedPoint
      */
-    public Point getMousePoint() {
-        return this.mousePoint;
+    public Point getRelatedPoint() {
+        return this.relatedPoint;
     }
 
     /**
@@ -100,27 +91,6 @@ public class StorageContainer implements Serializable {
      */
     public Point getFixation() {
         return this.fixation;
-    }
-
-    /**
-     * @return the pupilsize
-     *  0 = left
-     *  1 = right
-     */
-    public float[] getPupils() {
-        return this.pupils;
-    }
-
-    /**
-     * the pupilsize to set
-     * 0 = left
-     * 1 = right
-     * 
-     * @param pupils 
-     */
-    public void setPupils(float[] pupils) {
-        this.pupils[0] = pupils[0];
-        this.pupils[1] = pupils[1];
     }
     
     /**

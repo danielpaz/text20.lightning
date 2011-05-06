@@ -1,5 +1,5 @@
 /*
- * XMLParser.java
+ * DataXMLParser.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -43,7 +43,7 @@ import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
  * @author Christoph Käding
  *
  */
-public class XMLParser {
+public class DataXMLParser {
 
     /** readed data */
     private ArrayList<StorageContainer> data;
@@ -51,11 +51,11 @@ public class XMLParser {
     /** indicates if the next entry should be the timestamp */
     private boolean timestamp;
 
-    /** indicates if the next entry should be the x coordinate of the mouseposition */
-    private boolean mouseX;
+    /** indicates if the next entry should be the x coordinate of the related position */
+    private boolean relatedX;
 
-    /** indicates if the next entry should be the y coordinate of the mouseposition */
-    private boolean mouseY;
+    /** indicates if the next entry should be the y coordinate of the related position */
+    private boolean relatedY;
 
     /** indicates if the next entry should be the dimension of the screenshots */
     private boolean dimension;
@@ -66,11 +66,11 @@ public class XMLParser {
     /** temporary stored timestamp */
     private long timastampTmp;
 
-    /** temporary stored mouseX coordinate */
-    private int mouseXTmp;
+    /** temporary stored relatedX coordinate */
+    private int relatedXTmp;
 
-    /** temporary stored mouseY coordinate */
-    private int mouseYTmp;
+    /** temporary stored relatedY coordinate */
+    private int relatedYTmp;
 
     /** name of the actual file */
     private String fileName;
@@ -89,19 +89,6 @@ public class XMLParser {
 
     /** temporary stored fixY coordinate */
     private int fixYTmp;
-
-    /** indicates if the next entry should be the size of the left pupil */
-    private boolean left;
-
-    /** indicates if the next entry should be the size of the right pupil */
-    private boolean right;
-
-    /** 
-     * size of pupils
-     * 0 = left
-     * 1 = right
-     */
-    private float[] pupils;
 
     /** indicates if the next entry should be the screen brightness */
     private boolean screen;
@@ -127,8 +114,14 @@ public class XMLParser {
     /** indicates if the next value should be the amount of steps */
     private boolean amount;
 
-    /** indicates if the mouse was out of dimension */
+    /** indicates if the related point was out of dimension */
     private boolean outOfDim;
+
+    /** indicates which mode was used */
+    private int evaluationModeTmp;
+
+    /** indicates that the next value should be the evaluation mode */
+    private boolean evaluationMode;
 
     /**
      * tries to read the included StorageContainer of the given XML-file
@@ -145,21 +138,18 @@ public class XMLParser {
         this.data = new ArrayList<StorageContainer>();
         this.timestamp = false;
         this.fileName = file.getName();
-        this.mouseX = false;
-        this.mouseY = false;
+        this.relatedX = false;
+        this.relatedY = false;
         this.dimension = false;
         this.timastampTmp = 0;
-        this.mouseXTmp = 0;
-        this.mouseYTmp = 0;
+        this.relatedXTmp = 0;
+        this.relatedYTmp = 0;
         this.dimensionTmp = 0;
         this.usedDimension = choosedDimension;
         this.fixX = false;
         this.fixY = false;
         this.fixXTmp = 0;
         this.fixYTmp = 0;
-        this.left = false;
-        this.right = false;
-        this.pupils = new float[2];
         this.screen = false;
         this.setting = false;
         this.screenTmp = 0;
@@ -168,6 +158,8 @@ public class XMLParser {
         this.recalibrationTmp = false;
         this.amount = false;
         this.outOfDim = false;
+        this.evaluationModeTmp = 0;
+        this.evaluationMode = false;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -231,72 +223,49 @@ public class XMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
-            // if the readed characters should be the size of the right pupil ...
-            if (this.right) {
+            // if the readed characters should be the relatedY coordinate ...
+            if (this.relatedY) {
 
-                // ... store it and ...
-                this.pupils[1] = Float.parseFloat(value);
+                // ... store it
+                this.relatedYTmp = Integer.parseInt(value);
+
+                // indicate warning
+                if (Math.abs(this.relatedYTmp - this.fixYTmp) > (this.usedDimension / 2)) {
+                    System.out.println("WARNING: y-coordinate " + value + " is out of dimension!");
+                    this.outOfDim = true;
+                }
 
                 // ... add a new container to the data
-                this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.mouseXTmp, this.mouseYTmp), this.pupils));
+                this.data.add(new StorageContainer(this.timastampTmp, new Point(this.fixXTmp, this.fixYTmp), new Point(this.relatedXTmp, this.relatedYTmp)));
 
                 // check ood
                 if (this.outOfDim) this.settingsContainer.addOutOfDim();
 
                 // reset variables
                 this.timestamp = false;
-                this.mouseX = false;
-                this.mouseY = false;
+                this.relatedX = false;
+                this.relatedY = false;
                 this.fixX = false;
                 this.fixY = false;
-                this.left = false;
-                this.right = false;
                 this.outOfDim = false;
-                this.pupils = new float[2];
-                this.mouseXTmp = 0;
-                this.mouseYTmp = 0;
+                this.relatedXTmp = 0;
+                this.relatedYTmp = 0;
                 this.timastampTmp = 0;
                 this.fixXTmp = 0;
                 this.fixYTmp = 0;
-
+                
                 // return success
                 return true;
             }
 
-            // if the readed characters should be the size of the left pupil ...
-            if (this.left) {
+            // if the readed characters should be the relatedX coordinate ...
+            if (this.relatedX) {
 
                 // ... store it
-                this.pupils[0] = Float.parseFloat(value);
-
-                // return success
-                return true;
-            }
-
-            // if the readed characters should be the mouseY coordinate ...
-            if (this.mouseY) {
-
-                // ... store it
-                this.mouseYTmp = Integer.parseInt(value);
+                this.relatedXTmp = Integer.parseInt(value);
 
                 // indicate warning
-                if (Math.abs(this.mouseYTmp - this.fixYTmp) > (this.usedDimension / 2)) {
-                    System.out.println("WARNING: y-coordinate " + value + " is out of dimension!");
-                    this.outOfDim = true;
-                }
-
-                // return success
-                return true;
-            }
-
-            // if the readed characters should be the mouseX coordinate ...
-            if (this.mouseX) {
-
-                // ... store it
-                this.mouseXTmp = Integer.parseInt(value);
-
-                // indicate warning
-                if (Math.abs(this.mouseXTmp - this.fixXTmp) > (this.usedDimension / 2)) {
+                if (Math.abs(this.relatedXTmp - this.fixXTmp) > (this.usedDimension / 2)) {
                     System.out.println("WARNING: x-coordinate " + value + " is out of dimension!");
                     this.outOfDim = true;
                 }
@@ -348,7 +317,17 @@ public class XMLParser {
                     System.out.println("WARNING: choosed dimension is smaller than the stored one (" + this.dimensionTmp + ")!" + " File: " + this.fileName);
 
                 // initialize setting container
-                this.settingsContainer = new SettingsContainer(this.dimensionTmp, this.recalibrationTmp, this.screenTmp, this.settingTmp);
+                this.settingsContainer = new SettingsContainer(this.dimensionTmp, this.recalibrationTmp, this.screenTmp, this.settingTmp, this.evaluationModeTmp);
+
+                // return success
+                return true;
+            }
+
+            // if the readed characters should be the evaluation mode ...
+            if (this.evaluationMode) {
+
+                // ... store it
+                this.evaluationModeTmp = Integer.parseInt(value);
 
                 // return success
                 return true;
@@ -419,6 +398,12 @@ public class XMLParser {
         }
 
         // dimension tag 
+        if (value.equals("evaluationmode")) {
+            this.evaluationMode = true;
+            return;
+        }
+
+        // dimension tag 
         if (value.equals("dimension")) {
             this.dimension = true;
             return;
@@ -437,38 +422,26 @@ public class XMLParser {
         }
 
         // fixX 
-        if (value.equals("x") && !this.fixX && !this.mouseX) {
+        if (value.equals("x") && !this.fixX && !this.relatedX) {
             this.fixX = true;
             return;
         }
 
         // fixY
-        if (value.equals("y") && !this.fixY && !this.mouseY) {
+        if (value.equals("y") && !this.fixY && !this.relatedY) {
             this.fixY = true;
             return;
         }
 
-        // mouseX
-        if (value.equals("x") && !this.mouseX && this.fixX) {
-            this.mouseX = true;
+        // relatedX
+        if (value.equals("x") && !this.relatedX && this.fixX) {
+            this.relatedX = true;
             return;
         }
 
-        // mouseY 
-        if (value.equals("y") && !this.mouseY && this.fixY) {
-            this.mouseY = true;
-            return;
-        }
-
-        // left
-        if (value.equals("left")) {
-            this.left = true;
-            return;
-        }
-
-        // right 
-        if (value.equals("right")) {
-            this.right = true;
+        // relatedY 
+        if (value.equals("y") && !this.relatedY && this.fixY) {
+            this.relatedY = true;
             return;
         }
     }
