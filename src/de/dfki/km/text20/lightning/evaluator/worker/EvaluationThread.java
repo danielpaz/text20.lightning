@@ -22,6 +22,7 @@ package de.dfki.km.text20.lightning.evaluator.worker;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
@@ -81,13 +82,17 @@ public class EvaluationThread implements Runnable {
     @Override
     public void run() {
         // initialize Variables
-        XMLParser parser = new XMLParser();
+        DataXMLParser dataParser = new DataXMLParser();
+        PupilXMLParser pupilParser = new PupilXMLParser();
         CoverageAnalyser analyser = this.mainClass.getCoverageAnalyser();
 
         // run through every file ...
         for (File file : this.files) {
 
             System.out.println("- File " + file.getName() + " is the next one.");
+            
+            // ... read related pupil stream, ...
+            pupilParser.readFile(new File(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("_") + 1) + "pupils.xml"), this.worker);
             
             // ... and every detector
             for (SaliencyDetector detector : this.selectedDetectors) {
@@ -99,7 +104,7 @@ public class EvaluationThread implements Runnable {
                 System.out.println("- Detector: " + detector.getInformation().getDisplayName());
                 
                 // ... and through every container in it ...
-                for (StorageContainer container : parser.readFile(file, this.dimension, this.worker)) {
+                for (StorageContainer container : dataParser.readFile(file, this.dimension, this.worker)) {
 
                     // process evaluation
                     this.worker.evaluate(analyser, file, detector, container);

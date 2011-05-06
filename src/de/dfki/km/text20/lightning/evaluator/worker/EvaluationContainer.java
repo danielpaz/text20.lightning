@@ -70,41 +70,11 @@ public class EvaluationContainer {
     /** username */
     private String name;
 
-    /** indicates if the pupilsize should be devided or not */
-    private boolean firstGetOverAll;
-
-    /** indicates if the pupilsize should be devided or not */
-    private boolean firstGetHigher;
-
-    /** indicates if the pupilsize should be devided or not */
-    private boolean firstGetLower;
-
     /** threshold for text coverage */
     private double threshold;
 
     /** list of distances between mouse and fixation */
     private ArrayList<StorageContainer> container;
-
-    /** 
-     * size of pupils
-     * 0 = left
-     * 1 = right
-     */
-    private float[] pupilsizeOverAll;
-
-    /** 
-     * size of pupils
-     * 0 = left
-     * 1 = right
-     */
-    private float[] pupilsizeHigher;
-
-    /** 
-     * size of pupils
-     * 0 = left
-     * 1 = right
-     */
-    private float[] pupilsizeLower;
 
     /**
      * Creates a new container and initializes all necessary variables.
@@ -140,12 +110,6 @@ public class EvaluationContainer {
         this.log = log;
         this.name = name;
         this.timeStamp = timeStamp;
-        this.pupilsizeOverAll = new float[2];
-        this.pupilsizeHigher = new float[2];
-        this.pupilsizeLower = new float[2];
-        this.firstGetOverAll = true;
-        this.firstGetHigher = true;
-        this.firstGetLower = true;
         this.threshold = threshold;
 
         // add first value
@@ -170,30 +134,19 @@ public class EvaluationContainer {
             // ... increase sizeO ...
             this.sizeOverAll++;
 
-            // ... and add pupilsize
-            this.pupilsizeOverAll[0] = storageContainer.getPupils()[0] + this.pupilsizeOverAll[0];
-            this.pupilsizeOverAll[1] = storageContainer.getPupils()[1] + this.pupilsizeOverAll[1];
-
             // add container
             this.container.add(storageContainer);
 
             // store by coverage
             if (storageContainer.getTextCoverage() > this.threshold) {
+                
                 // increase size ...
                 this.sizeHigher++;
-
-                // ... and add pupilsize
-                this.pupilsizeHigher[0] = storageContainer.getPupils()[0] + this.pupilsizeHigher[0];
-                this.pupilsizeHigher[1] = storageContainer.getPupils()[1] + this.pupilsizeHigher[1];
 
             } else {
 
                 // increase size ...
                 this.sizeLower++;
-
-                // ... and add pupilsize
-                this.pupilsizeLower[0] = storageContainer.getPupils()[0] + this.pupilsizeLower[0];
-                this.pupilsizeLower[1] = storageContainer.getPupils()[1] + this.pupilsizeLower[1];
             }
         }
 
@@ -268,48 +221,6 @@ public class EvaluationContainer {
         if (this.resultsLower.containsKey(id))
             return (this.resultsLower.get(id) / this.sizeLower);
         return 0;
-    }
-
-    /**
-     * averaged pupilsize from all entries
-     * 
-     * @return pupils
-     */
-    public float[] getAveragedPupilsOverAll() {
-        if (this.firstGetOverAll) {
-            this.pupilsizeOverAll[0] = this.pupilsizeOverAll[0] / this.sizeOverAll;
-            this.pupilsizeOverAll[1] = this.pupilsizeOverAll[1] / this.sizeOverAll;
-            this.firstGetOverAll = false;
-        }
-        return this.pupilsizeOverAll;
-    }
-
-    /**
-     * averaged pupilsize from all entries with a higher coverage than the threshold
-     * 
-     * @return pupils
-     */
-    public float[] getAveragedPupilsHigher() {
-        if (this.firstGetHigher) {
-            this.pupilsizeHigher[0] = this.pupilsizeHigher[0] / this.sizeHigher;
-            this.pupilsizeHigher[1] = this.pupilsizeHigher[1] / this.sizeHigher;
-            this.firstGetHigher = false;
-        }
-        return this.pupilsizeHigher;
-    }
-
-    /**
-     * averaged pupilsize from all entries with a lower coverage than the threshold
-     * 
-     * @return pupils
-     */
-    public float[] getAveragedPupilsLower() {
-        if (this.firstGetLower) {
-            this.pupilsizeLower[0] = this.pupilsizeLower[0] / this.sizeLower;
-            this.pupilsizeLower[1] = this.pupilsizeLower[1] / this.sizeLower;
-            this.firstGetLower = false;
-        }
-        return this.pupilsizeLower;
     }
 
     /**

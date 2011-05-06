@@ -46,6 +46,9 @@ public class SettingsContainer {
     
     /** indicates if recalibration was used */
     private boolean recalibration;
+    
+    /** indicates which mode was used to collect the data */
+    private int evaluationModus;
 
     /**
      * Creates a new container and initializes its variables.
@@ -54,14 +57,16 @@ public class SettingsContainer {
      * @param recalibration 
      * @param screenBright
      * @param settingBright
+     * @param evaluationMode 
      */
-    public SettingsContainer(int dimension, boolean recalibration, int screenBright, int settingBright) {
+    public SettingsContainer(int dimension, boolean recalibration, int screenBright, int settingBright, int evaluationMode) {
         this.dimension = dimension;
         this.screenBright = screenBright;
         this.settingBright = settingBright;
         this.recalibration = recalibration;
         this.outOfDim = 0;
         this.outOfRect = 0;
+        this.evaluationModus = evaluationMode;
     }
 
     /**
@@ -122,10 +127,18 @@ public class SettingsContainer {
     public int getOutOfRaster() {
         return this.outOfRect;
     }
+    
     /**
      * @return the recalibration
      */
     public boolean isRecalibration() {
         return this.recalibration;
+    }
+    
+    /**
+     * @return the evaluatonMode
+     */
+    public int getEvaluationMode() {
+        return this.evaluationModus;
     }
 }

@@ -192,7 +192,7 @@ public class Hotkey implements HotkeyListener {
 
             if (!this.evaluationStatus) {
                 // set mouse position which is associated with the last stored fixation and react on its return value
-                switch (this.precisionEvaluator.setMousePosition(MouseInfo.getPointerInfo().getLocation())) {
+                switch (this.precisionEvaluator.setRelatedPosition(MouseInfo.getPointerInfo().getLocation())) {
                 case OK:
                     // indicate success
                     this.main.playDing();

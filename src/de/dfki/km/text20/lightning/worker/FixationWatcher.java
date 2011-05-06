@@ -73,12 +73,6 @@ public class FixationWatcher {
     /** list of things which will be proved to check validity */
     private EyeTrackingEventValidity[] eventValidity;
 
-    /** current size of pupils
-     *  0 = left
-     *  1 = right
-     */
-    private float[] pupils;
-
     /**
      * Create the fixation watcher
      * 
@@ -93,7 +87,6 @@ public class FixationWatcher {
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         this.isValid = true;
-        this.pupils = new float[2];
         this.lastEvents = new ArrayList<RawDataEvent>();
         this.eventValidity = new EyeTrackingEventValidity[6];
         this.eventValidity[0] = EyeTrackingEventValidity.CENTER_POSITION_VALID;
@@ -144,12 +137,11 @@ public class FixationWatcher {
                 if (!main.isActivated()) return;
                 if (event.getType() != FixationEventType.FIXATION_START) return;
 
-
                 if (!isValid) return;
 
                 // if the tool is activated and a fixation occurs, it will be stored 
                 fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-                precisionEvaluator.setFixationPoint(event.getFixation().getCenter(), pupils);
+                precisionEvaluator.setFixationPoint(event.getFixation().getCenter());
                 if (manager.getCurrentMouseWarper() != null)
                     manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
             }
@@ -157,6 +149,12 @@ public class FixationWatcher {
 
         //add rawdata listener
         this.evaluator.addEvaluationListener(new RawDataListener() {
+
+            /** prevents pupildata from doubled datasets */
+            private long timeStampTmp = 0;
+            
+            /** intervall for pupil update */
+            private int intervall = 1;
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
@@ -177,11 +175,12 @@ public class FixationWatcher {
                 for (RawDataEvent storedEvent : lastEvents) {
                     isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
                 }
-                //                System.out.println(isValid);
 
                 // set pupil size
-                pupils[0] = event.getTrackingEvent().getPupilSizeLeft();
-                pupils[1] = event.getTrackingEvent().getPupilSizeRight();
+                if (System.currentTimeMillis() >= this.timeStampTmp + this.intervall) {
+                    precisionEvaluator.addPupilData(new float[] { event.getTrackingEvent().getPupilSizeLeft(), event.getTrackingEvent().getPupilSizeRight() });
+                    this.timeStampTmp = System.currentTimeMillis();
+                }
 
                 // set valid
                 main.setTrackingValid(isValid);

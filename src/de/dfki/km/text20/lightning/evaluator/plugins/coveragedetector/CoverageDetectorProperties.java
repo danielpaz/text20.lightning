@@ -29,8 +29,6 @@ import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 
-import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
-
 /**
  * stores configurations, write them to a file on exit and tries to load them on startup 
  * 
@@ -73,7 +71,7 @@ public class CoverageDetectorProperties implements Serializable {
     private CoverageDetectorProperties() {
 
         // creates properties file
-        this.propertiesFile = new File("./plugins/CoverageDetector/properties.prop");
+        this.propertiesFile = new File("plugins/CoverageDetector/properties.prop");
 
         // status is used to indicate if the properties object could be readed probably 
         boolean status = false;
@@ -85,17 +83,17 @@ public class CoverageDetectorProperties implements Serializable {
                 ObjectInputStream inputStream = new ObjectInputStream((new FileInputStream(this.propertiesFile)));
                 this.object = inputStream.readObject();
 
-                if (this.object instanceof TextDetectorProperties) {
+                if (this.object instanceof CoverageDetectorProperties) {
 
                     // store readed configurations
-                    this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
-                    this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
-                    this.debug = ((TextDetectorProperties) this.object).isDebug();
-                    this.sensitivity = ((TextDetectorProperties) this.object).getSenitivity();
+                    this.letterHeight = ((CoverageDetectorProperties) this.object).getLetterHeight();
+                    this.lineSize = ((CoverageDetectorProperties) this.object).getLineSize();
+                    this.debug = ((CoverageDetectorProperties) this.object).isDebug();
+                    this.sensitivity = ((CoverageDetectorProperties) this.object).getSenitivity();
 
                     // reading successful
                     status = true;
-                    System.out.println("\r\nTextDetector properties file was found.");
+                    System.out.println("\r\nCoverageDetector properties file was found.");
                     System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", senitivity: " + this.sensitivity + ", debug: " + this.debug);
                 }
 
@@ -110,7 +108,7 @@ public class CoverageDetectorProperties implements Serializable {
         // if reading was not successful or properties file was not found
         if (!status) {
             this.restoreDefault();
-            System.out.println("\r\nCoverageDetector properties file was not found.\r\n");
+            System.out.println("\r\nCoverageDetector properties file was not found.");
         }
     }
 
@@ -198,9 +196,9 @@ public class CoverageDetectorProperties implements Serializable {
      */
     public void writeProperties() {
         try {
-
+            
             // write object
-            new File("plugins/TextDetector").mkdirs();
+            new File("plugins/CoverageDetector").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));
             outputStream.writeObject(this);
 
