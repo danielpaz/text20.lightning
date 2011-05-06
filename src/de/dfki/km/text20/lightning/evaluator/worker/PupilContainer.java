@@ -20,7 +20,7 @@
  */
 package de.dfki.km.text20.lightning.evaluator.worker;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Storage for pupil data
@@ -30,13 +30,13 @@ import java.util.HashMap;
 public class PupilContainer {
 
     /** stored data */
-    private HashMap<Long, float[]> pupilData;
+    private TreeMap<Long, float[]> pupilData;
 
     /**
      * crates new instance and initialize variables
      */
     public PupilContainer() {
-        this.pupilData = new HashMap<Long, float[]>();
+        this.pupilData = new TreeMap<Long, float[]>();
     }
 
     /**
@@ -53,7 +53,7 @@ public class PupilContainer {
     /**
      * @return the pupilData
      */
-    public HashMap<Long, float[]> getData() {
+    public TreeMap<Long, float[]> getData() {
         return this.pupilData;
     }
 }

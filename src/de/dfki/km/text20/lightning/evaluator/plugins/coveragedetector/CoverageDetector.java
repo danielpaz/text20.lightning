@@ -32,7 +32,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.evaluator.plugins.coveragedetector.gui.CoverageDetectorConfigImpl;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
-import de.dfki.km.text20.lightning.plugins.saliency.textdetector.GetImageText;
 
 /**
  * analyses the given screenshot with GetImageText and returns the coverage
