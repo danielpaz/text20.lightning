@@ -671,23 +671,36 @@ public class EvaluatorWorker {
                 workbook = Workbook.createWorkbook(new File(this.results.get(key).getLogPath().replace(".log", ".xls")), wbSettings);
                 workbook.createSheet("Evaluation", 0);
                 WritableSheet excelSheet = workbook.getSheet(0);
+                int timeStampNumber = 0;
+                int fixationNumber = 0;
 
                 // add captions
-                excelSheet.addCell(new Label(0, 0, "Fixation-x", this.format));
-                excelSheet.addCell(new Label(1, 0, "Fixation-y", this.format));
-                excelSheet.addCell(new Label(2, 0, "Related-x", this.format));
-                excelSheet.addCell(new Label(3, 0, "Related-y", this.format));
-                excelSheet.addCell(new Label(5, 0, "Text Coverage", this.format));
-                excelSheet.addCell(new Label(6, 0, "Distance-Related-Fixation", this.format));
+                excelSheet.addCell(new Label(0, 0, "Timestamp", this.format));
+                excelSheet.addCell(new Label(1, 0, "Pupil-left", this.format));
+                excelSheet.addCell(new Label(2, 0, "Pupil-right", this.format));
+                excelSheet.addCell(new Label(3, 0, "Fixation-x", this.format));
+                excelSheet.addCell(new Label(4, 0, "Fixation-y", this.format));
+                excelSheet.addCell(new Label(5, 0, "Related-x", this.format));
+                excelSheet.addCell(new Label(6, 0, "Related-y", this.format));
+                excelSheet.addCell(new Label(7, 0, "Text Coverage", this.format));
+                excelSheet.addCell(new Label(8, 0, "Distance-Related-Fixation", this.format));
 
-                // iterate trough data
-                for (int i = 0; i < this.results.get(key).getContainer().size(); i++) {
-                    excelSheet.addCell(new Number(0, i + 1, this.results.get(key).getContainer().get(i).getFixation().x, this.format));
-                    excelSheet.addCell(new Number(1, i + 1, this.results.get(key).getContainer().get(i).getFixation().y, this.format));
-                    excelSheet.addCell(new Number(2, i + 1, this.results.get(key).getContainer().get(i).getRelatedPoint().x, this.format));
-                    excelSheet.addCell(new Number(3, i + 1, this.results.get(key).getContainer().get(i).getRelatedPoint().y, this.format));
-                    excelSheet.addCell(new Number(5, i + 1, this.results.get(key).getContainer().get(i).getTextCoverage(), this.format));
-                    excelSheet.addCell(new Number(6, i + 1, this.results.get(key).getContainer().get(i).getFixation().distance(this.results.get(key).getContainer().get(i).getRelatedPoint()), this.format));
+                // iterate through data
+                for (long timeStamp : this.pupilData.get(key).getData().keySet()) {
+                    excelSheet.addCell(new Number(0, timeStampNumber + 1, timeStamp, this.format));
+                    excelSheet.addCell(new Number(1, timeStampNumber + 1, this.pupilData.get(key).getData().get(timeStamp)[0], this.format));
+                    excelSheet.addCell(new Number(2, timeStampNumber + 1, this.pupilData.get(key).getData().get(timeStamp)[1], this.format));
+                    if (fixationNumber < this.results.get(key).getContainer().size())
+                        if (this.results.get(key).getContainer().get(fixationNumber).getTimestamp() <= timeStamp) {
+                            excelSheet.addCell(new Number(3, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getFixation().x, this.format));
+                            excelSheet.addCell(new Number(4, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getFixation().y, this.format));
+                            excelSheet.addCell(new Number(5, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getRelatedPoint().x, this.format));
+                            excelSheet.addCell(new Number(6, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getRelatedPoint().y, this.format));
+                            excelSheet.addCell(new Number(7, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getTextCoverage(), this.format));
+                            excelSheet.addCell(new Number(8, timeStampNumber + 1, this.results.get(key).getContainer().get(fixationNumber).getFixation().distance(this.results.get(key).getContainer().get(fixationNumber).getRelatedPoint()), this.format));
+                            fixationNumber++;
+                        }
+                    timeStampNumber++;
                 }
 
                 // write and close

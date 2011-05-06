@@ -48,19 +48,19 @@ public class PupilXMLParser {
     private boolean timestamp;
 
     /** indicates if the next entry should be the x coordinate of the related position */
-    private boolean relatedX;
+    private boolean left;
 
     /** indicates if the next entry should be the y coordinate of the related position */
-    private boolean relatedY;
+    private boolean right;
 
     /** temporary stored timestamp */
-    private long timastampTmp;
+    private long timestampTmp;
 
-    /** temporary stored relatedX coordinate */
-    private float relatedXTmp;
+    /** temporary stored left coordinate */
+    private float leftTmp;
 
-    /** temporary stored relatedY coordinate */
-    private float relatedYTmp;
+    /** temporary stored right coordinate */
+    private float rightTmp;
 
     /** name of the actual file */
     private String fileName;
@@ -79,11 +79,11 @@ public class PupilXMLParser {
         this.data = new PupilContainer();
         this.timestamp = false;
         this.fileName = file.getName();
-        this.relatedX = false;
-        this.relatedY = false;
-        this.timastampTmp = 0;
-        this.relatedXTmp = 0;
-        this.relatedYTmp = 0;
+        this.left = false;
+        this.right = false;
+        this.timestampTmp = 0;
+        this.leftTmp = 0;
+        this.rightTmp = 0;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -115,7 +115,7 @@ public class PupilXMLParser {
             }
 
             // update settings map at worker
-            worker.addToPupilMap(this.fileName, this.data);
+            worker.addToPupilMap(this.fileName.replace("pupils.xml", "data.xml"), this.data);
 
             // close all
             inputStream.close();
@@ -147,32 +147,32 @@ public class PupilXMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
-            // if the readed characters should be the relatedY coordinate ...
-            if (this.relatedY) {
+            // if the readed characters should be the right coordinate ...
+            if (this.right) {
 
                 // ... store it ...
-                this.relatedYTmp = Float.parseFloat(value);
+                this.rightTmp = Float.parseFloat(value);
 
                 // ... add a new container to the data
-                this.data.addData(this.timastampTmp, new float[] { this.relatedXTmp, this.relatedYTmp });
+                this.data.addData(this.timestampTmp, new float[] { this.leftTmp, this.rightTmp });
 
                 // reset variables
                 this.timestamp = false;
-                this.relatedX = false;
-                this.relatedY = false;
-                this.relatedXTmp = 0;
-                this.relatedYTmp = 0;
-                this.timastampTmp = 0;
+                this.left = false;
+                this.right = false;
+                this.leftTmp = 0;
+                this.rightTmp = 0;
+                this.timestampTmp = 0;
 
                 // return success
                 return true;
             }
 
-            // if the readed characters should be the relatedX coordinate ...
-            if (this.relatedX) {
+            // if the readed characters should be the left coordinate ...
+            if (this.left) {
 
                 // ... store it
-                this.relatedXTmp = Float.parseFloat(value);
+                this.leftTmp = Float.parseFloat(value);
 
                 // return success
                 return true;
@@ -182,8 +182,8 @@ public class PupilXMLParser {
             if (this.timestamp) {
 
                 // ... store it
-                this.timastampTmp = Long.parseLong(value);
-
+                this.timestampTmp = Long.parseLong(value);
+                
                 // return success
                 return true;
             }
@@ -211,15 +211,15 @@ public class PupilXMLParser {
             return;
         }
 
-        // relatedX
+        // left
         if (value.equals("left")) {
-            this.relatedX = true;
+            this.left = true;
             return;
         }
 
-        // relatedY 
+        // right 
         if (value.equals("right")) {
-            this.relatedY = true;
+            this.right = true;
             return;
         }
     }

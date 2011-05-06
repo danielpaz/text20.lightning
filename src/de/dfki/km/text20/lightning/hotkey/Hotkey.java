@@ -175,54 +175,68 @@ public class Hotkey implements HotkeyListener {
                 break;
             }
 
-            if (this.evaluationStatus) {
+            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("0")) {
 
-                // store last fixation point
-                if (this.precisionEvaluator.storeFixation()) {
-                    this.main.showTrayMessage("Evaluation: fixation position recognized, now place the mouse to the point you look at and press " + this.getCurrentHotkey(1, true) + " again...");
-                    this.evaluationStatus = !(this.evaluationStatus);
+                // first hotkey while in evaluation mode
+                if(!this.precisionEvaluator.isLogPupils()) {
+                    // start pupil stream
+                    this.precisionEvaluator.startPupilStream();
+                    
+                    // indicate start
+                    this.main.showTrayMessage("Evaluation: Now look at the first point and press " + this.getCurrentHotkey(1, true) + ".");
+
+                    break;
+                }
+                
+                if (this.evaluationStatus) {
+
+                    // store last fixation point
+                    if (this.precisionEvaluator.storeFixation()) {
+                        this.main.showTrayMessage("Evaluation: fixation position recognized, now place the mouse to the point you look at and press " + this.getCurrentHotkey(1, true) + " again...");
+                        this.evaluationStatus = !(this.evaluationStatus);
+                        break;
+                    }
+
+                    // indicate error
+                    this.main.playError();
+                    this.main.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
                     break;
                 }
 
-                // indicate error
-                this.main.playError();
-                this.main.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
-                break;
-            }
+                if (!this.evaluationStatus) {
+                    // set mouse position which is associated with the last stored fixation and react on its return value
+                    switch (this.precisionEvaluator.setRelatedPosition(MouseInfo.getPointerInfo().getLocation())) {
+                    case OK:
+                        // indicate success
+                        this.main.playDing();
+                        this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
-            if (!this.evaluationStatus) {
-                // set mouse position which is associated with the last stored fixation and react on its return value
-                switch (this.precisionEvaluator.setRelatedPosition(MouseInfo.getPointerInfo().getLocation())) {
-                case OK:
-                    // indicate success
-                    this.main.playDing();
-                    this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
+                        // toggle status
+                        this.evaluationStatus = !(this.evaluationStatus);
 
-                    // toggle status
-                    this.evaluationStatus = !(this.evaluationStatus);
+                        break;
 
-                    break;
+                    case ALREADY_PROCESSING:
+                        // do nothing
+                        break;
 
-                case ALREADY_PROCESSING:
-                    // do nothing
-                    break;
+                    case NO_FIXATION:
+                        // theoretical never reached
+                        break;
 
-                case NO_FIXATION:
-                    // theoretical never reached
-                    break;
+                    case OUT_OFF_DIMENSION:
+                        // indicate failure
+                        this.main.playError();
+                        this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
 
-                case OUT_OFF_DIMENSION:
-                    // indicate failure
-                    this.main.playError();
-                    this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
+                        // toggle status
+                        this.evaluationStatus = !(this.evaluationStatus);
 
-                    // toggle status
-                    this.evaluationStatus = !(this.evaluationStatus);
+                        break;
 
-                    break;
-
-                default:
-                    break;
+                    default:
+                        break;
+                    }
                 }
             }
 

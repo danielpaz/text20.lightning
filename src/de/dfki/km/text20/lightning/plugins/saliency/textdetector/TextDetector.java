@@ -111,15 +111,12 @@ public class TextDetector implements SaliencyDetector {
                 this.boxes.add((TextRegion) textRegion);
             }
         }
-
+        
         // calculate coverage
         for (TextRegion textRegion : this.boxes) {
             textSize = textSize + textRegion.width() * textRegion.height();
         }
         coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
-
-        // reset boxes
-        this.boxes.clear();
         
         // write image if debug is enabled
         if (this.properties.isDebug()) {
@@ -130,6 +127,9 @@ public class TextDetector implements SaliencyDetector {
                 e.printStackTrace();
             }
         }
+        
+        // reset boxes
+        this.boxes.clear();
         
         // decide which method should be used and return its results
         if (coverage > this.properties.getThreshold()) {

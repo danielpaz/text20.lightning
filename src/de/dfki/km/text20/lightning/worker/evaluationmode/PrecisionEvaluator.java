@@ -91,9 +91,12 @@ public class PrecisionEvaluator {
     /** timestamp for logfiles */
     private long logTimeStamp;
 
+    /** temporary stored timestamp */
+    private long timeStampTmp;
+
     /** actual pupil file */
     private File pupilFile;
-    
+
     /** indicates if the pupilfile should be updated */
     private boolean logPupils;
 
@@ -126,6 +129,7 @@ public class PrecisionEvaluator {
      */
     public void setFixationPoint(Point fixation) {
         this.fixationTmp = fixation;
+        this.timeStampTmp = System.currentTimeMillis();
     }
 
     /**
@@ -136,7 +140,7 @@ public class PrecisionEvaluator {
     public boolean storeFixation() {
         if (this.fixationTmp == null || this.isProcessing) return false;
         this.isProcessing = true;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = this.timeStampTmp;
         this.fixation = new Point(this.fixationTmp);
         this.fixationTmp = null;
         this.isProcessing = false;
@@ -154,8 +158,6 @@ public class PrecisionEvaluator {
         if (this.fixation == null) return EvaluationCode.NO_FIXATION;
         if (this.isProcessing) return EvaluationCode.ALREADY_PROCESSING;
         this.isProcessing = true;
-        this.user = MainClass.getInstance().getEvaluationSettings()[0];
-        if (this.allData.size() == 0) this.startPupilStream();
         this.relatedPosition = relatedPosition;
         Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
@@ -205,11 +207,13 @@ public class PrecisionEvaluator {
     /** 
      * initialize pupil stream
      */
-    private void startPupilStream() {
+    public void startPupilStream() {
         this.logTimeStamp = System.currentTimeMillis();
+        this.user = MainClass.getInstance().getEvaluationSettings()[0];
 
         // create file
         this.pupilFile = new File(MainClass.getInstance().getEvaluationSettings()[3] + "/evaluation/data/" + this.user + "/" + this.user + "_" + this.logTimeStamp + "_pupils.xml");
+        new File(this.pupilFile.getAbsolutePath().substring(0, this.pupilFile.getAbsolutePath().lastIndexOf(File.separator))).mkdirs();
 
         try {
             // Create an XML stream writer
@@ -236,7 +240,7 @@ public class PrecisionEvaluator {
 
             // set status
             this.logPupils = true;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -260,7 +264,7 @@ public class PrecisionEvaluator {
         $(this.pupilFile).append("</pupildata>");
         File xsd = new File(MainClass.getInstance().getEvaluationSettings()[3] + "/evaluation/data/" + this.user + "/PupilPattern.xsd");
         if (!xsd.exists())
-          $(PrecisionEvaluator.class.getResourceAsStream("resources/PupilPattern.zip")).zipstream().unzip(xsd.getAbsolutePath().substring(0, xsd.getAbsolutePath().lastIndexOf(File.separator) + 1));
+            $(PrecisionEvaluator.class.getResourceAsStream("resources/PupilPattern.zip")).zipstream().unzip(xsd.getAbsolutePath().substring(0, xsd.getAbsolutePath().lastIndexOf(File.separator) + 1));
     }
 
     /**
@@ -441,5 +445,12 @@ public class PrecisionEvaluator {
      */
     public int getCount() {
         return this.allData.size();
+    }
+
+    /**
+     * @return the logPupils
+     */
+    public boolean isLogPupils() {
+        return this.logPupils;
     }
 }
