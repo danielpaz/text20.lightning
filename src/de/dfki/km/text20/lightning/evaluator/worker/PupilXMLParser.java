@@ -33,6 +33,8 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
+
 /**
  * the XML-files which stores the evaluation datas are processed by this class
  * 
@@ -65,6 +67,9 @@ public class PupilXMLParser {
     /** name of the actual file */
     private String fileName;
 
+    /** stored timestamp */
+    private long storedTimeStamp;
+
     /**
      * tries to read the included StorageContainer of the given XML-file
      * 
@@ -84,6 +89,7 @@ public class PupilXMLParser {
         this.timestampTmp = 0;
         this.leftTmp = 0;
         this.rightTmp = 0;
+        this.storedTimeStamp = 0;
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -153,8 +159,9 @@ public class PupilXMLParser {
                 // ... store it ...
                 this.rightTmp = Float.parseFloat(value);
 
-                // ... add a new container to the data
-                this.data.addData(this.timestampTmp, new float[] { this.leftTmp, this.rightTmp });
+                // ... add a new container to the data, if the interval is overstepped
+                if (this.storedTimeStamp + EvaluatorMain.getInstance().getInterval() > this.timestampTmp)
+                    this.data.addData(this.timestampTmp, new float[] { this.leftTmp, this.rightTmp });
 
                 // reset variables
                 this.timestamp = false;
@@ -162,6 +169,7 @@ public class PupilXMLParser {
                 this.right = false;
                 this.leftTmp = 0;
                 this.rightTmp = 0;
+                this.storedTimeStamp = this.timestampTmp;
                 this.timestampTmp = 0;
 
                 // return success
@@ -183,7 +191,7 @@ public class PupilXMLParser {
 
                 // ... store it
                 this.timestampTmp = Long.parseLong(value);
-                
+
                 // return success
                 return true;
             }
