@@ -385,6 +385,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonTextConfig.setEnabled(false);
             this.labelThresh.setEnabled(false);
             this.spinnerThresh.setEnabled(false);
+            this.labelInterval.setEnabled(false);
+            this.spinnerInterval.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -412,6 +414,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonTextConfig.setEnabled(true);
             this.labelThresh.setEnabled(true);
             this.spinnerThresh.setEnabled(true);
+            this.labelInterval.setEnabled(true);
+            this.spinnerInterval.setEnabled(true);
         }
     }
 
@@ -460,7 +464,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonTextConfig.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.labelThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.buttonConfiguration.setEnabled(this.checkBoxConfiguration.isSelected());
+        this.buttonConfiguration.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.labelInterval.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.spinnerInterval.setEnabled(!this.checkBoxConfiguration.isSelected());
     }
 
     /**
@@ -674,7 +680,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         System.out.println();
         System.out.println();
-        
+
         // initialize and start evaluationThread
         this.evaluationThread.init(this);
         Thread thread = new Thread(this.evaluationThread);
@@ -825,5 +831,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public double getCoverageThreshold() {
         return this.treshold;
+    }
+
+    /**
+     * @return interval for pupil recognition
+     */
+    public int getInterval() {
+        return Integer.parseInt(this.spinnerInterval.getValue().toString());
     }
 }
