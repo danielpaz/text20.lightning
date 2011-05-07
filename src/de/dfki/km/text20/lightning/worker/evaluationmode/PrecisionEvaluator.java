@@ -62,7 +62,7 @@ public class PrecisionEvaluator {
     private Point relatedPosition;
 
     /** offset between fixation point and mouse position */
-    private Point mousePoint;
+    private Point translatedRelatedPosition;
 
     /** robot for creating screenshots */
     private Robot robot;
@@ -108,7 +108,7 @@ public class PrecisionEvaluator {
         // initialize variables
         this.fixation = new Point();
         this.fixationTmp = new Point();
-        this.mousePoint = new Point();
+        this.translatedRelatedPosition = new Point();
         this.allData = new ArrayList<StorageContainer>();
         this.properties = MainClass.getInstance().getProperties();
         this.warning = false;
@@ -163,7 +163,7 @@ public class PrecisionEvaluator {
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
         // calculate offset
-        this.mousePoint.setLocation(this.relatedPosition.x - this.fixation.x, this.relatedPosition.y - this.fixation.y);
+        this.translatedRelatedPosition.setLocation(this.relatedPosition.x - this.fixation.x, this.relatedPosition.y - this.fixation.y);
 
         // collect data
         this.allData.add(new StorageContainer(new Long(this.timestamp), new Point(this.fixation), new Point(this.relatedPosition)));
@@ -184,10 +184,10 @@ public class PrecisionEvaluator {
         MainClass.getInstance().addToStatistic("evaluation", logString);
 
         // update recalibration
-        MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.mousePoint);
+        MainClass.getInstance().getRecalibrator().updateCalibration(this.fixation, this.translatedRelatedPosition);
 
         // indicate error
-        if ((Math.abs(this.mousePoint.x) > this.properties.getDimension() / 2) || (Math.abs(this.mousePoint.y) > this.properties.getDimension() / 2)) {
+        if ((Math.abs(this.translatedRelatedPosition.x) > this.properties.getDimension() / 2) || (Math.abs(this.translatedRelatedPosition.y) > this.properties.getDimension() / 2)) {
             this.warning = true;
 
             // reset status

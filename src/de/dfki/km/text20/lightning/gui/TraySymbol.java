@@ -62,9 +62,9 @@ public class TraySymbol {
         }
 
         // initialize images
-        this.active = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveNormal.gif"));
-        this.deactivated = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("Inactive.gif"));
-        this.evaluation = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("ActiveEvaluation.gif"));
+        this.active = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("recources/ActiveNormal.gif"));
+        this.deactivated = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("recources/Inactive.gif"));
+        this.evaluation = Toolkit.getDefaultToolkit().getImage(TraySymbol.class.getResource("recources/ActiveEvaluation.gif"));
 
         // initialize tray icon and add it to tray
         this.trayIcon = new TrayIcon(this.active, "Project Lightning (Desktop)");
