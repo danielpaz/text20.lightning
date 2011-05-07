@@ -35,13 +35,13 @@ import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
+import de.dfki.km.text20.lightning.components.evaluationmode.StorageContainer;
+import de.dfki.km.text20.lightning.components.evaluationmode.gui.EvaluationMainWindowImpl;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.mousewarp.MouseWarper;
-import de.dfki.km.text20.lightning.worker.evaluationmode.StorageContainer;
-import de.dfki.km.text20.lightning.worker.evaluationmode.gui.EvaluationMainWindowImpl;
 
 /**
  * This is the configuration window which is shown after a click on the 'configuration' button of the tray menu. 
@@ -90,7 +90,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.main = MainClass.getInstance();
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
-        this.main.resetEvaluator();
         this.child = null;
 
         // take values of global properties and preselect them
@@ -289,6 +288,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // update statistics
         this.main.addToStatistic("settings changed");
         this.main.setupStatistics();
+        
+        // reset evaluator
+        this.main.resetEvaluator();
 
         // close the gui
         this.mainFrame.dispose();
