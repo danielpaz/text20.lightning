@@ -1,5 +1,5 @@
 /*
- * PupilContainer.java
+ * EvaluationContainer.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,42 +18,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.evaluator.worker;
-
-import java.util.TreeMap;
+package de.dfki.km.text20.lightning.worker.evaluator.worker;
 
 /**
- * Storage for pupil data
+ * This container stores setting-specific distances between fixation and mouse. 
+ * It is possible that different SettingContainer could include the same setting,
+ * so an common container is needed.
  * 
  * @author Christoph Käding
+ *
  */
-public class PupilContainer {
+public class DerivationContainer {
 
-    /** stored data */
-    private TreeMap<Long, float[]> pupilData;
+    /** number of adds */
+    private int counter;
+
+    /** summarized distance */
+    private double derivation;
 
     /**
-     * crates new instance and initialize variables
+     * creates a new object and initializes variables
      */
-    public PupilContainer() {
-        this.pupilData = new TreeMap<Long, float[]>();
+    public DerivationContainer() {
+        this.counter = 0;
+        this.derivation = 0;
     }
 
     /**
-     * adds data to hashmap
+     * adds distance and pupils to storage
      * 
-     * @param timestamp
-     * @param pupils
+     * @param distance
      */
-    @SuppressWarnings("boxing")
-    public void addData(long timestamp, float[] pupils) {
-        this.pupilData.put(timestamp, pupils);
+    public void addDistance(double distance) {
+        this.derivation = this.derivation + distance;
+        this.counter++;
     }
 
     /**
-     * @return the pupilData
+     * @return averaged derivation
      */
-    public TreeMap<Long, float[]> getData() {
-        return this.pupilData;
+    public double getAveragedDerivation() {
+        if (this.counter > 0) return (this.derivation / this.counter);
+        return 0;
     }
 }

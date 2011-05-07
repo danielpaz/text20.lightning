@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.evaluator.worker;
+package de.dfki.km.text20.lightning.worker.evaluator.worker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +33,7 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
-import de.dfki.km.text20.lightning.evaluator.EvaluatorMain;
+import de.dfki.km.text20.lightning.worker.evaluator.EvaluatorMain;
 
 /**
  * the XML-files which stores the evaluation datas are processed by this class
