@@ -41,17 +41,17 @@ import net.xeoh.plugins.meta.updatecheck.UpdateCheck;
 
 import com.melloware.jintellitype.JIntellitype;
 
+import de.dfki.km.text20.lightning.components.FixationWatcher;
+import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
+import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.components.evaluationmode.gui.EvaluationMainWindowImpl;
+import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
+import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
+import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.gui.TraySymbol;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
-import de.dfki.km.text20.lightning.worker.FixationWatcher;
-import de.dfki.km.text20.lightning.worker.clickto.FixationEvaluator;
-import de.dfki.km.text20.lightning.worker.evaluationmode.PrecisionEvaluator;
-import de.dfki.km.text20.lightning.worker.evaluationmode.gui.EvaluationMainWindowImpl;
-import de.dfki.km.text20.lightning.worker.recalibrator.Recalibrator;
-import de.dfki.km.text20.lightning.worker.submitreminder.SubmitReminder;
-import de.dfki.km.text20.lightning.worker.warpmouse.WarpCommander;
 
 /**
  * Main entry point.
@@ -122,6 +122,9 @@ public class MainClass {
 
     /** ShutDownHook */
     private Thread hook;
+
+    /** evaluation gui */
+    private EvaluationMainWindowImpl evaluationWindow;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -510,7 +513,7 @@ public class MainClass {
 
             // open gui if selected
             if (this.evaluationSettings[4].equals("1")) {
-                new EvaluationMainWindowImpl(this.evaluator);
+                this.evaluationWindow = new EvaluationMainWindowImpl(this.evaluator);
 
                 // shows change in tray and console
                 this.showTrayMessage("Evaluation mode activated.");
@@ -560,10 +563,14 @@ public class MainClass {
     }
 
     /**
-     * resets evaluator, used to notify new user names
+     * resets evaluator, used to notify new user names, ...
      */
     public void resetEvaluator() {
         this.evaluator.leaveEvaluation();
+        if (this.evaluationSettings[4].equals("1")) {
+            if (this.evaluationWindow.isVisible()) this.evaluationWindow.exit();
+            this.evaluationWindow = new EvaluationMainWindowImpl(this.evaluator);
+        }
     }
 
     /**
@@ -582,7 +589,7 @@ public class MainClass {
      * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
      * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
      * 3 = output path
-     * 4 = use special gui
+     * 4 = evaluation type
      */
     public String[] getEvaluationSettings() {
         if (this.evaluationSettings == null) {
@@ -602,6 +609,7 @@ public class MainClass {
      * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
      * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
      * 3 = output path
+     * 4 = evaluation type
      */
     public void setEvaluationSettings(String[] settings) {
         String tmpString = this.evaluationSettings[3];
@@ -705,7 +713,7 @@ public class MainClass {
         //            // return not successful
         //            return false;
         //        }
-        
+
         // TODO: test these for XP, Win7 32Bit, ... works fine for Win7 64Bit
         File destination = new File("JIntellitype.dll");
 
