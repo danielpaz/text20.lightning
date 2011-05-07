@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.evaluator;
+package de.dfki.km.text20.lightning.worker.evaluator;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -50,14 +50,14 @@ import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
 import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
-import de.dfki.km.text20.lightning.evaluator.gui.EvaluationWindow;
-import de.dfki.km.text20.lightning.evaluator.plugins.CoverageAnalyser;
-import de.dfki.km.text20.lightning.evaluator.worker.DataXMLParser;
-import de.dfki.km.text20.lightning.evaluator.worker.EvaluationThread;
-import de.dfki.km.text20.lightning.evaluator.worker.EvaluatorWorker;
-import de.dfki.km.text20.lightning.evaluator.worker.PupilXMLParser;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+import de.dfki.km.text20.lightning.worker.evaluator.gui.EvaluationWindow;
+import de.dfki.km.text20.lightning.worker.evaluator.plugins.CoverageAnalyser;
+import de.dfki.km.text20.lightning.worker.evaluator.worker.DataXMLParser;
+import de.dfki.km.text20.lightning.worker.evaluator.worker.EvaluationThread;
+import de.dfki.km.text20.lightning.worker.evaluator.worker.EvaluatorWorker;
+import de.dfki.km.text20.lightning.worker.evaluator.worker.PupilXMLParser;
 
 /**
  * @author Christoph Käding
