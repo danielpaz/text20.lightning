@@ -705,6 +705,26 @@ public class MainClass {
         //            // return not successful
         //            return false;
         //        }
+        
+        // TODO: test these for XP, Win7 32Bit, ... works fine for Win7 64Bit
+        File destination = new File("JIntellitype.dll");
+
+        // check if it is already the
+        if (!destination.exists()) {
+
+            // try to unzip it to "."
+            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(".");
+
+            if (!destination.exists()) {
+                // Display an error message
+                String msg = new String("Initializing failed. The DLL 'JIntellitype.dll' could not be copied to " + new File(".").getAbsolutePath() + ".");
+                this.showTrayMessage(msg);
+                this.channel.status(msg);
+
+                // return not successful
+                return false;
+            }
+        }
 
         // return successful
         return true;
