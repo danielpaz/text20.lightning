@@ -28,6 +28,15 @@
        <string>$sizePolicy</string> 
        <int>1</int> 
       </void> 
+      <void method="setProperty"> 
+       <string>background</string> 
+       <object class="java.awt.Color"> 
+        <int>255</int> 
+        <int>255</int> 
+        <int>255</int> 
+        <int>255</int> 
+       </object> 
+      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JPanel</string> 

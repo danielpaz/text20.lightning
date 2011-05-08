@@ -29,6 +29,7 @@ public class EvaluationMainWindow extends JFrame {
 
         //======== this ========
         setTitle("Project Lightning (Desktop) Evaluation Mode");
+        setBackground(Color.white);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "1dlu, $lcgap, 1dlu:grow",

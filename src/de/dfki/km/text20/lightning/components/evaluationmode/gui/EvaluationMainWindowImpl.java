@@ -20,6 +20,8 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.gui;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -30,7 +32,6 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Time;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -38,6 +39,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
+import de.dfki.km.text20.lightning.components.evaluationmode.AreaXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.CoordinatesXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
 
@@ -100,13 +102,40 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     /** timer to draw notifications */
     private Timer notificationTimer;
 
-    /** indicates if the current step is done */
+    /** a list of already selected indexes for preparedText-array */
+    private ArrayList<Integer> alreadySelected;
+
+    /** current index of text array*/
+    private int textNumber;
+
+    /** indicates if the next button should react */
     private boolean ready;
+
+    /** 
+     * indicates which status the currrent shown text has
+     * true = highlighted
+     * false = not highlighted
+     */
+    private boolean textStatus;
+
+    /** 
+     * current textarea to highlight
+     * x = start
+     * y = end
+     */
+    private Point area;
+
+    /** current used textfile */
+    private File textFile;
+
+    /** a list of all needed time to place the cursor inside the highlighted area */
+    private ArrayList<Long> neededTime;
 
     /**
      * @param evaluator 
      * 
      */
+    @SuppressWarnings("boxing")
     public EvaluationMainWindowImpl(PrecisionEvaluator evaluator) {
         // initialize variables
         this.configPanel = new ContentPanelZeroImpl();
@@ -116,6 +145,10 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         this.preparedText = new ArrayList<Point>();
         this.coordinatesValid = true;
         this.textValid = true;
+        this.alreadySelected = new ArrayList<Integer>();
+        this.alreadySelected.add(-1);
+        this.neededTime = new ArrayList<Long>();
+        this.textStatus = false;
         this.ready = true;
 
         // add 1st panel
@@ -146,7 +179,14 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
      * fired if the next bitton is clicked
      * navigates through evaluation
      */
+    @SuppressWarnings("boxing")
     private void buttonNextActionPerformed() {
+
+        if (!this.ready) {
+            System.out.println("Please confirm current step.");
+            this.labelDescription.setText("Please confirm current step.");
+            return;
+        }
 
         // reset label
         this.labelDescription.setText("");
@@ -194,6 +234,36 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 }
             }
 
+            if (this.evaluateDetector || this.evaluateWarper) {
+                this.pathText = this.configPanel.getPathText();
+                AreaXMLParser areaXMLParser = new AreaXMLParser();
+                File areaFile = new File(this.pathText);
+
+                // change path from xml-file to directory
+                this.pathText = this.pathText.replace("PreparedText.xml", "");
+
+                // validity check
+                if (areaFile.exists()) {
+                    if (areaXMLParser.isValid(areaFile)) {
+                        this.preparedText = areaXMLParser.readFile(areaFile);
+
+                        // indicate that all is fine
+                        this.textValid = true;
+
+                        // set to get first screenshot
+                        this.evaluator.setStepRecognized(true);
+
+                        // set max size
+                        this.maxStep = this.maxStep + this.preparedText.size() + 1;
+
+                    } else {
+                        this.textValid = false;
+                    }
+                } else {
+                    this.textValid = false;
+                }
+            }
+
             // check if all stuff is correct
             if (this.coordinatesValid && this.textValid && (this.maxStep > 1)) {
 
@@ -212,11 +282,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                         this.labelDescription.setText(e.toString());
                         e.printStackTrace();
                     }
-
-                } else if (this.evaluateDetector || this.evaluateWarper) {
-                    // TODO: add text description
+                    return;
                 }
-
             } else {
 
                 // indicate failure
@@ -227,13 +294,15 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     this.labelDescription.setText("PreparedText.xml is not recognized or is not valid.");
                     System.out.println("PreparedText.xml is not recognized or is not valid.");
                 }
+
+                return;
             }
-            return;
         }
 
-        // start pupil stream is needed
+        // start pupil stream if is needed
         if ((this.step == 1) && this.evaluatePrecision) {
             this.evaluator.startPupilStream();
+            this.evaluator.setEvaluationStep(0);
         }
 
         // next steps, if precision evaluation is enabled, +1 because of description png
@@ -267,6 +336,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
         // precision evaluation done
         if (this.step == this.preparedCoordinates.size() + 1) {
+            
+            this.evaluator.setBlockHotkeys(true);
 
             if (!this.evaluateDetector && !this.evaluateWarper) {
 
@@ -290,21 +361,57 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 }
 
                 // step forward
+                this.evaluator.setEvaluationStep(1);
                 this.step++;
-
                 return;
             }
         }
 
         // text, normal 
         if ((this.step > (this.preparedCoordinates.size() + 1)) && (this.evaluateDetector || this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1))) {
-            // TODO: step through normal text
+
+            if (!this.textStatus) {
+                // generate position
+                this.textNumber = -1;
+                while (this.alreadySelected.contains(0 + this.textNumber))
+                    this.textNumber = Integer.parseInt($.range(0, this.preparedText.size()).random(1).string().join());
+                this.alreadySelected.add(0 + this.textNumber);
+
+                // add text
+                this.area = new Point(-1, -1);
+                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.panelContent.removeAll();
+                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.dispose();
+                this.setVisible(true);
+
+                // step forward
+                this.textStatus = true;
+                return;
+            }
+
+            // add text
+            this.area = this.preparedText.get(this.textNumber);
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.panelContent.removeAll();
+            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.dispose();
+            this.setVisible(true);
+
+            // step forward
+            this.textStatus = false;
+            this.ready = false;
             this.step++;
             return;
         }
 
         // text, description detector
         if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector)) {
+
+            // reset 
+            this.alreadySelected.clear();
+            this.alreadySelected.add(-1);
+            this.textStatus = false;
 
             if (this.evaluateDetector) {
                 try {
@@ -316,25 +423,62 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 }
 
                 // step forward
+                this.evaluator.setEvaluationStep(2);
                 this.step++;
                 return;
             }
 
             // skip detector
-            this.step = this.step + this.preparedText.size() + 2;
-            return;
-
+            this.evaluator.setEvaluationStep(3);
+            this.step = this.step + this.preparedText.size() + 1;
         }
 
         // text, detector
         if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2))) {
-            // TODO: step through normal text
+
+            if (!this.textStatus) {
+                // generate position
+                this.textNumber = -1;
+                while (this.alreadySelected.contains(0 + this.textNumber))
+                    this.textNumber = Integer.parseInt($.range(0, this.preparedText.size()).random(1).string().join());
+                this.alreadySelected.add(0 + this.textNumber);
+
+                // add text
+                this.area = new Point(-1, -1);
+                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.panelContent.removeAll();
+                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.dispose();
+                this.setVisible(true);
+
+                // step forward
+                this.textStatus = true;
+                return;
+            }
+
+            // add text
+            this.area = this.preparedText.get(this.textNumber);
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.panelContent.removeAll();
+            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.dispose();
+            this.setVisible(true);
+
+            // step forward
+            this.textStatus = false;
+            this.ready = false;
             this.step++;
             return;
         }
 
         // text, description warper
         if (this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) {
+
+            // reset list
+            this.alreadySelected.clear();
+            this.alreadySelected.add(-1);
+            this.textStatus = false;
+
             if (this.evaluateWarper) {
                 try {
                     this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionWarp.png"));
@@ -345,19 +489,50 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 }
 
                 // step forward
+                this.evaluator.setEvaluationStep(3);
                 this.step++;
                 return;
 
             }
 
             // if warper should not be evaluated
-            this.step = this.step + this.preparedText.size() + 2;
-            return;
+            this.step = this.step + this.preparedText.size() + 1;
         }
 
         // text, warper
         if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && (this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 3 + 3))) {
-            // TODO: step through normal text
+
+            if (!this.textStatus) {
+                // generate position
+                this.textNumber = -1;
+                while (this.alreadySelected.contains(0 + this.textNumber))
+                    this.textNumber = Integer.parseInt($.range(0, this.preparedText.size()).random(1).string().join());
+                this.alreadySelected.add(0 + this.textNumber);
+
+                // add text
+                this.area = new Point(-1, -1);
+                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.panelContent.removeAll();
+                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.dispose();
+                this.setVisible(true);
+
+                // step forward
+                this.textStatus = true;
+                return;
+            }
+
+            // add text
+            this.area = this.preparedText.get(this.textNumber);
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.panelContent.removeAll();
+            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.dispose();
+            this.setVisible(true);
+
+            // step forward
+            this.textStatus = false;
+            this.ready = false;
             this.step++;
             return;
         }
@@ -485,6 +660,33 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
         // start timer
         this.notificationTimer.start();
+    }
+
+    /**
+     * @return start and endcoordinate of current highlighted word
+     * x-coordinate = start
+     * y-coordinate = end
+     */
+    public Point getArea() {
+        return this.area;
+    }
+
+    /**
+     * @return current textfile
+     */
+    public File getTextFile() {
+        return this.textFile;
+    }
+
+    /**
+     * @param time
+     */
+    @SuppressWarnings("boxing")
+    public void addToTimeArray(long time) {
+        this.neededTime.add(time);
+        this.ready = true;
+        this.labelDescription.setText("OK");
+        System.out.println("OK");
     }
 
     /* (non-Javadoc)
