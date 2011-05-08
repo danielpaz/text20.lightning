@@ -22,9 +22,6 @@ package de.dfki.km.text20.lightning.components.evaluationmode.gui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,13 +30,13 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.components.evaluationmode.CoordinatesXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
@@ -97,8 +94,14 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     /** JLabel which contains the image */
     private JLabel label;
 
-    /** graphic to draw stuff into the screenshots */
-    private Graphics2D graphics;
+    /** for temporary use, for example to show notifications */
+    private Point pointTmp;
+
+    /** timer to draw notifications */
+    private Timer notificationTimer;
+
+    /** indicates if the current step is done */
+    private boolean ready;
 
     /**
      * @param evaluator 
@@ -113,6 +116,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         this.preparedText = new ArrayList<Point>();
         this.coordinatesValid = true;
         this.textValid = true;
+        this.ready = true;
 
         // add 1st panel
         this.panelContent.add(this.configPanel);
@@ -143,6 +147,10 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
      * navigates through evaluation
      */
     private void buttonNextActionPerformed() {
+
+        // reset label
+        this.labelDescription.setText("");
+
         // first step
         if (this.step == 0) {
             // set evaluation steps
@@ -169,6 +177,12 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                         // indicate that all is fine
                         this.coordinatesValid = true;
 
+                        // set to get first screenshot
+                        this.evaluator.setStepRecognized(true);
+
+                        // set content panel for translation of coordinates
+                        this.evaluator.setContentPanel(this.panelContent);
+
                         // set max size
                         this.maxStep = this.preparedCoordinates.size() + 1;
 
@@ -192,7 +206,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
                     // paint image to JPanel
                     try {
-                        this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/PrecisionEvaluationDescription.png"));
+                        this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionPrecision.png"));
                         this.setImage();
                     } catch (IOException e) {
                         this.labelDescription.setText(e.toString());
@@ -214,11 +228,22 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     System.out.println("PreparedText.xml is not recognized or is not valid.");
                 }
             }
-
             return;
+        }
 
-            // next steps, if precision evaluation is enabled, +1 because of description png
-        } else if ((this.step > 0) && (this.step < this.preparedCoordinates.size() + 1) && this.evaluatePrecision) {
+        // start pupil stream is needed
+        if ((this.step == 1) && this.evaluatePrecision) {
+            this.evaluator.startPupilStream();
+        }
+
+        // next steps, if precision evaluation is enabled, +1 because of description png
+        if ((this.step > 0) && (this.step < this.preparedCoordinates.size() + 1) && this.evaluatePrecision) {
+
+            // check if ready for next step
+            if (!this.evaluator.isStepRecognized()) {
+                this.labelDescription.setText("Please confirm the current related point.");
+                return;
+            }
 
             // paint image to JPanel
             try {
@@ -230,35 +255,114 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.labelDescription.setText(e.toString());
             }
 
+            // set evaluator
+            this.evaluator.setPreparedPoint(this.preparedCoordinates.get(this.step - 1));
+            this.evaluator.setStepRecognized(false);
+
             // step forward
             this.step++;
 
             return;
+        }
 
-            // precision evaluation done
-        } else if (this.step == this.preparedCoordinates.size() + 1) {
+        // precision evaluation done
+        if (this.step == this.preparedCoordinates.size() + 1) {
 
-            if (!this.evaluateDetector) {
+            if (!this.evaluateDetector && !this.evaluateWarper) {
 
-                // if detectors shouldn't be evaluated, the description isn't needed
+                // if normal text should not be evaluated skip its description
                 this.step++;
-
-                if (!this.evaluateWarper) {
-
-                    // if the warper shouldn't also not evaluated, its description and the description of normal use is also not needed
-                    this.step++;
-                    this.step++;
-                }
-            } else {
-
-                if (!this.evaluateWarper) {
-
-                    // if warpers shouldn't be evaluated, the description isn't needed
-                    this.step++;
-                }
+                this.step++;
+                this.step++;
             }
 
+            // flush collected data
+            if (this.evaluatePrecision) this.evaluator.leaveEvaluation();
+
+            // show description if some more evaluation should be done
+            if (this.evaluateDetector || this.evaluateWarper) {
+                try {
+                    this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionNormal.png"));
+                    this.setImage();
+                } catch (IOException e) {
+                    this.labelDescription.setText(e.toString());
+                    e.printStackTrace();
+                }
+
+                // step forward
+                this.step++;
+
+                return;
+            }
         }
+
+        // text, normal 
+        if ((this.step > (this.preparedCoordinates.size() + 1)) && (this.evaluateDetector || this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1))) {
+            // TODO: step through normal text
+            this.step++;
+            return;
+        }
+
+        // text, description detector
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector)) {
+
+            if (this.evaluateDetector) {
+                try {
+                    this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionDetector.png"));
+                    this.setImage();
+                } catch (IOException e) {
+                    this.labelDescription.setText(e.toString());
+                    e.printStackTrace();
+                }
+
+                // step forward
+                this.step++;
+                return;
+            }
+
+            // skip detector
+            this.step = this.step + this.preparedText.size() + 2;
+            return;
+
+        }
+
+        // text, detector
+        if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2))) {
+            // TODO: step through normal text
+            this.step++;
+            return;
+        }
+
+        // text, description warper
+        if (this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) {
+            if (this.evaluateWarper) {
+                try {
+                    this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionWarp.png"));
+                    this.setImage();
+                } catch (IOException e) {
+                    this.labelDescription.setText(e.toString());
+                    e.printStackTrace();
+                }
+
+                // step forward
+                this.step++;
+                return;
+
+            }
+
+            // if warper should not be evaluated
+            this.step = this.step + this.preparedText.size() + 2;
+            return;
+        }
+
+        // text, warper
+        if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && (this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 3 + 3))) {
+            // TODO: step through normal text
+            this.step++;
+            return;
+        }
+
+        // show finish
         if (this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 3 + 3)) {
             // paint image to JPanel
             try {
@@ -308,25 +412,79 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         // FIXME: why does repaint not work?
         this.dispose();
         this.setVisible(true);
-        this.panelButtonPanel.repaint();
+        this.buttonCancel.repaint();
+        this.buttonNext.repaint();
+        this.labelDescription.repaint();
     }
 
     /**
      * updates current image inside the JPanel with some notification stuff
+     * 
+     * @param point which should be shown
      */
     private void updateImage(Point point) {
-        this.label = new JLabel(new ImageIcon(this.image));
-        this.label.setSize(this.image.getWidth(), this.image.getHeight());
-        SwingUtilities.convertPointToScreen(point, this.label);
-        this.graphics = this.image.createGraphics();
-        this.graphics.setColor(Color.BLUE);
-        this.graphics.drawOval(point.x - 5, point.y - 5, 10, 10);
-        this.panelContent.removeAll();
-        this.panelContent.remove(this.configPanel);
-        this.label = new JLabel(new ImageIcon(this.image));
-        this.label.setSize(this.image.getWidth(), this.image.getHeight());
-        this.panelContent.add(this.label);
-        this.panelContent.repaint();
+        // initialize timer, calculation is necessary because repaint of large scaled images will need more time than repaint of small ones
+        // TODO: test calculation with more different image sizes
+        this.notificationTimer = new Timer(Math.max((4000000 / (this.image.getWidth() * this.image.getHeight())), 50), new ActionListener() {
+
+            private BufferedImage notificationImage;
+
+            private Graphics2D graphics;
+
+            private int size = 100;
+
+            @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                // create graphics
+                this.notificationImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+                this.notificationImage.setData(image.getData());
+                this.graphics = this.notificationImage.createGraphics();
+
+                // block hotkeys
+                evaluator.setBlockHotkeys(true);
+
+                // remove old image
+                panelContent.removeAll();
+
+                // draw into image
+                this.graphics.setColor(new Color(0, 0, 255, 255));
+                this.graphics.drawOval(pointTmp.x - this.size / 2, pointTmp.y - this.size / 2, this.size, this.size);
+                this.graphics.setColor(new Color(0, 0, 255, 64));
+                this.graphics.fillOval(pointTmp.x - this.size / 2, pointTmp.y - this.size / 2, this.size, this.size);
+
+                // draw image to panel
+                label = new JLabel(new ImageIcon(this.notificationImage));
+                label.setSize(this.notificationImage.getWidth(), this.notificationImage.getHeight());
+                panelContent.add(label);
+                panelContent.repaint();
+
+                // decrement size
+                this.size = this.size - 5;
+
+                if (size <= 0) {
+                    // stop timer
+                    notificationTimer.stop();
+
+                    // enable hotkeys
+                    evaluator.setBlockHotkeys(false);
+
+                    // draw original picture
+                    panelContent.removeAll();
+                    label = new JLabel(new ImageIcon(image));
+                    label.setSize(image.getWidth(), image.getHeight());
+                    panelContent.add(label);
+                    panelContent.repaint();
+                }
+            }
+        });
+
+        // initialize point
+        this.pointTmp = point;
+
+        // start timer
+        this.notificationTimer.start();
     }
 
     /* (non-Javadoc)

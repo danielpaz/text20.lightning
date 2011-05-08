@@ -175,19 +175,20 @@ public class Hotkey implements HotkeyListener {
                 break;
             }
 
+            // old evaluation mode
             if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("0")) {
 
                 // first hotkey while in evaluation mode
-                if(!this.precisionEvaluator.isLogPupils()) {
+                if (!this.precisionEvaluator.isLogPupils()) {
                     // start pupil stream
                     this.precisionEvaluator.startPupilStream();
-                    
+
                     // indicate start
                     this.main.showTrayMessage("Evaluation: Now look at the first point and press " + this.getCurrentHotkey(1, true) + ".");
 
                     break;
                 }
-                
+
                 if (this.evaluationStatus) {
 
                     // store last fixation point
@@ -238,6 +239,32 @@ public class Hotkey implements HotkeyListener {
                         break;
                     }
                 }
+            }
+
+            // new evaluation mode
+            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1")) {
+
+                // check if oval is currently drawed
+                if(this.precisionEvaluator.isBlockHotkeys()) break;
+                
+                // store last fixation point
+                if (!this.precisionEvaluator.storeFixation()) {
+                    // indicate error
+                    this.main.playError();
+                    this.main.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
+                    break;
+                }
+
+                // set related point
+                this.precisionEvaluator.setRelatedPosition(null);
+                
+                // set status
+                this.precisionEvaluator.setStepRecognized(true);
+                
+                // inidcate success
+                this.main.playDing();
+                
+                break;
             }
 
             break;
