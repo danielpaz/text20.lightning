@@ -335,12 +335,11 @@ public class EvaluationPreparer extends PreparerWindow implements ActionListener
             // write images
             for (int i = 0; i < this.screenShots.size(); i++) {
                 // TODO: debugging
-                Graphics2D graphic = this.screenShots.get(i).createGraphics();
-                graphic.setFont(graphic.getFont().deriveFont(5));
-                graphic.setColor(new Color(255, 0, 0, 255));
-                graphic.drawOval(this.coordinates.get(i).x - 5, this.coordinates.get(i).y - 5, 10, 10);
-                graphic.setColor(new Color(255, 0, 0, 32));
-                graphic.fillOval(this.coordinates.get(i).x - 5, this.coordinates.get(i).y - 5, 10, 10);
+                //                Graphics2D graphic = this.screenShots.get(i).createGraphics();
+                //                graphic.setColor(new Color(255, 0, 0, 255));
+                //                graphic.drawOval(this.coordinates.get(i).x - 5, this.coordinates.get(i).y - 5, 10, 10);
+                //                graphic.setColor(new Color(255, 0, 0, 32));
+                //                graphic.fillOval(this.coordinates.get(i).x - 5, this.coordinates.get(i).y - 5, 10, 10);
 
                 // write image
                 try {

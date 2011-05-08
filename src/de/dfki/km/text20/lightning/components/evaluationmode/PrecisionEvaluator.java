@@ -24,6 +24,7 @@ package de.dfki.km.text20.lightning.components.evaluationmode;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.AWTException;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -36,6 +37,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -60,6 +63,9 @@ public class PrecisionEvaluator {
 
     /** associated mouse position which shows the real target */
     private Point relatedPosition;
+
+    /** by evaluation tool prepared position */
+    private Point preparedPosition;
 
     /** offset between fixation point and mouse position */
     private Point translatedRelatedPosition;
@@ -99,18 +105,27 @@ public class PrecisionEvaluator {
 
     /** indicates if the pupilfile should be updated */
     private boolean logPupils;
-    
+
     /** current brightness settings */
     private String screenBright;
-    
+
     /** current brightness settings */
     private String settingBright;
-    
+
     /** current output path */
     private String path;
-    
+
     /** current evaluation type */
     private String evaluationType;
+
+    /** trigger for evaluation gui */
+    private boolean stepRecognized;
+    
+    /** trigger for evaluation gui */
+    private boolean blockHotkeys;
+    
+    /** panel to translate coordinates within it */
+    private JPanel contentPanel;
 
     /**
      * creates the precision evaluator
@@ -126,6 +141,7 @@ public class PrecisionEvaluator {
         this.warning = false;
         this.isProcessing = false;
         this.logPupils = false;
+        this.stepRecognized = false;
 
         try {
             this.robot = new Robot();
@@ -145,6 +161,20 @@ public class PrecisionEvaluator {
     }
 
     /**
+     * stores prepared point
+     *
+     * @param preparedPoint 
+     * @return success 
+     */
+    public boolean setPreparedPoint(Point preparedPoint) {
+        if (this.isProcessing) return false;
+        this.isProcessing = true;
+        this.preparedPosition = new Point(preparedPoint);
+        this.isProcessing = false;
+        return true;
+    }
+
+    /**
      * stores last fixation so that it can be used to create a evaluation step
      * 
      * @return true if successful 
@@ -160,7 +190,7 @@ public class PrecisionEvaluator {
     }
 
     /**
-     * sets the mouseposition to associate it with the stored fixation
+     * sets the related position to associate it with the stored fixation
      * 
      * @param relatedPosition
      * @return true if the position is valid
@@ -170,7 +200,14 @@ public class PrecisionEvaluator {
         if (this.fixation == null) return EvaluationCode.NO_FIXATION;
         if (this.isProcessing) return EvaluationCode.ALREADY_PROCESSING;
         this.isProcessing = true;
-        this.relatedPosition = relatedPosition;
+        this.stepRecognized = true;
+        if (this.evaluationType.equals("0")) {
+            this.relatedPosition = relatedPosition;
+        } else {
+            SwingUtilities.convertPointToScreen(this.preparedPosition, this.contentPanel);
+            this.relatedPosition = this.preparedPosition;
+        }
+        
         Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
@@ -190,7 +227,7 @@ public class PrecisionEvaluator {
         }
 
         // update logfile
-        String logString = new String("Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Mouseposition: (" + this.relatedPosition.x + "," + this.relatedPosition.y + "), Dimension: " + this.properties.getDimension() + ", Recalibration is used: " + this.properties.isRecalibration());
+        String logString = new String("Timestamp: " + this.timestamp + ", Fixation: (" + this.fixation.x + "," + this.fixation.y + "), Related Position: (" + this.relatedPosition.x + "," + this.relatedPosition.y + "), Dimension: " + this.properties.getDimension() + ", Recalibration is used: " + this.properties.isRecalibration());
         System.out.println("Evaluation - " + logString);
         MainClass.getInstance().getChannel().status("Evaluation - " + logString);
         MainClass.getInstance().addToStatistic("evaluation", logString);
@@ -468,5 +505,40 @@ public class PrecisionEvaluator {
      */
     public boolean isLogPupils() {
         return this.logPupils;
+    }
+
+    /**
+     * @return the stepRecognized
+     */
+    public boolean isStepRecognized() {
+        return this.stepRecognized;
+    }
+
+    /**
+     * @param stepRecognized the stepRecognized to set
+     */
+    public void setStepRecognized(boolean stepRecognized) {
+        this.stepRecognized = stepRecognized;
+    }
+
+    /**
+     * @param contentPanel the contentPanel to set
+     */
+    public void setContentPanel(JPanel contentPanel) {
+        this.contentPanel = contentPanel;
+    }
+
+    /**
+     * @return the blockHotkeys
+     */
+    public boolean isBlockHotkeys() {
+        return this.blockHotkeys;
+    }
+
+    /**
+     * @param blockHotkeys the blockHotkeys to set
+     */
+    public void setBlockHotkeys(boolean blockHotkeys) {
+        this.blockHotkeys = blockHotkeys;
     }
 }
