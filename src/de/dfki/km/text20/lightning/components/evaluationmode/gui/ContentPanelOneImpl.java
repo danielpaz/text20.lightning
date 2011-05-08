@@ -22,88 +22,47 @@ package de.dfki.km.text20.lightning.components.evaluationmode.gui;
 
 import static net.jcores.CoreKeeper.$;
 
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
 
 /**
  * @author Christoph Käding
- *
  */
 @SuppressWarnings("serial")
-public class ContentPanelOneImpl extends ContentPanelOne implements ActionListener,
-        CaretListener {
+public class ContentPanelOneImpl extends ContentPanelOne implements CaretListener {
 
-    private StyledDocument doc;
+    private long timestamp;
 
-    private Style red;
-    
-    private PrecisionEvaluator evaluator;
+    private Point area;
+
+    private EvaluationMainWindowImpl mainWindow;
 
     /**
-     * 
+     * @param evalMainWin 
      */
-    public ContentPanelOneImpl(PrecisionEvaluator evaluator) {
+    public ContentPanelOneImpl(EvaluationMainWindowImpl evalMainWin) {
+        this.mainWindow = evalMainWin;
+        this.textPaneContent.setBounds(new Rectangle(new Dimension(this.getBounds().width, this.getBounds().height)));
         this.textPaneContent.setContentType("text/html");
-        this.textPaneContent.setText($(ContentPanelOneImpl.class.getResourceAsStream("../resources/test.html")).text().join(""));
-
-        this.doc = this.textPaneContent.getStyledDocument();
-        this.red = this.textPaneContent.addStyle("Red", null);
-        StyleConstants.setForeground(this.red, Color.red);
-
-        this.evaluator = evaluator;
-        
-        this.buttonStart.addActionListener(this);
+        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join(""));
         this.textPaneContent.addCaretListener(this);
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        if (event.getSource() == this.buttonStart) {
-            this.buttonStartActionPerformed();
-        }
-    }
-
-    private void buttonStartActionPerformed() {
-        this.doc.setCharacterAttributes(0, 5, this.textPaneContent.getStyle("Red"), true);
+        //        this.textPaneContent.setEditable(false);
+        this.area = this.mainWindow.getArea();
+        this.timestamp = System.currentTimeMillis();
     }
 
     /* (non-Javadoc)
      * @see javax.swing.event.CaretListener#caretUpdate(javax.swing.event.CaretEvent)
      */
     @Override
-    public void caretUpdate(CaretEvent e) {
-        try {
-            // width from rectangles are always 0?
-            
-            Rectangle rectangleCaret = this.textPaneContent.getUI().modelToView(this.textPaneContent, this.textPaneContent.getCaretPosition());
-            Point caretPosition = new Point(rectangleCaret.x + rectangleCaret.width / 2, rectangleCaret.y + rectangleCaret.height / 2);
-            SwingUtilities.convertPointToScreen(caretPosition, this.textPaneContent);
-
-            Rectangle rectangleChar = this.textPaneContent.getUI().modelToView(this.textPaneContent, 1);
-            Point charPosition = new Point(rectangleChar.x + rectangleChar.width / 2, rectangleChar.y + rectangleChar.height / 2);
-            SwingUtilities.convertPointToScreen(charPosition, this.textPaneContent);
-
-            System.out.println(this.textPaneContent.getCaretPosition() + " " + caretPosition + " " + charPosition);
-            System.out.println(rectangleCaret + " " + rectangleChar);
-        } catch (BadLocationException e1) {
-            e1.printStackTrace();
+    public void caretUpdate(CaretEvent event) {
+        System.out.println("index: " + this.textPaneContent.getCaretPosition());
+        if ((this.textPaneContent.getCaretPosition() >= this.area.x) && (this.textPaneContent.getCaretPosition() <= this.area.y)) {
+            this.mainWindow.addToTimeArray(System.currentTimeMillis() - this.timestamp);
         }
     }
-
 }

@@ -242,11 +242,11 @@ public class Hotkey implements HotkeyListener {
             }
 
             // new evaluation mode
-            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1")) {
+            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1") && (this.precisionEvaluator.getEvaluationStep() == 0)) {
 
                 // check if oval is currently drawed
-                if(this.precisionEvaluator.isBlockHotkeys()) break;
-                
+                if (this.precisionEvaluator.isBlockHotkeys()) break;
+
                 // store last fixation point
                 if (!this.precisionEvaluator.storeFixation()) {
                     // indicate error
@@ -257,13 +257,13 @@ public class Hotkey implements HotkeyListener {
 
                 // set related point
                 this.precisionEvaluator.setRelatedPosition(null);
-                
+
                 // set status
                 this.precisionEvaluator.setStepRecognized(true);
-                
+
                 // inidcate success
                 this.main.playDing();
-                
+
                 break;
             }
 

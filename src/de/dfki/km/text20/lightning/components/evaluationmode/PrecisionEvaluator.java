@@ -24,7 +24,6 @@ package de.dfki.km.text20.lightning.components.evaluationmode;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.AWTException;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -126,6 +125,14 @@ public class PrecisionEvaluator {
     
     /** panel to translate coordinates within it */
     private JPanel contentPanel;
+    
+    /** 
+     * indicates which step is the current one
+     * 0 = precision
+     * 1 = detector
+     * 2 = warper
+     */
+    private int evaluationStep;
 
     /**
      * creates the precision evaluator
@@ -540,5 +547,27 @@ public class PrecisionEvaluator {
      */
     public void setBlockHotkeys(boolean blockHotkeys) {
         this.blockHotkeys = blockHotkeys;
+    }
+
+    /**
+     * @return the evaluationStep
+     * 0 = precision
+     * 1 = normal
+     * 2 = detector
+     * 3 = warper
+     */
+    public int getEvaluationStep() {
+        return this.evaluationStep;
+    }
+
+    /**
+     * @param evaluationStep the evaluationStep to set
+     * 0 = precision
+     * 1 = normal
+     * 2 = detector
+     * 3 = warper
+     */
+    public void setEvaluationStep(int evaluationStep) {
+        this.evaluationStep = evaluationStep;
     }
 }
