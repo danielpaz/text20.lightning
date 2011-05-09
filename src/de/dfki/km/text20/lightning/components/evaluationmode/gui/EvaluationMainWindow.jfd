@@ -39,61 +39,72 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
+        <string>javax.swing.JScrollPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>java.awt.GridBagLayout</class> 
-         <void method="setProperty"> 
-          <string>$columnSpecs</string> 
-          <string>center:0:1.0</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$rowSpecs</string> 
-          <string>center:0:1.0</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$hGap</string> 
-          <int>5</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$vGap</string> 
-          <int>5</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$alignTop</string> 
-          <boolean>true</boolean> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$alignLeft</string> 
-          <boolean>true</boolean> 
-         </void> 
+         <class>javax.swing.JScrollPane</class> 
         </object> 
-        <void method="auxiliary"> 
-         <void method="setProperty"> 
-          <string>JavaCodeGenerator.variableModifiers</string> 
-          <int>4</int> 
-         </void> 
-        </void> 
         <void property="name"> 
-         <string>panelContent</string> 
+         <string>scrollPane1</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>java.awt.GridBagLayout</class> 
+           <void method="setProperty"> 
+            <string>$columnSpecs</string> 
+            <string>center:0:1.0</string> 
+           </void> 
+           <void method="setProperty"> 
+            <string>$rowSpecs</string> 
+            <string>center:0:1.0</string> 
+           </void> 
+           <void method="setProperty"> 
+            <string>$hGap</string> 
+            <int>5</int> 
+           </void> 
+           <void method="setProperty"> 
+            <string>$vGap</string> 
+            <int>5</int> 
+           </void> 
+           <void method="setProperty"> 
+            <string>$alignTop</string> 
+            <boolean>true</boolean> 
+           </void> 
+           <void method="setProperty"> 
+            <string>$alignLeft</string> 
+            <boolean>true</boolean> 
+           </void> 
+          </object> 
+          <void method="auxiliary"> 
+           <void method="setProperty"> 
+            <string>JavaCodeGenerator.variableModifiers</string> 
+            <int>4</int> 
+           </void> 
+          </void> 
+          <void property="name"> 
+           <string>panelContent</string> 
+          </void> 
+         </object> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
-         <string>gridHeight</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
          <string>gridWidth</string> 
          <int>3</int> 
         </void> 
         <void method="setProperty"> 
-         <string>vAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
+         <string>gridHeight</string> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
         </void> 
        </object> 
       </void> 
