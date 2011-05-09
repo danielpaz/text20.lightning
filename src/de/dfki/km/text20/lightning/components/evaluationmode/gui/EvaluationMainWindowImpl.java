@@ -195,6 +195,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.evaluateDetector = this.configPanel.isEvaluateDetector();
             this.evaluatePrecision = this.configPanel.isEvaluatePrecision();
             this.evaluateWarper = this.configPanel.isEvaluateWarp();
+            this.textValid = true;
+            this.coordinatesValid = true;
 
             // test files if necessary
             if (this.evaluatePrecision) {
@@ -425,7 +427,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
             // activate detector
             MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
-            
+
             // step forward
             this.evaluator.setEvaluationStep(2);
             this.step++;
@@ -491,22 +493,23 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.alreadySelected.add(-1);
             this.textStatus = false;
 
-                try {
-                    this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionWarp.png"));
-                    this.setImage();
-                } catch (IOException e) {
-                    this.labelDescription.setText(e.toString());
-                    e.printStackTrace();
-                }
+            try {
+                this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionWarp.png"));
+                this.setImage();
+            } catch (IOException e) {
+                this.labelDescription.setText(e.toString());
+                e.printStackTrace();
+            }
 
-                // activate/deactive plugins
-                if(this.evaluateDetector) MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
-                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().start();
-                
-                // step forward
-                this.evaluator.setEvaluationStep(3);
-                this.step++;
-                return;
+            // activate/deactive plugins
+            if (this.evaluateDetector)
+                MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
+            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().start();
+
+            // step forward
+            this.evaluator.setEvaluationStep(3);
+            this.step++;
+            return;
         }
 
         // text, warper
@@ -559,9 +562,11 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // deactivate plugins
-            if(this.evaluateDetector && !this.evaluateWarper) MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
-            if(this.evaluateWarper) MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().stop();
-            
+            if (this.evaluateDetector && !this.evaluateWarper)
+                MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
+            if (this.evaluateWarper)
+                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().stop();
+
             // step forward
             this.buttonNext.setText("Exit");
             this.step++;
@@ -585,7 +590,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
      */
     private void setImage() {
         this.panelContent.removeAll();
-        this.panelContent.remove(this.configPanel);
         this.label = new JLabel(new ImageIcon(this.image));
         this.label.setSize(this.image.getWidth(), this.image.getHeight());
         this.panelContent.add(this.label);
@@ -637,7 +641,10 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 label = new JLabel(new ImageIcon(this.notificationImage));
                 label.setSize(this.notificationImage.getWidth(), this.notificationImage.getHeight());
                 panelContent.add(label);
-                panelContent.repaint();
+                
+                // label.repaint() or panelContent.repaint() moves image in the upper left corner... WTF why?
+                label.setVisible(false);
+                label.setVisible(true);
 
                 // decrement size
                 this.size = this.size - 5;
@@ -654,7 +661,10 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     label = new JLabel(new ImageIcon(image));
                     label.setSize(image.getWidth(), image.getHeight());
                     panelContent.add(label);
-                    panelContent.repaint();
+                    
+                    // label.repaint() or panelContent.repaint() moves image in the upper left corner... WTF why?
+                    label.setVisible(false);
+                    label.setVisible(true);
                 }
             }
         });

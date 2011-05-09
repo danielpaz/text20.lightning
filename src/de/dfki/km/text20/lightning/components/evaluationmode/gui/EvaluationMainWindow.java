@@ -20,6 +20,7 @@ public class EvaluationMainWindow extends JFrame {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
+        scrollPane1 = new JScrollPane();
         panelContent = new JPanel();
         panelButtonPanel = new JPanel();
         buttonNext = new JButton();
@@ -34,15 +35,20 @@ public class EvaluationMainWindow extends JFrame {
             "1dlu, $lcgap, 1dlu:grow",
             "1dlu, $lgap, 1dlu:grow, $lgap, default, $lgap, 1dlu"));
 
-        //======== panelContent ========
+        //======== scrollPane1 ========
         {
-            panelContent.setLayout(new GridBagLayout());
-            ((GridBagLayout)panelContent.getLayout()).columnWidths = new int[] {0, 0};
-            ((GridBagLayout)panelContent.getLayout()).rowHeights = new int[] {0, 0};
-            ((GridBagLayout)panelContent.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-            ((GridBagLayout)panelContent.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+
+            //======== panelContent ========
+            {
+                panelContent.setLayout(new GridBagLayout());
+                ((GridBagLayout)panelContent.getLayout()).columnWidths = new int[] {0, 0};
+                ((GridBagLayout)panelContent.getLayout()).rowHeights = new int[] {0, 0};
+                ((GridBagLayout)panelContent.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                ((GridBagLayout)panelContent.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+            }
+            scrollPane1.setViewportView(panelContent);
         }
-        contentPane.add(panelContent, cc.xywh(1, 1, 3, 3, CellConstraints.CENTER, CellConstraints.CENTER));
+        contentPane.add(scrollPane1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
         //======== panelButtonPanel ========
         {
@@ -66,6 +72,7 @@ public class EvaluationMainWindow extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner non-commercial license
+    private JScrollPane scrollPane1;
     protected JPanel panelContent;
     protected JPanel panelButtonPanel;
     protected JButton buttonNext;
