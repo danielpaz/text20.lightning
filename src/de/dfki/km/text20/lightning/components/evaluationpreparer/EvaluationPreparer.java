@@ -23,8 +23,6 @@ package de.dfki.km.text20.lightning.components.evaluationpreparer;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;

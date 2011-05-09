@@ -494,7 +494,6 @@ public class MainClass {
     /**
      * Toggles mode between normal an evaluation mode.
      */
-    @SuppressWarnings("unused")
     public void toggleMode() {
         if (this.isNormalMode) {
 

@@ -11,8 +11,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class ContentPanelOne extends JPanel {
-    public ContentPanelOne() {
+public class ContentPanelText extends JPanel {
+    public ContentPanelText() {
         initComponents();
     }
 
@@ -42,3 +42,4 @@ public class ContentPanelOne extends JPanel {
     protected JTextPane textPaneContent;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
+

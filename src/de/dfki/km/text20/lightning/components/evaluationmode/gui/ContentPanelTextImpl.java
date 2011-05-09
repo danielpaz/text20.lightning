@@ -1,5 +1,5 @@
 /*
- * ContentPanelOneImpl.java
+ * ContentPanelTextImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -35,18 +35,21 @@ import javax.swing.text.BadLocationException;
  * @author Christoph Käding
  */
 @SuppressWarnings("serial")
-public class ContentPanelOneImpl extends ContentPanelOne implements CaretListener {
+public class ContentPanelTextImpl extends ContentPanelText implements CaretListener {
 
+    /** */
     private long timestamp;
 
+    /** */
     private Point area;
 
+    /** */
     private EvaluationMainWindowImpl mainWindow;
 
     /**
      * @param evalMainWin 
      */
-    public ContentPanelOneImpl(EvaluationMainWindowImpl evalMainWin) {
+    public ContentPanelTextImpl(EvaluationMainWindowImpl evalMainWin) {
         this.mainWindow = evalMainWin;
         this.textPaneContent.setBounds(new Rectangle(new Dimension(this.getBounds().width, this.getBounds().height)));
         this.textPaneContent.setContentType("text/html");

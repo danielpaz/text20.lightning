@@ -11,8 +11,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class ContentPanelZero extends JPanel {
-    public ContentPanelZero() {
+public class ContentPanelConfig extends JPanel {
+    public ContentPanelConfig() {
         initComponents();
     }
 
