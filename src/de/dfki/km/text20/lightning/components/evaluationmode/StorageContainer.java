@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementArray;
 
 /**
  * Container which stores collected evaluation data.
@@ -64,7 +63,6 @@ public class StorageContainer implements Serializable {
      * @param timestamp
      * @param fixation 
      * @param relatedPoint
-     * @param pubils 
      */
     public StorageContainer(long timestamp, Point fixation, Point relatedPoint) {
         this.timestamp = timestamp;

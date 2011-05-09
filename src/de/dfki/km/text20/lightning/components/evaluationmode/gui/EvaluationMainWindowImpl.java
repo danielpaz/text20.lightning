@@ -59,7 +59,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     private PrecisionEvaluator evaluator;
 
     /** cofigurations panel */
-    private ContentPanelZeroImpl configPanel;
+    private ContentPanelConfigImpl configPanel;
 
     /** current evaluation step */
     private int step;
@@ -139,7 +139,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     @SuppressWarnings("boxing")
     public EvaluationMainWindowImpl(PrecisionEvaluator evaluator) {
         // initialize variables
-        this.configPanel = new ContentPanelZeroImpl();
+        this.configPanel = new ContentPanelConfigImpl();
         this.evaluator = evaluator;
         this.step = 0;
         this.preparedCoordinates = new ArrayList<Point>();
@@ -382,7 +382,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.area = new Point(-1, -1);
                 this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.panelContent.add(new ContentPanelTextImpl(this));
                 this.dispose();
                 this.setVisible(true);
 
@@ -395,7 +395,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.area = this.preparedText.get(this.textNumber);
             this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
             this.panelContent.removeAll();
-            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
             this.setVisible(true);
 
@@ -446,7 +446,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.area = new Point(-1, -1);
                 this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.panelContent.add(new ContentPanelTextImpl(this));
                 this.dispose();
                 this.setVisible(true);
 
@@ -459,7 +459,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.area = this.preparedText.get(this.textNumber);
             this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
             this.panelContent.removeAll();
-            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
             this.setVisible(true);
             this.evaluator.setBlockHotkeys(false);
@@ -523,7 +523,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.area = new Point(-1, -1);
                 this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelOneImpl(this));
+                this.panelContent.add(new ContentPanelTextImpl(this));
                 this.dispose();
                 this.setVisible(true);
 
@@ -536,7 +536,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.area = this.preparedText.get(this.textNumber);
             this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
             this.panelContent.removeAll();
-            this.panelContent.add(new ContentPanelOneImpl(this));
+            this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
             this.setVisible(true);
 

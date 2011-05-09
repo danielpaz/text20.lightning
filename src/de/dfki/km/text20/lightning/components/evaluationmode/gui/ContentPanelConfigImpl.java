@@ -1,5 +1,5 @@
 /*
- * ContentPanelZeroImpl.java
+ * ContentPanelConfigImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -34,7 +34,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Christoph Käding
  */
 @SuppressWarnings("serial")
-public class ContentPanelZeroImpl extends ContentPanelZero implements ActionListener {
+public class ContentPanelConfigImpl extends ContentPanelConfig implements ActionListener {
 
     /** path to coordinates file */
     private String pathCoordinates;
@@ -56,7 +56,7 @@ public class ContentPanelZeroImpl extends ContentPanelZero implements ActionList
     /** 
      * creates new instance and initializes variables
      */
-    public ContentPanelZeroImpl() {
+    public ContentPanelConfigImpl() {
         // initialize chooser
         this.chooser = new JFileChooser() {
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
