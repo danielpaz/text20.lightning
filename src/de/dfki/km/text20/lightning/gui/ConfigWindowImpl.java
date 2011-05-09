@@ -36,7 +36,6 @@ import javax.swing.Timer;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.components.evaluationmode.StorageContainer;
-import de.dfki.km.text20.lightning.components.evaluationmode.gui.EvaluationMainWindowImpl;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
@@ -254,7 +253,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     /**
      * Fired if the OK button is clicked. All changes were applied.
      */
-    @SuppressWarnings("unused")
     protected void buttonOKActionPerformed() {
         // initialize temporary variables
         int useGui = 0;
@@ -288,9 +286,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // update statistics
         this.main.addToStatistic("settings changed");
         this.main.setupStatistics();
-        
+
         // reset evaluator
-        this.main.resetEvaluator();
+        if (this.checkBoxEvaluation.isSelected()) this.main.resetEvaluator();
 
         // close the gui
         this.mainFrame.dispose();

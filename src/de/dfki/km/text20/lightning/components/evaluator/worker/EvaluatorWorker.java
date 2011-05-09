@@ -27,7 +27,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -213,6 +215,14 @@ public class EvaluatorWorker {
             this.results.put(identifier, new EvaluationContainer(detector.getInformation().getId(), point.distance(translatedRelatedPoint), container, this.main.getCoverageThreshold(), path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + xmlTimeStamp + ".log", user, Long.parseLong(xmlTimeStamp)));
         }
 
+        // copy timefile
+        if (this.main.writeLog()) {
+            File timeFileSource = new File(file.getAbsolutePath().replace("_data.xml", "_time.log"));
+            File timeFileDestination = new File(path + "/evaluated/Session_" + this.currentTimeStamp + "/" + user + "_" + xmlTimeStamp + "/" + user + "_" + xmlTimeStamp + "_time.log");
+            if (!timeFileDestination.exists() && timeFileSource.exists()) {
+                $(timeFileSource).copy(timeFileDestination.getAbsolutePath());
+            }
+        }
     }
 
     /**
@@ -712,6 +722,20 @@ public class EvaluatorWorker {
             } catch (WriteException e) {
                 e.printStackTrace();
             }
+
+            // summarize time file
+            for (String xlsPath : this.overAllPath) {
+                try {
+                    BufferedReader lineReader = new BufferedReader(new FileReader(this.results.get(key).getLogPath().replace(".log", "_time.log")));
+                    String line = null;
+                    while ((line = lineReader.readLine()) != null) {
+                        $(xlsPath.replace("evaluation.log", "time.log")).file().append(line + "\r\n");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             // update progress bar
             this.main.updateProgressBar();
         }
@@ -840,6 +864,51 @@ public class EvaluatorWorker {
                 e.printStackTrace();
             }
         }
+
+        // create time xls
+        for (String xlsPath : this.overAllPath) {
+            try {
+                // initialize file
+                workbook = Workbook.createWorkbook(new File(xlsPath.replace("evaluation.log", "time.xls")), wbSettings);
+                workbook.createSheet("Evaluation", 0);
+                WritableSheet excelSheet = workbook.getSheet(0);
+
+                // add captions
+                excelSheet.addCell(new Label(0, 0, "Type", this.format));
+                excelSheet.addCell(new Label(1, 0, "Distance", this.format));
+                excelSheet.addCell(new Label(2, 0, "Time", this.format));
+
+                // initialize reader
+                BufferedReader lineReader = new BufferedReader(new FileReader(xlsPath.replace("evaluation.log", "time.log")));
+                String line = null;
+                int lineNumber = 1;
+                double distanceTmp;
+                long timeTmp;
+                String typeTmp;
+
+                // read
+                while ((line = lineReader.readLine()) != null) {
+                    typeTmp = line.substring(0, line.indexOf(" - "));
+                    //                    System.out.println("|" + typeTmp + "|");
+                    distanceTmp = Double.parseDouble(line.substring(line.indexOf(":") + 2, line.indexOf(" Pixel")));
+                    //                    System.out.println("|" + line.substring(line.indexOf(":") + 2, line.indexOf(" Pixel")) + "|");
+                    timeTmp = Integer.parseInt(line.substring(line.lastIndexOf(":") + 2, line.indexOf(" ms")));
+                    //                    System.out.println("|" + line.substring(line.lastIndexOf(":") + 2, line.indexOf(" ms")) + "|");
+                    excelSheet.addCell(new Label(0, lineNumber, typeTmp, this.format));
+                    excelSheet.addCell(new Number(1, lineNumber, distanceTmp, this.format));
+                    excelSheet.addCell(new Number(2, lineNumber, timeTmp, this.format));
+                    lineNumber++;
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /**

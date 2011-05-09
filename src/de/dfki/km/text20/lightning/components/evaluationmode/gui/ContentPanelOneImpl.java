@@ -26,8 +26,10 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
 
 /**
  * @author Christoph Käding
@@ -60,9 +62,17 @@ public class ContentPanelOneImpl extends ContentPanelOne implements CaretListene
      */
     @Override
     public void caretUpdate(CaretEvent event) {
-        System.out.println("index: " + this.textPaneContent.getCaretPosition());
-        if ((this.textPaneContent.getCaretPosition() >= this.area.x) && (this.textPaneContent.getCaretPosition() <= this.area.y)) {
-            this.mainWindow.addToTimeArray(System.currentTimeMillis() - this.timestamp);
+        //        System.out.println("index: " + this.textPaneContent.getCaretPosition());
+        if ((this.textPaneContent.getCaretPosition() >= this.area.x) && (this.textPaneContent.getCaretPosition() <= this.area.y + 1)) {
+            try {
+                long neededTime = System.currentTimeMillis() - this.timestamp;
+                Rectangle caretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, this.textPaneContent.getCaretPosition());
+                Point caretPoint = new Point(caretRectangle.x + caretRectangle.width / 2, caretRectangle.y + caretRectangle.height / 2);
+                SwingUtilities.convertPointToScreen(caretPoint, this.textPaneContent);
+                this.mainWindow.addToTimeFile(caretPoint.distance(this.mainWindow.getButtonNextCenter()), neededTime);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -89,19 +89,19 @@ public class EvaluationThread implements Runnable {
         for (File file : this.files) {
 
             System.out.println("- File " + file.getName() + " is the next one.");
-            
+
             // ... read related pupil stream, ...
             pupilParser.readFile(new File(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("_") + 1) + "pupils.xml"), this.worker);
-            
+
             // ... and every detector
             for (SaliencyDetector detector : this.selectedDetectors) {
 
                 // start current detector
                 detector.start();
-                
+
                 // indicate current detector
                 System.out.println("- Detector: " + detector.getInformation().getDisplayName());
-                
+
                 // ... and through every container in it ...
                 for (StorageContainer container : dataParser.readFile(file, this.dimension, this.worker)) {
 
@@ -114,7 +114,7 @@ public class EvaluationThread implements Runnable {
                     // update progress bar
                     this.mainClass.updateProgressBar();
                 }
-                
+
                 // stop current detector
                 detector.stop();
             }

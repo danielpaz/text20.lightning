@@ -37,15 +37,19 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.components.evaluationmode.AreaXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.CoordinatesXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
 
 /**
+ * super quick and dirty evaluation mode main window
+ * TODO: refactor this, HotKey integration, PrecisionEvaluator integration and EvaluatorWorker integration
+ * 
  * @author Christoph Käding
- *
  */
 @SuppressWarnings("serial")
 public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
@@ -128,9 +132,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     /** current used textfile */
     private File textFile;
 
-    /** a list of all needed time to place the cursor inside the highlighted area */
-    private ArrayList<Long> neededTime;
-
     /**
      * @param evaluator 
      * 
@@ -147,16 +148,15 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         this.textValid = true;
         this.alreadySelected = new ArrayList<Integer>();
         this.alreadySelected.add(-1);
-        this.neededTime = new ArrayList<Long>();
         this.textStatus = false;
         this.ready = true;
+        this.labelDescription.setText("Initializing done.");
 
         // add 1st panel
         this.panelContent.add(this.configPanel);
 
         // add action listeners
         this.buttonNext.addActionListener(this);
-        this.buttonCancel.addActionListener(this);
         this.addWindowListener(this);
 
         // set visible
@@ -170,8 +170,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() == this.buttonNext) {
             this.buttonNextActionPerformed();
-        } else if (event.getSource() == this.buttonCancel) {
-            this.buttonCancelActionPerformed();
         }
     }
 
@@ -336,7 +334,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
         // precision evaluation done
         if (this.step == this.preparedCoordinates.size() + 1) {
-            
+
             this.evaluator.setBlockHotkeys(true);
 
             if (!this.evaluateDetector && !this.evaluateWarper) {
@@ -359,6 +357,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     this.labelDescription.setText(e.toString());
                     e.printStackTrace();
                 }
+
+                // set needed variables to output time file 
+                if (!this.evaluatePrecision) this.evaluator.initTimeFile();
 
                 // step forward
                 this.evaluator.setEvaluationStep(1);
@@ -413,24 +414,22 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.alreadySelected.add(-1);
             this.textStatus = false;
 
-            if (this.evaluateDetector) {
-                try {
-                    this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionDetector.png"));
-                    this.setImage();
-                } catch (IOException e) {
-                    this.labelDescription.setText(e.toString());
-                    e.printStackTrace();
-                }
-
-                // step forward
-                this.evaluator.setEvaluationStep(2);
-                this.step++;
-                return;
+            // show description
+            try {
+                this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionDetector.png"));
+                this.setImage();
+            } catch (IOException e) {
+                this.labelDescription.setText(e.toString());
+                e.printStackTrace();
             }
 
-            // skip detector
-            this.evaluator.setEvaluationStep(3);
-            this.step = this.step + this.preparedText.size() + 1;
+            // activate detector
+            MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
+            
+            // step forward
+            this.evaluator.setEvaluationStep(2);
+            this.step++;
+            return;
         }
 
         // text, detector
@@ -463,6 +462,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.panelContent.add(new ContentPanelOneImpl(this));
             this.dispose();
             this.setVisible(true);
+            this.evaluator.setBlockHotkeys(false);
 
             // step forward
             this.textStatus = false;
@@ -471,15 +471,26 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             return;
         }
 
+        // overstep detector
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 1 + 1)) && this.evaluateWarper && !this.evaluateDetector) {
+            this.step = this.step + this.preparedText.size() * 1 + 1;
+
+        }
+
+        // overstep warper
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && !this.evaluateWarper && this.evaluateDetector) {
+            this.step = this.step + this.preparedText.size() * 1 + 1;
+
+        }
+
         // text, description warper
-        if (this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) {
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && this.evaluateWarper) {
 
             // reset list
             this.alreadySelected.clear();
             this.alreadySelected.add(-1);
             this.textStatus = false;
 
-            if (this.evaluateWarper) {
                 try {
                     this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/DescriptionWarp.png"));
                     this.setImage();
@@ -488,15 +499,14 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     e.printStackTrace();
                 }
 
+                // activate/deactive plugins
+                if(this.evaluateDetector) MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
+                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().start();
+                
                 // step forward
                 this.evaluator.setEvaluationStep(3);
                 this.step++;
                 return;
-
-            }
-
-            // if warper should not be evaluated
-            this.step = this.step + this.preparedText.size() + 1;
         }
 
         // text, warper
@@ -548,23 +558,18 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 e.printStackTrace();
             }
 
+            // deactivate plugins
+            if(this.evaluateDetector && !this.evaluateWarper) MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
+            if(this.evaluateWarper) MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().stop();
+            
             // step forward
             this.buttonNext.setText("Exit");
             this.step++;
 
             return;
-
         }
 
         // last step
-        this.exit();
-    }
-
-    /**
-     * fired if the cancel button is clicked
-     * closes evaluation
-     */
-    private void buttonCancelActionPerformed() {
         this.exit();
     }
 
@@ -587,7 +592,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         // FIXME: why does repaint not work?
         this.dispose();
         this.setVisible(true);
-        this.buttonCancel.repaint();
         this.buttonNext.repaint();
         this.labelDescription.repaint();
     }
@@ -679,14 +683,24 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     }
 
     /**
+     * @param distance 
      * @param time
      */
-    @SuppressWarnings("boxing")
-    public void addToTimeArray(long time) {
-        this.neededTime.add(time);
+    public void addToTimeFile(double distance, long time) {
+        this.evaluator.setBlockHotkeys(true);
+        this.evaluator.addToTimeFile("distance: " + distance + " Pixel, time: " + time + " ms");
         this.ready = true;
         this.labelDescription.setText("OK");
         System.out.println("OK");
+    }
+
+    /**
+     * @return the screen coordinates of the center of the next button
+     */
+    public Point getButtonNextCenter() {
+        Point center = new Point(this.buttonNext.getBounds().x + this.buttonNext.getBounds().width / 2, this.buttonNext.getBounds().y + this.buttonNext.getBounds().height / 2);
+        SwingUtilities.convertPointToScreen(center, this.buttonNext);
+        return center;
     }
 
     /* (non-Javadoc)
