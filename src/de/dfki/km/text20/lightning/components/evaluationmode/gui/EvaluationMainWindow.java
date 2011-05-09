@@ -23,7 +23,6 @@ public class EvaluationMainWindow extends JFrame {
         panelContent = new JPanel();
         panelButtonPanel = new JPanel();
         buttonNext = new JButton();
-        buttonCancel = new JButton();
         labelDescription = new JLabel();
         CellConstraints cc = new CellConstraints();
 
@@ -48,17 +47,16 @@ public class EvaluationMainWindow extends JFrame {
         //======== panelButtonPanel ========
         {
             panelButtonPanel.setLayout(new FormLayout(
-                "2*(60dlu, $lcgap), default:grow",
+                "60dlu, $lcgap, default:grow",
                 "default"));
 
             //---- buttonNext ----
             buttonNext.setText("Next");
             panelButtonPanel.add(buttonNext, cc.xy(1, 1));
 
-            //---- buttonCancel ----
-            buttonCancel.setText("Cancel");
-            panelButtonPanel.add(buttonCancel, cc.xy(3, 1));
-            panelButtonPanel.add(labelDescription, cc.xy(5, 1));
+            //---- labelDescription ----
+            labelDescription.setText("text");
+            panelButtonPanel.add(labelDescription, cc.xy(3, 1));
         }
         contentPane.add(panelButtonPanel, cc.xy(3, 5));
         setSize(470, 375);
@@ -71,7 +69,6 @@ public class EvaluationMainWindow extends JFrame {
     protected JPanel panelContent;
     protected JPanel panelButtonPanel;
     protected JButton buttonNext;
-    protected JButton buttonCancel;
     protected JLabel labelDescription;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

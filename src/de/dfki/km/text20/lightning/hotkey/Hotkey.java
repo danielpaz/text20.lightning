@@ -241,7 +241,7 @@ public class Hotkey implements HotkeyListener {
                 }
             }
 
-            // new evaluation mode
+            // new evaluation mode, precision
             if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1") && (this.precisionEvaluator.getEvaluationStep() == 0)) {
 
                 // check if oval is currently drawed
@@ -267,6 +267,17 @@ public class Hotkey implements HotkeyListener {
                 break;
             }
 
+
+            // new evaluation mode, detector
+            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1") && (this.precisionEvaluator.getEvaluationStep() == 2)) {
+
+                if(this.precisionEvaluator.isBlockHotkeys()) break;
+                
+                // similar to normal mode
+                if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
+                break;
+            }
+            
             break;
         // status hotkey
         case 2:

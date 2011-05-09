@@ -119,13 +119,13 @@ public class PrecisionEvaluator {
 
     /** trigger for evaluation gui */
     private boolean stepRecognized;
-    
+
     /** trigger for evaluation gui */
     private boolean blockHotkeys;
-    
+
     /** panel to translate coordinates within it */
     private JPanel contentPanel;
-    
+
     /** 
      * indicates which step is the current one
      * 0 = precision
@@ -214,7 +214,7 @@ public class PrecisionEvaluator {
             SwingUtilities.convertPointToScreen(this.preparedPosition, this.contentPanel);
             this.relatedPosition = this.preparedPosition;
         }
-        
+
         Rectangle screenShotRect = new Rectangle(-this.properties.getDimension() / 2, -this.properties.getDimension() / 2, Toolkit.getDefaultToolkit().getScreenSize().width + this.properties.getDimension(), Toolkit.getDefaultToolkit().getScreenSize().height + this.properties.getDimension());
         this.screenShot = this.robot.createScreenCapture(screenShotRect);
 
@@ -569,5 +569,33 @@ public class PrecisionEvaluator {
      */
     public void setEvaluationStep(int evaluationStep) {
         this.evaluationStep = evaluationStep;
+    }
+
+    /**
+     * initializes time file, 
+     * only if precision is not evaluated useful
+     */
+    public void initTimeFile() {
+        this.logTimeStamp = System.currentTimeMillis();
+        this.user = MainClass.getInstance().getEvaluationSettings()[0];
+        this.path = MainClass.getInstance().getEvaluationSettings()[3];
+    }
+    
+    /**
+     * @param text
+     */
+    public void addToTimeFile(String text) {
+        switch (this.getEvaluationStep()) {
+        case 1:
+            text = "normal - " + text;
+            break;
+        case 2:
+            text = "detector - " + text;
+            break;
+        case 3:
+            text = "warper - " + text;
+            break;
+        }
+        $(this.path + "/evaluation/data/" + this.user + "/" + this.user + "_" + this.logTimeStamp + "_time.log").file().append(text + "\r\n");
     }
 }
