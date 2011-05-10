@@ -20,10 +20,10 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.gui;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 
 /**
+ * displays given text on JTextPane
+ * 
  * @author Christoph Käding
  */
 @SuppressWarnings("serial")
@@ -33,7 +33,6 @@ public class ContentPanelTextHint extends ContentPanelText {
      * @param hint 
      */
     public ContentPanelTextHint(String hint) {
-        this.textPaneContent.setBounds(new Rectangle(new Dimension(this.getBounds().width, this.getBounds().height)));
         this.textPaneContent.setContentType("text/html");
         this.textPaneContent.setText(hint);
         this.textPaneContent.setEditable(false);

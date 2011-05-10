@@ -266,7 +266,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 // prepare next step
                 this.step++;
                 this.labelDescription.setText("");
-                
+
                 // calculate sizes
                 if (this.evaluateDetector && this.evaluateWarper) {
                     this.sizeDetector = this.preparedText.size() / 3;
@@ -285,7 +285,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     this.sizeWarp = 0;
                     this.sizeNormal = 0;
                 }
-                
+
                 System.out.println("nomral = " + this.sizeNormal);
                 System.out.println("detector = " + this.sizeDetector);
                 System.out.println("warp = " + this.sizeWarp);
@@ -404,7 +404,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
                 this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
-                this.dispose();
+                this.setVisible(false);
                 this.setVisible(true);
 
                 // step forward
@@ -417,7 +417,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
-            this.dispose();
+            this.setVisible(false);
             this.setVisible(true);
 
             // step forward
@@ -467,7 +467,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
                 this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
-                this.dispose();
+                this.setVisible(false);
                 this.setVisible(true);
 
                 // step forward
@@ -480,7 +480,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
-            this.dispose();
+            this.setVisible(false);
             this.setVisible(true);
             this.evaluator.setBlockHotkeys(false);
 
@@ -522,7 +522,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             // activate/deactive plugins
             if (this.evaluateDetector)
                 MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
-            MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().start();
+            MainClass.getInstance().startWarp();
 
             // step forward
             this.evaluator.setEvaluationStep(3);
@@ -544,7 +544,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
                 this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
-                this.dispose();
+                this.setVisible(false);
                 this.setVisible(true);
 
                 // step forward
@@ -557,7 +557,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
-            this.dispose();
+            this.setVisible(false);
             this.setVisible(true);
 
             // step forward
@@ -581,8 +581,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             // deactivate plugins
             if (this.evaluateDetector && !this.evaluateWarper)
                 MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
-            if (this.evaluateWarper)
-                MainClass.getInstance().getInternalPluginManager().getCurrentMouseWarper().stop();
+            if (this.evaluateWarper) MainClass.getInstance().stopWarp();
 
             // step forward
             this.buttonNext.setText("Exit");
@@ -611,7 +610,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         this.label.setSize(this.image.getWidth(), this.image.getHeight());
         this.panelContent.add(this.label);
         // FIXME: why does repaint not work?
-        this.dispose();
+        this.setVisible(false);
         this.setVisible(true);
         this.buttonNext.repaint();
         this.labelDescription.repaint();

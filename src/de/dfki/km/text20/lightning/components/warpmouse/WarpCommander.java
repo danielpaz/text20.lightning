@@ -27,7 +27,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 
 /**
@@ -46,15 +45,11 @@ public class WarpCommander {
     /** internal used plugin manager */
     private InternalPluginManager manager;
 
-    /** global used properties */
-    private Properties properties;
-
     /**
      * creates a new WarpCommander and initializes the timer.
      */
     public WarpCommander() {
         // initialize variables
-        this.properties = MainClass.getInstance().getProperties();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         final int interval = 10;
 
@@ -76,7 +71,7 @@ public class WarpCommander {
      * starts the timer
      */
     public void start() {
-        if (this.properties.isUseWarp()) this.timer.start();
+        this.timer.start();
     }
 
     /**
