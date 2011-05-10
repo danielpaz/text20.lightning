@@ -186,7 +186,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // set enable/disable and text to some components
         this.buttonStart.setEnabled(false);
         this.buttonStart.setText("Start");
-        this.labelDescription.setText("Step 1: Select *.xml files.");
+        this.labelDescription.setText("Step 1: Select *_data.xml files.");
         this.checkBoxImages.setSelected(true);
         this.checkBoxSummary.setSelected(true);
         this.buttonStart.setEnabled(false);

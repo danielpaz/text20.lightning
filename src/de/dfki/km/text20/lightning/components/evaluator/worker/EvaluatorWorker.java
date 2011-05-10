@@ -726,6 +726,8 @@ public class EvaluatorWorker {
             // summarize time file
             for (String xlsPath : this.overAllPath) {
                 try {
+                    if (!new File(this.results.get(key).getLogPath().replace(".log", "_time.log")).exists())
+                        continue;
                     BufferedReader lineReader = new BufferedReader(new FileReader(this.results.get(key).getLogPath().replace(".log", "_time.log")));
                     String line = null;
                     while ((line = lineReader.readLine()) != null) {
@@ -868,6 +870,9 @@ public class EvaluatorWorker {
         // create time xls
         for (String xlsPath : this.overAllPath) {
             try {
+                if (!new File(xlsPath.replace("evaluation.log", "time.log")).exists())
+                    continue;
+
                 // initialize file
                 workbook = Workbook.createWorkbook(new File(xlsPath.replace("evaluation.log", "time.xls")), wbSettings);
                 workbook.createSheet("Evaluation", 0);
