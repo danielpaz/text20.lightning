@@ -64,9 +64,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     /** current evaluation step */
     private int step;
 
-    /** maximal number of steps */
-    private int maxStep;
-
     /** indicates if the current warper should be evaluated */
     private boolean evaluateWarper;
 
@@ -114,6 +111,15 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
     /** indicates if the next button should react */
     private boolean ready;
+
+    /** number of normal text evaluation steps */
+    private int sizeNormal;
+
+    /** number of warp text evaluation steps */
+    private int sizeWarp;
+
+    /** number of detector text evaluation steps */
+    private int sizeDetector;
 
     /** 
      * indicates which status the currrent shown text has
@@ -219,9 +225,6 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                         // set content panel for translation of coordinates
                         this.evaluator.setContentPanel(this.panelContent);
 
-                        // set max size
-                        this.maxStep = this.preparedCoordinates.size() + 1;
-
                     } else {
                         this.coordinatesValid = false;
                     }
@@ -233,24 +236,21 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             if (this.evaluateDetector || this.evaluateWarper) {
                 this.pathText = this.configPanel.getPathText();
                 WordXMLParser wordXMLParser = new WordXMLParser();
-                File areaFile = new File(this.pathText);
+                File wordFile = new File(this.pathText);
 
                 // change path from xml-file to directory
                 this.pathText = this.pathText.replace("PreparedText.xml", "");
 
                 // validity check
-                if (areaFile.exists()) {
-                    if (wordXMLParser.isValid(areaFile)) {
-                        this.preparedText = wordXMLParser.readFile(areaFile);
+                if (wordFile.exists()) {
+                    if (wordXMLParser.isValid(wordFile)) {
+                        this.preparedText = wordXMLParser.readFile(wordFile);
 
                         // indicate that all is fine
                         this.textValid = true;
 
                         // set to get first screenshot
                         this.evaluator.setStepRecognized(true);
-
-                        // set max size
-                        this.maxStep = this.maxStep + this.preparedText.size() + 1;
 
                     } else {
                         this.textValid = false;
@@ -261,11 +261,34 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // check if all stuff is correct
-            if (this.coordinatesValid && this.textValid && (this.maxStep > 1)) {
+            if (this.coordinatesValid && this.textValid && ((this.preparedCoordinates.size()) > 0 || (this.preparedText.size() > 2))) {
 
                 // prepare next step
                 this.step++;
                 this.labelDescription.setText("");
+                
+                // calculate sizes
+                if (this.evaluateDetector && this.evaluateWarper) {
+                    this.sizeDetector = this.preparedText.size() / 3;
+                    this.sizeWarp = this.preparedText.size() / 3;
+                    this.sizeNormal = this.preparedText.size() - this.sizeDetector - this.sizeWarp;
+                } else if (this.evaluateDetector && !this.evaluateWarper) {
+                    this.sizeDetector = this.preparedText.size() / 2;
+                    this.sizeWarp = 0;
+                    this.sizeNormal = this.preparedText.size() - this.sizeDetector;
+                } else if (!this.evaluateDetector && this.evaluateWarper) {
+                    this.sizeDetector = 0;
+                    this.sizeWarp = this.preparedText.size() / 2;
+                    this.sizeNormal = this.preparedText.size() - this.sizeWarp;
+                } else if (!this.evaluateDetector && !this.evaluateWarper) {
+                    this.sizeDetector = 0;
+                    this.sizeWarp = 0;
+                    this.sizeNormal = 0;
+                }
+                
+                System.out.println("nomral = " + this.sizeNormal);
+                System.out.println("detector = " + this.sizeDetector);
+                System.out.println("warp = " + this.sizeWarp);
 
                 // show description png
                 if (this.evaluatePrecision) {
@@ -280,6 +303,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     }
                     return;
                 }
+
             } else {
 
                 // indicate failure
@@ -367,7 +391,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // text, normal 
-        if ((this.step > (this.preparedCoordinates.size() + 1)) && (this.evaluateDetector || this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1))) {
+        if ((this.step > (this.preparedCoordinates.size() + 1)) && (this.evaluateDetector || this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.sizeNormal + 1))) {
 
             if (!this.textStatus) {
                 // generate position
@@ -377,9 +401,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.word =  this.preparedText.get(this.textNumber);
+                this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -389,7 +413,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.labelDescription.setText("Your word is '" + this.word + "'.");
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
@@ -404,11 +428,11 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // text, description detector
-        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector)) {
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.sizeNormal + 1)) && (this.evaluateDetector)) {
 
             // reset 
-            this.alreadySelected.clear();
-            this.alreadySelected.add(-1);
+            //            this.alreadySelected.clear();
+            //            this.alreadySelected.add(-1);
             this.textStatus = false;
 
             // show description
@@ -430,7 +454,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // text, detector
-        if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() + 1)) && (this.evaluateDetector) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2))) {
+        if ((this.step > (this.preparedCoordinates.size() + 1 + this.sizeNormal + 1)) && (this.evaluateDetector) && (this.step < (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + 2))) {
 
             if (!this.textStatus) {
                 // generate position
@@ -440,9 +464,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.word =  this.preparedText.get(this.textNumber);
+                this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -452,7 +476,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.labelDescription.setText("Your word is '" + this.word + "'.");
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
@@ -468,23 +492,23 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // overstep detector
-        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 1 + 1)) && this.evaluateWarper && !this.evaluateDetector) {
-            this.step = this.step + this.preparedText.size() * 1 + 1;
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.sizeNormal + 1)) && this.evaluateWarper && !this.evaluateDetector) {
+            this.step = this.step + 1;
 
         }
 
         // overstep warper
-        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && !this.evaluateWarper && this.evaluateDetector) {
-            this.step = this.step + this.preparedText.size() * 1 + 1;
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + 2)) && !this.evaluateWarper && this.evaluateDetector) {
+            this.step = this.step + 1;
 
         }
 
         // text, description warper
-        if ((this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && this.evaluateWarper) {
+        if ((this.step == (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + 2)) && this.evaluateWarper) {
 
             // reset list
-            this.alreadySelected.clear();
-            this.alreadySelected.add(-1);
+            //            this.alreadySelected.clear();
+            //            this.alreadySelected.add(-1);
             this.textStatus = false;
 
             try {
@@ -507,7 +531,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // text, warper
-        if ((this.step > (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 2 + 2)) && (this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 3 + 3))) {
+        if ((this.step > (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + 2)) && (this.evaluateWarper) && (this.step < (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + this.sizeWarp + 3))) {
 
             if (!this.textStatus) {
                 // generate position
@@ -517,9 +541,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.word =  this.preparedText.get(this.textNumber);
+                this.word = this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word + "'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -529,7 +553,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.labelDescription.setText("Your word is '" + this.word + "'.");
             this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
@@ -544,7 +568,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         }
 
         // show finish
-        if (this.step == (this.preparedCoordinates.size() + 1 + this.preparedText.size() * 3 + 3)) {
+        if (this.step == (this.preparedCoordinates.size() + 1 + this.sizeNormal + this.sizeDetector + this.sizeWarp + 3)) {
             // paint image to JPanel
             try {
                 this.image = ImageIO.read(EvaluationMainWindowImpl.class.getResourceAsStream("../resources/Finished.png"));
@@ -634,7 +658,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 label = new JLabel(new ImageIcon(this.notificationImage));
                 label.setSize(this.notificationImage.getWidth(), this.notificationImage.getHeight());
                 panelContent.add(label);
-                
+
                 // label.repaint() or panelContent.repaint() moves image in the upper left corner... WTF why?
                 label.setVisible(false);
                 label.setVisible(true);
@@ -654,7 +678,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                     label = new JLabel(new ImageIcon(image));
                     label.setSize(image.getWidth(), image.getHeight());
                     panelContent.add(label);
-                    
+
                     // label.repaint() or panelContent.repaint() moves image in the upper left corner... WTF why?
                     label.setVisible(false);
                     label.setVisible(true);
