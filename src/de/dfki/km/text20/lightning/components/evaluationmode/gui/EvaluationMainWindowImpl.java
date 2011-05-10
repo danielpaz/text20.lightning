@@ -41,9 +41,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
-import de.dfki.km.text20.lightning.components.evaluationmode.AreaXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.CoordinatesXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
+import de.dfki.km.text20.lightning.components.evaluationmode.WordXMLParser;
 
 /**
  * super quick and dirty evaluation mode main window
@@ -86,7 +86,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     private ArrayList<Point> preparedCoordinates;
 
     /** list of all prepared text positions which should be highlighted */
-    private ArrayList<Point> preparedText;
+    private ArrayList<String> preparedText;
 
     /** indicates that the coordinate file is valid */
     private boolean coordinatesValid;
@@ -122,12 +122,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
      */
     private boolean textStatus;
 
-    /** 
-     * current textarea to highlight
-     * x = start
-     * y = end
-     */
-    private Point area;
+    /** current word for search */
+    private String word;
 
     /** current used textfile */
     private File textFile;
@@ -143,7 +139,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
         this.evaluator = evaluator;
         this.step = 0;
         this.preparedCoordinates = new ArrayList<Point>();
-        this.preparedText = new ArrayList<Point>();
+        this.preparedText = new ArrayList<String>();
         this.coordinatesValid = true;
         this.textValid = true;
         this.alreadySelected = new ArrayList<Integer>();
@@ -236,7 +232,7 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
             if (this.evaluateDetector || this.evaluateWarper) {
                 this.pathText = this.configPanel.getPathText();
-                AreaXMLParser areaXMLParser = new AreaXMLParser();
+                WordXMLParser wordXMLParser = new WordXMLParser();
                 File areaFile = new File(this.pathText);
 
                 // change path from xml-file to directory
@@ -244,8 +240,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
 
                 // validity check
                 if (areaFile.exists()) {
-                    if (areaXMLParser.isValid(areaFile)) {
-                        this.preparedText = areaXMLParser.readFile(areaFile);
+                    if (wordXMLParser.isValid(areaFile)) {
+                        this.preparedText = wordXMLParser.readFile(areaFile);
 
                         // indicate that all is fine
                         this.textValid = true;
@@ -381,10 +377,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.area = new Point(-1, -1);
-                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.word =  this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextImpl(this));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -394,8 +389,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.area = this.preparedText.get(this.textNumber);
-            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
@@ -445,10 +440,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.area = new Point(-1, -1);
-                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.word =  this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextImpl(this));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -458,8 +452,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.area = this.preparedText.get(this.textNumber);
-            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
@@ -523,10 +517,9 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
                 this.alreadySelected.add(0 + this.textNumber);
 
                 // add text
-                this.area = new Point(-1, -1);
-                this.textFile = new File(this.pathText + "Text" + this.textNumber + "_normal.html");
+                this.word =  this.preparedText.get(this.textNumber);
                 this.panelContent.removeAll();
-                this.panelContent.add(new ContentPanelTextImpl(this));
+                this.panelContent.add(new ContentPanelTextHint("Your word is '" + this.word+"'."));
                 this.dispose();
                 this.setVisible(true);
 
@@ -536,8 +529,8 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
             }
 
             // add text
-            this.area = this.preparedText.get(this.textNumber);
-            this.textFile = new File(this.pathText + "Text" + this.textNumber + "_highlighted.html");
+            this.labelDescription.setText("Your word is '" + this.word+"'.");
+            this.textFile = new File(this.pathText + "Text" + this.textNumber + ".html");
             this.panelContent.removeAll();
             this.panelContent.add(new ContentPanelTextImpl(this));
             this.dispose();
@@ -677,12 +670,10 @@ public class EvaluationMainWindowImpl extends EvaluationMainWindow implements
     }
 
     /**
-     * @return start and endcoordinate of current highlighted word
-     * x-coordinate = start
-     * y-coordinate = end
+     * @return current word for search
      */
-    public Point getArea() {
-        return this.area;
+    public String getWord() {
+        return this.word;
     }
 
     /**

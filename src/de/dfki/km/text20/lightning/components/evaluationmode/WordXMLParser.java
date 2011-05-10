@@ -20,7 +20,6 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode;
 
-import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -41,22 +40,16 @@ import org.xml.sax.SAXException;
  * @author Christoph Käding
  *
  */
-public class AreaXMLParser {
+public class WordXMLParser {
 
     /** readed data */
-    private ArrayList<Point> data;
+    private ArrayList<String> data;
 
-    /** indicates if the next entry should be the x coordinate of the related position */
-    private boolean x;
+    /** indicates if the next entry should be the word */
+    private boolean word;
 
-    /** indicates if the next entry should be the y coordinate of the related position */
-    private boolean y;
-
-    /** temporary stored x coordinate */
-    private int xTmp;
-
-    /** temporary stored y coordinate */
-    private int yTmp;
+    /** temporary stored word */
+    private String wordTmp;
 
     /** name of the actual file */
     private String fileName;
@@ -74,16 +67,14 @@ public class AreaXMLParser {
      * 
      * @return the readed container
      */
-    public ArrayList<Point> readFile(File file) {
+    public ArrayList<String> readFile(File file) {
         // initialize variables
-        this.data = new ArrayList<Point>();
+        this.data = new ArrayList<String>();
         this.fileName = file.getAbsolutePath();
-        this.x = false;
-        this.y = false;
+        this.word = false;
         this.number = false;
         this.numberTmp = -1;
-        this.xTmp = 0;
-        this.yTmp = 0;
+        this.wordTmp = "";
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
@@ -105,7 +96,7 @@ public class AreaXMLParser {
                 // if some characters are found    
                 case XMLStreamConstants.CHARACTERS:
                     if (!handleCharacters(reader.getText().trim()))
-                        return new ArrayList<Point>();
+                        return new ArrayList<String>();
                     break;
 
                 // all other things
@@ -126,7 +117,7 @@ public class AreaXMLParser {
             } catch (Exception ioe) {
                 ioe.printStackTrace();
             }
-            return new ArrayList<Point>();
+            return new ArrayList<String>();
         }
 
         // return readed data
@@ -144,36 +135,24 @@ public class AreaXMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
-            // if the readed characters should be the y coordinate ...
-            if (this.y) {
+            // if the readed characters should be the word coordinate ...
+            if (this.word) {
 
                 // ... store it ...
-                this.yTmp = Integer.parseInt(value);
+                this.wordTmp = value;
 
                 // ...  and add it to the arraylist
-                if (new File(this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + "_normal.html")).exists() && new File(this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + "_highlighted.html")).exists()) {
-                    this.data.add(new Point(this.xTmp, this.yTmp));
+                if (new File(this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + ".html")).exists()) {
+                    this.data.add(this.wordTmp);
                 } else {
-                    System.out.println("File " + this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + "_normal.html or ") + this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + "_highlighted.html not found."));
+                    System.out.println("File " + this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + ".html not found."));
                 }
 
                 // reset variables
-                this.x = false;
-                this.y = false;
+                this.word = false;
                 this.number = false;
-                this.xTmp = 0;
-                this.yTmp = 0;
+                this.wordTmp = "";
                 this.numberTmp = -1;
-
-                // return success
-                return true;
-            }
-
-            // if the readed characters should be the x coordinate ...
-            if (this.x) {
-
-                // ... store it
-                this.xTmp = Integer.parseInt(value);
 
                 // return success
                 return true;
@@ -212,15 +191,9 @@ public class AreaXMLParser {
             return;
         }
 
-        // x
-        if (value.equals("start")) {
-            this.x = true;
-            return;
-        }
-
-        // y 
-        if (value.equals("stop")) {
-            this.y = true;
+        // word 
+        if (value.equals("word")) {
+            this.word = true;
             return;
         }
     }

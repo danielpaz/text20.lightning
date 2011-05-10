@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- Definition SimplTypes -->
-	<xs:simpleType name="areatype">
-		<xs:restriction base="xs:int"/>
+	<xs:simpleType name="wordtype">
+		<xs:restriction base="xs:string"/>
 	</xs:simpleType>
 	
 	<xs:simpleType name="numbertype">
 		<xs:restriction base="xs:int"/>
 	</xs:simpleType>
 	
-	<!-- Definition ComplexTypes -->
+	<!-- Definition ComplexTypes -->	
 	<xs:complexType name="steptype">
 		<xs:sequence>
 			<xs:element name="number" type="numbertype" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="start" type="areatype" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="stop" type="areatype" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="word" type="wordtype" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
-	</xs:complexType>
-			
+	</xs:complexType>		
+	
 	<xs:complexType name="alldatatype">
 		<xs:sequence>
-			<xs:element name="area" type="steptype" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="step" type="steptype" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	
