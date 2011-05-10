@@ -135,15 +135,21 @@ public class FixationWatcher {
             public void newEvaluationEvent(FixationEvent event) {
                 // check if the fixation should be stored
                 if (!main.isActivated()) return;
-                if (event.getType() != FixationEventType.FIXATION_START) return;
+                if (event.getType() == FixationEventType.FIXATION_START) {
 
-                if (!isValid) return;
+                    if (!isValid) return;
 
-                // if the tool is activated and a fixation occurs, it will be stored 
-                fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-                precisionEvaluator.setFixationPoint(event.getFixation().getCenter());
-                if (manager.getCurrentMouseWarper() != null)
-                    manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
+                    // if the tool is activated and a fixation occurs, it will be stored 
+                    fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
+                    precisionEvaluator.setFixationPoint(event.getFixation().getCenter());
+                    precisionEvaluator.addEvent("FIXATION_START");
+                    if (manager.getCurrentMouseWarper() != null)
+                        manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
+                    
+                } else if (event.getType() == FixationEventType.FIXATION_END) {
+                    if (!isValid) return;
+                    precisionEvaluator.addEvent("FIXATION_END");
+                }
             }
         });
 
@@ -152,7 +158,7 @@ public class FixationWatcher {
 
             /** prevents pupildata from doubled datasets */
             private long timeStampTmp = 0;
-            
+
             /** intervall for pupil update */
             private int intervall = 1;
 

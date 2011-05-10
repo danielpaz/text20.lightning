@@ -152,6 +152,9 @@ public class PupilXMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
+            // catch FIXATION_START and FIXATION_END to prevent error
+            if (value.equals("FIXATION_START") || value.equals("FIXATION_END")) return true;
+            
             // if the readed characters should be the right coordinate ...
             if (this.right) {
 
@@ -200,6 +203,7 @@ public class PupilXMLParser {
             System.out.println("parsing failed on '" + value + "' in " + this.fileName);
             return false;
         }
+
         // indicate error and return failure
         System.out.println("parsing failed on '" + value + "' in " + this.fileName);
         return false;

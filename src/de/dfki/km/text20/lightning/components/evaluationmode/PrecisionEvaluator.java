@@ -317,6 +317,16 @@ public class PrecisionEvaluator {
     }
 
     /**
+     * adds event to pupil file
+     * 
+     * @param event
+     */
+    public void addEvent(String event) {
+        if (this.logPupils)
+            $(this.pupilFile).append("\t<event>\r\n\t\t<timestamp>" + System.currentTimeMillis() + "</timestamp>\r\n\t\t<type>" + event + "</type>\r\n\t</event>\r\n");
+    }
+
+    /**
      * writes endtag to pupilfile and unzips xsd
      */
     private void closePupilStream() {
@@ -580,7 +590,7 @@ public class PrecisionEvaluator {
         this.user = MainClass.getInstance().getEvaluationSettings()[0];
         this.path = MainClass.getInstance().getEvaluationSettings()[3];
     }
-    
+
     /**
      * @param text
      */
