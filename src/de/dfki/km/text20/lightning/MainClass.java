@@ -248,7 +248,7 @@ public class MainClass {
 
                 // start listening
                 fixationCatcher.startWatching();
-                this.warper.start();
+                if (this.properties.isUseWarp()) this.warper.start();
 
                 // indicate success
                 // this.showTrayMessage("Initializing successful.");
@@ -376,7 +376,19 @@ public class MainClass {
     public void refreshWarper() {
         if (!this.isNormalMode) return;
         this.warper.stop();
+        if (this.properties.isUseWarp()) this.warper.start();
+    }
+
+    /** starts mousewarping, used in evaluation mode */
+    public void startWarp() {
+        this.internalPluginManager.getCurrentMouseWarper().start();
         this.warper.start();
+    }
+
+    /** stops mousewarping, used in evaluation mode */
+    public void stopWarp() {
+        this.warper.stop();
+        this.internalPluginManager.getCurrentMouseWarper().stop();
     }
 
     /**
@@ -404,7 +416,7 @@ public class MainClass {
             this.trayIcon.setActivatedIcon(this.isNormalMode);
 
             // activate plugins
-            this.warper.start();
+            if (this.properties.isUseWarp()) this.warper.start();
             this.internalPluginManager.getCurrentMouseWarper().start();
             this.internalPluginManager.getCurrentSaliencyDetector().start();
 
@@ -534,7 +546,7 @@ public class MainClass {
             // activate plugins
             this.internalPluginManager.getCurrentMouseWarper().start();
             this.internalPluginManager.getCurrentSaliencyDetector().start();
-            this.warper.start();
+            if (this.properties.isUseWarp()) this.warper.start();
         }
 
         // change icon

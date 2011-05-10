@@ -19,7 +19,6 @@ public class ContentPanelText extends JPanel {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
-        scrollPane1 = new JScrollPane();
         textPaneContent = new JTextPane();
         CellConstraints cc = new CellConstraints();
 
@@ -27,18 +26,12 @@ public class ContentPanelText extends JPanel {
         setLayout(new FormLayout(
             "80dlu:grow",
             "default:grow"));
-
-        //======== scrollPane1 ========
-        {
-            scrollPane1.setViewportView(textPaneContent);
-        }
-        add(scrollPane1, cc.xywh(1, 1, 1, 1, CellConstraints.FILL, CellConstraints.FILL));
+        add(textPaneContent, cc.xywh(1, 1, 1, 1, CellConstraints.FILL, CellConstraints.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner non-commercial license
-    private JScrollPane scrollPane1;
     protected JTextPane textPaneContent;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

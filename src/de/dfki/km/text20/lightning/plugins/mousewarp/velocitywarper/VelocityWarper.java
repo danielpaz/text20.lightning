@@ -226,7 +226,7 @@ public class VelocityWarper implements MouseWarper {
             this.timer.start();
             return;
         }
-
+        
         // calculate setRadius and speed
         this.velocityStartEnd = this.mousePositions.get(0).distance(this.mousePositions.get(this.mousePositions.size() - 1)) / (this.setIntervall * (this.mousePositions.size() - 1));
         this.velocityStartMid = this.mousePositions.get(0).distance(this.mousePositions.get(this.mid)) / (this.setIntervall * this.mid);

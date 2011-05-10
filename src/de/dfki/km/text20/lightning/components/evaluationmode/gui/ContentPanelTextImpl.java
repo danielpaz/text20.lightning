@@ -22,7 +22,6 @@ package de.dfki.km.text20.lightning.components.evaluationmode.gui;
 
 import static net.jcores.CoreKeeper.$;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -51,7 +50,6 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
      */
     public ContentPanelTextImpl(EvaluationMainWindowImpl evalMainWin) {
         this.mainWindow = evalMainWin;
-        this.textPaneContent.setBounds(new Rectangle(new Dimension(this.getBounds().width, this.getBounds().height)));
         this.textPaneContent.setContentType("text/html");
         this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join(""));
         this.textPaneContent.addCaretListener(this);
