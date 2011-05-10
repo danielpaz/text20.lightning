@@ -41,7 +41,7 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
     private long timestamp;
 
     /** */
-    private Point area;
+    private String word;
 
     /** */
     private EvaluationMainWindowImpl mainWindow;
@@ -55,8 +55,8 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
         this.textPaneContent.setContentType("text/html");
         this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join(""));
         this.textPaneContent.addCaretListener(this);
-        //        this.textPaneContent.setEditable(false);
-        this.area = this.mainWindow.getArea();
+        // TODO: add a kind of content changed listener to textPaneContent and rewrite original content
+        this.word = this.mainWindow.getWord();
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -65,11 +65,33 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
      */
     @Override
     public void caretUpdate(CaretEvent event) {
-        //        System.out.println("index: " + this.textPaneContent.getCaretPosition());
-        if ((this.textPaneContent.getCaretPosition() >= this.area.x) && (this.textPaneContent.getCaretPosition() <= this.area.y + 1)) {
+        String currentWord = "";
+        int caretIndex = this.textPaneContent.getCaretPosition();
+
+        // build current word
+        // TODO: catch linebreak
+        try {
+            for (int i = caretIndex; i > 0; i--) {
+                if (!this.textPaneContent.getDocument().getText(i, 1).equals(" ") && !this.textPaneContent.getDocument().getText(i, 1).equals("\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\r\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\t")) {
+                    currentWord = this.textPaneContent.getDocument().getText(i, 1) + currentWord;
+                } else
+                    break;
+            }
+            for (int i = caretIndex + 1; i < this.textPaneContent.getDocument().getLength(); i++) {
+                if (!this.textPaneContent.getDocument().getText(i, 1).equals(" ") && !this.textPaneContent.getDocument().getText(i, 1).equals("\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\r\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\t")) {
+                    currentWord = currentWord + this.textPaneContent.getDocument().getText(i, 1);
+                } else
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("|" + currentWord + "|");
+
+        if (currentWord.equals(this.word)) {
             try {
                 long neededTime = System.currentTimeMillis() - this.timestamp;
-                Rectangle caretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, this.textPaneContent.getCaretPosition());
+                Rectangle caretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, caretIndex);
                 Point caretPoint = new Point(caretRectangle.x + caretRectangle.width / 2, caretRectangle.y + caretRectangle.height / 2);
                 SwingUtilities.convertPointToScreen(caretPoint, this.textPaneContent);
                 this.mainWindow.addToTimeFile(caretPoint.distance(this.mainWindow.getButtonNextCenter()), neededTime);
