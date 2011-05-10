@@ -86,7 +86,7 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("|" + currentWord + "|");
+        //        System.out.println("|" + currentWord + "|");
 
         if (currentWord.equals(this.word)) {
             try {
