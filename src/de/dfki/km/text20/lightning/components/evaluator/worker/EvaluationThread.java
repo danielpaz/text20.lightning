@@ -20,12 +20,14 @@
  */
 package de.dfki.km.text20.lightning.components.evaluator.worker;
 
+import static net.jcores.CoreKeeper.$;
+
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 
-import de.dfki.km.text20.lightning.components.evaluationmode.StorageContainer;
 import de.dfki.km.text20.lightning.components.evaluator.EvaluatorMain;
-import de.dfki.km.text20.lightning.components.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
@@ -51,9 +53,6 @@ public class EvaluationThread implements Runnable {
     /** indicates if the thread should be stopped */
     private boolean stop;
 
-    /** current used dimension */
-    private int dimension;
-
     /**
      * initializes necessary variables
      * 
@@ -65,7 +64,6 @@ public class EvaluationThread implements Runnable {
         this.selectedDetectors = main.getSelectedDetectors();
         this.worker = main.getWorker();
         this.stop = false;
-        this.dimension = main.getDimension();
     }
 
     /**
@@ -82,47 +80,84 @@ public class EvaluationThread implements Runnable {
     public void run() {
         // initialize Variables
         DataXMLParser dataParser = new DataXMLParser();
-        PupilXMLParser pupilParser = new PupilXMLParser();
-        CoverageAnalyser analyser = this.mainClass.getCoverageAnalyser();
+        BufferedImage screenshot;
+        long timestamp = 0;
 
+        // start all detectors
+        for (SaliencyDetector detector : this.selectedDetectors)
+            detector.start();
+
+        System.out.println();
+        System.out.println();
+        
         // run through every file ...
         for (File file : this.files) {
 
             System.out.println("- File " + file.getName() + " is the next one.");
 
-            // ... read related pupil stream, ...
-            pupilParser.readFile(new File(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("_") + 1) + "pupils.xml"), this.worker);
+            // read placed targets
+            for (Point data : dataParser.readFile(file)) {
 
-            // ... and every detector
-            for (SaliencyDetector detector : this.selectedDetectors) {
+                // read screenshot
+                screenshot = dataParser.getRelatedImage(file);
 
-                // start current detector
-                detector.start();
+                // run through all calculated fixations
+                for (Point fixation : this.calculateFixations(screenshot, data)) {
 
-                // indicate current detector
-                System.out.println("- Detector: " + detector.getInformation().getDisplayName());
+                    timestamp = System.currentTimeMillis();
 
-                // ... and through every container in it ...
-                for (StorageContainer container : dataParser.readFile(file, this.dimension, this.worker)) {
+                    // ... and every detector
+                    for (SaliencyDetector detector : this.selectedDetectors) {
 
-                    // process evaluation
-                    this.worker.evaluate(analyser, file, detector, container);
+                        System.out.println("- Detector: " + detector.getInformation().getDisplayName());
 
-                    // stops the processing if needed
-                    if (this.stop) return;
+                        // process evaluation
+                        this.worker.evaluate(timestamp, detector, screenshot, fixation, data, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
 
-                    // update progress bar
-                    this.mainClass.updateProgressBar();
+                        // stops the processing if needed
+                        if (this.stop) return;
+
+                        // update progress bar
+                        this.mainClass.updateProgressBar();
+                    }
                 }
-
-                // stop current detector
-                detector.stop();
             }
 
             System.out.println("- File " + file.getName() + " finished.\r\n");
         }
 
+        // stop all detectors
+        for (SaliencyDetector detector : this.selectedDetectors)
+            detector.stop();
+
         // finish the evaluation
         this.mainClass.finish();
+    }
+
+    /**
+     * calculates randomized fixations
+     * 
+     * @param image
+     * @param point
+     * @return list of fixations
+     */
+    private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
+        // initialize variables
+        int derivation = 20;
+        int x = Integer.MAX_VALUE;
+        int y = Integer.MAX_VALUE;
+        ArrayList<Point> calculatedFixations = new ArrayList<Point>();
+
+        // calculate fixations
+        for (int i = 0; i < this.mainClass.getAmount(); i++) {
+            while (x > image.getWidth())
+                x = Integer.parseInt($.range(-derivation / 2, derivation / 2).random(1).string().join()) + point.x;
+            while (y > image.getHeight())
+                y = Integer.parseInt($.range(-derivation / 2, derivation / 2).random(1).string().join()) - derivation / 2 + point.y;
+            calculatedFixations.add(new Point(x, y));
+        }
+
+        // return list
+        return calculatedFixations;
     }
 }

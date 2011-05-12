@@ -43,8 +43,6 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.components.FixationWatcher;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
-import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
-import de.dfki.km.text20.lightning.components.evaluationmode.gui.EvaluationMainWindowImpl;
 import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
@@ -96,9 +94,6 @@ public class MainClass {
     /** necessary to identify the evaluation data */
     private String[] evaluationSettings;
 
-    /** collects evaluation data */
-    private PrecisionEvaluator evaluator;
-
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
 
@@ -122,9 +117,6 @@ public class MainClass {
 
     /** ShutDownHook */
     private Thread hook;
-
-    /** evaluation gui */
-    private EvaluationMainWindowImpl evaluationWindow;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -205,11 +197,10 @@ public class MainClass {
         // Creates classes which are needed for the three parts (clicking,
         // warping and evaluation) of this tool.
         FixationEvaluator fixationEvaluator = new FixationEvaluator();
-        this.evaluator = new PrecisionEvaluator();
         this.warper = new WarpCommander();
 
         // main component which listen on trackingevents
-        FixationWatcher fixationCatcher = new FixationWatcher(fixationEvaluator, this.evaluator);
+        FixationWatcher fixationCatcher = new FixationWatcher(fixationEvaluator);
 
         // add menu to tray
         this.trayIcon.setPopUpMenu();
@@ -218,7 +209,7 @@ public class MainClass {
         if (this.dllStatus) {
 
             // initialize hotkeys
-            Hotkey.init(fixationEvaluator, this.evaluator);
+            Hotkey.init(fixationEvaluator);
 
             // load sounds
             this.soundDing = Applet.newAudioClip(MainClass.class.getResource("resources/ding.wav"));
@@ -460,9 +451,6 @@ public class MainClass {
         // update statistics
         this.addToStatistic("Session closed.");
 
-        // make the evaluator known that the evaluation is over
-        this.evaluator.leaveEvaluation();
-
         if (this.dllStatus && type)
         // deactivate the hotkeys
             JIntellitype.getInstance().cleanUp();
@@ -522,16 +510,9 @@ public class MainClass {
             this.internalPluginManager.getCurrentMouseWarper().stop();
             this.internalPluginManager.getCurrentSaliencyDetector().stop();
 
-            // open gui if selected
-            if (this.evaluationSettings[4].equals("1")) {
-                this.evaluationWindow = new EvaluationMainWindowImpl(this.evaluator);
-
                 // shows change in tray and console
                 this.showTrayMessage("Evaluation mode activated.");
-            } else {
-                // shows change in tray and console
-                this.showTrayMessage("Evaluation mode activated.\nPress " + Hotkey.getInstance().getCurrentHotkey(1, true).buttonString + " to start recording.");
-            }
+                
         } else {
 
             // shows change in tray and console
@@ -577,11 +558,7 @@ public class MainClass {
      * resets evaluator, used to notify new user names, ...
      */
     public void resetEvaluator() {
-        this.evaluator.leaveEvaluation();
-        if (this.evaluationSettings[4].equals("1")) {
-            if (this.evaluationWindow.isVisible()) this.evaluationWindow.exit();
-            this.evaluationWindow = new EvaluationMainWindowImpl(this.evaluator);
-        }
+        // TODO: add method body
     }
 
     /**
@@ -697,33 +674,6 @@ public class MainClass {
      * @return true if it is there or the copy was successful
      */
     private boolean checkDll() {
-
-        // create target file
-        //        File destination = new File(System.getenv("SYSTEMROOT") + "/System32/JIntellitype.dll");
-        //
-        //        // check if it is already the
-        //        if (!destination.exists()) {
-        //            System.out.println("JIntellytype.dll was not found.");
-        //
-        //            // try to unzip it to the windows directory
-        //            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
-        //            if (destination.exists()) {
-        //                System.out.println("... but we copied it to the system directory..\r\n");
-        //                // return successful
-        //                return true;
-        //            }
-        //
-        //            // try to unzip it to "."
-        //            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(".");
-        //
-        //            // Display an error message
-        //            String msg = new String("Initializing failed. The DLL 'JIntellitype.dll' could not be copied to the windows/system32 directory. Please copy it yourself as admin.");
-        //            this.showTrayMessage(msg);
-        //            this.channel.status(msg);
-        //
-        //            // return not successful
-        //            return false;
-        //        }
 
         // TODO: test these for XP, Win7 32Bit, ... works fine for Win7 64Bit
         File destination = new File("JIntellitype.dll");

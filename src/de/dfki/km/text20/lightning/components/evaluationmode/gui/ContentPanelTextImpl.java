@@ -51,10 +51,10 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
     public ContentPanelTextImpl(EvaluationMainWindowImpl evalMainWin) {
         this.mainWindow = evalMainWin;
         this.textPaneContent.setContentType("text/html");
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join(""));
+        //        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join(""));
         this.textPaneContent.addCaretListener(this);
         // TODO: add a kind of content changed listener to textPaneContent and rewrite original content
-        this.word = this.mainWindow.getWord();
+        //        this.word = this.mainWindow.getWord();
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -92,7 +92,7 @@ public class ContentPanelTextImpl extends ContentPanelText implements CaretListe
                 Rectangle caretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, caretIndex);
                 Point caretPoint = new Point(caretRectangle.x + caretRectangle.width / 2, caretRectangle.y + caretRectangle.height / 2);
                 SwingUtilities.convertPointToScreen(caretPoint, this.textPaneContent);
-                this.mainWindow.addToTimeFile(caretPoint.distance(this.mainWindow.getButtonNextCenter()), neededTime);
+                //                this.mainWindow.addToTimeFile(caretPoint.distance(this.mainWindow.getButtonNextCenter()), neededTime);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
