@@ -21,7 +21,6 @@
  */
 package de.dfki.km.text20.lightning.hotkey;
 
-import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -32,7 +31,6 @@ import com.melloware.jintellitype.JIntellitypeConstants;
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
-import de.dfki.km.text20.lightning.components.evaluationmode.PrecisionEvaluator;
 
 /**
  * This is the hotkey management which is designed as a singleton. The hotkeys
@@ -67,26 +65,14 @@ public class Hotkey implements HotkeyListener {
     /** this is necessary for move the mouse and click in normal mode */
     FixationEvaluator fixationEvaluator;
 
-    /** this is needed for evaluation mode */
-    private PrecisionEvaluator precisionEvaluator;
-
     /** singleton instance of the main class */
     private MainClass main;
 
-    /**
-     * indicates status of evaluation step true = catch fixation false = catch
-     * mouse position
-     */
-    private boolean evaluationStatus;
-
     /** */
-    private Hotkey(FixationEvaluator fixationEvaluator,
-                   PrecisionEvaluator precisionEvaluator) {
+    private Hotkey(FixationEvaluator fixationEvaluator) {
         this.fixationEvaluator = fixationEvaluator;
-        this.precisionEvaluator = precisionEvaluator;
         this.properties = MainClass.getInstance().getProperties();
         this.main = MainClass.getInstance();
-        this.evaluationStatus = true;
         this.initHotkeys();
         this.tmpActionHotkey = null;
         this.tmpStatusHotkey = null;
@@ -135,11 +121,9 @@ public class Hotkey implements HotkeyListener {
      * any hotkey function.
      * 
      * @param fixationEvaluator
-     * @param precisionEvaluator
      */
-    public static void init(FixationEvaluator fixationEvaluator,
-                            PrecisionEvaluator precisionEvaluator) {
-        instance = new Hotkey(fixationEvaluator, precisionEvaluator);
+    public static void init(FixationEvaluator fixationEvaluator) {
+        instance = new Hotkey(fixationEvaluator);
     }
 
     /**
@@ -176,108 +160,10 @@ public class Hotkey implements HotkeyListener {
             }
 
             // old evaluation mode
-            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("0")) {
-
-                // first hotkey while in evaluation mode
-                if (!this.precisionEvaluator.isLogPupils()) {
-                    // start pupil stream
-                    this.precisionEvaluator.startPupilStream();
-
-                    // indicate start
-                    this.main.showTrayMessage("Evaluation: Now look at the first point and press " + this.getCurrentHotkey(1, true) + ".");
-
-                    break;
-                }
-
-                if (this.evaluationStatus) {
-
-                    // store last fixation point
-                    if (this.precisionEvaluator.storeFixation()) {
-                        this.main.showTrayMessage("Evaluation: fixation position recognized, now place the mouse to the point you look at and press " + this.getCurrentHotkey(1, true) + " again...");
-                        this.evaluationStatus = !(this.evaluationStatus);
-                        break;
-                    }
-
-                    // indicate error
-                    this.main.playError();
-                    this.main.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
-                    break;
-                }
-
-                if (!this.evaluationStatus) {
-                    // set mouse position which is associated with the last stored fixation and react on its return value
-                    switch (this.precisionEvaluator.setRelatedPosition(MouseInfo.getPointerInfo().getLocation())) {
-                    case OK:
-                        // indicate success
-                        this.main.playDing();
-                        this.main.showTrayMessage("Evaluation: mouse position recognized, now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
-
-                        // toggle status
-                        this.evaluationStatus = !(this.evaluationStatus);
-
-                        break;
-
-                    case ALREADY_PROCESSING:
-                        // do nothing
-                        break;
-
-                    case NO_FIXATION:
-                        // theoretical never reached
-                        break;
-
-                    case OUT_OFF_DIMENSION:
-                        // indicate failure
-                        this.main.playError();
-                        this.main.showTrayMessage("Evaluation: --WARNING-- mouse position was out of dimension! now look at the next point and press " + this.getCurrentHotkey(1, true) + " again...\r\n\r\n" + this.precisionEvaluator.getCount() + " datatsets already stored.");
-
-                        // toggle status
-                        this.evaluationStatus = !(this.evaluationStatus);
-
-                        break;
-
-                    default:
-                        break;
-                    }
-                }
+            if (!this.main.isNormalMode()) {
+                // TODO: add method
             }
 
-            // new evaluation mode, precision
-            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1") && (this.precisionEvaluator.getEvaluationStep() == 0)) {
-
-                // check if oval is currently drawed
-                if (this.precisionEvaluator.isBlockHotkeys()) break;
-
-                // store last fixation point
-                if (!this.precisionEvaluator.storeFixation()) {
-                    // indicate error
-                    this.main.playError();
-                    this.main.showTrayMessage("Evaluation: --WARNING-- failure in recognizing fixation position, please try again...");
-                    break;
-                }
-
-                // set related point
-                this.precisionEvaluator.setRelatedPosition(null);
-
-                // set status
-                this.precisionEvaluator.setStepRecognized(true);
-
-                // inidcate success
-                this.main.playDing();
-
-                break;
-            }
-
-
-            // new evaluation mode, detector
-            if (!this.main.isNormalMode() && this.main.getEvaluationSettings()[4].equals("1") && (this.precisionEvaluator.getEvaluationStep() == 2)) {
-
-                if(this.precisionEvaluator.isBlockHotkeys()) break;
-                
-                // similar to normal mode
-                if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
-                break;
-            }
-            
             break;
         // status hotkey
         case 2:

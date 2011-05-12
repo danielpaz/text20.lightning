@@ -52,9 +52,6 @@ public class FixationWatcher {
     /** evaluates eyetracking events */
     private GazeEvaluator evaluator;
 
-    /** this is needed for evaluation mode */
-    private PrecisionEvaluator precisionEvaluator;
-
     /** indicates if the tracking device is working probably */
     private boolean status;
 
@@ -77,13 +74,10 @@ public class FixationWatcher {
      * Create the fixation watcher
      * 
      * @param fixationEvaluator
-     * @param precisionEvaluator
      */
-    public FixationWatcher(FixationEvaluator fixationEvaluator,
-                           PrecisionEvaluator precisionEvaluator) {
+    public FixationWatcher(FixationEvaluator fixationEvaluator) {
         // initialize variables
         this.fixationEvaluator = fixationEvaluator;
-        this.precisionEvaluator = precisionEvaluator;
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         this.isValid = true;
@@ -135,32 +129,18 @@ public class FixationWatcher {
             public void newEvaluationEvent(FixationEvent event) {
                 // check if the fixation should be stored
                 if (!main.isActivated()) return;
-                if (event.getType() == FixationEventType.FIXATION_START) {
+                if (event.getType() != FixationEventType.FIXATION_START) return;
+                if (!isValid) return;
 
-                    if (!isValid) return;
-
-                    // if the tool is activated and a fixation occurs, it will be stored 
-                    fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
-                    precisionEvaluator.setFixationPoint(event.getFixation().getCenter());
-                    precisionEvaluator.addEvent("FIXATION_START");
-                    if (manager.getCurrentMouseWarper() != null)
-                        manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
-                    
-                } else if (event.getType() == FixationEventType.FIXATION_END) {
-                    if (!isValid) return;
-                    precisionEvaluator.addEvent("FIXATION_END");
-                }
+                // if the tool is activated and a fixation occurs, it will be stored 
+                fixationEvaluator.setFixationPoint(event.getFixation().getCenter());
+                if (manager.getCurrentMouseWarper() != null)
+                    manager.getCurrentMouseWarper().setFixationPoint(event.getFixation().getCenter());
             }
         });
 
         //add rawdata listener
         this.evaluator.addEvaluationListener(new RawDataListener() {
-
-            /** prevents pupildata from doubled datasets */
-            private long timeStampTmp = 0;
-
-            /** intervall for pupil update */
-            private int intervall = 1;
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
@@ -180,12 +160,6 @@ public class FixationWatcher {
                 // check validity of storage
                 for (RawDataEvent storedEvent : lastEvents) {
                     isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
-                }
-
-                // set pupil size
-                if (System.currentTimeMillis() >= this.timeStampTmp + this.intervall) {
-                    precisionEvaluator.addPupilData(new float[] { event.getTrackingEvent().getPupilSizeLeft(), event.getTrackingEvent().getPupilSizeRight() });
-                    this.timeStampTmp = System.currentTimeMillis();
                 }
 
                 // set valid

@@ -35,7 +35,6 @@ import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
-import de.dfki.km.text20.lightning.components.evaluationmode.StorageContainer;
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 import de.dfki.km.text20.lightning.hotkey.HotkeyContainer;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
@@ -127,14 +126,11 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
         this.checkBockEvaluationActionPerformed();
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
-        this.checkBoxEvaluationGui.setSelected(this.main.getEvaluationSettings()[4].equals("1"));
 
         // initializes tooltips
         this.manageToolTips();
 
         // initialize current evaluation settings
-        this.textFieldName.setText(this.main.getEvaluationSettings()[0]);
-        this.manageBrightnessComboBox();
         this.textFieldOutputPath.setText(new File(this.main.getEvaluationSettings()[3]).getAbsolutePath());
 
         // initialize file chooser
@@ -254,11 +250,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
-        // initialize temporary variables
-        int useGui = 0;
-        if (this.checkBoxEvaluationGui.isSelected()) useGui = 1;
-        String[] settings = { this.textFieldName.getText(), "" + this.comboBoxScreenBright.getSelectedIndex(), "" + this.comboBoxSettingBright.getSelectedIndex(), this.textFieldOutputPath.getText(), "" + useGui };
-
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
@@ -270,9 +261,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
-
-        // set evaluation settings
-        this.main.setEvaluationSettings(settings);
 
         // refresh warper and plugins
         this.main.refreshWarper();
@@ -404,12 +392,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         if (!this.checkBoxEvaluation.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
         else
             this.buttonDetectorConfig.setEnabled(false);
-        this.labelName.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.textFieldName.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.labelScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.labelSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.comboBoxScreenBright.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.comboBoxSettingBright.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
         this.buttonSelect.setEnabled(this.checkBoxEvaluation.isSelected());
         this.textFieldOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
@@ -418,8 +400,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
-        this.labelSpecialGui.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.checkBoxEvaluationGui.setEnabled(this.checkBoxEvaluation.isSelected());
     }
 
     /**
@@ -467,21 +447,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
                 return this;
             }
         };
-    }
-
-    /**
-     * manages brightness comboboxes
-     */
-    private void manageBrightnessComboBox() {
-        // add options
-        for (String option : StorageContainer.getScreenBrightnessOptions().values())
-            this.comboBoxScreenBright.addItem(option);
-        for (String option : StorageContainer.getSettingBrightnessOptions().values())
-            this.comboBoxSettingBright.addItem(option);
-
-        //preselect options
-        this.comboBoxScreenBright.setSelectedIndex(Integer.parseInt(this.main.getEvaluationSettings()[1]));
-        this.comboBoxSettingBright.setSelectedIndex(Integer.parseInt(this.main.getEvaluationSettings()[2]));
     }
 
     /**
@@ -600,9 +565,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
         String labelEvaluationTT = "<HTML><body>This activates the evaluation mode.<br>This mode is used to collect data<br>which can be evaluated later.</body></HTML>";
         String labelSoundTT = "<HTML><body>Enables/Disables the sound notifications.</body></HTML>";
-        String labelUserTT = "<HTML><body>Your name to identify the data.</body></HTML>";
-        String labelScreenBrightTT = "<HTML><body>A description of the screen brightness.<br>e.g. light, dark, ...</body></HTML>";
-        String labelSettingBrightTT = "<HTML><body>A description of the setting brightness.<br>e.g. light, dark, ...</body></HTML>";
         String buttonSubmitTT = "<HTML><body>Submits collected statistic data<br>to the statistic-server.</body></HTML>";
         String labelRecalibrationTT = "<HTML><body>Every cursor warp and evaluation<br>step recalibrates the Trackingserver<br>if this checkboxs is selected.<br>This feature will only work with<br>Trackingserver 1.4 or higher.</HTML></body>";
         String buttonClearRecalibrationTT = "<HTML><body>This button clears all the recalibrations<br>and sets the tracking device back<br>to defult calibration.</HTML></body>";
@@ -617,9 +579,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
         this.labelEvaluation.setToolTipText(labelEvaluationTT);
         this.labelSound.setToolTipText(labelSoundTT);
-        this.labelName.setToolTipText(labelUserTT);
-        this.labelScreenBright.setToolTipText(labelScreenBrightTT);
-        this.labelSettingBright.setToolTipText(labelSettingBrightTT);
         this.buttonSubmit.setToolTipText(buttonSubmitTT);
         this.labelRecalibration.setToolTipText(labelRecalibrationTT);
         this.buttonClearRecalibration.setToolTipText(buttonClearRecalibrationTT);

@@ -54,7 +54,6 @@ import de.dfki.km.text20.lightning.components.evaluator.plugins.CoverageAnalyser
 import de.dfki.km.text20.lightning.components.evaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.components.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.components.evaluator.worker.EvaluatorWorker;
-import de.dfki.km.text20.lightning.components.evaluator.worker.PupilXMLParser;
 import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
@@ -124,6 +123,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** threshold for text coverage */
     private double treshold;
 
+    /** amount of generated fixations */
+    private int amount;
+
     /**
      * main entry point
      * 
@@ -163,6 +165,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.coverageInformation = new ArrayList<PluginInformation>();
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
         this.progress = 1;
+        this.amount = 0;
 
         // add action listeners
         this.buttonSelect.addActionListener(this);
@@ -385,8 +388,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonTextConfig.setEnabled(false);
             this.labelThresh.setEnabled(false);
             this.spinnerThresh.setEnabled(false);
-            this.labelInterval.setEnabled(false);
-            this.spinnerInterval.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -414,8 +415,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonTextConfig.setEnabled(true);
             this.labelThresh.setEnabled(true);
             this.spinnerThresh.setEnabled(true);
-            this.labelInterval.setEnabled(true);
-            this.spinnerInterval.setEnabled(true);
         }
     }
 
@@ -465,8 +464,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.labelThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.buttonConfiguration.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.labelInterval.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.spinnerInterval.setEnabled(!this.checkBoxConfiguration.isSelected());
     }
 
     /**
@@ -634,17 +631,15 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void startEvaluation() {
         // initialize variables
         DataXMLParser dataParser = new DataXMLParser();
-        PupilXMLParser pupilParser = new PupilXMLParser();
         ArrayList<File> tmp = new ArrayList<File>(this.files);
         int size = 0;
 
-        // set threshold
+        // set threshold and amount
         this.treshold = Double.parseDouble(this.spinnerThresh.getValue().toString());
+        this.amount = Integer.parseInt(this.spinnerAmount.getValue().toString());
 
         // start coverage analyzer
         this.currentAnalyser.start();
-        System.out.println();
-        System.out.println();
 
         // add selected detectors to array list 
         for (Object selected : this.listDetectors.getSelectedValues())
@@ -660,26 +655,17 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // validate files
         for (File file : this.files) {
             if (!dataParser.isValid(file)) tmp.remove(file);
-            else if (!pupilParser.isValid(new File(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("_") + 1) + "pupils.xml")))
-                tmp.remove(file);
         }
         this.files = tmp;
 
-        // count container 
+        // calculate size
         for (File file : this.files)
             size = size + dataParser.count(file);
-
-        // calculate size
-        if (this.writeLog()) size = (size * this.selectedDetectors.size()) + (this.files.size() * 4);
-        else
-            size = (size * this.selectedDetectors.size()) + (this.files.size() * 2);
+        size = size * this.selectedDetectors.size() * this.amount;
 
         // initialize progress bar
         this.progressBar.setMaximum(size);
         this.progressBar.setStringPainted(true);
-
-        System.out.println();
-        System.out.println();
 
         // initialize and start evaluationThread
         this.evaluationThread.init(this);
@@ -834,9 +820,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * @return interval for pupil recognition
+     * @return the amount
      */
-    public int getInterval() {
-        return Integer.parseInt(this.spinnerInterval.getValue().toString());
+    public int getAmount() {
+        return this.amount;
     }
 }
