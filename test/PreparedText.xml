@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Project Lightning (Desktop) - prepared text-->
+<alldata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PreparedTextPattern.xsd">
+	<step>
+		<number>0</number>
+		<word>blablubbbla</word>
+	</step>
+	<step>
+		<number>1</number>
+		<word>blablubbbla</word>
+	</step>
+	<step>
+		<number>2</number>
+		<word>blablubbbla</word>
+	</step>
+</alldata>

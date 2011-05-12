@@ -1,0 +1,19 @@
+
+syntax: regexp
+^diagnosis\.record$
+syntax: regexp
+^jspf\.plugin\.cache$
+syntax: regexp
+^properties\.prop$
+syntax: regexp
+^dist$
+syntax: regexp
+^evaluation$
+syntax: regexp
+^plugins$
+syntax: regexp
+^tmp$
+syntax: regexp
+^blabla\.txt$
+syntax: regexp
+^JIntellitype\.dll$
