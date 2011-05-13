@@ -27,6 +27,8 @@ public class TextDetectorConfig extends JFrame {
         spinnerThreshold = new JSpinner();
         labelLetterHeight = new JLabel();
         spinnerLetterHeight = new JSpinner();
+        labelWidth = new JLabel();
+        spinnerLetterWidth = new JSpinner();
         labelLineSize = new JLabel();
         spinnerLineSize = new JSpinner();
         labelSensitivity = new JLabel();
@@ -54,7 +56,7 @@ public class TextDetectorConfig extends JFrame {
             {
                 contentPanel.setLayout(new FormLayout(
                     "2*(60dlu:grow, $lcgap), 60dlu:grow",
-                    "5*(default, $lgap), bottom:default:grow"));
+                    "6*(default, $lgap), bottom:default:grow"));
 
                 //---- labelThreshold ----
                 labelThreshold.setText("text coverage threshold");
@@ -66,32 +68,37 @@ public class TextDetectorConfig extends JFrame {
                 contentPanel.add(labelLetterHeight, cc.xywh(1, 3, 3, 1));
                 contentPanel.add(spinnerLetterHeight, cc.xy(5, 3));
 
+                //---- labelWidth ----
+                labelWidth.setText("min letter width in Pixel");
+                contentPanel.add(labelWidth, cc.xywh(1, 5, 3, 1));
+                contentPanel.add(spinnerLetterWidth, cc.xy(5, 5));
+
                 //---- labelLineSize ----
                 labelLineSize.setText("max line size in Pixel");
-                contentPanel.add(labelLineSize, cc.xywh(1, 5, 3, 1));
-                contentPanel.add(spinnerLineSize, cc.xy(5, 5));
+                contentPanel.add(labelLineSize, cc.xywh(1, 7, 3, 1));
+                contentPanel.add(spinnerLineSize, cc.xy(5, 7));
 
                 //---- labelSensitivity ----
                 labelSensitivity.setText("sensitivity");
-                contentPanel.add(labelSensitivity, cc.xywh(1, 7, 3, 1));
-                contentPanel.add(spinnerSensitivity, cc.xy(5, 7));
+                contentPanel.add(labelSensitivity, cc.xywh(1, 9, 3, 1));
+                contentPanel.add(spinnerSensitivity, cc.xy(5, 9));
 
                 //---- labelDebug ----
                 labelDebug.setText("draw debug images");
-                contentPanel.add(labelDebug, cc.xywh(1, 9, 3, 1));
-                contentPanel.add(checkBoxDebug, cc.xy(5, 9));
+                contentPanel.add(labelDebug, cc.xywh(1, 11, 3, 1));
+                contentPanel.add(checkBoxDebug, cc.xy(5, 11));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
-                contentPanel.add(buttonOK, cc.xy(1, 11));
+                contentPanel.add(buttonOK, cc.xy(1, 13));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
-                contentPanel.add(buttonDefault, cc.xy(3, 11));
+                contentPanel.add(buttonDefault, cc.xy(3, 13));
 
                 //---- buttonCancel ----
                 buttonCancel.setText("Cancel");
-                contentPanel.add(buttonCancel, cc.xy(5, 11));
+                contentPanel.add(buttonCancel, cc.xy(5, 13));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
         }
@@ -109,6 +116,8 @@ public class TextDetectorConfig extends JFrame {
     protected JSpinner spinnerThreshold;
     protected JLabel labelLetterHeight;
     protected JSpinner spinnerLetterHeight;
+    protected JLabel labelWidth;
+    protected JSpinner spinnerLetterWidth;
     protected JLabel labelLineSize;
     protected JSpinner spinnerLineSize;
     protected JLabel labelSensitivity;

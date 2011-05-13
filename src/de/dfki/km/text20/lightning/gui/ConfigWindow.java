@@ -120,12 +120,8 @@ public class ConfigWindow {
         panel3 = new JPanel();
         labelEvaluation = new JLabel();
         checkBoxEvaluation = new JCheckBox();
-        label1 = new JLabel();
-        comboBox1 = new JComboBox();
-        label2 = new JLabel();
-        comboBox2 = new JComboBox();
-        label3 = new JLabel();
-        spinner1 = new JSpinner();
+        labelMode = new JLabel();
+        comboBoxMode = new JComboBox();
         labelOutputPath = new JLabel();
         buttonSelect = new JButton();
         textFieldOutputPath = new JTextField();
@@ -256,7 +252,7 @@ public class ConfigWindow {
                         panel3.setBorder(new TitledBorder("Evaluation "));
                         panel3.setLayout(new FormLayout(
                             "80dlu:grow, $lcgap, 80dlu:grow",
-                            "5*(default, $lgap), default"));
+                            "3*(default, $lgap), default"));
 
                         //---- labelEvaluation ----
                         labelEvaluation.setText("Evaluation Mode");
@@ -271,29 +267,19 @@ public class ConfigWindow {
                         });
                         panel3.add(checkBoxEvaluation, cc.xy(3, 1));
 
-                        //---- label1 ----
-                        label1.setText("Algorithm One");
-                        panel3.add(label1, cc.xy(1, 3));
-                        panel3.add(comboBox1, cc.xy(3, 3));
-
-                        //---- label2 ----
-                        label2.setText("Algorithm Two");
-                        panel3.add(label2, cc.xy(1, 5));
-                        panel3.add(comboBox2, cc.xy(3, 5));
-
-                        //---- label3 ----
-                        label3.setText("Time");
-                        panel3.add(label3, cc.xy(1, 7));
-                        panel3.add(spinner1, cc.xy(3, 7));
+                        //---- labelMode ----
+                        labelMode.setText("Evaluation Mode");
+                        panel3.add(labelMode, cc.xywh(1, 3, 2, 1));
+                        panel3.add(comboBoxMode, cc.xy(3, 3));
 
                         //---- labelOutputPath ----
                         labelOutputPath.setText("Output Path");
-                        panel3.add(labelOutputPath, cc.xywh(1, 9, 1, 3));
+                        panel3.add(labelOutputPath, cc.xywh(1, 5, 1, 3));
 
                         //---- buttonSelect ----
                         buttonSelect.setText("Select");
-                        panel3.add(buttonSelect, cc.xy(3, 9));
-                        panel3.add(textFieldOutputPath, cc.xy(3, 11));
+                        panel3.add(buttonSelect, cc.xy(3, 5));
+                        panel3.add(textFieldOutputPath, cc.xy(3, 7));
                     }
                     contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
@@ -366,7 +352,7 @@ public class ConfigWindow {
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 370);
+            mainFrame.setSize(570, 340);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -398,12 +384,8 @@ public class ConfigWindow {
     private JPanel panel3;
     protected JLabel labelEvaluation;
     protected JCheckBox checkBoxEvaluation;
-    private JLabel label1;
-    private JComboBox comboBox1;
-    private JLabel label2;
-    private JComboBox comboBox2;
-    private JLabel label3;
-    private JSpinner spinner1;
+    protected JLabel labelMode;
+    protected JComboBox comboBoxMode;
     protected JLabel labelOutputPath;
     protected JButton buttonSelect;
     protected JTextField textFieldOutputPath;

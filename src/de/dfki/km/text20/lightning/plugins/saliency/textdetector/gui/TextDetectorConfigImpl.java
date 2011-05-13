@@ -43,7 +43,7 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
     public TextDetectorConfigImpl() {
         // initialize variables
         this.properties = TextDetectorProperties.getInstance();
-        
+
         // add listener
         this.buttonCancel.addActionListener(this);
         this.buttonDefault.addActionListener(this);
@@ -71,6 +71,7 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
         // set values
         this.properties.setSensitivity(Double.parseDouble(this.spinnerSensitivity.getValue().toString()));
         this.properties.setLetterHeight(Integer.parseInt(this.spinnerLetterHeight.getValue().toString()));
+        this.properties.setLetterWidth(Integer.parseInt(this.spinnerLetterWidth.getValue().toString()));
         this.properties.setLineSize(Integer.parseInt(this.spinnerLineSize.getValue().toString()));
         this.properties.setDebug(this.checkBoxDebug.isSelected());
         this.properties.setThreshold(Double.parseDouble(this.spinnerThreshold.getValue().toString()));
@@ -106,6 +107,7 @@ public class TextDetectorConfigImpl extends TextDetectorConfig implements Action
     private void initializeValues() {
         this.spinnerSensitivity.setModel(new SpinnerNumberModel(this.properties.getSenitivity(), 0.1, Double.MAX_VALUE, 0.1));
         this.spinnerLetterHeight.setValue(this.properties.getLetterHeight());
+        this.spinnerLetterWidth.setValue(this.properties.getLetterWidth());
         this.spinnerLineSize.setValue(this.properties.getLineSize());
         this.checkBoxDebug.setSelected(this.properties.isDebug());
         this.spinnerThreshold.setModel(new SpinnerNumberModel(this.properties.getThreshold(), 0, 100, 0.1));

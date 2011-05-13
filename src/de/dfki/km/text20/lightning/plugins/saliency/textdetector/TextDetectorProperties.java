@@ -48,6 +48,10 @@ public class TextDetectorProperties implements Serializable {
     @Attribute
     private int letterHeight;
 
+    /** minimal width to recognize letters */
+    @Attribute
+    private int letterWidth;
+
     /** minimal size to identify lines */
     @Attribute
     private int lineSize;
@@ -92,6 +96,7 @@ public class TextDetectorProperties implements Serializable {
                     // store readed configurations
                     this.threshold = ((TextDetectorProperties) this.object).getThreshold();
                     this.letterHeight = ((TextDetectorProperties) this.object).getLetterHeight();
+                    this.letterWidth = ((TextDetectorProperties) this.object).getLetterWidth();
                     this.lineSize = ((TextDetectorProperties) this.object).getLineSize();
                     this.debug = ((TextDetectorProperties) this.object).isDebug();
                     this.sensitivity = ((TextDetectorProperties) this.object).getSenitivity();
@@ -100,7 +105,7 @@ public class TextDetectorProperties implements Serializable {
                     status = true;
                     System.out.println("\r\nTextDetector properties file was found.");
                     System.out.println("text coverage threshold: " + this.threshold + ", debug: " + this.debug);
-                    System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", sensitivity: " + this.sensitivity);
+                    System.out.println("letter height: " + this.letterHeight + ", letter width: " + this.letterWidth + ", line size: " + this.lineSize + ", sensitivity: " + this.sensitivity);
                 }
 
                 // cleanup
@@ -125,6 +130,7 @@ public class TextDetectorProperties implements Serializable {
         // set default values
         this.threshold = 10;
         this.letterHeight = 7;
+        this.letterWidth = 7;
         this.lineSize = 100;
         this.debug = false;
         this.sensitivity = 1.5;
@@ -156,6 +162,20 @@ public class TextDetectorProperties implements Serializable {
      */
     public void setLetterHeight(int letterHeight) {
         this.letterHeight = letterHeight;
+    }
+
+    /**
+     * @return the letterWidth
+     */
+    public int getLetterWidth() {
+        return this.letterWidth;
+    }
+
+    /**
+     * @param letterWidth the letterWidth to set
+     */
+    public void setLetterWidth(int letterWidth) {
+        this.letterWidth = letterWidth;
     }
 
     /**

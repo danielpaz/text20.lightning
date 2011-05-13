@@ -11,6 +11,7 @@ import com.jgoodies.forms.layout.*;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class MarkerWindow extends JFrame {
     public MarkerWindow() {
         initComponents();
@@ -69,7 +70,7 @@ public class MarkerWindow extends JFrame {
             panel1.add(labelDescription, cc.xy(9, 1));
         }
         contentPane.add(panel1, cc.xy(1, 3));
-        pack();
+        setSize(535, 485);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
