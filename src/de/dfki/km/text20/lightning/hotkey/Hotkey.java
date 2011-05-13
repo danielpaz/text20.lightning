@@ -67,6 +67,9 @@ public class Hotkey implements HotkeyListener {
 
     /** singleton instance of the main class */
     private MainClass main;
+    
+    /** block hotkeys in some periods at evaluation mode */
+    private boolean blockHotkeys;
 
     /** */
     private Hotkey(FixationEvaluator fixationEvaluator) {
@@ -159,9 +162,11 @@ public class Hotkey implements HotkeyListener {
                 break;
             }
 
-            // old evaluation mode
-            if (!this.main.isNormalMode()) {
-                // TODO: add method
+            // evaluation mode
+            if (!this.main.isNormalMode() && !this.blockHotkeys) {
+                // if the hotkey is typed, the stored fixation will be evaluated
+                if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
+                break;
             }
 
             break;
@@ -286,6 +291,13 @@ public class Hotkey implements HotkeyListener {
     public void resetTmpKeys() {
         this.tmpActionHotkey = null;
         this.tmpStatusHotkey = null;
+    }
+
+    /**
+     * @param blockHotkeys the blockHotkeys to set
+     */
+    public void setBlockHotkeys(boolean blockHotkeys) {
+        this.blockHotkeys = blockHotkeys;
     }
 
     /**

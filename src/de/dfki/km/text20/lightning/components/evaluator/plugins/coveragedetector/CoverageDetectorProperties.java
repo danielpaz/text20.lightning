@@ -44,6 +44,10 @@ public class CoverageDetectorProperties implements Serializable {
     @Attribute
     private int letterHeight;
 
+    /** minimal width to recognize letters */
+    @Attribute
+    private int letterWidth;
+
     /** minimal size to identify lines */
     @Attribute
     private int lineSize;
@@ -87,6 +91,7 @@ public class CoverageDetectorProperties implements Serializable {
 
                     // store readed configurations
                     this.letterHeight = ((CoverageDetectorProperties) this.object).getLetterHeight();
+                    this.letterWidth = ((CoverageDetectorProperties) this.object).getLetterWidth();
                     this.lineSize = ((CoverageDetectorProperties) this.object).getLineSize();
                     this.debug = ((CoverageDetectorProperties) this.object).isDebug();
                     this.sensitivity = ((CoverageDetectorProperties) this.object).getSenitivity();
@@ -94,7 +99,7 @@ public class CoverageDetectorProperties implements Serializable {
                     // reading successful
                     status = true;
                     System.out.println("\r\nCoverageDetector properties file was found.");
-                    System.out.println("letter height: " + this.letterHeight + ", line size: " + this.lineSize + ", senitivity: " + this.sensitivity + ", debug: " + this.debug);
+                    System.out.println("letter height: " + this.letterHeight + ", letter width: " + this.letterWidth + ", line size: " + this.lineSize + ", senitivity: " + this.sensitivity + ", debug: " + this.debug);
                 }
 
                 // cleanup
@@ -118,6 +123,7 @@ public class CoverageDetectorProperties implements Serializable {
     public void restoreDefault() {
         // set default values
         this.letterHeight = 7;
+        this.letterWidth = 7;
         this.lineSize = 100;
         this.debug = false;
         this.sensitivity = 1.5;
@@ -135,6 +141,20 @@ public class CoverageDetectorProperties implements Serializable {
      */
     public void setLetterHeight(int letterHeight) {
         this.letterHeight = letterHeight;
+    }
+
+    /**
+     * @return the letterWidth
+     */
+    public int getLetterWidth() {
+        return this.letterWidth;
+    }
+
+    /**
+     * @param letterWidth the letterWidth to set
+     */
+    public void setLetterWidth(int letterWidth) {
+        this.letterWidth = letterWidth;
     }
 
     /**
@@ -196,7 +216,7 @@ public class CoverageDetectorProperties implements Serializable {
      */
     public void writeProperties() {
         try {
-            
+
             // write object
             new File("plugins/CoverageDetector").mkdirs();
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(this.propertiesFile));

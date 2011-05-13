@@ -131,7 +131,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.manageToolTips();
 
         // initialize current evaluation settings
-        this.textFieldOutputPath.setText(new File(this.main.getEvaluationSettings()[3]).getAbsolutePath());
+        this.textFieldOutputPath.setText(new File(this.main.getEvaluationSettings()[1]).getAbsolutePath());
+        for (String option : this.main.getEvaluationOptions())
+            this.comboBoxMode.addItem(option);
+        this.comboBoxMode.setSelectedItem(this.main.getEvaluationSettings()[0]);
 
         // initialize file chooser
         this.chooser = new JFileChooser() {
@@ -250,6 +253,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
+        // initialize temporary variables
+        String[] settings = { this.comboBoxMode.getSelectedItem().toString(), this.textFieldOutputPath.getText() };
+
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
@@ -261,6 +267,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // set new plugins
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
+
+        // set evaluation settings
+        this.main.setEvaluationSettings(settings);
 
         // refresh warper and plugins
         this.main.refreshWarper();
@@ -394,12 +403,15 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.buttonDetectorConfig.setEnabled(false);
         this.labelOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
         this.buttonSelect.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.labelMode.setEnabled(this.checkBoxEvaluation.isSelected());
+        this.comboBoxMode.setEnabled(this.checkBoxEvaluation.isSelected());
         this.textFieldOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
         this.checkBoxUseWarpActionPerformed();
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
+        
     }
 
     /**

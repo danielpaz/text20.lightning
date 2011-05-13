@@ -28,6 +28,7 @@ import java.applet.AudioClip;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javax.swing.UIManager;
 
@@ -43,6 +44,7 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.components.FixationWatcher;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
+import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
 import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
@@ -499,8 +501,6 @@ public class MainClass {
 
             // update settings to statistic
             this.addToStatistic("evaluation activated");
-            this.addToStatistic("screen brighness", this.getEvaluationSettings()[1]);
-            this.addToStatistic("setting brightness", this.getEvaluationSettings()[2]);
 
             // change mode
             this.isNormalMode = false;
@@ -510,9 +510,9 @@ public class MainClass {
             this.internalPluginManager.getCurrentMouseWarper().stop();
             this.internalPluginManager.getCurrentSaliencyDetector().stop();
 
-                // shows change in tray and console
-                this.showTrayMessage("Evaluation mode activated.");
-                
+            // shows change in tray and console
+            this.showTrayMessage("Evaluation mode activated.");
+
         } else {
 
             // shows change in tray and console
@@ -557,8 +557,17 @@ public class MainClass {
     /**
      * resets evaluator, used to notify new user names, ...
      */
+    @SuppressWarnings("unused")
     public void resetEvaluator() {
-        // TODO: add method body
+        // block hotkeys
+        Hotkey.getInstance().setBlockHotkeys(true);
+
+        // start choosed mode
+        if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(0))) {
+            new DoubleBlindMode();
+        } else if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(1))) {
+            // TODO: create quickness test
+        }
     }
 
     /**
@@ -573,40 +582,46 @@ public class MainClass {
 
     /**
      * @return the evaluationSettings 
-     * 0 = user name 
-     * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
-     * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
-     * 3 = output path
-     * 4 = evaluation type
+     * 
+     * 0 = evaluation mode
+     * 1 = output path
      */
     public String[] getEvaluationSettings() {
         if (this.evaluationSettings == null) {
-            this.evaluationSettings = new String[5];
-            this.evaluationSettings[0] = "DefaultUser";
-            this.evaluationSettings[1] = "0";
-            this.evaluationSettings[2] = "0";
-            this.evaluationSettings[3] = ".";
-            this.evaluationSettings[4] = "1";
+            this.evaluationSettings = new String[2];
+            this.evaluationSettings[0] = this.getEvaluationOptions().get(0);
+            this.evaluationSettings[1] = ".";
         }
         return this.evaluationSettings;
     }
 
     /**
+     * @return all available evaluation modi
+     */
+    public ArrayList<String> getEvaluationOptions() {
+        ArrayList<String> options = new ArrayList<String>();
+        options.add("double blind");
+        options.add("quickness");
+        return options;
+    }
+
+    /**
      * @param settings
-     * 0 = user name 
-     * 1 = screen brightness (index from StorageContainer.getBrightnessOptions())
-     * 2 = setting brightness (index from StorageContainer.getBrightnessOptions())
-     * 3 = output path
-     * 4 = evaluation type
+     * 
+     * 0 = evaluation mode
+     * 1 = output path
      */
     public void setEvaluationSettings(String[] settings) {
-        String tmpString = this.evaluationSettings[3];
+        String tmpString = this.evaluationSettings[1];
 
         this.evaluationSettings = settings;
 
-        File tmpFile = new File(this.evaluationSettings[3]);
+        File tmpFile = new File(this.evaluationSettings[1]);
         if (tmpFile.exists() && !tmpFile.isDirectory())
-            this.evaluationSettings[3] = tmpString;
+            this.evaluationSettings[1] = tmpString;
+
+        if (this.evaluationSettings[1].endsWith(File.separator + "."))
+            this.evaluationSettings[1] = this.evaluationSettings[1].substring(0, this.evaluationSettings[1].lastIndexOf("."));
     }
 
     /**

@@ -104,20 +104,20 @@ public class TextDetector implements SaliencyDetector {
         int textSize = 0;
         double coverage = 0;
         this.analyser = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
-        
+
         // get text boxes
         for (Object textRegion : this.analyser.getTextBoxes()) {
-            if (textRegion instanceof TextRegion) {
-                this.boxes.add((TextRegion) textRegion);
-            }
+            if (textRegion instanceof TextRegion)
+                if (((TextRegion) textRegion).width() >= this.properties.getLetterWidth())
+                    this.boxes.add((TextRegion) textRegion);
         }
-        
+
         // calculate coverage
         for (TextRegion textRegion : this.boxes) {
             textSize = textSize + textRegion.width() * textRegion.height();
         }
         coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
-        
+
         // write image if debug is enabled
         if (this.properties.isDebug()) {
             try {
@@ -127,14 +127,12 @@ public class TextDetector implements SaliencyDetector {
                 e.printStackTrace();
             }
         }
-        
+
         // reset boxes
         this.boxes.clear();
-        
+
         // decide which method should be used and return its results
-        if (coverage > this.properties.getThreshold()) {
-            return this.worker.textAnalyse(this.analyser.getShrinkedBoxes(), screenShot.getHeight());
-        }
+        if (coverage > this.properties.getThreshold()) { return this.worker.textAnalyse(this.analyser.getShrinkedBoxes(), screenShot.getHeight()); }
         return this.worker.normalAnalyse(this.analyser.getContrastImage());
     }
 

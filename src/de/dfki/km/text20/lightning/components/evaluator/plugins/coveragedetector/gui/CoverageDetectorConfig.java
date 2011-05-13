@@ -25,6 +25,8 @@ public class CoverageDetectorConfig extends JFrame {
         contentPanel = new JPanel();
         labelLetterHeight = new JLabel();
         spinnerLetterHeight = new JSpinner();
+        labelWidth = new JLabel();
+        spinnerWidth = new JSpinner();
         labelLineSize = new JLabel();
         spinnerLineSize = new JSpinner();
         labelSensitivity = new JLabel();
@@ -52,39 +54,44 @@ public class CoverageDetectorConfig extends JFrame {
             {
                 contentPanel.setLayout(new FormLayout(
                     "2*(60dlu:grow, $lcgap), 60dlu:grow",
-                    "4*(default, $lgap), bottom:default:grow"));
+                    "5*(default, $lgap), bottom:default:grow"));
 
                 //---- labelLetterHeight ----
                 labelLetterHeight.setText("min letter height in Pixel");
                 contentPanel.add(labelLetterHeight, cc.xywh(1, 1, 3, 1));
                 contentPanel.add(spinnerLetterHeight, cc.xy(5, 1));
 
+                //---- labelWidth ----
+                labelWidth.setText("min letter width in Pixel");
+                contentPanel.add(labelWidth, cc.xywh(1, 3, 3, 1));
+                contentPanel.add(spinnerWidth, cc.xy(5, 3));
+
                 //---- labelLineSize ----
                 labelLineSize.setText("max line size in Pixel");
-                contentPanel.add(labelLineSize, cc.xywh(1, 3, 3, 1));
-                contentPanel.add(spinnerLineSize, cc.xy(5, 3));
+                contentPanel.add(labelLineSize, cc.xywh(1, 5, 3, 1));
+                contentPanel.add(spinnerLineSize, cc.xy(5, 5));
 
                 //---- labelSensitivity ----
                 labelSensitivity.setText("sensitivity");
-                contentPanel.add(labelSensitivity, cc.xywh(1, 5, 3, 1));
-                contentPanel.add(spinnerSensitivity, cc.xy(5, 5));
+                contentPanel.add(labelSensitivity, cc.xywh(1, 7, 3, 1));
+                contentPanel.add(spinnerSensitivity, cc.xy(5, 7));
 
                 //---- labelDebug ----
                 labelDebug.setText("draw debug images");
-                contentPanel.add(labelDebug, cc.xywh(1, 7, 3, 1));
-                contentPanel.add(checkBoxDebug, cc.xy(5, 7));
+                contentPanel.add(labelDebug, cc.xywh(1, 9, 3, 1));
+                contentPanel.add(checkBoxDebug, cc.xy(5, 9));
 
                 //---- buttonOK ----
                 buttonOK.setText("OK");
-                contentPanel.add(buttonOK, cc.xy(1, 9));
+                contentPanel.add(buttonOK, cc.xy(1, 11));
 
                 //---- buttonDefault ----
                 buttonDefault.setText("Default");
-                contentPanel.add(buttonDefault, cc.xy(3, 9));
+                contentPanel.add(buttonDefault, cc.xy(3, 11));
 
                 //---- buttonCancel ----
                 buttonCancel.setText("Cancel");
-                contentPanel.add(buttonCancel, cc.xy(5, 9));
+                contentPanel.add(buttonCancel, cc.xy(5, 11));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
         }
@@ -100,6 +107,8 @@ public class CoverageDetectorConfig extends JFrame {
     private JPanel contentPanel;
     protected JLabel labelLetterHeight;
     protected JSpinner spinnerLetterHeight;
+    protected JLabel labelWidth;
+    protected JSpinner spinnerWidth;
     protected JLabel labelLineSize;
     protected JSpinner spinnerLineSize;
     protected JLabel labelSensitivity;

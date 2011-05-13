@@ -72,6 +72,7 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
         // set values
         this.properties.setSensitivity(Double.parseDouble(this.spinnerSensitivity.getValue().toString()));
         this.properties.setLetterHeight(Integer.parseInt(this.spinnerLetterHeight.getValue().toString()));
+        this.properties.setLetterWidth(Integer.parseInt(this.spinnerWidth.getValue().toString()));
         this.properties.setLineSize(Integer.parseInt(this.spinnerLineSize.getValue().toString()));
         this.properties.setDebug(this.checkBoxDebug.isSelected());
 
@@ -106,6 +107,7 @@ public class CoverageDetectorConfigImpl extends CoverageDetectorConfig implement
     private void initializeValues() {
         this.spinnerSensitivity.setModel(new SpinnerNumberModel(this.properties.getSenitivity(), 0.1, Double.MAX_VALUE, 0.1));
         this.spinnerLetterHeight.setValue(this.properties.getLetterHeight());
+        this.spinnerWidth.setValue(this.properties.getLetterWidth());
         this.spinnerLineSize.setValue(this.properties.getLineSize());
         this.checkBoxDebug.setSelected(this.properties.isDebug());
     }
