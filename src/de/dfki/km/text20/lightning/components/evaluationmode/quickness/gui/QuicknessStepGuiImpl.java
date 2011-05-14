@@ -1,6 +1,6 @@
 /*
- * PrecisionEvaluator.java
- *
+ * QuicknessStepGuiImpl.java
+ * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -17,17 +17,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *
  */
-package de.dfki.km.text20.lightning.components.evaluationmode;
-
+package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 
 /**
- * The precision evaluator is used in evaluation mode. Here the collected data is
- * handled.
- * 
  * @author Christoph Käding
- * 
+ *
  */
-public class PrecisionEvaluator {
+public class QuicknessStepGuiImpl {
+
 }

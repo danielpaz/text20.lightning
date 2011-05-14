@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode;
+package de.dfki.km.text20.lightning.components.evaluationmode.quickness;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,8 +34,10 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui.QuicknessConfigGuiImpl;
+
 /**
- * the XML-files which stores the evaluation datas are processed by this class
+ * reads given xml file and returns included data
  * 
  * @author Christoph Käding
  *
@@ -54,32 +56,31 @@ public class WordXMLParser {
     /** name of the actual file */
     private String fileName;
 
-    /** indicates that the next readed value should be the number */
-    private boolean number;
+    /** indicates that the next readed value should be filename */
+    private boolean file;
 
-    /** the temporary stored number */
-    private int numberTmp;
+    /** temporary stored filename */
+    private String fileTmp;
 
     /**
-     * tries to read the included StorageContainer of the given XML-file
-     * 
-     * @param file
-     * 
-     * @return the readed container
+     * tries to read the included data of the given XML-file
+     *
+     * @param configGui 
+     * @param xmlFile 
      */
-    public ArrayList<String> readFile(File file) {
+    public void readFile(QuicknessConfigGuiImpl configGui, File xmlFile) {
         // initialize variables
         this.data = new ArrayList<String>();
-        this.fileName = file.getAbsolutePath();
+        this.fileName = xmlFile.getAbsolutePath();
         this.word = false;
-        this.number = false;
-        this.numberTmp = -1;
+        this.file = false;
+        this.fileTmp = "";
         this.wordTmp = "";
         FileInputStream inputStream = null;
         XMLStreamReader reader = null;
 
         try {
-            inputStream = new FileInputStream(file);
+            inputStream = new FileInputStream(xmlFile);
             reader = XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
 
             // if there are still some data ...
@@ -95,8 +96,7 @@ public class WordXMLParser {
 
                 // if some characters are found    
                 case XMLStreamConstants.CHARACTERS:
-                    if (!handleCharacters(reader.getText().trim()))
-                        return new ArrayList<String>();
+                    if (!handleCharacters(reader.getText().trim())) return;
                     break;
 
                 // all other things
@@ -117,11 +117,12 @@ public class WordXMLParser {
             } catch (Exception ioe) {
                 ioe.printStackTrace();
             }
-            return new ArrayList<String>();
+            return;
         }
 
-        // return readed data
-        return this.data;
+        // add readed data
+        configGui.setCurrentFile(this.fileTmp);
+        configGui.setCurrentWords(this.data);
     }
 
     /**
@@ -142,30 +143,26 @@ public class WordXMLParser {
                 this.wordTmp = value;
 
                 // ...  and add it to the arraylist
-                if (new File(this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + ".html")).exists()) {
-                    this.data.add(this.wordTmp);
-                } else {
-                    System.out.println("File " + this.fileName.replace("PreparedText.xml", "Text" + this.numberTmp + ".html not found."));
-                }
+                this.data.add(this.wordTmp);
 
                 // reset variables
                 this.word = false;
-                this.number = false;
                 this.wordTmp = "";
-                this.numberTmp = -1;
 
                 // return success
                 return true;
             }
 
             // if the readed characters should be the number ...
-            if (this.number) {
+            if (this.file) {
 
-                // ... store it
-                this.numberTmp = Integer.parseInt(value);
+                this.fileTmp = this.fileName.substring(0, this.fileName.lastIndexOf(File.separator) + 1) + value;
 
                 // return success
-                return true;
+                if (new File(this.fileTmp).exists()) return true;
+
+                System.out.println("'" + this.fileTmp + "' does not exist.");
+                return false;
             }
 
         } catch (Exception e) {
@@ -185,9 +182,9 @@ public class WordXMLParser {
      */
     private void handleStartElement(String value) {
 
-        // x
-        if (value.equals("number")) {
-            this.number = true;
+        // file
+        if (value.equals("file")) {
+            this.file = true;
             return;
         }
 

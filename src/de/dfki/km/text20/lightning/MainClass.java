@@ -45,6 +45,7 @@ import com.melloware.jintellitype.JIntellitype;
 import de.dfki.km.text20.lightning.components.FixationWatcher;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
 import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
+import de.dfki.km.text20.lightning.components.evaluationmode.quickness.QuicknessMode;
 import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
@@ -566,7 +567,7 @@ public class MainClass {
         if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(0))) {
             new DoubleBlindMode();
         } else if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(1))) {
-            // TODO: create quickness test
+            new QuicknessMode();
         }
     }
 
