@@ -25,7 +25,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
@@ -49,6 +51,12 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
     /** */
     private int two;
 
+    /** frame for configuration guis of plugins */
+    private JFrame child;
+
+    /** timer for window focus */
+    private Timer timer;
+
     /**
      * creates instance, initializes variables and opens gui
      * 
@@ -61,6 +69,7 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
         this.autoSelect = false;
         this.one = 0;
         this.two = 1;
+        this.child = null;
 
         // handle to few detectors
         if (MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().size() < 2) {
@@ -72,12 +81,29 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
         this.comboBoxOne.setRenderer(this.detectorRenderer());
         this.comboBoxTwo.setRenderer(this.detectorRenderer());
         this.comboboxActionPerformed();
+        this.buttonTwoConfig.setEnabled(((PluginInformation) this.comboBoxTwo.getSelectedItem()).isGuiAvailable());
+        this.buttonOneConfig.setEnabled(((PluginInformation) this.comboBoxOne.getSelectedItem()).isGuiAvailable());
 
         // add action listener
         this.buttonStart.addActionListener(this);
         this.buttonCancel.addActionListener(this);
         this.comboBoxOne.addActionListener(this);
         this.comboBoxTwo.addActionListener(this);
+        this.buttonOneConfig.addActionListener(this);
+        this.buttonTwoConfig.addActionListener(this);
+
+        // initialize timer
+        this.timer = new Timer(500, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                setEnabled(true);
+                requestFocus();
+            }
+        });
 
         // show gui
         this.setVisible(true);
@@ -96,13 +122,39 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
             this.buttonCancelActionPerformed();
         } else if (event.getSource() == this.comboBoxOne) {
             this.one = ((PluginInformation) this.comboBoxOne.getSelectedItem()).getId();
+            this.buttonOneConfig.setEnabled(((PluginInformation) this.comboBoxOne.getSelectedItem()).isGuiAvailable());
             this.comboboxActionPerformed();
         } else if (event.getSource() == this.comboBoxTwo) {
             this.two = ((PluginInformation) this.comboBoxTwo.getSelectedItem()).getId();
+            this.buttonTwoConfig.setEnabled(((PluginInformation) this.comboBoxTwo.getSelectedItem()).isGuiAvailable());
             this.comboboxActionPerformed();
+        } else if (event.getSource() == this.buttonOneConfig){
+            this.buttonOneConfigActionPerformed();
+        }else if (event.getSource() == this.buttonTwoConfig){
+            this.buttonTwoConfigActionPerformed();
         }
     }
 
+    /**
+     * Fired if the Config button one is clicked. Shows the configdialog.
+     */
+    private void buttonOneConfigActionPerformed() {
+        this.child = MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(((PluginInformation) this.comboBoxOne.getSelectedItem()).getId()).getGui();
+        this.child.setVisible(true);
+        this.setEnabled(false);
+        this.timer.start();
+    }
+
+    /**
+     * Fired if the Config button two is clicked. Shows the configdialog.
+     */
+    private void buttonTwoConfigActionPerformed() {
+        this.child = MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(((PluginInformation) this.comboBoxTwo.getSelectedItem()).getId()).getGui();
+        this.child.setVisible(true);
+        this.setEnabled(false);
+        this.timer.start();
+    }
+    
     private void buttonStartActionPerformed() {
         // set values
         this.blindMode.setOne(((PluginInformation) this.comboBoxOne.getSelectedItem()).getId());
