@@ -19,6 +19,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class DoubleBlindGui extends JFrame {
     public DoubleBlindGui() {
         initComponents();

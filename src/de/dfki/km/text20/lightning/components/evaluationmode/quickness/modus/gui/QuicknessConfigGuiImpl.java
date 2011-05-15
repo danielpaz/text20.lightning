@@ -135,6 +135,7 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
     private void buttonOKActionPerformed() {
         // initialize variables
         WordXMLParser parser = new WordXMLParser();
+        int size = 0;
 
         // run through all files
         for (File file : this.files) {
@@ -154,9 +155,13 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
                     // reset data
                     this.currentFile = "";
                     this.currentWords.clear();
+                    size++;
                 }
             }
         }
+
+        // test if some valid data is added
+        if (size == 0) return;
 
         // set other stuff
         this.quicknessMode.setStartWithDetector(this.checkBoxStartWithDetector.isSelected());
@@ -165,7 +170,7 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
 
         // close config
         this.dispose();
-        
+
         // start quickness evaluation
         this.quicknessMode.start();
     }
