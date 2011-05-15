@@ -228,8 +228,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
      * TODO: change method
      */
     private void refresh() {
-        this.setVisible(false);
-        this.setVisible(true);
+        this.panelContent.setVisible(false);
+        this.panelContent.setVisible(true);
     }
 
     /**

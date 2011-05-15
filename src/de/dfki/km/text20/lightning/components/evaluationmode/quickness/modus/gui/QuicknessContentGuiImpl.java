@@ -123,6 +123,16 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         this.textPaneContent.addCaretListener(this);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
 
+        // request focus
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @SuppressWarnings("unqualified-field-access")
+            @Override
+            public void run() {
+                textPaneContent.requestFocus();
+            }
+        });
+
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -180,12 +190,23 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         // update text
         this.autoUpdate = true;
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
-        this.currentCarretPosition = this.textPaneContent.getCaretPosition();
+        this.currentCarretPosition = this.textPaneContent.getCaretPosition() - 1;
         this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font color=\"red\">" + this.word + "</font>"));
         this.textPaneContent.setCaretPosition(this.currentCarretPosition);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
         this.textPaneContent.setVisible(true);
+
+        // request focus
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @SuppressWarnings("unqualified-field-access")
+            @Override
+            public void run() {
+                textPaneContent.requestFocus();
+            }
+        });
+
         this.autoUpdate = false;
     }
 }
