@@ -44,8 +44,8 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.components.FixationWatcher;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
-import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.modus.DoubleBlindMode;
-import de.dfki.km.text20.lightning.components.evaluationmode.quickness.modus.QuicknessMode;
+import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
+import de.dfki.km.text20.lightning.components.evaluationmode.quickness.QuicknessMode;
 import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
