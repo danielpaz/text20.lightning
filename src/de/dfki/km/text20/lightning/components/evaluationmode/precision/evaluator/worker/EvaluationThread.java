@@ -153,7 +153,7 @@ public class EvaluationThread implements Runnable {
             x = (int) (point.x + (random.nextGaussian() * derivation));
             x = Math.max(0, Math.min(this.mainClass.getDimension(), x));
             y = (int) (point.y + (random.nextGaussian() * derivation));
-            x = Math.max(0, Math.min(this.mainClass.getDimension(), y));
+            y = Math.max(0, Math.min(this.mainClass.getDimension(), y));
             calculatedFixations.add(new Point(x, y));
         }
 
