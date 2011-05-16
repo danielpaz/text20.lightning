@@ -151,9 +151,9 @@ public class EvaluationThread implements Runnable {
         // calculate fixations
         for (int i = 0; i < this.mainClass.getAmount(); i++) {
             x = (int) (point.x + (random.nextGaussian() * derivation));
-            x = Math.max(0, Math.min(this.mainClass.getDimension(), x));
+            x = Math.max(point.x - this.mainClass.getDimension() / 2, Math.min(point.x + this.mainClass.getDimension() / 2, x));
             y = (int) (point.y + (random.nextGaussian() * derivation));
-            y = Math.max(0, Math.min(this.mainClass.getDimension(), y));
+            y = Math.max(point.y - this.mainClass.getDimension() / 2, Math.min(point.y + this.mainClass.getDimension() / 2, y));
             calculatedFixations.add(new Point(x, y));
         }
 
