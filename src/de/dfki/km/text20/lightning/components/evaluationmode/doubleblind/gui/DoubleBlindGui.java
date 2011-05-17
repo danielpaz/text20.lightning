@@ -81,7 +81,7 @@ public class DoubleBlindGui extends JFrame {
         //---- buttonCancel ----
         buttonCancel.setText("Cancel");
         contentPane.add(buttonCancel, cc.xy(5, 15));
-        pack();
+        setSize(400, 215);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

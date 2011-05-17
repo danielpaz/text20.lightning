@@ -411,7 +411,13 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
         else
             this.enableWarpConfig(false);
-        
+        this.buttonSubmit.setEnabled(!this.checkBoxEvaluation.isSelected());
+        if (!this.checkBoxEvaluation.isSelected()) {
+            this.buttonOK.setText("OK");
+        } else {
+            this.buttonOK.setText("Start");
+        }
+
     }
 
     /**

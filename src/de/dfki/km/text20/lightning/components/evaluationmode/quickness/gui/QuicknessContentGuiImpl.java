@@ -36,7 +36,7 @@ import javax.swing.text.BadLocationException;
  * shows current text and highlights given word
  * gives time distance and carretpostion back
  * 
- * TODO: handle words which contains the text more than once 
+ * TODO: handle words which are contained the text more than once 
  *  
  * @author Christoph Käding
  */
@@ -145,16 +145,15 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         int caretIndex = this.textPaneContent.getCaretPosition();
 
         // build current word
-        // TODO: catch linebreak
         try {
-            for (int i = caretIndex; i > 0; i--) {
-                if (!this.textPaneContent.getDocument().getText(i, 1).equals(" ") && !this.textPaneContent.getDocument().getText(i, 1).equals("\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\r\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\t")) {
+            for (int i = caretIndex - 1; i > 0; i--) {
+                if (Character.isLetter(this.textPaneContent.getDocument().getText(i, 1).toCharArray()[0])) {
                     currentWord = this.textPaneContent.getDocument().getText(i, 1) + currentWord;
                 } else
                     break;
             }
-            for (int i = caretIndex + 1; i < this.textPaneContent.getDocument().getLength(); i++) {
-                if (!this.textPaneContent.getDocument().getText(i, 1).equals(" ") && !this.textPaneContent.getDocument().getText(i, 1).equals("\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\r\n") && !this.textPaneContent.getDocument().getText(i, 1).equals("\t")) {
+            for (int i = caretIndex; i < this.textPaneContent.getDocument().getLength(); i++) {
+                if (Character.isLetter(this.textPaneContent.getDocument().getText(i, 1).toCharArray()[0])) {
                     currentWord = currentWord + this.textPaneContent.getDocument().getText(i, 1);
                 } else
                     break;

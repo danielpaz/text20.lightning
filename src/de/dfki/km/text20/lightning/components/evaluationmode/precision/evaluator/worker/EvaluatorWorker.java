@@ -20,8 +20,6 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
 
-import static net.jcores.CoreKeeper.$;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -29,12 +27,18 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.Number;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
-import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
@@ -51,10 +55,7 @@ public class EvaluatorWorker {
     private long currentTimeStamp;
 
     /** stores over all results */
-    private EvaluationContainer overAllResults;
-
-    /** logging channel */
-    private DiagnosisChannel<String> channel;
+    private EvaluationContainer results;
 
     /** current main class */
     private EvaluatorMain main;
@@ -65,24 +66,21 @@ public class EvaluatorWorker {
     /** coverage of last picture */
     private double formerCoverage;
 
-    /** timestamp to identify screenshots */
-    private long formerTimestamp;
+    /** identifier for screenshots */
+    private int formerIdentifier;
 
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
      * @param main
      * @param currentTimeStamp
-     * @param channel
      */
-    public EvaluatorWorker(EvaluatorMain main, long currentTimeStamp,
-                           DiagnosisChannel<String> channel) {
+    public EvaluatorWorker(EvaluatorMain main, long currentTimeStamp) {
         // initialize some variables
         this.currentTimeStamp = currentTimeStamp;
-        this.overAllResults = null;
-        this.channel = channel;
+        this.results = null;
         this.main = main;
-        this.formerTimestamp = 0;
+        this.formerIdentifier = 0;
 
         // excel-stuff
         WritableFont arial10pt = new WritableFont(WritableFont.ARIAL, 10);
@@ -97,14 +95,14 @@ public class EvaluatorWorker {
     /**
      * evaluates the given container with the given detector
      *
-     * @param timestamp 
+     * @param identifier 
      * @param detector 
      * @param screenShot 
      * @param fixation 
      * @param relatedPoint 
      * @param path 
      */
-    public void evaluate(long timestamp, SaliencyDetector detector,
+    public void evaluate(int identifier, SaliencyDetector detector,
                          BufferedImage screenShot, Point fixation, Point relatedPoint,
                          String path) {
 
@@ -126,9 +124,9 @@ public class EvaluatorWorker {
 
         // analyze text coverage
         if (this.main.writeLog()) {
-            if (this.formerTimestamp != timestamp) {
+            if (this.formerIdentifier != identifier) {
                 this.formerCoverage = this.main.getCoverageAnalyser().analyse(screenShot);
-                this.formerTimestamp = timestamp;
+                this.formerIdentifier = identifier;
             }
             coverage = this.formerCoverage;
         }
@@ -140,195 +138,122 @@ public class EvaluatorWorker {
 
         // write the png-file
         if (this.main.writeImages())
-            this.drawPicture(detector, calculatedTarget, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + this.formerTimestamp + "_evaluated.png", screenShot, translatedRelated);
+            this.drawPicture(detector, calculatedTarget, path + "/evaluated/Session_" + this.currentTimeStamp + "/" + this.formerIdentifier + "_evaluated.png", screenShot, translatedRelated);
 
         // add results to over all storage
-        if (this.overAllResults == null) this.overAllResults = new EvaluationContainer(detector.getInformation().getId(), calculatedTarget.distance(translatedRelated), coverage, this.main.getCoverageThreshold(), path);
+        if (this.results == null) this.results = new EvaluationContainer(detector.getInformation().getId(), calculatedTarget.distance(translatedRelated), coverage, this.main.getCoverageThreshold(), path);
         else
-            this.overAllResults.add(detector.getInformation().getId(), calculatedTarget.distance(translatedRelated), coverage, path);
+            this.results.add(detector.getInformation().getId(), calculatedTarget.distance(translatedRelated), coverage, path);
     }
 
     /**
-     * A call of this method indicates that the evaluation is finished and the
-     * result files can be written.
+     * writes result files
      * 
      * @param detectors
      * 
-     * @return name of best ranked detector
+     * @return locations where result files are written to
      */
-    @SuppressWarnings("boxing")
-    public String getBestResult(ArrayList<SaliencyDetector> detectors) {
-        // test if some data are collected
-        if (this.overAllResults == null) return "...nothing";
-        if (this.overAllResults.getSizeOverAll() == 0) return "...nothing";
-
+    public String writeResults(ArrayList<SaliencyDetector> detectors) {
         // initialize variables
-        double veryBestValue = Double.MAX_VALUE;
-        ArrayList<Integer> veryBestKey = new ArrayList<Integer>();
-        String bestMethods = "";
-        String veryBestMethods = "";
+        String locations = "";
 
-        for (String path : this.overAllResults.getLogPath()) {
+        // test if some data are collected
+        if (this.results == null) return "...nowhere";
+        if (this.results.getSize(EvaluationResultType.OVERALL) == 0) return "...nowhere";
+
+        // test if resultfiles should be written#
+        if (!this.main.writeLog()) return "...nowhere";
+
+        for (String path : this.results.getLogPath()) {
 
             // build path
-            path = path + "/evaluated/Session_" + this.currentTimeStamp + "/" + System.currentTimeMillis() + "_evaluated.log";
+            path = path + "/evaluated/Session_" + this.currentTimeStamp + "/" + System.currentTimeMillis() + "_evaluated.xls";
 
-            if (this.main.writeLog()) {
-                $(path).file().append("- overall results for this session -\r\n\r\n#Overview#\r\n");
-                $(path).file().append("- Number of different Locations: " + this.overAllResults.getLogPath().size() + "\r\n");
-                $(path).file().append("- Number of DataSets overall: " + this.overAllResults.getSizeOverAll() + "\r\n");
-                $(path).file().append("- Text Coverage Threshold: " + this.main.getCoverageThreshold() + "%\r\n");
-                $(path).file().append("- Datasets with a Text Coverage higher than threshold: " + this.overAllResults.getSizeHigher() + "\r\n");
-                $(path).file().append("- Datasets with a Text Coverage lower than threshold: " + this.overAllResults.getSizeLower() + "\r\n");
-                $(path).file().append("\r\n#Results, over all#\r\n");
+            try {
+                // initialize xls-stuff
+                WorkbookSettings wbSettings = new WorkbookSettings();
+                wbSettings.setLocale(new Locale("en", "EN"));
+                WritableWorkbook workbook;
+
+                // initialize file
+                workbook = Workbook.createWorkbook(new File(path), wbSettings);
+                workbook.createSheet("Evaluation", 0);
+                WritableSheet excelSheet = workbook.getSheet(0);
+
+                // add captions
+                excelSheet.addCell(new Label(1, 0, "Overview", this.format));
+                excelSheet.addCell(new Label(0, 2, "different locations", this.format));
+                excelSheet.addCell(new Label(0, 3, "datasets overall", this.format));
+                excelSheet.addCell(new Label(0, 4, "threshold in %", this.format));
+                excelSheet.addCell(new Label(0, 5, "datasets, higher than", this.format));
+                excelSheet.addCell(new Label(0, 6, "datasets, lower than", this.format));
+                excelSheet.addCell(new Label(1, 9, "Results", this.format));
+                excelSheet.addCell(new Label(0, 11, "detector", this.format));
+                excelSheet.addCell(new Label(2, 11, "averaged distance", this.format));
+                excelSheet.addCell(new Label(1, 12, "overall", this.format));
+                excelSheet.addCell(new Label(2, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(3, 12, "lower than", this.format));
+                excelSheet.addCell(new Label(5, 11, "median", this.format));
+                excelSheet.addCell(new Label(4, 12, "overall", this.format));
+                excelSheet.addCell(new Label(5, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(6, 12, "lower than", this.format));
+                excelSheet.addCell(new Label(8, 11, "unit variance", this.format));
+                excelSheet.addCell(new Label(7, 12, "overall", this.format));
+                excelSheet.addCell(new Label(8, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(9, 12, "lower than", this.format));
+                excelSheet.addCell(new Label(11, 11, "standard deviation", this.format));
+                excelSheet.addCell(new Label(10, 12, "overall", this.format));
+                excelSheet.addCell(new Label(11, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(12, 12, "lower than", this.format));
+
+                // write head values
+                excelSheet.addCell(new Number(1, 2, this.results.getLogPath().size(), this.format));
+                excelSheet.addCell(new Number(1, 3, this.results.getSize(EvaluationResultType.OVERALL), this.format));
+                excelSheet.addCell(new Number(1, 4, this.main.getCoverageThreshold(), this.format));
+                excelSheet.addCell(new Number(1, 5, this.results.getSize(EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                excelSheet.addCell(new Number(1, 6, this.results.getSize(EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+
+                // run through detectors
+                for (int i = 0; i < detectors.size(); i++) {
+                    excelSheet.addCell(new Label(0, 13 + i, detectors.get(i).getInformation().getDisplayName(), this.format));
+                    excelSheet.addCell(new Number(1, 13 + i, this.results.getAveragedDistance(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(2, 13 + i, this.results.getAveragedDistance(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(3, 13 + i, this.results.getAveragedDistance(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(4, 13 + i, this.results.getMedian(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(5, 13 + i, this.results.getMedian(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(6, 13 + i, this.results.getMedian(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(7, 13 + i, this.results.getUnitVariance(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(8, 13 + i, this.results.getUnitVariance(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(9, 13 + i, this.results.getUnitVariance(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(10, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(11, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(12, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // run through all included ids, over all
-            for (int id : this.overAllResults.getIds()) {
-
-                // write result to log
-                if (this.main.writeLog())
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceOverAll(id) * 100) / 100) + " Pixel distance averaged.\r\n");
-
-                // check if the current value is equal then the best value
-                if (veryBestValue == this.overAllResults.getAveragedDistanceOverAll(id))
-                    veryBestKey.add(id);
-
-                // check if the current value is better then the best value
-                if (veryBestValue > this.overAllResults.getAveragedDistanceOverAll(id)) {
-
-                    // store new best value
-                    veryBestKey.clear();
-                    veryBestKey.add(id);
-                    veryBestValue = this.overAllResults.getAveragedDistanceOverAll(id);
-                }
-            }
-            if (this.main.writeLog()) {
-                // single best key
-                if (veryBestKey.size() == 1) {
-                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
-
-                    // multiple best keys
-                } else {
-                    $(path).file().append("-> best results for ");
-                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
-                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
-                    }
-                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
-                }
-            }
-
-            // create best results string
-            if (veryBestKey.size() == 1) {
-                bestMethods = detectors.get(veryBestKey.get(0)).getInformation().getDisplayName();
-
-                // multiple best keys
-            } else {
-                for (int i = 0; i < veryBestKey.size() - 2; i++) {
-                    bestMethods = bestMethods + detectors.get(i).getInformation().getDisplayName() + ", ";
-                }
-                bestMethods = bestMethods + detectors.get(veryBestKey.size() - 2).getInformation().getDisplayName();
-                bestMethods = bestMethods + " and " + detectors.get(veryBestKey.size() - 1).getInformation().getDisplayName();
-            }
-
-            // reset
-            veryBestMethods = bestMethods;
-            bestMethods = "";
-            veryBestKey.clear();
-            veryBestValue = Double.MAX_VALUE;
-
-            if (this.main.writeLog()) {
-
-                // write header
-                $(path).file().append("\r\n#Results, higher than threshold#\r\n");
-
-                // run through all included ids, higher than
-                for (int id : this.overAllResults.getIds()) {
-
-                    // write result to log
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceHigher(id) * 100) / 100) + " Pixel distance averaged.\r\n");
-
-                    // check if the current value is equal then the best value
-                    if (veryBestValue == this.overAllResults.getAveragedDistanceHigher(id))
-                        veryBestKey.add(id);
-
-                    // check if the current value is better then the best value
-                    if (veryBestValue > this.overAllResults.getAveragedDistanceHigher(id)) {
-
-                        // store new best value
-                        veryBestKey.clear();
-                        veryBestKey.add(id);
-                        veryBestValue = this.overAllResults.getAveragedDistanceHigher(id);
-                    }
-                }
-
-                // single best key
-                if (veryBestKey.size() == 1) {
-                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
-
-                    // multiple best keys
-                } else {
-                    $(path).file().append("-> best results for ");
-                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
-                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
-                    }
-                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
-                }
-
-                // reset
-                veryBestKey.clear();
-                veryBestValue = Double.MAX_VALUE;
-
-                // write header
-                $(path).file().append("\r\n#Results, lower than threshold#\r\n");
-
-                // run through all included ids, higher than
-                for (int id : this.overAllResults.getIds()) {
-
-                    // write result to log
-                    $(path).file().append(detectors.get(id).getInformation().getDisplayName() + ": " + ((double) Math.round(this.overAllResults.getAveragedDistanceLower(id) * 100) / 100) + " Pixel distance averaged.\r\n");
-
-                    // check if the current value is equal then the best value
-                    if (veryBestValue == this.overAllResults.getAveragedDistanceLower(id))
-                        veryBestKey.add(id);
-
-                    // check if the current value is better then the best value
-                    if (veryBestValue > this.overAllResults.getAveragedDistanceLower(id)) {
-
-                        // store new best value
-                        veryBestKey.clear();
-                        veryBestKey.add(id);
-                        veryBestValue = this.overAllResults.getAveragedDistanceLower(id);
-                    }
-                }
-
-                // single best key
-                if (veryBestKey.size() == 1) {
-                    $(path).file().append("-> best result for " + detectors.get(veryBestKey.get(0)).getInformation().getDisplayName() + "\r\n");
-
-                    // multiple best keys
-                } else {
-                    $(path).file().append("-> best results for ");
-                    for (int i = 0; i < veryBestKey.size() - 2; i++) {
-                        $(path).file().append(detectors.get(veryBestKey.get(i)).getInformation().getDisplayName() + ", ");
-                    }
-                    $(path).file().append(detectors.get(veryBestKey.get(veryBestKey.size() - 2)).getInformation().getDisplayName());
-                    $(path).file().append(" and " + detectors.get(veryBestKey.get(veryBestKey.size() - 1)).getInformation().getDisplayName() + "\r\n");
-                }
-
-                // reset
-                veryBestKey.clear();
-                veryBestValue = Double.MAX_VALUE;
-            }
+            // update progress bar
+            this.main.updateProgressBar();
         }
 
-        // log best result
-        this.channel.status("best result: " + veryBestMethods + " with " + this.overAllResults.getSizeOverAll() + "datasets");
+        // build location string
+        if (this.results.getLogPath().size() > 1) {
+            for (int i = 0; i < this.results.getLogPath().size() - 3; i++) {
+                locations = locations + this.results.getLogPath().get(i) + "evaluated" + File.separator + "Session_" + this.currentTimeStamp + ", ";
+            }
+            locations = locations + this.results.getLogPath().get(this.results.getLogPath().size() - 2) + "evaluated" + File.separator + "Session_" + this.currentTimeStamp + " and " + this.results.getLogPath().get(this.results.getLogPath().size() - 1) + "evaluated" + File.separator + "Session_" + this.currentTimeStamp;
+        } else {
+            locations = this.results.getLogPath().get(0) + "evaluated" + File.separator + "Session_" + this.currentTimeStamp;
+        }
 
-        // return the name of the very best detector
-        return veryBestMethods;
+        // return locations
+        return locations;
     }
 
     /**

@@ -80,7 +80,7 @@ public class EvaluationThread implements Runnable {
         // initialize Variables
         DataXMLParser dataParser = new DataXMLParser();
         BufferedImage screenshot;
-        long timestamp = 0;
+        int identifier = 0;
 
         // start all detectors
         for (SaliencyDetector detector : this.selectedDetectors)
@@ -103,15 +103,11 @@ public class EvaluationThread implements Runnable {
                 // run through all calculated fixations
                 for (Point fixation : this.calculateFixations(screenshot, data)) {
 
-                    timestamp = System.currentTimeMillis();
-
                     // ... and every detector
                     for (SaliencyDetector detector : this.selectedDetectors) {
 
-                        System.out.println("- Detector: " + detector.getInformation().getDisplayName());
-
                         // process evaluation
-                        this.worker.evaluate(timestamp, detector, screenshot, fixation, data, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
+                        this.worker.evaluate(identifier, detector, screenshot, fixation, data, file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
 
                         // stops the processing if needed
                         if (this.stop) return;
@@ -119,6 +115,9 @@ public class EvaluationThread implements Runnable {
                         // update progress bar
                         this.mainClass.updateProgressBar();
                     }
+                    
+                    // step forward
+                    identifier++;
                 }
             }
 
@@ -142,7 +141,7 @@ public class EvaluationThread implements Runnable {
      */
     private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
         // initialize variables
-        int derivation = 10;
+        int deviation = 10;
         int x;
         int y;
         ArrayList<Point> calculatedFixations = new ArrayList<Point>();
@@ -150,9 +149,9 @@ public class EvaluationThread implements Runnable {
 
         // calculate fixations
         for (int i = 0; i < this.mainClass.getAmount(); i++) {
-            x = (int) (point.x + (random.nextGaussian() * derivation));
+            x = (int) (point.x + (random.nextGaussian() * deviation));
             x = Math.max(point.x - this.mainClass.getDimension() / 2, Math.min(point.x + this.mainClass.getDimension() / 2, x));
-            y = (int) (point.y + (random.nextGaussian() * derivation));
+            y = (int) (point.y + (random.nextGaussian() * deviation));
             y = Math.max(point.y - this.mainClass.getDimension() / 2, Math.min(point.y + this.mainClass.getDimension() / 2, y));
             calculatedFixations.add(new Point(x, y));
         }

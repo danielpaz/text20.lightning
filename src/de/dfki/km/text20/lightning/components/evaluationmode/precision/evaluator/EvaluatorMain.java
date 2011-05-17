@@ -105,9 +105,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** timestamp from the start of this tool */
     private long currentTimeStamp;
 
-    /** logging channel */
-    private DiagnosisChannel<String> channel;
-
     /** thread in which the evaluation runs */
     private EvaluationThread evaluationThread;
 
@@ -207,16 +204,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // set logging properties
         final JSPFProperties props = new JSPFProperties();
-        props.setProperty(Diagnosis.class, "recording.enabled", "true");
-        props.setProperty(Diagnosis.class, "recording.file", "diagnosis.record");
-        props.setProperty(Diagnosis.class, "recording.format", "java/serialization");
-        props.setProperty(Diagnosis.class, "analysis.stacktraces.enabled", "true");
-        props.setProperty(Diagnosis.class, "analysis.stacktraces.depth", "10000");
         props.setProperty(PluginManager.class, "cache.enabled", "true");
         props.setProperty(PluginManager.class, "cache.mode", "weak");
-
-        // set statistic properties
-        props.setProperty(Statistics.class, "application.id", "StatisticsTest");
 
         // initialize plugin manager
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
@@ -244,8 +233,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         }
 
         // create new worker and channel
-        this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
-        this.worker = new EvaluatorWorker(this, this.currentTimeStamp, this.channel);
+        this.worker = new EvaluatorWorker(this, this.currentTimeStamp);
 
         // initialize coverage combobox
         for (CoverageAnalyser analyzer : this.coverageDetectors)
@@ -284,9 +272,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // initialize evaluation evaluationThread
         this.evaluationThread = new EvaluationThread();
-
-        // log start
-        this.channel.status("Session started.");
 
         // initialize timer and child
         this.child = null;
@@ -631,7 +616,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void startEvaluation() {
         // initialize variables
         DataXMLParser dataParser = new DataXMLParser();
-        ArrayList<File> tmp = new ArrayList<File>(this.files);
+        ArrayList<File> tmpFile = new ArrayList<File>(this.files);
+        ArrayList<String> tmpPath = new ArrayList<String>();
         int size = 0;
 
         // set threshold and amount
@@ -648,20 +634,24 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // kill pupil files
         for (File file : this.files) {
-            if (file.getAbsolutePath().endsWith("_pupils.xml")) tmp.remove(file);
+            if (file.getAbsolutePath().endsWith("_pupils.xml")) tmpFile.remove(file);
         }
-        this.files = new ArrayList<File>(tmp);
+        this.files = new ArrayList<File>(tmpFile);
 
         // validate files
         for (File file : this.files) {
-            if (!dataParser.isValid(file)) tmp.remove(file);
+            if (!dataParser.isValid(file)) tmpFile.remove(file);
         }
-        this.files = tmp;
+        this.files = tmpFile;
 
         // calculate size
-        for (File file : this.files)
+        for (File file : this.files) {
             size = size + dataParser.count(file);
-        size = size * this.selectedDetectors.size() * this.amount;
+            if (!tmpPath.contains(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1))) {
+                tmpPath.add(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
+            }
+        }
+        size = size * this.selectedDetectors.size() * this.amount * tmpPath.size();
 
         // initialize progress bar
         this.progressBar.setMaximum(size);
@@ -677,10 +667,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * finishes the evaluation
      */
     public void finish() {
-        // show best result
-        String bestResult = this.worker.getBestResult(this.saliencyDetectors);
-        this.labelDescription.setText("Evaluation finished. " + bestResult + " achived the best results.");
-        System.out.println("Evaluation finished. Best results for " + bestResult + ".\n");
+        // write results
+        String locations = this.worker.writeResults(this.saliencyDetectors);
+        this.labelDescription.setText("Evaluation finished. Results written to " + locations);
+        System.out.println("Evaluation finished. Results written to " + locations + ".\n");
 
         // inidicate finish
         this.selectedDetectors.clear();

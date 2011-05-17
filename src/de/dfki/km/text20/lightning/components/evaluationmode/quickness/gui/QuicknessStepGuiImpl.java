@@ -56,7 +56,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
     private HashMap<String, ArrayList<String>> data;
 
     /** */
-    private int formerWordIndex;
+    private int formerWordIndexOne;
+
+    /** */
+    private int formerWordIndexTwo;
 
     /** */
     private int currentWordIndex;
@@ -141,7 +144,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
 
             // reset variables
             this.carretPosition = 1;
-            this.formerWordIndex = -1;
+            this.formerWordIndexOne = -1;
+            this.formerWordIndexTwo = -1;
             this.currentWordIndex = -1;
 
             if (this.startWithDetector) {
@@ -170,7 +174,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
 
             // reset variables
             this.carretPosition = 1;
-            this.formerWordIndex = -1;
+            this.formerWordIndexOne = -1;
+            this.formerWordIndexTwo = -1;
             this.currentWordIndex = -1;
 
             if (this.startWithDetector) {
@@ -207,8 +212,11 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         }
 
         // choose word randomized 
-        while (this.formerWordIndex == this.currentWordIndex)
-            this.currentWordIndex = Integer.parseInt($.range(0, this.data.get(this.currentFile).size() - 1).random(1).string().join());
+        // TODO: add sth that catches this.data.get(this.currentFile).size() == 2
+        while ((this.formerWordIndexOne == this.currentWordIndex) || (this.formerWordIndexTwo == this.currentWordIndex))
+            this.currentWordIndex = Integer.parseInt($.range(0, this.data.get(this.currentFile).size()).random(1).string().join());
+        this.formerWordIndexTwo = this.formerWordIndexOne;
+        this.formerWordIndexOne = this.currentWordIndex;
 
         // set current word and current file
         this.currentWord = this.data.get(this.currentFile).get(this.currentWordIndex);
