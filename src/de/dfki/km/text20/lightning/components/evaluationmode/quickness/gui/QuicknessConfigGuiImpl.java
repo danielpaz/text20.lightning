@@ -77,6 +77,7 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
         this.files = new ArrayList<File>();
         this.currentWords = new ArrayList<String>();
         this.child = null;
+        this.currentFile = "";
 
         // initialze combobox
         this.manageComboBoxSaliencyDetector();

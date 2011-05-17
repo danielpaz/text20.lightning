@@ -21,6 +21,7 @@
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -33,31 +34,13 @@ import java.util.Map;
 public class EvaluationContainer {
 
     /** map with stored results as value and method id as key */
-    private Map<Integer, Double> resultsOverAll;
+    private Map<Integer, ArrayList<Double>> resultsOverAll;
 
     /** map with stored results as value and method id as key */
-    private Map<Integer, Double> resultsHigher;
+    private Map<Integer, ArrayList<Double>> resultsHigher;
 
     /** map with stored results as value and method id as key */
-    private Map<Integer, Double> resultsLower;
-
-    /** id wich is counted to get the number of 'adds' */
-    private int keyId;
-
-    /** number of 'adds' */
-    private int sizeOverAll;
-
-    /** number of 'adds' */
-    private int sizeHigher;
-
-    /** number of 'adds' */
-    private int sizeLower;
-
-    /** temp for calculations */
-    private double temp;
-
-    /** list of ids */
-    private ArrayList<Integer> ids;
+    private Map<Integer, ArrayList<Double>> resultsLower;
 
     /** path where logfiles should be placed */
     private ArrayList<String> log;
@@ -83,15 +66,10 @@ public class EvaluationContainer {
     public EvaluationContainer(int id, double distance, double value, double threshold,
                                String path) {
         // initialize variables
-        this.resultsOverAll = new Hashtable<Integer, Double>();
-        this.resultsHigher = new Hashtable<Integer, Double>();
-        this.resultsLower = new Hashtable<Integer, Double>();
+        this.resultsOverAll = new Hashtable<Integer, ArrayList<Double>>();
+        this.resultsHigher = new Hashtable<Integer, ArrayList<Double>>();
+        this.resultsLower = new Hashtable<Integer, ArrayList<Double>>();
         this.log = new ArrayList<String>();
-        this.ids = new ArrayList<Integer>();
-        this.keyId = id;
-        this.sizeOverAll = 0;
-        this.sizeHigher = 0;
-        this.sizeLower = 0;
         this.threshold = threshold;
 
         // add first value
@@ -113,107 +91,211 @@ public class EvaluationContainer {
      */
     @SuppressWarnings("boxing")
     public void add(int id, double distance, double value, String path) {
-        // if the given id is the key id ... 
-        if (this.keyId == id) {
-            // ... increase sizeO ...
-            this.sizeOverAll++;
 
-            // store by coverage
-            if (value > this.threshold) {
-
-                // increase size ...
-                this.sizeHigher++;
-
-            } else {
-
-                // increase size ...
-                this.sizeLower++;
-            }
+        // store distance to overall results
+        if (this.resultsOverAll.containsKey(id)) {
+            this.resultsOverAll.get(id).add(distance);
+        } else {
+            ArrayList<Double> tmp = new ArrayList<Double>();
+            tmp.add(distance);
+            this.resultsOverAll.put(id, tmp);
         }
 
-        // if the map contains already the given id, store value in temp
-        if (this.resultsOverAll.containsKey(id)) this.temp = this.resultsOverAll.get(id);
-
-        // put temp + given value by given id to the map
-        this.resultsOverAll.put(id, this.temp + distance);
-
-        // add id to the list of ids if it is not already there
-        if (!this.ids.contains(id)) this.ids.add(id);
-
-        // reset temp
-        this.temp = 0;
-
+        // store distance in threshold specific map
         if (value > this.threshold) {
 
-            // if the map contains already the given id, store value in temp
-            if (this.resultsHigher.containsKey(id))
-                this.temp = this.resultsHigher.get(id);
-
-            // put temp + given value by given id to the map
-            this.resultsHigher.put(id, this.temp + distance);
+            if (this.resultsHigher.containsKey(id)) {
+                this.resultsHigher.get(id).add(distance);
+            } else {
+                ArrayList<Double> tmp = new ArrayList<Double>();
+                tmp.add(distance);
+                this.resultsHigher.put(id, tmp);
+            }
 
         } else {
 
-            // if the map contains already the given id, store value in temp
-            if (this.resultsLower.containsKey(id)) this.temp = this.resultsLower.get(id);
-
-            // put temp + given value by given id to the map
-            this.resultsLower.put(id, this.temp + distance);
+            if (this.resultsLower.containsKey(id)) {
+                this.resultsLower.get(id).add(distance);
+            } else {
+                ArrayList<Double> tmp = new ArrayList<Double>();
+                tmp.add(distance);
+                this.resultsLower.put(id, tmp);
+            }
         }
-
-        // reset temp
-        this.temp = 0;
 
         // add path
         if (!this.log.contains(path)) this.log.add(path);
     }
 
     /**
-     * Returns averaged distance for the given id.
+     * Returns averaged distance for the given id and type.
      * 
      * @param id
+     * @param type 
+     *      
      * @return averaged distance
      */
-    @SuppressWarnings("boxing")
-    public double getAveragedDistanceOverAll(int id) {
-        if (this.resultsOverAll.containsKey(id))
-            return (this.resultsOverAll.get(id) / this.sizeOverAll);
-        return 0;
+    public double getAveragedDistance(int id, EvaluationResultType type) {
+        // initialize variables
+        ArrayList<Double> values = this.getValues(id, type);
+        double result = 0;
+
+        // check if datas are available
+        if (values.size() == 0) return -1;
+
+        // summarize values
+        for (double tmp : values) {
+            result = result + tmp;
+        }
+
+        // return average
+        return result / values.size();
     }
 
     /**
-     * Returns averaged distance for the given id.
+     * Returns unit variance for the given id and type.
      * 
      * @param id
-     * @return averaged distance
+     * @param type 
+     *      
+     * @return unit variance
      */
     @SuppressWarnings("boxing")
-    public double getAveragedDistanceHigher(int id) {
-        if (this.resultsHigher.containsKey(id))
-            return (this.resultsHigher.get(id) / this.sizeHigher);
-        return 0;
+    public double getUnitVariance(int id, EvaluationResultType type) {
+        // initialize variables
+        ArrayList<Double> values = this.getValues(id, type);
+        HashMap<Double, Double> probability = new HashMap<Double, Double>();
+        double tmp;
+
+        // check if datas are available
+        if (values.size() == 0) return -1;
+        
+        // calculate probability of each value
+        for (double value : values) {
+            if (probability.containsKey(value)) {
+                tmp = probability.get(value);
+                tmp = tmp + 1.0 / values.size();
+                probability.put(value, tmp);
+            } else {
+                probability.put(value, 1.0 / values.size());
+            }
+        }
+
+        // reset tmp
+        tmp = 0;
+
+        // calculate unity variance
+        for (double value : probability.keySet()) {
+            tmp = tmp + (Math.pow(value - this.getAveragedDistance(id, type), 2) * probability.get(value));
+        }
+
+        // return unit variance
+        return tmp;
     }
 
     /**
-     * Returns averaged distance for the given id.
+     * Returns standard deviation for the given id and type.
      * 
      * @param id
+     * @param type 
+     *      
+     * @return standard deviation
+     * 
+     * TODO: calculate unity variance only once
+     */
+    public double getStandardDeviation(int id, EvaluationResultType type) {
+        // initialize variable
+        double unityVariance = this.getUnitVariance(id, type);
+        
+        // check if unity variance is available
+        if (unityVariance == -1) return -1;
+        
+        // return standard derivation
+        return Math.sqrt(unityVariance);
+    }
+
+    /**
+     * Returns median for the given id and type.
+     * 
+     * @param id
+     * @param type 
+     *      
      * @return averaged distance
+     * 
+     * TODO: sort array only once
      */
     @SuppressWarnings("boxing")
-    public double getAveragedDistanceLower(int id) {
-        if (this.resultsLower.containsKey(id))
-            return (this.resultsLower.get(id) / this.sizeLower);
-        return 0;
+    public double getMedian(int id, EvaluationResultType type) {
+        // initialize variables
+        double median = 0;
+        double temp;
+        boolean doMore = true;
+        ArrayList<Double> values = this.getValues(id, type);
+
+        // check if data are available
+        if (values.size() == 0) return -1;
+
+        // kind of bubble sort
+        while (doMore) {
+            doMore = false;
+            for (int i = 0; i < values.size() - 1; i++) {
+                if (values.get(i) > values.get(i + 1)) {
+                    temp = values.get(i);
+                    values.set(i, values.get(i + 1));
+                    values.set(i + 1, temp);
+                    doMore = true;
+                }
+            }
+        }
+
+        // set median
+        if ((values.size() % 2) == 1) {
+
+            // if uneven number, set middle value as median
+            median = values.get(((values.size() - 1) / 2));
+        } else {
+
+            // if even number, calculate average of the to middle values
+            median = (values.get(values.size() / 2) + values.get((values.size() / 2) - 1)) / 2;
+        }
+
+        // return average
+        return median;
     }
 
     /**
      * returns a list of recognized ids
      * 
+     * @param type 
+     * 
      * @return ids
      */
-    public ArrayList<Integer> getIds() {
-        return this.ids;
+    public ArrayList<Integer> getIds(EvaluationResultType type) {
+        // create variable
+        ArrayList<Integer> ids;
+
+        // initialize variable
+        switch (type) {
+
+        case OVERALL:
+            ids = new ArrayList<Integer>(this.resultsOverAll.keySet());
+            break;
+
+        case HIGHER_THAN_THRESHOLD:
+            ids = new ArrayList<Integer>(this.resultsHigher.keySet());
+            break;
+
+        case LOWER_THEN_THRESHOLD:
+            ids = new ArrayList<Integer>(this.resultsLower.keySet());
+            break;
+
+        default:
+            ids = new ArrayList<Integer>();
+            break;
+        }
+
+        // return list
+        return ids;
     }
 
     /**
@@ -226,23 +308,58 @@ public class EvaluationContainer {
     }
 
     /**
+     * @param type
+     *      
      * @return the number of datasets
      */
-    public int getSizeOverAll() {
-        return this.sizeOverAll;
+    public int getSize(EvaluationResultType type) {
+
+        // return size by type
+        switch (type) {
+
+        case OVERALL:
+            if (this.getIds(type).size() == 0) return -1;
+            return this.resultsOverAll.get(this.getIds(type).get(0)).size();
+
+        case HIGHER_THAN_THRESHOLD:
+            if (this.getIds(type).size() == 0) return -1;
+            return this.resultsHigher.get(this.getIds(type).get(0)).size();
+
+        case LOWER_THEN_THRESHOLD:
+            if (this.getIds(type).size() == 0) return -1;
+            return this.resultsLower.get(this.getIds(type).get(0)).size();
+
+        default:
+            return -1;
+        }
     }
 
     /**
-     * @return the number of datasets
+     * @param id
+     * @param type
+     * 
+     * @return list of distances by id and type
      */
-    public int getSizeHigher() {
-        return this.sizeHigher;
-    }
+    @SuppressWarnings("boxing")
+    private ArrayList<Double> getValues(int id, EvaluationResultType type) {
 
-    /**
-     * @return the number of datasets
-     */
-    public int getSizeLower() {
-        return this.sizeLower;
+        // return values by type and id
+        switch (type) {
+
+        case OVERALL:
+            if (!this.resultsOverAll.containsKey(id)) return new ArrayList<Double>();
+            return this.resultsOverAll.get(id);
+
+        case HIGHER_THAN_THRESHOLD:
+            if (!this.resultsHigher.containsKey(id)) return new ArrayList<Double>();
+            return this.resultsHigher.get(id);
+
+        case LOWER_THEN_THRESHOLD:
+            if (!this.resultsLower.containsKey(id)) return new ArrayList<Double>();
+            return this.resultsLower.get(id);
+
+        default:
+            return new ArrayList<Double>();
+        }
     }
 }

@@ -80,7 +80,7 @@ public class QuicknessConfigGui extends JFrame {
         contentPane.add(spinnerSteps, cc.xy(5, 13));
 
         //---- buttonOK ----
-        buttonOK.setText("OK");
+        buttonOK.setText("Start");
         contentPane.add(buttonOK, cc.xy(3, 15));
 
         //---- buttonCancel ----

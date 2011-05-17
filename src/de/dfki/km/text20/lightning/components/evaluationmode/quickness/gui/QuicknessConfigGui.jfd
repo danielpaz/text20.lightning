@@ -349,7 +349,7 @@
         <string>javax.swing.JButton</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>OK</string> 
+         <string>Start</string> 
         </void> 
         <void property="name"> 
          <string>buttonOK</string> 
