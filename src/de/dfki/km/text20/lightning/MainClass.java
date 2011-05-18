@@ -622,7 +622,9 @@ public class MainClass {
             this.evaluationSettings[1] = tmpString;
 
         if (this.evaluationSettings[1].endsWith(File.separator + "."))
-            this.evaluationSettings[1] = this.evaluationSettings[1].substring(0, this.evaluationSettings[1].lastIndexOf("."));
+            this.evaluationSettings[1] = this.evaluationSettings[1].substring(0, this.evaluationSettings[1].lastIndexOf(File.separator + "."));
+        
+        System.out.println(this.evaluationSettings[1]);
     }
 
     /**
