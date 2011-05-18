@@ -104,9 +104,9 @@ public class DoubleBlindMode {
                     Hotkey.getInstance().setBlockHotkeys(true);
 
                     // update file
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy ', ' HH:mm:ss ").format(new Date()) + "\r\n");
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "DoubleBlind.log").file().append("- algorithm one: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(one).getInformation().getDisplayName() + "\r\n");
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n\r\n");
+                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy ', ' HH:mm:ss ").format(new Date()) + "\r\n");
+                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm one: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(one).getInformation().getDisplayName() + "\r\n");
+                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n\r\n");
 
                     // indicate finish
                     JOptionPane.showOptionDialog(null, "Double Blind finished.", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0);
