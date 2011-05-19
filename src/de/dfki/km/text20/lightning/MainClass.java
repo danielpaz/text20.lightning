@@ -373,18 +373,6 @@ public class MainClass {
         if (this.properties.isUseWarp()) this.warper.start();
     }
 
-    /** starts mousewarping, used in evaluation mode */
-    public void startWarp() {
-        this.internalPluginManager.getCurrentMouseWarper().start();
-        this.warper.start();
-    }
-
-    /** stops mousewarping, used in evaluation mode */
-    public void stopWarp() {
-        this.warper.stop();
-        this.internalPluginManager.getCurrentMouseWarper().stop();
-    }
-
     /**
      * Toggles between active and inactive status.
      */
@@ -556,10 +544,12 @@ public class MainClass {
     }
 
     /**
-     * resets evaluator, used to notify new user names, ...
+     * resets evaluator, used to notify new mode
      */
     @SuppressWarnings("unused")
     public void resetEvaluator() {
+        if (this.isNormalMode) return;
+
         // block hotkeys
         Hotkey.getInstance().setBlockHotkeys(true);
 
