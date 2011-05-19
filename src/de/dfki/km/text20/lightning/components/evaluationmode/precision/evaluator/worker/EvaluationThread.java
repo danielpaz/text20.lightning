@@ -141,7 +141,7 @@ public class EvaluationThread implements Runnable {
      */
     private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
         // initialize variables
-        int deviation = 10;
+        int deviation = 20;
         int x;
         int y;
         ArrayList<Point> calculatedFixations = new ArrayList<Point>();

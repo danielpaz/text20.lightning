@@ -668,7 +668,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public void finish() {
         // write results
-        String locations = this.worker.writeResults(this.saliencyDetectors);
+        String locations = this.worker.writeResults(this.selectedDetectors);
         this.labelDescription.setText("Evaluation finished. Results written to " + locations);
         System.out.println("Evaluation finished. Results written to " + locations + ".\n");
 

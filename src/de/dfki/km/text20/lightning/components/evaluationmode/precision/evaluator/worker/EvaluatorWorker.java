@@ -153,6 +153,7 @@ public class EvaluatorWorker {
      * 
      * @return locations where result files are written to
      */
+    @SuppressWarnings("boxing")
     public String writeResults(ArrayList<SaliencyDetector> detectors) {
         // initialize variables
         String locations = "";
@@ -167,16 +168,18 @@ public class EvaluatorWorker {
         for (String path : this.results.getLogPath()) {
 
             // build path
-            path = path + "/evaluated/Session_" + this.currentTimeStamp + "/" + System.currentTimeMillis() + "_evaluated.xls";
+            path = path + "/evaluated/Session_" + this.currentTimeStamp;
+            new File(path).mkdirs();
+            path = path + "/" + this.currentTimeStamp + "_evaluated.xls";
 
             try {
                 // initialize xls-stuff
-                WorkbookSettings wbSettings = new WorkbookSettings();
-                wbSettings.setLocale(new Locale("en", "EN"));
+                WorkbookSettings workbookSettings = new WorkbookSettings();
+                workbookSettings.setLocale(new Locale("en", "EN"));
                 WritableWorkbook workbook;
 
                 // initialize file
-                workbook = Workbook.createWorkbook(new File(path), wbSettings);
+                workbook = Workbook.createWorkbook(new File(path), workbookSettings);
                 workbook.createSheet("Evaluation", 0);
                 WritableSheet excelSheet = workbook.getSheet(0);
 
@@ -205,6 +208,14 @@ public class EvaluatorWorker {
                 excelSheet.addCell(new Label(10, 12, "overall", this.format));
                 excelSheet.addCell(new Label(11, 12, "higher than", this.format));
                 excelSheet.addCell(new Label(12, 12, "lower than", this.format));
+                excelSheet.addCell(new Label(14, 11, "min value", this.format));
+                excelSheet.addCell(new Label(13, 12, "overall", this.format));
+                excelSheet.addCell(new Label(14, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(15, 12, "lower than", this.format));
+                excelSheet.addCell(new Label(17, 11, "max value", this.format));
+                excelSheet.addCell(new Label(16, 12, "overall", this.format));
+                excelSheet.addCell(new Label(17, 12, "higher than", this.format));
+                excelSheet.addCell(new Label(18, 12, "lower than", this.format));
 
                 // write head values
                 excelSheet.addCell(new Number(1, 2, this.results.getLogPath().size(), this.format));
@@ -228,6 +239,78 @@ public class EvaluatorWorker {
                     excelSheet.addCell(new Number(10, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
                     excelSheet.addCell(new Number(11, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
                     excelSheet.addCell(new Number(12, 13 + i, this.results.getStandardDeviation(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(13, 13 + i, this.results.getMinValue(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(14, 13 + i, this.results.getMinValue(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(15, 13 + i, this.results.getMinValue(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(16, 13 + i, this.results.getMaxValue(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL), this.format));
+                    excelSheet.addCell(new Number(17, 13 + i, this.results.getMaxValue(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD), this.format));
+                    excelSheet.addCell(new Number(18, 13 + i, this.results.getMaxValue(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD), this.format));
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+                // write all results to files, over all
+
+                // initialize file
+                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_overall.xls")), workbookSettings);
+                workbook.createSheet("Evaluation", 0);
+                excelSheet = workbook.getSheet(0);
+
+                // add values
+                for (int i = 0; i < detectors.size(); i++) {
+
+                    // add caption
+                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
+
+                    // add values
+                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).size(); j++)
+                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).get(j), this.format));
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+                // write all results to files, higher than
+
+                // initialize file
+                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_higherthan.xls")), workbookSettings);
+                workbook.createSheet("Evaluation", 0);
+                excelSheet = workbook.getSheet(0);
+
+                // add values
+                for (int i = 0; i < detectors.size(); i++) {
+
+                    // add caption
+                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
+
+                    // add values
+                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD).size(); j++)
+                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD).get(j), this.format));
+                }
+
+                // write and close
+                workbook.write();
+                workbook.close();
+
+                // write all results to files, lower than
+
+                // initialize file
+                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_lowerthan.xls")), workbookSettings);
+                workbook.createSheet("Evaluation", 0);
+                excelSheet = workbook.getSheet(0);
+
+                // add values
+                for (int i = 0; i < detectors.size(); i++) {
+
+                    // add caption
+                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
+
+                    // add values
+                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD).size(); j++)
+                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD).get(j), this.format));
                 }
 
                 // write and close

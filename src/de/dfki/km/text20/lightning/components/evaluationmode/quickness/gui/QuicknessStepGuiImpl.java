@@ -22,6 +22,7 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 
 import static net.jcores.CoreKeeper.$;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -89,6 +90,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         this.startWithDetector = startWithDetector;
         this.data = data;
         this.currentFileIndex = 0;
+
+        // set color
+        this.panelContent.setOpaque(true);
+        this.panelContent.setBackground(Color.WHITE);
 
         // set visible
         this.setVisible(true);
