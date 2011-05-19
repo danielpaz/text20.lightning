@@ -46,21 +46,17 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
-import net.xeoh.plugins.diagnosis.local.Diagnosis;
-import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
-import de.dfki.km.augmentedtext.services.language.statistics.Statistics;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.gui.EvaluationWindow;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.EvaluationThread;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.EvaluatorWorker;
-import de.dfki.km.text20.lightning.diagnosis.channels.tracing.LightningTracer;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
  * @author Christoph Käding
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class EvaluatorMain extends EvaluationWindow implements ActionListener,
@@ -72,7 +68,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** selected *.xml files */
     private ArrayList<File> files;
 
-    /** manager which handles the detector plugins, statitic plugin, logging plugin .... */
+    /**
+     * manager which handles the detector plugins, statitic plugin, logging
+     * plugin ....
+     */
     private PluginManager pluginManager;
 
     /** list of available detectors */
@@ -105,10 +104,13 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** timestamp from the start of this tool */
     private long currentTimeStamp;
 
+    /** timestamp from the start calculation */
+    private long startTimeStamp;
+
     /** thread in which the evaluation runs */
     private EvaluationThread evaluationThread;
 
-    /** progress of the progress bar*/
+    /** progress of the progress bar */
     private int progress;
 
     /** timer for window focus */
@@ -129,7 +131,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * @param args
      */
     public static void main(String[] args) {
-        // Set global look and feel. 
+        // Set global look and feel.
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
@@ -163,6 +165,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
         this.progress = 1;
         this.amount = 0;
+        this.startTimeStamp = 0;
 
         // add action listeners
         this.buttonSelect.addActionListener(this);
@@ -291,12 +294,16 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.mainFrame.setVisible(true);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        // check which source occurs the action event and start a handle function
+        // check which source occurs the action event and start a handle
+        // function
         if (event.getSource() == this.buttonSelect) {
             this.buttonSelectActionPerformed();
             return;
@@ -334,8 +341,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the buttonSelect is clicked
-     * opens the file chooser
+     * fired when the buttonSelect is clicked opens the file chooser
      */
     private void buttonSelectActionPerformed() {
         JFileChooser chooser = initChooser();
@@ -343,8 +349,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the buttonStart is clicked
-     * reacts on the current status of this tool and starts a handle for it
+     * fired when the buttonStart is clicked reacts on the current status of
+     * this tool and starts a handle for it
      */
     private void buttonStartActionPerformed() {
         // if the work is finished, exit the tool
@@ -404,8 +410,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the buttonRemove is clicked
-     * removes selected files from array list and listFiles
+     * fired when the buttonRemove is clicked removes selected files from array
+     * list and listFiles
      */
     private void buttonRemoveActionPerformed() {
         // for every selected file ...
@@ -421,8 +427,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the checkboxConfig is clicked
-     * sets the gui in config mode
+     * fired when the checkboxConfig is clicked sets the gui in config mode
      */
     private void checkboxConfigActionPerformed() {
         this.listDetectors.clearSelection();
@@ -452,8 +457,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the buttonConfig is clicked
-     * opens the gui for selected detectors
+     * fired when the buttonConfig is clicked opens the gui for selected
+     * detectors
      */
     private void buttonConfigActionPerformed() {
         if (this.listDetectors.getSelectedValue() instanceof PluginInformation)
@@ -464,8 +469,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * fired when the buttonConfig is clicked
-     * opens the gui for coverage analyzer
+     * fired when the buttonConfig is clicked opens the gui for coverage
+     * analyzer
      */
     private void buttonTextConfigActionPerformed() {
         if (this.comboBoxTextPlugin.getSelectedItem() instanceof PluginInformation)
@@ -525,7 +530,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         chooser.setFileFilter(new FileFilter() {
 
-            // filter string, only files with this extension and directories will be shown
+            // filter string, only files with this extension and directories
+            // will be shown
             private String extension = ".xml";
 
             @Override
@@ -586,7 +592,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * the whole plugin saliencyInformation is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * the whole plugin saliencyInformation is added to the combobox, so here
+     * the displayname is changed from .toString() to .getDisplayName()
      * 
      * @return a changed default renderer
      */
@@ -627,7 +634,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // start coverage analyzer
         this.currentAnalyser.start();
 
-        // add selected detectors to array list 
+        // add selected detectors to array list
         for (Object selected : this.listDetectors.getSelectedValues())
             if (selected instanceof PluginInformation)
                 this.selectedDetectors.add(this.saliencyDetectors.get(((PluginInformation) selected).getId()));
@@ -651,7 +658,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
                 tmpPath.add(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
             }
         }
-        size = size * this.selectedDetectors.size() * this.amount * tmpPath.size();
+        size = size * this.selectedDetectors.size() * this.amount;
+        if (this.writeLog()) size = size * tmpPath.size();
 
         // initialize progress bar
         this.progressBar.setMaximum(size);
@@ -682,6 +690,32 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * updates current progress of the progress bar
      */
     public void updateProgressBar() {
+        // calculating time remaining
+        long passedTime = System.currentTimeMillis() - this.startTimeStamp;
+        double timeLeftMs = (((double) passedTime / this.progress) * this.progressBar.getMaximum()) - passedTime;
+        String timeLeft = "";
+
+        // test for valuable data
+        if (timeLeftMs <= 0) timeLeft = "... calculating";
+        else {
+
+            // calculate h,min,s
+            long timeLeftH = Math.round((timeLeftMs / (1000 * 60 * 60)) - 0.5);
+            timeLeftMs = timeLeftMs - (timeLeftH * 1000 * 60 * 60);
+            long timeLeftMin = Math.round(timeLeftMs / (1000 * 60) - 0.5);
+            timeLeftMs = timeLeftMs - (timeLeftMin * 1000 * 60);
+            long timeLeftS = Math.round((timeLeftMs / 1000) - 0.5);
+
+            // build string
+            if (timeLeftH > 0) timeLeft = timeLeft + timeLeftH + "h ";
+            if (timeLeftMin > 0) timeLeft = timeLeft + timeLeftMin + "min ";
+            timeLeft = timeLeft + timeLeftS + "s";
+        }
+
+        // indicate time remaining
+        this.labelDescription.setText("Step 3: Wait for the results... estimated time remaining: " + timeLeft);
+
+        // update progress bar
         this.progressBar.setValue(this.progress++);
         this.progressBar.paint(this.progressBar.getGraphics());
     }
@@ -698,22 +732,31 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         System.exit(0);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
      */
     @Override
     public void windowActivated(WindowEvent arg0) {
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
      */
     @Override
     public void windowClosed(WindowEvent arg0) {
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
      */
     @Override
     public void windowClosing(WindowEvent arg0) {
@@ -725,29 +768,43 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         System.exit(0);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent
+     * )
      */
     @Override
     public void windowDeactivated(WindowEvent arg0) {
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent
+     * )
      */
     @Override
     public void windowDeiconified(WindowEvent arg0) {
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
      */
     @Override
     public void windowIconified(WindowEvent arg0) {
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
      */
     @Override
     public void windowOpened(WindowEvent arg0) {
@@ -774,21 +831,21 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         return this.worker;
     }
 
-    /**    
+    /**
      * @return true if they should be written
      */
     public boolean writeImages() {
         return this.checkBoxImages.isSelected();
     }
 
-    /**    
+    /**
      * @return true if it should be written
      */
     public boolean writeLog() {
         return this.checkBoxSummary.isSelected();
     }
 
-    /**      
+    /**
      * @return the dimension
      */
     public int getDimension() {
@@ -814,5 +871,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public int getAmount() {
         return this.amount;
+    }
+
+    /**
+     * @param startTimeStamp the startTimeStamp to set
+     */
+    public void setStartTimeStamp(long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
     }
 }

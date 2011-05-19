@@ -20,6 +20,8 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -69,6 +71,9 @@ public class EvaluatorWorker {
     /** identifier for screenshots */
     private int formerIdentifier;
 
+    /** count FileNotFoundExceptions, necessary because the os is sometimes to slow for the paint method */
+    private int exceptionCounter;
+
     /**
      * creates a new evaluation worker and initializes necessary variables
      * 
@@ -81,6 +86,7 @@ public class EvaluatorWorker {
         this.results = null;
         this.main = main;
         this.formerIdentifier = 0;
+        this.exceptionCounter = 0;
 
         // excel-stuff
         WritableFont arial10pt = new WritableFont(WritableFont.ARIAL, 10);
@@ -109,6 +115,7 @@ public class EvaluatorWorker {
         // initialize variables
         Point calculatedTarget;
         double coverage = 0;
+        this.exceptionCounter = 0;
 
         // transform screenshot
         try {
@@ -157,6 +164,8 @@ public class EvaluatorWorker {
     public String writeResults(ArrayList<SaliencyDetector> detectors) {
         // initialize variables
         String locations = "";
+        int tmp = 0;
+        int raw = 0;
 
         // test if some data are collected
         if (this.results == null) return "...nowhere";
@@ -251,71 +260,42 @@ public class EvaluatorWorker {
                 workbook.write();
                 workbook.close();
 
-                // write all results to files, over all
+                // build path
+                path = path.replace("_evaluated.xls", "_data.txt");
 
-                // initialize file
-                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_overall.xls")), workbookSettings);
-                workbook.createSheet("Evaluation", 0);
-                excelSheet = workbook.getSheet(0);
+                $(path).file().delete();
 
-                // add values
+                // run through detectors
                 for (int i = 0; i < detectors.size(); i++) {
 
-                    // add caption
-                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
+                    // reset temps
+                    raw = 0;
+                    tmp = 0;
 
-                    // add values
-                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).size(); j++)
-                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).get(j), this.format));
+                    // run through results
+                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).size(); j++) {
+
+                        // build raw point number
+                        if (tmp >= this.main.getAmount()) {
+                            raw++;
+                            tmp = 1;
+                        } else
+                            tmp++;
+
+                        // write results
+                        $(path).file().append($(i, raw, j, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.OVERALL).get(j)).string().join(",") + "\n");
+                    }
                 }
 
-                // write and close
-                workbook.write();
-                workbook.close();
+                // bulid path
+                path = path.replace("_data.txt", "_datakeys.txt");
 
-                // write all results to files, higher than
+                $(path).file().delete();
 
-                // initialize file
-                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_higherthan.xls")), workbookSettings);
-                workbook.createSheet("Evaluation", 0);
-                excelSheet = workbook.getSheet(0);
-
-                // add values
+                // run through detectors
                 for (int i = 0; i < detectors.size(); i++) {
-
-                    // add caption
-                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
-
-                    // add values
-                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD).size(); j++)
-                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.HIGHER_THAN_THRESHOLD).get(j), this.format));
+                    $(path).file().append("index: " + i + " name: " + detectors.get(i).getInformation().getDisplayName() + "\r\n");
                 }
-
-                // write and close
-                workbook.write();
-                workbook.close();
-
-                // write all results to files, lower than
-
-                // initialize file
-                workbook = Workbook.createWorkbook(new File(path.replace("_evaluated.xls", "_values_lowerthan.xls")), workbookSettings);
-                workbook.createSheet("Evaluation", 0);
-                excelSheet = workbook.getSheet(0);
-
-                // add values
-                for (int i = 0; i < detectors.size(); i++) {
-
-                    // add caption
-                    excelSheet.addCell(new Label(i, 0, detectors.get(i).getInformation().getDisplayName(), this.format));
-
-                    // add values
-                    for (int j = 0; j < this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD).size(); j++)
-                        excelSheet.addCell(new Number(i, j + 1, this.results.getValues(detectors.get(i).getInformation().getId(), EvaluationResultType.LOWER_THEN_THRESHOLD).get(j), this.format));
-                }
-
-                // write and close
-                workbook.write();
-                workbook.close();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -398,8 +378,27 @@ public class EvaluatorWorker {
             // write the image
             file.mkdirs();
             ImageIO.write(screenShot, "png", file);
+
         } catch (Exception e) {
-            e.printStackTrace();
+
+            // increase exception count
+            this.exceptionCounter++;
+
+            //indicate exception
+            System.out.println("exception number " + this.exceptionCounter + ": " + e.toString());
+
+            // test if deadlock
+            if (this.exceptionCounter >= 10) return;
+
+            // wait to give the os some time to handle files
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+
+            // retry
+            this.drawPicture(detector, point, path, screenShot, relatedPoint);
         }
     }
 }

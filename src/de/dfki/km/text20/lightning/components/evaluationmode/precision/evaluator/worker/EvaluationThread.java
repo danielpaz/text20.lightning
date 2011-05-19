@@ -89,6 +89,9 @@ public class EvaluationThread implements Runnable {
         System.out.println();
         System.out.println();
 
+        // set start timestamp
+        this.mainClass.setStartTimeStamp(System.currentTimeMillis());
+
         // run through every file ...
         for (File file : this.files) {
 
@@ -115,7 +118,7 @@ public class EvaluationThread implements Runnable {
                         // update progress bar
                         this.mainClass.updateProgressBar();
                     }
-                    
+
                     // step forward
                     identifier++;
                 }

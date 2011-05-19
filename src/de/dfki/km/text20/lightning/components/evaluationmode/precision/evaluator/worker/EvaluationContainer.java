@@ -276,7 +276,7 @@ public class EvaluationContainer {
         double median = 0;
         double temp;
         boolean doMore = true;
-        ArrayList<Double> values = this.getValues(id, type);
+        ArrayList<Double> values = new ArrayList<Double>(this.getValues(id, type));
 
         // check if data are available
         if (values.size() == 0) return -1;
