@@ -159,6 +159,8 @@ public class EvaluationContainer {
      * @param type 
      *      
      * @return unit variance
+     * 
+     * TODO: calculate averaged distance only once
      */
     @SuppressWarnings("boxing")
     public double getUnitVariance(int id, EvaluationResultType type) {
@@ -169,7 +171,7 @@ public class EvaluationContainer {
 
         // check if datas are available
         if (values.size() == 0) return -1;
-        
+
         // calculate probability of each value
         for (double value : values) {
             if (probability.containsKey(value)) {
@@ -206,12 +208,56 @@ public class EvaluationContainer {
     public double getStandardDeviation(int id, EvaluationResultType type) {
         // initialize variable
         double unityVariance = this.getUnitVariance(id, type);
-        
+
         // check if unity variance is available
         if (unityVariance == -1) return -1;
-        
+
         // return standard derivation
         return Math.sqrt(unityVariance);
+    }
+
+    /**
+     * @param id
+     * @param type 
+     *      
+     * @return minimal value
+     */
+    public double getMinValue(int id, EvaluationResultType type) {
+        // initialize variable
+        ArrayList<Double> values = this.getValues(id, type);
+        double minValue = Double.MAX_VALUE;
+
+        // check if unity variance is available
+        if (values.size() == 0) return -1;
+
+        // set min value
+        for (double tmp : values)
+            if (tmp < minValue) minValue = tmp;
+
+        // return standard derivation
+        return minValue;
+    }
+
+    /**
+     * @param id
+     * @param type 
+     *      
+     * @return maximal value
+     */
+    public double getMaxValue(int id, EvaluationResultType type) {
+        // initialize variable
+        ArrayList<Double> values = this.getValues(id, type);
+        double maxValue = Double.MIN_VALUE;
+
+        // check if unity variance is available
+        if (values.size() == 0) return -1;
+
+        // set min value
+        for (double tmp : values)
+            if (tmp > maxValue) maxValue = tmp;
+
+        // return standard derivation
+        return maxValue;
     }
 
     /**
@@ -341,7 +387,7 @@ public class EvaluationContainer {
      * @return list of distances by id and type
      */
     @SuppressWarnings("boxing")
-    private ArrayList<Double> getValues(int id, EvaluationResultType type) {
+    public ArrayList<Double> getValues(int id, EvaluationResultType type) {
 
         // return values by type and id
         switch (type) {

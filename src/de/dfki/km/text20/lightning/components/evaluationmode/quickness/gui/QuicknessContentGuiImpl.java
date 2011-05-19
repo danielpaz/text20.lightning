@@ -36,7 +36,7 @@ import javax.swing.text.BadLocationException;
  * shows current text and highlights given word
  * gives time distance and carretpostion back
  * 
- * TODO: handle words which are contained the text more than once 
+ * TODO: handle words which are part of other words
  *  
  * @author Christoph Käding
  */
