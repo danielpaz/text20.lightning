@@ -22,8 +22,10 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 
 import static net.jcores.CoreKeeper.$;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -117,11 +119,13 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
             }
         };
 
+        // initialize textpane
         this.textPaneContent.setContentType("text/html");
         this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font color=\"red\">" + this.word + "</font>"));
         this.textPaneContent.setCaretPosition(this.formerCarretPosition);
         this.textPaneContent.addCaretListener(this);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
+        this.textPaneContent.setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize().width - 50, this.textPaneContent.getPreferredSize().height + 50));
 
         // request focus
         SwingUtilities.invokeLater(new Runnable() {
@@ -134,6 +138,9 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         });
 
         this.timestamp = System.currentTimeMillis();
+
+        // show current word
+        System.out.println("current word: " + this.word);
     }
 
     /* (non-Javadoc)
