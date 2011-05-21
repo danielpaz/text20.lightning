@@ -20,6 +20,8 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.quickness;
 
+import static net.jcores.CoreKeeper.$;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import de.dfki.km.text20.lightning.components.evaluationmode.precision.screenshotmarker.ScreenshotMarker;
 import de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui.QuicknessConfigGuiImpl;
 
 /**
@@ -136,7 +139,7 @@ public class WordXMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
-            // if the readed characters should be the word coordinate ...
+            // if the readed characters should be the word ...
             if (this.word) {
 
                 // ... store it ...
@@ -156,11 +159,13 @@ public class WordXMLParser {
             // if the readed characters should be the number ...
             if (this.file) {
 
+               // ... store it
                 this.fileTmp = this.fileName.substring(0, this.fileName.lastIndexOf(File.separator) + 1) + value;
 
                 // return success
                 if (new File(this.fileTmp).exists()) return true;
 
+                // return failure
                 System.out.println("'" + this.fileTmp + "' does not exist.");
                 return false;
             }
@@ -205,8 +210,7 @@ public class WordXMLParser {
         // create xsd file
         File xsdFile = new File(xmlFile.getAbsolutePath().substring(0, xmlFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "PreparedTextPattern.xsd");
         if (!xsdFile.exists()) {
-            System.out.println(xsdFile.getAbsolutePath() + " not found!");
-            return false;
+            $(WordXMLParser.class.getResourceAsStream("resources/PreparedTextPattern.zip")).zipstream().unzip(xsdFile.getAbsolutePath().substring(0, xsdFile.getAbsolutePath().lastIndexOf(File.separator) + 1));
         }
 
         try {

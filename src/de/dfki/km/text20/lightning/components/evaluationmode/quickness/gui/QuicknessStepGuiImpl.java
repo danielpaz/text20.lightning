@@ -23,6 +23,9 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.Color;
+import java.awt.Frame;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -78,6 +81,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
 
     private int currentFileIndex;
 
+    private QuicknessContentGuiImpl contentWindow;
+
     /**
      * @param steps
      * @param startWithDetector
@@ -95,11 +100,25 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         this.panelContent.setOpaque(true);
         this.panelContent.setBackground(Color.WHITE);
 
+        // add window listener
+        this.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                if (contentWindow != null) contentWindow.resize();
+            }
+
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+            }
+        });
+
+        // set maximized
+        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+
         // set visible
         this.setVisible(true);
-
-        // initial file entry
-        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
 
         // run through files
         this.nextFile();
@@ -161,8 +180,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
                 this.currentMethod = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().getDisplayName();
 
                 // show dialog and react on answer
-                if (JOptionPane.showOptionDialog(null, "Ready to start DetectorQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0)
+                if (JOptionPane.showOptionDialog(null, "Ready to start DetectorQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+                    this.dispose();
                     return;
+                }
 
             } else {
 
@@ -170,9 +191,14 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
                 this.currentMethod = "Normal";
 
                 // show dialog and react on answer
-                if (JOptionPane.showOptionDialog(null, "Ready to start NormalQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0)
+                if (JOptionPane.showOptionDialog(null, "Ready to start NormalQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+                    this.dispose();
                     return;
+                }
             }
+
+            // initial file entry
+            $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
 
             // first set is done, switch do other mode
         } else if (this.currentStep == (this.steps)) {
@@ -190,8 +216,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
                 this.currentMethod = "Normal";
 
                 // show dialog and react on answer
-                if (JOptionPane.showOptionDialog(null, "Ready to start NormalQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0)
+                if (JOptionPane.showOptionDialog(null, "Ready to start NormalQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+                    this.dispose();
                     return;
+                }
 
             } else {
 
@@ -201,8 +229,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
                 this.currentMethod = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().getDisplayName();
 
                 // show dialog and react on answer
-                if (JOptionPane.showOptionDialog(null, "Ready to start DetectorQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0)
+                if (JOptionPane.showOptionDialog(null, "Ready to start DetectorQuicknessEvaluation?", "Quickness", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+                    this.dispose();
                     return;
+                }
             }
 
             // both mode are done
@@ -228,7 +258,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
 
         // add text
         this.panelContent.removeAll();
-        this.panelContent.add(new QuicknessContentGuiImpl(this));
+        this.contentWindow = new QuicknessContentGuiImpl(this);
+        this.panelContent.add(this.contentWindow);
         this.refresh();
 
         // step forward
@@ -256,8 +287,11 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         // set caret position
         this.carretPosition = currentCarretPosition;
 
+        // reset window
+        this.contentWindow = null;
+
         // update file
-        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("- " + this.currentMethod + ": distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
+        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
 
         // continue
         this.stepForward();

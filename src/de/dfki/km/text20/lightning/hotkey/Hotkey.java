@@ -130,8 +130,7 @@ public class Hotkey implements HotkeyListener {
     }
 
     /**
-     * Needed method of JIntellyType which is called when a registered hotkey is
-     * typed.
+     * Needed method of JIntellyType which is called when a registered hotkey is typed.
      */
     @Override
     public void onHotKey(int keyCode) {
@@ -142,10 +141,10 @@ public class Hotkey implements HotkeyListener {
             // check if the tool is activated
             if (!this.main.isActivated()) return;
 
-            // initializing was successful
+            // check if initializing was successful
             if (!this.main.isAllFine()) return;
 
-            // check if trackingdevice provides correct data and if the
+            // check if trackingdevice provides correct data
             if (!this.main.isTrackingValid()) {
                 this.main.showTrayMessage("Eyes not found!");
                 this.main.playError();

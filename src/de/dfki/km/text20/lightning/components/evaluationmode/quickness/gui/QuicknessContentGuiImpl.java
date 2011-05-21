@@ -25,7 +25,6 @@ import static net.jcores.CoreKeeper.$;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -33,6 +32,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.View;
 
 /**
  * shows current text and highlights given word
@@ -78,6 +78,9 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         this.autoUpdate = false;
         this.word = this.mainWindow.getWord();
         this.formerCarretPosition = this.mainWindow.getCarretPosition();
+        int preferredWidth;
+        int preferredHeight;
+        View view;
 
         // initialize document listener
         this.documentListener = new DocumentListener() {
@@ -121,11 +124,17 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
 
         // initialize textpane
         this.textPaneContent.setContentType("text/html");
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font color=\"red\">" + this.word + "</font>"));
+        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font size=\"5\" color=\"red\"><b>" + this.word + "</b></font>"));
         this.textPaneContent.setCaretPosition(this.formerCarretPosition);
         this.textPaneContent.addCaretListener(this);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
-        this.textPaneContent.setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize().width - 50, this.textPaneContent.getPreferredSize().height + 50));
+
+        // resize
+        preferredWidth = this.mainWindow.getSize().width;
+        view = this.textPaneContent.getUI().getRootView(this.textPaneContent);
+        view.setSize(preferredWidth - 50, Integer.MAX_VALUE);
+        preferredHeight = (int) view.getPreferredSpan(View.Y_AXIS);
+        this.textPaneContent.setPreferredSize(new Dimension(preferredWidth - 50, preferredHeight + 50));
 
         // request focus
         SwingUtilities.invokeLater(new Runnable() {
@@ -197,11 +206,52 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
         this.autoUpdate = true;
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
         this.currentCarretPosition = this.textPaneContent.getCaretPosition() - 1;
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font color=\"red\">" + this.word + "</font>"));
+        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font size=\"5\" color=\"red\"><b>" + this.word + "</b></font>"));
         this.textPaneContent.setCaretPosition(this.currentCarretPosition);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
         this.textPaneContent.setVisible(true);
+
+        // request focus
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @SuppressWarnings("unqualified-field-access")
+            @Override
+            public void run() {
+                textPaneContent.requestFocus();
+            }
+        });
+
+        this.autoUpdate = false;
+    }
+
+    /**
+     * resizes text pane
+     */
+    public void resize() {
+        // initialize variables
+        int preferredWidth;
+        int preferredHeight;
+        View view;
+
+        // test if autochange occurs call
+        if (this.autoUpdate) return;
+
+        // update text
+        this.autoUpdate = true;
+        this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
+        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.word, "<font size=\"5\" color=\"red\"><b>" + this.word + "</b></font>"));
+        this.textPaneContent.setCaretPosition(1);
+        this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
+        this.textPaneContent.setVisible(false);
+        this.textPaneContent.setVisible(true);
+
+        // resize
+        preferredWidth = this.mainWindow.getSize().width;
+        view = this.textPaneContent.getUI().getRootView(this.textPaneContent);
+        view.setSize(preferredWidth - 50, Integer.MAX_VALUE);
+        preferredHeight = (int) view.getPreferredSpan(View.Y_AXIS);
+        this.textPaneContent.setPreferredSize(new Dimension(preferredWidth - 50, preferredHeight + 50));
 
         // request focus
         SwingUtilities.invokeLater(new Runnable() {

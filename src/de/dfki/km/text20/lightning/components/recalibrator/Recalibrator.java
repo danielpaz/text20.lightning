@@ -54,25 +54,6 @@ public class Recalibrator {
         this.tarcker = device;
     }
     
-    /*
-     *  NOTE:
-     *  
-     *  see:
-     *  de.dfki.km.text20.trackingserver.eyes.remote.impl.TrackingServerRegitry.sendCommand();
-     *  de.dfki.km.text20.trackingserver.eyes.remote.impl.ReferenceBasedDisplacementFilter.updateReferencePoint();
-     *  de.dfki.km.text20.trackingserver.eyes.remote.impl.ReferenceBasedDisplacementFilter.clearReferencePoints();
-     *  
-     *  All reference points will be deleted in sendCommand(), so it is needed to call updateReferencePoint() 
-     *  and clearReferencePoints() directly?
-     *  
-     *  BUT where to get a instance of the current ReferenceBasedDisplacementFilter?
-     *  
-     *  changes in:
-     *  de.dfki.km.text20.trackingserver.eyes.remote.TrackingCommand;
-     *      added new constant
-     *  de.dfki.km.text20.trackingserver.eyes.remote.impl.TrackingServerRegistryImpl.sendCommand();
-     *      added case for UPDATE_CALIBRATION
-     */
     /**
      * 
      * @param fixation
