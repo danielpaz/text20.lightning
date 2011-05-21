@@ -74,6 +74,7 @@ public class DoubleBlindMode {
      */
     @SuppressWarnings("boxing")
     public void start() {
+        System.out.println();
         this.timer = new Timer(this.time * 60 * 1000, new ActionListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
@@ -88,6 +89,8 @@ public class DoubleBlindMode {
 
                 // test if last step
                 if (step != 2) {
+
+                    System.out.println("Step " + (step + 1) + " done.");
 
                     // show dialog
                     choice = JOptionPane.showOptionDialog(null, "Step " + (step + 1) + " done. Continue with next step?", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -108,8 +111,12 @@ public class DoubleBlindMode {
                     $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm one: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(one).getInformation().getDisplayName() + "\r\n");
                     $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n\r\n");
 
+                    System.out.println("Step " + (step + 1) + " done.");
+
                     // indicate finish
                     JOptionPane.showOptionDialog(null, "Double Blind finished.", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0);
+
+                    System.out.println();
                 }
             }
         });
