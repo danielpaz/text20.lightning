@@ -23,6 +23,8 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -30,7 +32,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.Timer;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import de.dfki.km.text20.lightning.MainClass;
@@ -63,8 +65,8 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
     /** frame for configuration guis of plugins */
     private JFrame child;
 
-    /** timer for window focus */
-    private Timer timer;
+    /** */
+    private WindowListener childWindowListener;
 
     /**
      * creates instance and initializes some stuff
@@ -76,7 +78,6 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
         this.quicknessMode = quicknessMode;
         this.files = new ArrayList<File>();
         this.currentWords = new ArrayList<String>();
-        this.child = null;
         this.currentFile = "";
 
         // initialze combobox
@@ -90,18 +91,9 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
         this.comboBoxDetector.addActionListener(this);
         this.buttonDetector.addActionListener(this);
 
-        // initialize timer
-        this.timer = new Timer(500, new ActionListener() {
-
-            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                if (child.isShowing()) return;
-                timer.stop();
-                setEnabled(true);
-                requestFocus();
-            }
-        });
+        // initialize child
+        this.child = null;
+        this.childWindowListener = initChildWindowListener();
 
         // show gui
         this.setVisible(true);
@@ -189,9 +181,9 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
      */
     private void buttonDetectorActionPerformed() {
         this.child = MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).getGui();
+        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.setEnabled(false);
-        this.timer.start();
     }
 
     /**
@@ -373,5 +365,53 @@ public class QuicknessConfigGuiImpl extends QuicknessConfigGui implements Action
      */
     public void setCurrentWords(ArrayList<String> currentWords) {
         this.currentWords = currentWords;
+    }
+
+    /**
+     * @return window listener for child window
+     */
+    private WindowListener initChildWindowListener() {
+        return new WindowListener() {
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void windowClosing(WindowEvent e) {
+                setEnabled(true);
+
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        requestFocus();
+                        child.removeWindowListener(childWindowListener);
+                        child = null;
+                    }
+                });
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+        };
     }
 }

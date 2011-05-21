@@ -69,7 +69,7 @@ public class VelocityWarperProperties implements Serializable {
         // creates properties file
         this.propertiesFile = new File("./plugins/VelocityWarper/properties.prop");
 
-        // status is used to indicate if the properties object could be readed probably 
+        // status is used to indicate if the properties object could be read properly 
         boolean status = false;
 
         if (this.propertiesFile.exists()) {

@@ -368,7 +368,7 @@ public class DataXMLParser {
 
                     break;
 
-                // all other stuff
+                // all the other stuff
                 default:
                     break;
                 }

@@ -36,7 +36,6 @@ public class SubmitReminder {
     /** creates new reminder object and initializes variables */
     public SubmitReminder() {
         // initialize variables
-        // TODO: set useful values
         this.upTimeThresh = 10;
         this.useCountThres = 100;
         this.timestamp = System.currentTimeMillis();
