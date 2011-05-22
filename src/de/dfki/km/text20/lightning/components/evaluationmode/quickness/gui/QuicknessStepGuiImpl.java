@@ -23,9 +23,6 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.io.File;
@@ -125,6 +122,9 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         // set visible
         this.setVisible(true);
 
+        // initial file entry
+        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+
         // run through files
         this.nextFile();
     }
@@ -201,9 +201,6 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
                     return;
                 }
             }
-
-            // initial file entry
-            $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
 
             // first set is done, switch do other mode
         } else if (this.currentStep == (this.steps)) {
