@@ -268,7 +268,7 @@ public class VelocityWarper implements MouseWarper {
         this.distance = this.distance + this.setPoint.distance(this.mousePositions.get(this.mousePositions.size() - 1));
 
         // indicate warp
-        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.get(this.mousePositions.size() - 1)) + " Pixels and an offset of " + this.setR + " Pixels. Method: Velocity Warper , Velocity: " + ((double) (Math.round(this.velocityStartEnd * 100)) / 100) + " Pixel/ms");
+        System.out.println("Warp - Mouse move to (" + this.setPoint.x + "," + this.setPoint.y + ") over a distance of " + (int) this.setPoint.distance(this.mousePositions.get(this.mousePositions.size() - 1)) + " Pixels and an offset of " + this.setR + " Pixels. Method: Velocity Warper");
 
         // TODO: debugging
         //        this.drawPicture();

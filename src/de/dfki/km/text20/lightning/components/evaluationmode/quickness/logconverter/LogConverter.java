@@ -116,15 +116,15 @@ public class LogConverter {
                 System.out.print(fileTmp + "|");
 
                 // extract word
-                wordTmp = line.substring(line.indexOf("word") + 7, line.indexOf("distance") - 2);
+                wordTmp = line.substring(line.indexOf("word") + 7, line.lastIndexOf("distance") - 2);
                 System.out.print(wordTmp + "|");
 
                 // extract distance
-                distanceTmp = Double.parseDouble(line.substring(line.indexOf("distance") + 10, line.indexOf(" Pixel")));
+                distanceTmp = Double.parseDouble(line.substring(line.lastIndexOf("distance") + 10, line.indexOf(" Pixel")));
                 System.out.print(distanceTmp + "|");
 
                 // extract time
-                timeTmp = Integer.parseInt(line.substring(line.indexOf("time") + 7, line.indexOf(" ms")));
+                timeTmp = Integer.parseInt(line.substring(line.lastIndexOf("time") + 7, line.indexOf(" ms")));
                 System.out.println(timeTmp + "|");
 
                 // write to xls
