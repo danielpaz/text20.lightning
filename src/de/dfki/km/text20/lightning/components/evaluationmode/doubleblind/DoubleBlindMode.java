@@ -107,9 +107,13 @@ public class DoubleBlindMode {
                     Hotkey.getInstance().setBlockHotkeys(true);
 
                     // update file
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy ', ' HH:mm:ss ").format(new Date()) + "\r\n");
+                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
                     $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm one: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(one).getInformation().getDisplayName() + "\r\n");
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n\r\n");
+                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n");
+
+                    if (current == two) $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: one, two\r\n\r\n");
+                    else
+                        $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: two, one\r\n\r\n");
 
                     System.out.println("Step " + (step + 1) + " done.");
 
@@ -122,7 +126,7 @@ public class DoubleBlindMode {
         });
 
         // choose algorithm randomized
-        this.current = Integer.parseInt($.range(1, 2).random(1).string().join());
+        this.current = Integer.parseInt($.range(1, 3).random(1).string().join());
         if (this.current == 1) {
             this.current = this.one;
         } else {

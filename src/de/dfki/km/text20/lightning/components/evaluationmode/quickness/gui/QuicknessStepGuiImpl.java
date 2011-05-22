@@ -23,7 +23,9 @@ package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.io.File;
@@ -115,7 +117,10 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         });
 
         // set maximized
-        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+        //        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+
+        // set size
+        this.setBounds(280, 0, 1000, 1000);
 
         // set visible
         this.setVisible(true);
