@@ -17,3 +17,5 @@ syntax: regexp
 ^blabla\.txt$
 syntax: regexp
 ^JIntellitype\.dll$
+syntax: regexp
+^Quickness\.log$
