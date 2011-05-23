@@ -19,3 +19,9 @@ syntax: regexp
 ^JIntellitype\.dll$
 syntax: regexp
 ^Quickness\.log$
+syntax: regexp
+^Quickness\.txt$
+syntax: regexp
+^Quickness\.xls$
+syntax: regexp
+^QuicknessKeys\.txt$
