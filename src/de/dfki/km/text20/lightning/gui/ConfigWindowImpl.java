@@ -31,7 +31,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
@@ -77,8 +77,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     /** frame for configuration guis of plugins */
     private JFrame child;
 
-    /** */
-    private WindowListener childWindowListener;
+    /** timer for window focus */
+    private Timer timer;
 
     /**
      * builds the window with all its components and shows it
@@ -88,6 +88,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.main = MainClass.getInstance();
         this.internalPluginManager = this.main.getInternalPluginManager();
         this.properties = this.main.getProperties();
+        this.child = null;
 
         // take values of global properties and preselect them
         this.spinnerDimension.setValue(this.properties.getDimension());
@@ -147,9 +148,18 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.chooser.setMultiSelectionEnabled(false);
         this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        // initialize child
-        this.child = null;
-        this.childWindowListener = initChildWindowListener();
+        // initialize timer
+        this.timer = new Timer(500, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                mainFrame.setEnabled(true);
+                mainFrame.requestFocus();
+            }
+        });
 
         // show the gui
         this.mainFrame.repaint();
@@ -246,7 +256,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         // initialize temporary variables
         String[] settings = { this.comboBoxMode.getSelectedItem().toString(), this.textFieldOutputPath.getText() };
 
-        // change variables in properties and in method manager
+        // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
         this.properties.setSoundActivated(this.checkBoxSound.isSelected());
@@ -333,9 +343,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      */
     private void buttonDetectorConfigActionPerformed() {
         this.child = this.internalPluginManager.getSaliencyDetectors().get(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
@@ -343,9 +353,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      */
     private void buttonWarpConfigActionPerformed() {
         this.child = this.internalPluginManager.getMouseWarpers().get(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
@@ -642,53 +652,5 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
      */
     @Override
     public void windowOpened(WindowEvent e) {
-    }
-
-    /**
-     * @return window listener for child window
-     */
-    private WindowListener initChildWindowListener() {
-        return new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-
-            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
-            @Override
-            public void windowClosing(WindowEvent e) {
-                mainFrame.setEnabled(true);
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mainFrame.requestFocus();
-                        child.removeWindowListener(childWindowListener);
-                        child = null;
-                    }
-                });
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-            }
-        };
     }
 }

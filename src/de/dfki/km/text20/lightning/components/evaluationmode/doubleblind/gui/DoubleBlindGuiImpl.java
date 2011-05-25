@@ -23,13 +23,11 @@ package de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.gui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
@@ -56,8 +54,8 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
     /** frame for configuration guis of plugins */
     private JFrame child;
 
-    /** */
-    private WindowListener childWindowListener;
+    /** timer for window focus */
+    private Timer timer;
 
     /**
      * creates instance, initializes variables and opens gui
@@ -71,12 +69,22 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
         this.autoSelect = false;
         this.one = 0;
         this.two = 1;
+        this.child = null;
 
         // handle to few detectors
         if (MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().size() < 2) {
             this.buttonCancel.addActionListener(this);
             return;
         }
+        
+        // preselect values
+        for (int i = 0; i < MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().size(); i++)
+            if (MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(i).getInformation().getDisplayName().equals("Text Detector"))
+                this.one = i;
+        
+        for (int i = 0; i < MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().size(); i++)
+            if (MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(i).getInformation().getDisplayName().equals("Dummy Filter"))
+                this.two = i;
 
         // initialize comboboxes
         this.comboBoxOne.setRenderer(this.detectorRenderer());
@@ -84,6 +92,9 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
         this.comboboxActionPerformed();
         this.buttonTwoConfig.setEnabled(((PluginInformation) this.comboBoxTwo.getSelectedItem()).isGuiAvailable());
         this.buttonOneConfig.setEnabled(((PluginInformation) this.comboBoxOne.getSelectedItem()).isGuiAvailable());
+
+        // TODO: set this in *.jfd
+        this.labelTwo.setText("Algorithm B");
 
         // add action listener
         this.buttonStart.addActionListener(this);
@@ -93,16 +104,28 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
         this.buttonOneConfig.addActionListener(this);
         this.buttonTwoConfig.addActionListener(this);
 
-        // initialize child
-        this.child = null;
-        this.childWindowListener = initChildWindowListener();
+        // initialize timer
+        this.timer = new Timer(500, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                setEnabled(true);
+                requestFocus();
+            }
+        });
 
         // show gui
         this.setVisible(true);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -132,9 +155,9 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
      */
     private void buttonOneConfigActionPerformed() {
         this.child = MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(((PluginInformation) this.comboBoxOne.getSelectedItem()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.setEnabled(false);
+        this.timer.start();
     }
 
     /**
@@ -142,9 +165,9 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
      */
     private void buttonTwoConfigActionPerformed() {
         this.child = MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(((PluginInformation) this.comboBoxTwo.getSelectedItem()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.setEnabled(false);
+        this.timer.start();
     }
 
     private void buttonStartActionPerformed() {
@@ -189,7 +212,8 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
     }
 
     /**
-     * the whole plugin information is added to the combobox, so here the displayname is changed from .toString() to .getDisplayName()
+     * the whole plugin information is added to the combobox, so here the
+     * displayname is changed from .toString() to .getDisplayName()
      * 
      * @return a changed default renderer
      */
@@ -209,54 +233,6 @@ public class DoubleBlindGuiImpl extends DoubleBlindGui implements ActionListener
                 }
 
                 return this;
-            }
-        };
-    }
-
-    /**
-     * @return window listener for child window
-     */
-    private WindowListener initChildWindowListener() {
-        return new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-
-            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
-            @Override
-            public void windowClosing(WindowEvent e) {
-                setEnabled(true);
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        requestFocus();
-                        child.removeWindowListener(childWindowListener);
-                        child = null;
-                    }
-                });
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
             }
         };
     }

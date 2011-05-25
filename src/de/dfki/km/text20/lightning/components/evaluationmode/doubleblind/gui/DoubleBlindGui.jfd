@@ -41,7 +41,7 @@
         <string>javax.swing.JLabel</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>Algorithm One</string> 
+         <string>Algorithm A</string> 
         </void> 
         <void property="name"> 
          <string>labelOne</string> 
