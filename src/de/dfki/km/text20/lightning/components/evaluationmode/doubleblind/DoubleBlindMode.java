@@ -66,62 +66,29 @@ public class DoubleBlindMode {
      */
     @SuppressWarnings("unused")
     public DoubleBlindMode() {
+        // initialize variables
+        this.step = 0;
+
+        // show gui
         new DoubleBlindGuiImpl(this);
     }
 
     /**
      * starts double blind mode
      */
-    @SuppressWarnings("boxing")
     public void start() {
+        // initialize variables
+        final Object[] options = { "Yes", "No" };
+        int choice = -1;
+        
         System.out.println();
+        
         this.timer = new Timer(this.time * 60 * 1000, new ActionListener() {
 
-            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @SuppressWarnings("synthetic-access")
             @Override
             public void actionPerformed(ActionEvent e) {
-                // initialize variables
-                final Object[] options = { "Yes", "No" };
-                int choice = -1;
-
-                // stop timer
-                timer.stop();
-
-                // test if last step
-                if (step != 2) {
-
-                    System.out.println("Step " + (step + 1) + " done.");
-
-                    // show dialog
-                    choice = JOptionPane.showOptionDialog(null, "Step " + (step + 1) + " done. Continue with next step?", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-                    // evaluate answer, if yes...  
-                    if (choice == 0) nextStep();
-
-                } else {
-
-                    // stop detector
-                    MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
-
-                    // block hotkeys
-                    Hotkey.getInstance().setBlockHotkeys(true);
-
-                    // update file
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm one: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(one).getInformation().getDisplayName() + "\r\n");
-                    $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm two: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(two).getInformation().getDisplayName() + "\r\n");
-
-                    if (current == two) $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: one, two\r\n\r\n");
-                    else
-                        $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: two, one\r\n\r\n");
-
-                    System.out.println("Step " + (step + 1) + " done.");
-
-                    // indicate finish
-                    JOptionPane.showOptionDialog(null, "Double Blind finished.", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0);
-
-                    System.out.println();
-                }
+                nextStep();
             }
         });
 
@@ -133,28 +100,75 @@ public class DoubleBlindMode {
             this.current = this.two;
         }
 
-        // show dialog and react on answer
-        if (JOptionPane.showOptionDialog(null, "Ready to start?", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) == 0)
-            this.timer.start();
+        // show dialog
+        choice = JOptionPane.showOptionDialog(null, "Ready to start with method A?", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        
+        if(choice != 0) return;
+
+        // set detector
+        MainClass.getInstance().getInternalPluginManager().setCurrentSaliencyDetector(this.current);
+
+        // start detector
+        MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();    
+
+        // unlock hotkeys
+        Hotkey.getInstance().setBlockHotkeys(false);
+        
+        // start timer
+        this.timer.start();
     }
 
+    @SuppressWarnings("boxing")
     private void nextStep() {
+        // initialize variables
+        final Object[] options = { "Yes", "No" };
+        int choice = -1;
+        String dialogText = "";
+
+        // stop timer
+        this.timer.stop();
+
         // step forward
         this.step++;
+
+        // stop detector
+        MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
 
         // unlock hotkeys
         Hotkey.getInstance().setBlockHotkeys(false);
 
         // react on current step
-        if (this.step == 1) {
+        if (this.step > 3) {
 
-            // set detector
-            MainClass.getInstance().getInternalPluginManager().setCurrentSaliencyDetector(this.current);
+            // block hotkeys
+            Hotkey.getInstance().setBlockHotkeys(true);
 
-            // start detector
-            MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
+            // update file
+            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n");
+            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n");
+
+            if (this.current == this.two) $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: A, B, A, B\r\n\r\n");
+            else
+                $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: B, A, B, A\r\n\r\n");
+
+            System.out.println("Step " + (this.step) + " done.");
+
+            // indicate finish
+            JOptionPane.showOptionDialog(null, "Double Blind finished.", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0);
+
+            System.out.println();
 
         } else {
+
+            System.out.println("Step " + (this.step) + " done.");
+
+            // set dialog text
+            if ((this.step % 2) == 1) {
+                dialogText = "Step " + (this.step) + " done. Continue with method B?";
+            } else {
+                dialogText = "Step " + (this.step) + " done. Continue with method A?";
+            }
 
             // set the other algorithm
             if (this.current == this.one) {
@@ -163,18 +177,21 @@ public class DoubleBlindMode {
                 this.current = this.one;
             }
 
-            // stop detector
-            MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().stop();
+            // show dialog
+            choice = JOptionPane.showOptionDialog(null, dialogText, "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            // evaluate answer, if yes...  
+            if (choice != 0) return;
 
             // set detector
             MainClass.getInstance().getInternalPluginManager().setCurrentSaliencyDetector(this.current);
 
             // start detector
             MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
+            
+            // restart timer
+            this.timer.start();
         }
-
-        // restart timer
-        this.timer.start();
     }
 
     /**

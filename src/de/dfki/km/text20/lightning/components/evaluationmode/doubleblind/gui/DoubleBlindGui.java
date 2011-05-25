@@ -49,7 +49,7 @@ public class DoubleBlindGui extends JFrame {
             "1dlu, 5*($lgap, default), $lgap, 1dlu:grow, $lgap, default, $lgap, 1dlu"));
 
         //---- labelOne ----
-        labelOne.setText("Algorithm One");
+        labelOne.setText("Algorithm A");
         contentPane.add(labelOne, cc.xywh(3, 3, 1, 3));
         contentPane.add(comboBoxOne, cc.xy(5, 3));
 

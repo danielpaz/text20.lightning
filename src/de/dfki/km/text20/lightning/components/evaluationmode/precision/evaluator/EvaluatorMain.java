@@ -36,7 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -112,12 +112,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** progress of the progress bar */
     private int progress;
-    
+
+    /** timer for window focus */
+    private Timer timer;
+
     /** frame for configuration guis of plugins */
     private JFrame child;
-    
-    /** */
-    private WindowListener childWindowListener;
 
     /** threshold for text coverage */
     private double treshold;
@@ -276,9 +276,19 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize evaluation evaluationThread
         this.evaluationThread = new EvaluationThread();
 
-        // initialize child
-        this.child = null;        
-        this.childWindowListener = initChildWindowListener();
+        // initialize timer and child
+        this.child = null;
+        this.timer = new Timer(500, new ActionListener() {
+
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (child.isShowing()) return;
+                timer.stop();
+                mainFrame.setEnabled(true);
+                mainFrame.requestFocus();
+            }
+        });
 
         // set the window visible
         this.mainFrame.setVisible(true);
@@ -453,9 +463,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void buttonConfigActionPerformed() {
         if (this.listDetectors.getSelectedValue() instanceof PluginInformation)
             this.child = this.saliencyDetectors.get(((PluginInformation) this.listDetectors.getSelectedValue()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
@@ -465,9 +475,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     private void buttonTextConfigActionPerformed() {
         if (this.comboBoxTextPlugin.getSelectedItem() instanceof PluginInformation)
             this.child = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId()).getGui();
-        this.child.addWindowListener(this.childWindowListener);
         this.child.setVisible(true);
         this.mainFrame.setEnabled(false);
+        this.timer.start();
     }
 
     /**
@@ -483,7 +493,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * @return initialized filechooser
+     * initializes filechooser
+     * 
+     * @return
      */
     private JFileChooser initChooser() {
         JFileChooser chooser = new JFileChooser() {
@@ -866,53 +878,5 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public void setStartTimeStamp(long startTimeStamp) {
         this.startTimeStamp = startTimeStamp;
-    }
-    
-    /**
-     * @return window listener for child window
-     */
-    private WindowListener initChildWindowListener(){
-        return new WindowListener() {
-            
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-            
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-            
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-            
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-            
-            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
-            @Override
-            public void windowClosing(WindowEvent e) {
-                mainFrame.setEnabled(true);
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                    
-                    @Override
-                    public void run() {
-                        mainFrame.requestFocus();
-                        child.removeWindowListener(childWindowListener);
-                        child = null;
-                    }
-                });
-            }
-            
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-            
-            @Override
-            public void windowActivated(WindowEvent e) {
-            }
-        };
     }
 }
