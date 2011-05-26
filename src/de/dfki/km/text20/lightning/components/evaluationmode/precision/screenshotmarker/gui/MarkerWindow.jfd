@@ -88,7 +88,7 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>1dlu, labelcompgap, 60dlu, labelcompgap, 60dlu, labelcompgap, 60dlu, labelcompgap, default:grow</string> 
+          <string>1dlu, labelcompgap, 60dlu, labelcompgap, 60dlu, labelcompgap, 60dlu, labelcompgap, 60dlu, labelcompgap, default:grow</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -150,6 +150,31 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JComboBox</string> 
+          <void property="name"> 
+           <string>comboBoxType</string> 
+          </void> 
+          <void method="auxiliary"> 
+           <void method="setProperty"> 
+            <string>JavaCodeGenerator.variableModifiers</string> 
+            <int>4</int> 
+           </void> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>7</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>1</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JButton</string> 
           <void method="setProperty"> 
            <string>text</string> 
@@ -169,7 +194,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>7</int> 
+           <int>9</int> 
           </void> 
          </object> 
         </void> 
@@ -194,7 +219,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>9</int> 
+           <int>11</int> 
           </void> 
          </object> 
         </void> 
@@ -223,8 +248,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>535</int> 
-        <int>485</int> 
+        <int>570</int> 
+        <int>235</int> 
        </object> 
       </void> 
      </object> 
