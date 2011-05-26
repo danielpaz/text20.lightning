@@ -211,7 +211,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             this.labelDescription.setText("stoped");
             this.enableGui(true);
             this.progressBar.setValue(0);
-            this.progress = 0;
+            this.progress = 1;
             this.timestamp = System.currentTimeMillis();
 
         } else {

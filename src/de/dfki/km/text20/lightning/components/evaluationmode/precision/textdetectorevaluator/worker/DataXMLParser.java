@@ -18,9 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
+package de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +36,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.w3c.dom.css.Rect;
 import org.xml.sax.SAXException;
 
 /**
@@ -45,7 +47,7 @@ import org.xml.sax.SAXException;
 public class DataXMLParser {
 
     /** readed data */
-    private ArrayList<Point> data;
+    private ArrayList<Rectangle> data;
 
     /** indicates that the next entry should be the x coordinate */
     private boolean x;
@@ -58,6 +60,18 @@ public class DataXMLParser {
 
     /** temporary stored y coordinate */
     private int yTmp;
+
+    /** indicates that the next entry should be the height */
+    private boolean height;
+
+    /** indicates that the next entry should be the width */
+    private boolean width;
+
+    /** temporary stored height */
+    private int heightTmp;
+
+    /** temporary stored width */
+    private int widthTmp;
 
     /** name of the actual file */
     private String filePath;
@@ -81,14 +95,18 @@ public class DataXMLParser {
      * 
      * @return the readed container
      */
-    public ArrayList<Point> readFile(File file) {
+    public ArrayList<Rectangle> readFile(File file) {
         // initialize variables
-        this.data = new ArrayList<Point>();
+        this.data = new ArrayList<Rectangle>();
         this.filePath = file.getAbsolutePath();
         this.x = false;
         this.y = false;
         this.xTmp = 0;
         this.yTmp = 0;
+        this.height = false;
+        this.width = false;
+        this.heightTmp = 0;
+        this.widthTmp = 0;
         this.amount = false;
         this.amountTmp = 0;
         this.relatedFile = false;
@@ -114,7 +132,7 @@ public class DataXMLParser {
                 // if some characters are found    
                 case XMLStreamConstants.CHARACTERS:
                     if (!handleCharacters(reader.getText().trim()))
-                        return new ArrayList<Point>();
+                        return new ArrayList<Rectangle>();
                     break;
 
                 // all other things
@@ -135,7 +153,7 @@ public class DataXMLParser {
             } catch (Exception ioe) {
                 ioe.printStackTrace();
             }
-            return new ArrayList<Point>();
+            return new ArrayList<Rectangle>();
         }
 
         // return readed data
@@ -153,22 +171,40 @@ public class DataXMLParser {
             // if there are a empty char return, this can be happen because there are some whitespace killed by .trim()
             if (value.equals("")) return true;
 
-            // if the readed characters should be the y coordinate ...
-            if (this.y) {
+            if (this.height) {
 
-                // ... store it
-                this.yTmp = Integer.parseInt(value);
+                this.heightTmp = Integer.parseInt(value);
 
                 // add to data
-                if (new File(this.filePath.substring(0, this.filePath.lastIndexOf(File.separator) + 1) + this.relatedFileTmp).exists()) this.data.add(new Point(this.xTmp, this.yTmp));
+                if (new File(this.filePath.substring(0, this.filePath.lastIndexOf(File.separator) + 1) + this.relatedFileTmp).exists()) this.data.add(new Rectangle(this.xTmp, this.yTmp, this.widthTmp, this.heightTmp));
                 else
                     System.out.println("'" + this.filePath.substring(0, this.filePath.lastIndexOf(File.separator) + 1) + this.relatedFileTmp + "' not found!");
 
                 // reset variables
                 this.x = false;
                 this.y = false;
+                this.height = false;
+                this.width = false;
                 this.xTmp = 0;
                 this.yTmp = 0;
+                this.heightTmp = 0;
+                this.widthTmp = 0;
+
+                return true;
+            }
+
+            if (this.width) {
+
+                this.widthTmp = Integer.parseInt(value);
+
+                return true;
+            }
+            
+            // if the readed characters should be the y coordinate ...
+            if (this.y) {
+
+                // ... store it
+                this.yTmp = Integer.parseInt(value);
 
                 // return success
                 return true;
@@ -226,13 +262,13 @@ public class DataXMLParser {
             this.relatedFile = true;
             return;
         }
-        
+
         // y 
         if (value.equals("amount")) {
             this.amount = true;
             return;
         }
-        
+
         // x
         if (value.equals("x") && !this.x) {
             this.x = true;
@@ -242,6 +278,18 @@ public class DataXMLParser {
         // y 
         if (value.equals("y") && !this.y) {
             this.y = true;
+            return;
+        }
+
+        // width 
+        if (value.equals("width") && !this.width) {
+            this.width = true;
+            return;
+        }
+        
+        // height
+        if (value.equals("height") && !this.height) {
+            this.height = true;
             return;
         }
     }
