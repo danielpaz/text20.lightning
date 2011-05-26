@@ -25,6 +25,7 @@ import static net.jcores.CoreKeeper.$;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
@@ -85,10 +86,16 @@ public class EvaluationThread implements Runnable {
         DataXMLParser dataParser = new DataXMLParser();
         BufferedImage screenShot;
         BufferedImage subImage;
+        Point target;
         Point offset;
-        int pointCount = 0;
+        int rectangleCount = 0;
         int fixationCount = 0;
+        int type = -1;
+        int hit;
+        int offsetX;
+        int offsetY;
         Point translatedRelated;
+        Rectangle translatedRectangle;
         double distance;
         String input;
         this.stop = false;
@@ -97,7 +104,10 @@ public class EvaluationThread implements Runnable {
         new File("./evaluation/detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
 
         // write key file
-        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("point, fixation, coverage, height, width, sensitivity, line, distance");
+        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\n");
+        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\n");
+        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\n");
+        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\n");
 
         System.out.println();
         System.out.println();
@@ -110,8 +120,19 @@ public class EvaluationThread implements Runnable {
 
             System.out.println("- File " + file.getName() + " is the next one.");
 
+            // set type
+            if (file.getName().contains("_Text_")) {
+                type = 0;
+            } else if (file.getName().contains("_Code_")) {
+                type = 1;
+            } else if (file.getName().contains("_Icons_")) {
+                type = 2;
+            } else {
+                type = 3;
+            }
+
             // read placed targets
-            for (Point data : dataParser.readFile(file)) {
+            for (Rectangle rectangle : dataParser.readFile(file)) {
 
                 // read screenshot
                 screenShot = dataParser.getRelatedImage(file);
@@ -119,15 +140,18 @@ public class EvaluationThread implements Runnable {
                 // reste fixations
                 fixationCount = 0;
 
+                // create target
+                target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+
                 // run through all calculated fixations
-                for (Point fixation : this.calculateFixations(screenShot, data)) {
+                for (Point fixation : this.calculateFixations(screenShot, target)) {
 
                     // transform screenshot
                     try {
                         subImage = new BufferedImage(screenShot.getWidth() + this.container.getDimension(), screenShot.getHeight() + this.container.getDimension(), screenShot.getType());
                         Graphics2D graphics = subImage.createGraphics();
                         graphics.drawImage(screenShot, this.container.getDimension() / 2, this.container.getDimension() / 2, null);
-                        subImage = screenShot.getSubimage(fixation.x, fixation.y, this.container.getDimension(), this.container.getDimension());
+                        subImage = subImage.getSubimage(fixation.x, fixation.y, this.container.getDimension(), this.container.getDimension());
                     } catch (RasterFormatException e) {
                         e.printStackTrace();
                         return;
@@ -150,28 +174,52 @@ public class EvaluationThread implements Runnable {
                                         this.properties.getInstance().setSensitivity(sensitivity);
                                         this.properties.getInstance().setLineSize(line);
 
-                                        // write properties
-                                        // this.properties.getInstance().writeProperties();
-
                                         // start detector        
                                         this.detector.start();
 
-                                        // calculate distance
+                                        // calculate offset
                                         offset = this.detector.analyse(subImage);
                                         offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
-                                        translatedRelated = new Point(data.x - fixation.x + subImage.getHeight() / 2, data.y - fixation.y + subImage.getWidth() / 2);
+
+                                        // translate
+                                        translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
+                                        translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
+
+                                        // calculate distance
                                         distance = offset.distance(translatedRelated);
 
-                                        // update file
-                                        input = $(pointCount, fixationCount, coverage, height, width, sensitivity, line, distance).string().join(",");
-                                        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluation.txt").file().append(input + "\r\n");
+                                        // calculate x offset
+                                        if (offset.x < translatedRectangle.x) {
+                                            offsetX = translatedRectangle.x - translatedRectangle.x;
+                                        } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
+                                            offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
+                                        } else {
+                                            offsetX = 0;
+                                        }
 
-                                        // stop detector
-                                        // this.detector.stop();
+                                        // calculate y offset
+                                        if (offset.y < translatedRectangle.y) {
+                                            offsetY = offset.y - translatedRectangle.y;
+                                        } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
+                                            offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
+                                        } else {
+                                            offsetY = 0;
+                                        }
+
+                                        // calculate hit
+                                        if ((offsetX == 0) && (offsetY == 0)) {
+                                            hit = 1;
+                                        } else {
+                                            hit = 0;
+                                        }
+
+                                        // update file
+                                        input = $(type, rectangleCount, fixationCount, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY).string().join(",");
+                                        $("./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluation.txt").file().append(input + "\r\n");
 
                                         // draw image
                                         if (this.container.isDrawImages())
-                                            this.drawPicture(offset, "./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/" + pointCount + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRelated);
+                                            this.drawPicture(offset, "./evaluation/detector evaluation/Session_" + this.container.getTimestamp() + "/" + type + "_" + rectangleCount + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
 
                                         // check if should continue
                                         if (this.stop) return;
@@ -205,7 +253,7 @@ public class EvaluationThread implements Runnable {
                 }
 
                 // step forward
-                pointCount++;
+                rectangleCount++;
             }
 
             System.out.println("- File " + file.getName() + " finished.\r\n");
@@ -255,11 +303,11 @@ public class EvaluationThread implements Runnable {
      * @param picture
      *            screenshot where the data will be written in, maybe it will be
      *            not used when the screenshot is already drawn to a file
-     * @param relatedPoint
+     * @param relatedRectangle
      *            target that was given or was pointed by the mouse
      */
     private void drawPicture(Point point, String path, BufferedImage picture,
-                             Point relatedPoint) {
+                             Rectangle relatedRectangle) {
         // initialize variables
         int dimension = picture.getHeight();
         File file = new File(path);
@@ -281,10 +329,9 @@ public class EvaluationThread implements Runnable {
 
             // visualize related point
             graphic.setColor(new Color(255, 0, 0, 255));
-            graphic.drawOval(relatedPoint.x - 5, relatedPoint.y - 5, 10, 10);
-            graphic.drawChars(("related target").toCharArray(), 0, 14, 12 + relatedPoint.x, 12 + relatedPoint.y);
+            graphic.drawRect(relatedRectangle.x, relatedRectangle.y, relatedRectangle.width, relatedRectangle.height);
             graphic.setColor(new Color(255, 0, 0, 32));
-            graphic.fillOval(relatedPoint.x - 5, relatedPoint.y - 5, 10, 10);
+            graphic.fillRect(relatedRectangle.x, relatedRectangle.y, relatedRectangle.width, relatedRectangle.height);
 
             // visualize calculations
             graphic.setColor(new Color(0, 0, 255, 255));

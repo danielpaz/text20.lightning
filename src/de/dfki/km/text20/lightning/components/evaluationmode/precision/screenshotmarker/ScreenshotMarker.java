@@ -226,7 +226,8 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         this.comboBoxType.setEnabled(false);
 
         // create file
-        File logfile = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "Marks_" + this.comboBoxType.getSelectedItem() + "_" + System.currentTimeMillis() + ".xml");
+        String name = this.screenshotFile.getName().substring(0, this.screenshotFile.getName().toLowerCase().lastIndexOf(".png"));
+        File logfile = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "Marks_" + this.comboBoxType.getSelectedItem() + "_" + name + "_" + System.currentTimeMillis() + ".xml");
         File xsd = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "MarksPattern.xsd");
 
         try {
@@ -317,6 +318,9 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
             System.out.println();
             System.out.println("Data stored to '" + logfile.getAbsolutePath() + "'.");
             this.labelDescription.setText("Data stored to '" + logfile.getAbsolutePath() + "'.");
+            
+            // clear marks
+            this.markedRectangles.clear();
 
         } catch (Exception e) {
             e.printStackTrace();
