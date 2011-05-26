@@ -25,6 +25,7 @@ public class MarkerWindow extends JFrame {
         panel1 = new JPanel();
         buttonSelect = new JButton();
         buttonRemove = new JButton();
+        comboBoxType = new JComboBox();
         buttonSave = new JButton();
         labelDescription = new JLabel();
         CellConstraints cc = new CellConstraints();
@@ -50,7 +51,7 @@ public class MarkerWindow extends JFrame {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "1dlu, 3*($lcgap, 60dlu), $lcgap, default:grow",
+                "1dlu, 4*($lcgap, 60dlu), $lcgap, default:grow",
                 "default"));
 
             //---- buttonSelect ----
@@ -60,17 +61,18 @@ public class MarkerWindow extends JFrame {
             //---- buttonRemove ----
             buttonRemove.setText("Remove");
             panel1.add(buttonRemove, cc.xy(5, 1));
+            panel1.add(comboBoxType, cc.xy(7, 1));
 
             //---- buttonSave ----
             buttonSave.setText("Save");
-            panel1.add(buttonSave, cc.xy(7, 1));
+            panel1.add(buttonSave, cc.xy(9, 1));
 
             //---- labelDescription ----
             labelDescription.setText("text");
-            panel1.add(labelDescription, cc.xy(9, 1));
+            panel1.add(labelDescription, cc.xy(11, 1));
         }
         contentPane.add(panel1, cc.xy(1, 3));
-        setSize(535, 485);
+        setSize(570, 235);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -82,6 +84,7 @@ public class MarkerWindow extends JFrame {
     private JPanel panel1;
     protected JButton buttonSelect;
     protected JButton buttonRemove;
+    protected JComboBox comboBoxType;
     protected JButton buttonSave;
     protected JLabel labelDescription;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
