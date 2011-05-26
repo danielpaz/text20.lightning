@@ -23,8 +23,10 @@ package de.dfki.km.text20.lightning.components.evaluationmode.precision.screensh
 import static net.jcores.CoreKeeper.$;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -75,8 +77,11 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
     /** the current image */
     private BufferedImage image;
 
-    /** list of marked points */
-    private ArrayList<Point> markedPoints;
+    /** list of marked rectangles */
+    private ArrayList<Rectangle> markedRectangles;
+
+    /** */
+    private Point tmp;
 
     /**
      * main entry point
@@ -118,7 +123,7 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         this.labelDescription.setText("");
 
         // initialize variables
-        this.markedPoints = new ArrayList<Point>();
+        this.markedRectangles = new ArrayList<Rectangle>();
 
         // add listener
         this.buttonSave.addActionListener(this);
@@ -182,6 +187,9 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
             }
         });
 
+        // set fullscreen
+        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+        
         // set visible
         this.setVisible(true);
     }
@@ -242,7 +250,7 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
             // write count
             writer.writeCharacters("\t");
             writer.writeStartElement("amount");
-            writer.writeCharacters("" + this.markedPoints.size());
+            writer.writeCharacters("" + this.markedRectangles.size());
             writer.writeEndElement();
             writer.writeCharacters("\r\n");
 
@@ -252,11 +260,11 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
             writer.writeCharacters("\r\n");
 
             // run through all data
-            for (Point mark : this.markedPoints) {
+            for (Rectangle mark : this.markedRectangles) {
 
                 // open mark
                 writer.writeCharacters("\t\t");
-                writer.writeStartElement("mark");
+                writer.writeStartElement("rectangle");
                 writer.writeCharacters("\r\n");
 
                 writer.writeCharacters("\t\t\t");
@@ -267,6 +275,16 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
                 writer.writeCharacters("\t\t\t");
                 writer.writeStartElement("y");
                 writer.writeCharacters("" + mark.y);
+                writer.writeEndElement();
+                writer.writeCharacters("\r\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("heigth");
+                writer.writeCharacters("" + mark.height);
+                writer.writeEndElement();
+                writer.writeCharacters("\r\n");
+                writer.writeCharacters("\t\t\t");
+                writer.writeStartElement("width");
+                writer.writeCharacters("" + mark.width);
                 writer.writeEndElement();
                 writer.writeCharacters("\r\n");
 
@@ -300,10 +318,10 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
 
     private void buttonRemoveActionPerformed() {
         // remove last point
-        this.markedPoints.remove(this.markedPoints.size() - 1);
+        this.markedRectangles.remove(this.markedRectangles.size() - 1);
 
         // disable elements if needed
-        if (this.markedPoints.size() == 0) {
+        if (this.markedRectangles.size() == 0) {
             this.buttonRemove.setEnabled(false);
             this.buttonSave.setEnabled(false);
         }
@@ -313,10 +331,23 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
     }
 
     /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
     @Override
-    public void mouseClicked(MouseEvent event) {
+    public void mousePressed(MouseEvent event) {
+        // add mousepoint to map
+        this.tmp = new Point(event.getXOnScreen(), event.getYOnScreen());
+        SwingUtilities.convertPointFromScreen(this.tmp, this.paintLabel);
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
+    @Override
+    public void mouseReleased(MouseEvent event) {
+        // check tmp
+        if(this.tmp == null) return;
+        
         // enable gui elements
         this.buttonRemove.setEnabled(true);
         this.buttonSave.setEnabled(true);
@@ -324,8 +355,11 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         // add mousepoint to map
         Point mousePoint = new Point(event.getXOnScreen(), event.getYOnScreen());
         SwingUtilities.convertPointFromScreen(mousePoint, this.paintLabel);
-        this.markedPoints.add(mousePoint);
+        this.markedRectangles.add(new Rectangle(this.tmp.x, this.tmp.y, mousePoint.x - this.tmp.x, mousePoint.y - this.tmp.y));
 
+        // reset tmp
+        this.tmp = null;
+        
         // update image
         this.updateImage();
     }
@@ -337,11 +371,11 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         Graphics2D graphics = notificationImage.createGraphics();
 
         // paint marks
-        for (Point mark : this.markedPoints) {
+        for (Rectangle mark : this.markedRectangles) {
             graphics.setColor(new Color(0, 0, 255, 255));
-            graphics.drawOval(mark.x - 5, mark.y - 5, 10, 10);
+            graphics.drawRect(mark.x, mark.y, mark.width, mark.height);
             graphics.setColor(new Color(0, 0, 255, 64));
-            graphics.fillOval(mark.x - 5, mark.y - 5, 10, 10);
+            graphics.fillRect(mark.x, mark.y, mark.width, mark.height);
         }
 
         // update image
@@ -352,8 +386,8 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         this.panelContent.repaint();
 
         // update label
-        this.labelDescription.setText("marks: " + this.markedPoints.size());
-        System.out.println("marks: " + this.markedPoints.size());
+        this.labelDescription.setText("marks: " + this.markedRectangles.size());
+        System.out.println("marks: " + this.markedRectangles.size());
     }
 
     /* (non-Javadoc)
@@ -371,17 +405,10 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
     }
 
     /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
     @Override
-    public void mousePressed(MouseEvent arg0) {
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseReleased(MouseEvent arg0) {
+    public void mouseClicked(MouseEvent event) {
     }
 
     /* (non-Javadoc)
