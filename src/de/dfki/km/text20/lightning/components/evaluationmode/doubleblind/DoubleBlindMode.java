@@ -24,6 +24,7 @@ import static net.jcores.CoreKeeper.$;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -80,9 +81,9 @@ public class DoubleBlindMode {
         // initialize variables
         final Object[] options = { "Yes", "No" };
         int choice = -1;
-        
+
         System.out.println();
-        
+
         this.timer = new Timer(this.time * 60 * 1000, new ActionListener() {
 
             @SuppressWarnings("synthetic-access")
@@ -102,18 +103,18 @@ public class DoubleBlindMode {
 
         // show dialog
         choice = JOptionPane.showOptionDialog(null, "Ready to start with method A?", "Double Blind", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        
-        if(choice != 0) return;
+
+        if (choice != 0) return;
 
         // set detector
         MainClass.getInstance().getInternalPluginManager().setCurrentSaliencyDetector(this.current);
 
         // start detector
-        MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();    
+        MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
 
         // unlock hotkeys
         Hotkey.getInstance().setBlockHotkeys(false);
-        
+
         // start timer
         this.timer.start();
     }
@@ -144,13 +145,14 @@ public class DoubleBlindMode {
             Hotkey.getInstance().setBlockHotkeys(true);
 
             // update file
-            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
-            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n");
-            $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n");
+            new File("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp()).mkdirs();
+            $("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp() + "/DoubleBlind.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+            $("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp() + "/DoubleBlind.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n");
+            $("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp() + "/DoubleBlind.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n");
 
-            if (this.current == this.two) $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: A, B, A, B\r\n\r\n");
+            if (this.current == this.two) $("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp() + "/DoubleBlind.log").file().append("- order: A, B, A, B\r\n\r\n");
             else
-                $(MainClass.getInstance().getEvaluationSettings()[1] + "/DoubleBlind.log").file().append("- order: B, A, B, A\r\n\r\n");
+                $("evaluation/double blind/Session_" + MainClass.getInstance().getTimestamp() + "/DoubleBlind.log").file().append("- order: B, A, B, A\r\n\r\n");
 
             System.out.println("Step " + (this.step) + " done.");
 
@@ -188,7 +190,7 @@ public class DoubleBlindMode {
 
             // start detector
             MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().start();
-            
+
             // restart timer
             this.timer.start();
         }
