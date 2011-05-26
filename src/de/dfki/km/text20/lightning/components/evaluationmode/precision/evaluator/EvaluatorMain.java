@@ -389,7 +389,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             // ... reset to startable state
             this.evaluationThread.stop();
             this.running = false;
+            this.currentTimeStamp = System.currentTimeMillis();
             this.progressBar.setValue(0);
+            this.progress = 0;
             this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
             this.buttonStart.setText("Start");
             this.buttonRemove.setEnabled(true);
