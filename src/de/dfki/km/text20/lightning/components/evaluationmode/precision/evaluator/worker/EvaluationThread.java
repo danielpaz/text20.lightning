@@ -33,14 +33,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 
 import net.jcores.interfaces.functions.F1;
 import net.jcores.options.Option;
 import net.jcores.options.OptionIndexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker.DataXMLParser;
-import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
@@ -109,6 +107,10 @@ public class EvaluationThread implements Runnable {
         $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
         $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
         $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- dataset - \r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("files: " + this.files.size() + "\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("datasets overall: " + this.mainClass.getSize() + "\r\n\r\n");
         $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
 
         // start all detectors and updfate keyfile
@@ -181,9 +183,6 @@ public class EvaluationThread implements Runnable {
                             graphics.drawImage(screenShot, dimension / 2, dimension / 2, null);
                             subImage = subImage.getSubimage(fixation.x, fixation.y, dimension, dimension);
 
-                            if (subImage == null) {
-                                System.out.println(rectangle + " " + fixation + " " + i.i());
-                            }
                         } catch (RasterFormatException e) {
                             e.printStackTrace();
                             return $(rval).array(String.class);
@@ -233,8 +232,6 @@ public class EvaluationThread implements Runnable {
 
                             // update file
                             input = $(type, pictureCount, i.i(), fixationCount, detectorCount, distance, hit, offsetX, offsetY).string().join(",");
-                            //$("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(input + "\r\n");
-
                             rval.add(input);
 
                             // draw image
@@ -261,6 +258,8 @@ public class EvaluationThread implements Runnable {
             }, i).expand(String.class).string().join("\r\n");
 
             $("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+
+            if (!this.mainClass.isRunning()) return;
 
             // step forward
             _pictureCount++;
