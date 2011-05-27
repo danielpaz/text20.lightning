@@ -51,7 +51,7 @@ public class FakePositionFinder implements SaliencyDetector {
      * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#analyse(java.awt.image.BufferedImage)
      */
     @Override
-    public Point analyse(BufferedImage derivatedScreenShot) {
+    public Point analyse(BufferedImage derivatedScreenShot, Object... options) {
         return new Point(0, 0);
     }
 

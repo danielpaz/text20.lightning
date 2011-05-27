@@ -75,6 +75,9 @@ public class DataPackage {
     
     /** */
     private boolean bigSteps;
+    
+    /** */
+    private int size; 
 
     /**
      * @return the coverageMin
@@ -298,5 +301,19 @@ public class DataPackage {
      */
     public void setBigSteps(boolean bigSteps) {
         this.bigSteps = bigSteps;
+    }
+
+    /**
+     * @return the size
+     */
+    public int getSize() {
+        return this.size;
+    }
+
+    /**
+     * @param size the size to set
+     */
+    public void setSize(int size) {
+        this.size = size;
     }
 }

@@ -39,9 +39,10 @@ public interface SaliencyDetector extends Plugin, CommonPluginInterface {
      * Analyzes the given processed screenshot and calculates an offset which is added to the fixation point.
      * 
      * @param screenShot in which center is the fixation point
+     * @param options 
      * @return offset of the next position which is realized as the real target
      */
-    public Point analyse(BufferedImage screenShot);
+    public Point analyse(BufferedImage screenShot, Object... options);
 
     /**
      * Returns some information about the plugin.

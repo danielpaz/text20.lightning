@@ -135,7 +135,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
         this.buttonStart.setEnabled(false);
         this.progressBar.setEnabled(false);
         this.labelDescription.setEnabled(false);
-        this.checkBoxDrawImages.setSelected(true);
+        this.checkBoxDrawImages.setSelected(false);
         this.checkBoxBigSteps.setSelected(true);
         this.checkboxBigStepsActionPerformed();
 
@@ -205,7 +205,6 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
 
         } else if (this.running) {
             // stop tool
-            this.evaluationThread.stop();
             this.running = false;
             this.buttonStart.setText("Start");
             this.labelDescription.setText("stoped");
@@ -318,6 +317,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             data.setAmount(Integer.parseInt(this.spinnerAmount.getValue().toString()));
             data.setDrawImages(this.checkBoxDrawImages.isSelected());
             data.setBigSteps(this.checkBoxBigSteps.isSelected());
+            data.setSize((int)size);
             
             // initialize and start evaluationThread
             this.evaluationThread.init(data, this.textDetector);
@@ -421,7 +421,6 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
      */
     private void exit() {
         this.pluginManager.shutdown();
-        if (this.running) this.evaluationThread.stop();
         this.dispose();
         System.out.println();
         System.out.println("Application closed.");
@@ -572,8 +571,17 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
     public void finish() {
         // inidicate finish
         this.labelDescription.setText("Evaluation finished");
+        // because of multithreading sometimes updates will be not done  
+        this.progressBar.setValue(this.progressBar.getMaximum());
         this.finished = true;
         this.buttonStart.setText("Exit");
+    }
+
+    /**
+     * @return the running
+     */
+    public boolean isRunning() {
+        return this.running;
     }
 
     /* (non-Javadoc)

@@ -106,6 +106,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** amount of generated fixations */
     private int amount;
+    
+    /** */
+    private int size;
 
     /**
      * main entry point
@@ -147,6 +150,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.progress = 1;
         this.amount = 0;
         this.startTimeStamp = 0;
+        this.size = 0;
 
         // add action listeners
         this.buttonSelect.addActionListener(this);
@@ -175,6 +179,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.progressBar.setEnabled(false);
         this.checkBoxConfiguration.setEnabled(false);
         this.buttonConfiguration.setEnabled(false);
+        this.checkBoxImages.setSelected(false);
 
         // initialize status
         this.running = false;
@@ -517,7 +522,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize variables
         DataXMLParser dataParser = new DataXMLParser();
         ArrayList<File> tmpFile = new ArrayList<File>(this.files);
-        int size = 0;
+        this.size = 0;
 
         // set amount
         this.amount = Integer.parseInt(this.spinnerAmount.getValue().toString());
@@ -541,12 +546,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // calculate size
         for (File file : this.files) {
-            size = size + dataParser.count(file);
+            this.size = this.size + dataParser.count(file);
         }
-        size = size * this.selectedDetectors.size() * this.amount;
+        this.size = this.size * this.selectedDetectors.size() * this.amount;
 
         // initialize progress bar
-        this.progressBar.setMaximum(size);
+        this.progressBar.setMaximum(this.size);
         this.progressBar.setStringPainted(true);
 
         // initialize and start evaluationThread
@@ -567,6 +572,9 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.selectedDetectors.clear();
         this.finished = true;
         this.buttonStart.setText("Exit");
+        
+        // because of multithreading sometimes updates will be not done  
+        this.progressBar.setValue(this.progressBar.getMaximum());
     }
 
     /**
@@ -743,5 +751,19 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public boolean isRunning() {
         return this.running;
+    }
+
+    /**
+     * @return the pluginManager
+     */
+    public PluginManager getPluginManager() {
+        return this.pluginManager;
+    }
+
+    /**
+     * @return the size
+     */
+    public int getSize() {
+        return this.size;
     }
 }

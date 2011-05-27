@@ -76,7 +76,7 @@ public class SimpleSobel implements SaliencyDetector {
      * A kind of spiral grows from the fixation point and returns the first point which is not black (works with derivated screenshot).
      */
     @Override
-    public Point analyse(BufferedImage screenShot) {
+    public Point analyse(BufferedImage screenShot, Object... options) {
 
         //encoding for direction:
         // 0 = down

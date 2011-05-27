@@ -24,6 +24,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
@@ -49,17 +50,8 @@ public class TextDetector implements SaliencyDetector {
     /** stored configuration */
     private TextDetectorProperties properties;
 
-    /** worker class */
-    private TextDetectorWorker worker;
-
     /** current time stamp */
     private long timeStamp;
-
-    /** text analyser */
-    private GetImageText analyser;
-
-    /** text boxes inside the screen shot */
-    private LinkedList<TextRegion> boxes;
 
     /**
      * creates new instance and initializes its variables
@@ -83,8 +75,6 @@ public class TextDetector implements SaliencyDetector {
     public void start() {
         this.properties = TextDetectorProperties.getInstance();
         this.timeStamp = System.currentTimeMillis();
-        this.worker = new TextDetectorWorker();
-        this.boxes = new LinkedList<TextRegion>();
     }
 
     /* (non-Javadoc)
@@ -99,21 +89,45 @@ public class TextDetector implements SaliencyDetector {
      * @see de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector#analyse(java.awt.image.BufferedImage)
      */
     @Override
-    public Point analyse(BufferedImage screenShot) {
+    public Point analyse(BufferedImage screenShot, Object... options) {
         // initialize variables
         int textSize = 0;
         double coverage = 0;
-        this.analyser = new GetImageText(screenShot, this.properties.getLetterHeight(), this.properties.getLineSize(), this.properties.getSenitivity());
+        double coverageThresh = this.properties.getThreshold();
+        int height = this.properties.getLetterHeight();
+        int width = this.properties.getLetterWidth();
+        double sensitivity = this.properties.getSenitivity();
+        int line = this.properties.getLineSize();
+
+        // set variables
+        for (Object option : options) {
+            if (option instanceof String) {
+                if (((String) option).startsWith("TDthreshold=")) {
+                    coverageThresh = Double.parseDouble(((String) option).substring(((String) option).lastIndexOf("=") + 1));
+                } else if (((String) option).startsWith("TDheight=")) {
+                    height = Integer.parseInt(((String) option).substring(((String) option).lastIndexOf("=") + 1));
+                } else if (((String) option).startsWith("TDwidth=")) {
+                    width = Integer.parseInt(((String) option).substring(((String) option).lastIndexOf("=") + 1));
+                } else if (((String) option).startsWith("TDsensitivity=")) {
+                    sensitivity = Double.parseDouble(((String) option).substring(((String) option).lastIndexOf("=") + 1));
+                } else if (((String) option).startsWith("TDline=")) {
+                    line = Integer.parseInt(((String) option).substring(((String) option).lastIndexOf("=") + 1));
+                }
+            } 
+        }
+
+        GetImageText analyser = new GetImageText(screenShot, height, line, sensitivity);
+        LinkedList<TextRegion> boxes = new LinkedList<TextRegion>();
 
         // get text boxes
-        for (Object textRegion : this.analyser.getTextBoxes()) {
+        for (Object textRegion : analyser.getTextBoxes()) {
             if (textRegion instanceof TextRegion)
-                if (((TextRegion) textRegion).width() >= this.properties.getLetterWidth())
-                    this.boxes.add((TextRegion) textRegion);
+                if (((TextRegion) textRegion).width() >= width)
+                    boxes.add((TextRegion) textRegion);
         }
 
         // calculate coverage
-        for (TextRegion textRegion : this.boxes) {
+        for (TextRegion textRegion : boxes) {
             textSize = textSize + textRegion.width() * textRegion.height();
         }
         coverage = ((double) 100 / (double) (screenShot.getWidth() * screenShot.getHeight())) * textSize;
@@ -122,18 +136,15 @@ public class TextDetector implements SaliencyDetector {
         if (this.properties.isDebug()) {
             try {
                 new File("./plugins/TextDetector/debug/Session_" + this.timeStamp).mkdirs();
-                ImageIO.write(this.analyser.isolateText(this.boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
+                ImageIO.write(analyser.isolateText(boxes), "png", new File("./plugins/TextDetector/debug/Session_" + this.timeStamp + "/" + System.currentTimeMillis() + "_TextDetectorDebug.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        // reset boxes
-        this.boxes.clear();
-
         // decide which method should be used and return its results
-        if (coverage > this.properties.getThreshold()) { return this.worker.textAnalyse(this.analyser.getShrinkedBoxes(), screenShot.getHeight()); }
-        return this.worker.normalAnalyse(this.analyser.getContrastImage());
+        if (coverage > coverageThresh) { return new TextDetectorWorker().textAnalyse(analyser.getShrinkedBoxes(), screenShot.getHeight()); }
+        return new TextDetectorWorker().normalAnalyse(analyser.getContrastImage());
     }
 
     /* (non-Javadoc)

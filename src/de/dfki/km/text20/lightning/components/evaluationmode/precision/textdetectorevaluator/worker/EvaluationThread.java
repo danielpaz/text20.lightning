@@ -34,6 +34,9 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import net.jcores.interfaces.functions.F1;
+import net.jcores.options.Option;
+import net.jcores.options.OptionIndexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.DetectorEvaluator;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
@@ -49,14 +52,8 @@ public class EvaluationThread implements Runnable {
     /** contains all needed data */
     private DataPackage container;
 
-    /** indicates if the thread should be stopped */
-    private boolean stop;
-
     /** text detector */
     private SaliencyDetector detector;
-
-    /** */
-    private TextDetectorProperties properties;
 
     /**
      * initializes necessary variables
@@ -69,13 +66,6 @@ public class EvaluationThread implements Runnable {
         this.detector = textDetector;
     }
 
-    /**
-     * stops the processing
-     */
-    public void stop() {
-        this.stop = true;
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
@@ -83,23 +73,12 @@ public class EvaluationThread implements Runnable {
     @Override
     public void run() {
         // initialize Variables
-        DataXMLParser dataParser = new DataXMLParser();
-        BufferedImage screenShot;
-        BufferedImage subImage;
-        Point target;
-        Point offset;
-        int pictureCount = 0;
-        int rectangleCount = 0;
-        int fixationCount = 0;
-        int type = -1;
-        int hit;
-        int offsetX;
-        int offsetY;
-        Point translatedRelated;
-        Rectangle translatedRectangle;
-        double distance;
-        String input;
-        this.stop = false;
+        final DataXMLParser dataParser = new DataXMLParser();
+        int _pictureCount = 0;
+        int _type = -1;
+        
+        // start detector
+        this.detector.start();
 
         // create directories
         new File("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
@@ -113,8 +92,12 @@ public class EvaluationThread implements Runnable {
         $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
         $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
         $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
+        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- dataset - \r\n");
+        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("files: " + this.container.getFiles().size() + "\r\n");
+        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.container.getAmount() + "\r\n");
+        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("datasets overall: " + this.container.getSize() + "\r\n\r\n");
         $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- files -\r\n");
-        
+
         System.out.println();
         System.out.println();
 
@@ -122,150 +105,165 @@ public class EvaluationThread implements Runnable {
         DetectorEvaluator.getInstance().setStartTimeStamp(System.currentTimeMillis());
 
         // run through every file ...
-        for (File file : this.container.getFiles()) {
+        for (final File file : this.container.getFiles()) {
 
             System.out.println("- File " + file.getName() + " is the next one.");
-            
-            $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("index: " + pictureCount + ", name: " + file.getName() + "\r\n");
+
+            $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
 
             // set type
             if (file.getName().contains("_Text_")) {
-                type = 0;
+                _type = 0;
             } else if (file.getName().contains("_Code_")) {
-                type = 1;
+                _type = 1;
             } else if (file.getName().contains("_Icons_")) {
-                type = 2;
+                _type = 2;
             } else {
-                type = 3;
+                _type = 3;
             }
 
-            // read placed targets
-            for (Rectangle rectangle : dataParser.readFile(file)) {
+            final int pictureCount = _pictureCount;
+            final int type = _type;
 
-                // read screenshot
-                screenShot = dataParser.getRelatedImage(file);
+            final OptionIndexer i = Option.INDEXER();
+            String output = $(dataParser.readFile(file)).map(new F1<Rectangle, String[]>() {
 
-                // reste fixations
-                fixationCount = 0;
+                @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+                public String[] f(Rectangle rectangle) {
+                    Point offset;
+                    int hit;
+                    int offsetX;
+                    int offsetY;
+                    Point translatedRelated;
+                    Rectangle translatedRectangle;
+                    double distance;
+                    String input;
+                    ArrayList<String> rval = new ArrayList<String>();
 
-                // create target
-                target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+                    // read screenshot
+                    BufferedImage screenShot = dataParser.getRelatedImage(file);
+                    BufferedImage subImage;
 
-                // run through all calculated fixations
-                for (Point fixation : this.calculateFixations(screenShot, target)) {
+                    // reste fixations
+                    int fixationCount = 0;
 
-                    // transform screenshot
-                    try {
-                        subImage = new BufferedImage(screenShot.getWidth() + this.container.getDimension(), screenShot.getHeight() + this.container.getDimension(), screenShot.getType());
-                        Graphics2D graphics = subImage.createGraphics();
-                        graphics.drawImage(screenShot, this.container.getDimension() / 2, this.container.getDimension() / 2, null);
-                        subImage = subImage.getSubimage(fixation.x, fixation.y, this.container.getDimension(), this.container.getDimension());
-                    } catch (RasterFormatException e) {
-                        e.printStackTrace();
-                        return;
-                    }
+                    // create target
+                    Point target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
 
-                    // run through parameters
-                    for (int coverage = this.container.getCoverageMin(); coverage <= this.container.getCoverageMax(); coverage++) {
-                        for (int height = this.container.getHeightMin(); height <= this.container.getHeightMax(); height++) {
-                            for (int width = this.container.getWidthMin(); width <= this.container.getWidthMax(); width++) {
-                                for (double sensitivity = this.container.getSensitivityMin(); sensitivity <= this.container.getSensitivityMax(); sensitivity = sensitivity + 0.1) {
-                                    for (int line = this.container.getLineMin(); line <= this.container.getLineMax(); line++) {
+                    // run through all calculated fixations
+                    for (Point fixation : calculateFixations(screenShot, target)) {
 
-                                        // wtf why?
-                                        sensitivity = (double) Math.round(sensitivity * 10) / 10;
+                        // transform screenshot
+                        try {
+                            subImage = new BufferedImage(screenShot.getWidth() + container.getDimension(), screenShot.getHeight() + container.getDimension(), screenShot.getType());
+                            Graphics2D graphics = subImage.createGraphics();
+                            graphics.drawImage(screenShot, container.getDimension() / 2, container.getDimension() / 2, null);
+                            subImage = subImage.getSubimage(fixation.x, fixation.y, container.getDimension(), container.getDimension());
 
-                                        // set values
-                                        this.properties.getInstance().setThreshold(coverage);
-                                        this.properties.getInstance().setLetterHeight(height);
-                                        this.properties.getInstance().setLetterWidth(width);
-                                        this.properties.getInstance().setSensitivity(sensitivity);
-                                        this.properties.getInstance().setLineSize(line);
+                        } catch (RasterFormatException e) {
+                            e.printStackTrace();
+                            return $(rval).array(String.class);
+                        }
 
-                                        // start detector        
-                                        this.detector.start();
+                        // run through parameters
+                        for (int coverage = container.getCoverageMin(); coverage <= container.getCoverageMax(); coverage++) {
+                            for (int height = container.getHeightMin(); height <= container.getHeightMax(); height++) {
+                                for (int width = container.getWidthMin(); width <= container.getWidthMax(); width++) {
+                                    for (double sensitivity = container.getSensitivityMin(); sensitivity <= container.getSensitivityMax(); sensitivity = sensitivity + 0.1) {
+                                        for (int line = container.getLineMin(); line <= container.getLineMax(); line++) {
 
-                                        // calculate offset
-                                        offset = this.detector.analyse(subImage);
-                                        offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
+                                            // wtf why?
+                                            sensitivity = (double) Math.round(sensitivity * 10) / 10;
 
-                                        // translate
-                                        translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
-                                        translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
+                                            // set values
+                                            String[] options = { "TDthreshold=" + coverage, "TDheight=" + height, "TDwidth=" + width, "TDsensitivity=" + sensitivity, "TDline=" + line };
 
-                                        // calculate distance
-                                        distance = offset.distance(translatedRelated);
+                                            // calculate offset
+                                            offset = detector.analyse(subImage, options);
+                                            offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
 
-                                        // calculate x offset
-                                        if (offset.x < translatedRectangle.x) {
-                                            offsetX = translatedRectangle.x - translatedRectangle.x;
-                                        } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
-                                            offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
-                                        } else {
-                                            offsetX = 0;
+                                            // translate
+                                            translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
+                                            translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
+
+                                            // calculate distance
+                                            distance = offset.distance(translatedRelated);
+
+                                            // calculate x offset
+                                            if (offset.x < translatedRectangle.x) {
+                                                offsetX = translatedRectangle.x - translatedRectangle.x;
+                                            } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
+                                                offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
+                                            } else {
+                                                offsetX = 0;
+                                            }
+
+                                            // calculate y offset
+                                            if (offset.y < translatedRectangle.y) {
+                                                offsetY = offset.y - translatedRectangle.y;
+                                            } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
+                                                offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
+                                            } else {
+                                                offsetY = 0;
+                                            }
+
+                                            // calculate hit
+                                            if ((offsetX == 0) && (offsetY == 0)) {
+                                                hit = 1;
+                                            } else {
+                                                hit = 0;
+                                            }
+
+                                            // update file
+                                            input = $(type, pictureCount, i.i(), fixationCount, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY).string().join(",");
+                                            rval.add(input);
+                                            
+                                            // draw image
+                                            if (container.isDrawImages())
+                                                drawPicture(offset, "./evaluation/text detector evaluation/Session_" + container.getTimestamp() + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
+
+                                            // check if should continue
+                                            if (!DetectorEvaluator.getInstance().isRunning())
+                                                return $(rval).array(String.class);
+
+                                            // check for big steps
+                                            if (container.isBigSteps()) line = line + 9;
+
+                                            // update progress bar
+                                            DetectorEvaluator.getInstance().updateProgressBar();
                                         }
-
-                                        // calculate y offset
-                                        if (offset.y < translatedRectangle.y) {
-                                            offsetY = offset.y - translatedRectangle.y;
-                                        } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
-                                            offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
-                                        } else {
-                                            offsetY = 0;
-                                        }
-
-                                        // calculate hit
-                                        if ((offsetX == 0) && (offsetY == 0)) {
-                                            hit = 1;
-                                        } else {
-                                            hit = 0;
-                                        }
-
-                                        // update file
-                                        input = $(type, pictureCount, rectangleCount, fixationCount, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY).string().join(",");
-                                        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluation.txt").file().append(input + "\r\n");
-
-                                        // draw image
-                                        if (this.container.isDrawImages())
-                                            this.drawPicture(offset, "./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/" + type + "_" + pictureCount + "_" + rectangleCount + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
-
-                                        // check if should continue
-                                        if (this.stop) return;
 
                                         // check for big steps
-                                        if (this.container.isBigSteps()) line = line + 9;
-
-                                        // update progress bar
-                                        DetectorEvaluator.getInstance().updateProgressBar();
+                                        if (container.isBigSteps())
+                                            sensitivity = sensitivity + 0.9;
                                     }
 
                                     // check for big steps
-                                    if (this.container.isBigSteps())
-                                        sensitivity = sensitivity + 0.9;
+                                    if (container.isBigSteps()) width = width + 9;
                                 }
 
                                 // check for big steps
-                                if (this.container.isBigSteps()) width = width + 9;
+                                if (container.isBigSteps()) height = height + 9;
                             }
 
                             // check for big steps
-                            if (this.container.isBigSteps()) height = height + 9;
+                            if (container.isBigSteps()) coverage = coverage + 9;
                         }
 
-                        // check for big steps
-                        if (this.container.isBigSteps()) coverage = coverage + 9;
+                        // step forward
+                        fixationCount++;
                     }
 
-                    // step forward
-                    fixationCount++;
+                    return $(rval).array(String.class);
                 }
+            }, i).expand(String.class).string().join("\r\n");
 
-                // step forward
-                rectangleCount++;
-            }
+            $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp()  + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+
+            if (!DetectorEvaluator.getInstance().isRunning()) return;
 
             // step forward
-            pictureCount++;
+            _pictureCount++;
 
             System.out.println("- File " + file.getName() + " finished.\r\n");
         }
