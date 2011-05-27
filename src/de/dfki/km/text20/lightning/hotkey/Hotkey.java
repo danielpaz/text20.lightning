@@ -171,9 +171,13 @@ public class Hotkey implements HotkeyListener {
             break;
         // status hotkey
         case 2:
+            // check if evaluation mode
+            if (!this.main.isNormalMode()) return;
+            
             // change status
             this.main.toggleStatus();
             break;
+            
         default:
             return;
         }

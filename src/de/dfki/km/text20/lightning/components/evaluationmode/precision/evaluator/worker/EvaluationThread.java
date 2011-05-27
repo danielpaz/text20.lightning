@@ -34,6 +34,8 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import net.jcores.interfaces.functions.F1;
+import net.jcores.options.Option;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
@@ -104,6 +106,7 @@ public class EvaluationThread implements Runnable {
         Point target;
         Point offset;
         int pictureCount = 0;
+//        final OptionIndexer index = Option.INDEXER();   
         int rectangleCount = 0;
         int fixationCount = 0;
         int detectorCount = 0;
@@ -162,6 +165,11 @@ public class EvaluationThread implements Runnable {
                 type = 3;
             }
 
+//            $(dataParser.readFile(file)).map(new F1<Rectangle, Void> (){
+//                public Void f(Rectangle test){
+//                }
+//            }, index);
+            
             // read placed targets
             for (Rectangle rectangle : dataParser.readFile(file)) {
 
@@ -176,6 +184,8 @@ public class EvaluationThread implements Runnable {
 
                 // run through all calculated fixations
                 for (Point fixation : this.calculateFixations(screenShot, target)) {
+
+                    System.out.println(fixation + " " + screenShot.getWidth() + " " + screenShot.getHeight());
 
                     // transform screenshot
                     try {
@@ -289,8 +299,10 @@ public class EvaluationThread implements Runnable {
         for (int i = 0; i < this.mainClass.getAmount(); i++) {
             x = (int) (point.x + (random.nextGaussian() * deviation));
             x = Math.max(point.x - this.mainClass.getDimension() / 2, Math.min(point.x + this.mainClass.getDimension() / 2, x));
+            x = Math.max(1, Math.min(image.getWidth() - 1, x));
             y = (int) (point.y + (random.nextGaussian() * deviation));
             y = Math.max(point.y - this.mainClass.getDimension() / 2, Math.min(point.y + this.mainClass.getDimension() / 2, y));
+            y = Math.max(1, Math.min(image.getHeight() - 1, y));
             calculatedFixations.add(new Point(x, y));
         }
 
