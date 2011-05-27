@@ -1,0 +1,400 @@
+/*
+ * EvaluationThread.java
+ * 
+ * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
+
+import static net.jcores.CoreKeeper.$;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
+
+import net.jcores.interfaces.functions.F1;
+import net.jcores.options.Option;
+import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
+import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker.DataXMLParser;
+import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
+
+/**
+ * This thread runs through all given files and detectors and evaluates them.
+ * 
+ * @author Christoph Käding
+ *
+ */
+public class EvaluationThread implements Runnable {
+
+    /** list of the from listDetectors selected detectors */
+    private ArrayList<SaliencyDetector> selectedDetectors;
+
+    /** selected *.xml files */
+    private ArrayList<File> files;
+
+    /** given main class */
+    private EvaluatorMain mainClass;
+
+    /** indicates if the thread should be stopped */
+    private boolean stop;
+
+    /** */
+    private int dimension;
+
+    /** */
+    private boolean drawImages;
+
+    /** */
+    private long timestamp;
+
+    /** */
+    private int exceptionCounter;
+
+    /**
+     * initializes necessary variables
+     * 
+     * @param main
+     */
+    public void init(EvaluatorMain main) {
+        this.mainClass = main;
+        this.files = main.getFiles();
+        this.selectedDetectors = main.getSelectedDetectors();
+        this.dimension = main.getDimension();
+        this.drawImages = main.writeImages();
+        this.timestamp = main.getCurrentTimeStamp();
+    }
+
+    /**
+     * stops the processing
+     */
+    public void stop() {
+        this.stop = true;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    @SuppressWarnings("boxing")
+    @Override
+    public void run() {
+        // initialize Variables
+        DataXMLParser dataParser = new DataXMLParser();
+        BufferedImage screenShot;
+        BufferedImage subImage;
+        Point target;
+        Point offset;
+        int pictureCount = 0;
+//        final OptionIndexer index = Option.INDEXER();   
+        int rectangleCount = 0;
+        int fixationCount = 0;
+        int detectorCount = 0;
+        int type = -1;
+        int hit;
+        int offsetX;
+        int offsetY;
+        Point translatedRelated;
+        Rectangle translatedRectangle;
+        double distance;
+        String input;
+        this.stop = false;
+
+        // create directories
+        new File("./evaluation/detector evaluation/Session_" + this.timestamp).mkdirs();
+
+        // write key file 
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- headings -\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, detector, distance, hit, offsetX, offsetY\r\n\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- filename -\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation.png\r\n\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- values -\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
+
+        // start all detectors and updfate keyfile
+        for (int i = 0; i < this.selectedDetectors.size(); i++) {
+            this.selectedDetectors.get(i).start();
+            $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + i + ", name: " + this.selectedDetectors.get(i).getInformation().getDisplayName() + "\r\n");
+        }
+        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("\r\n- files -\r\n");
+
+        System.out.println();
+        System.out.println();
+
+        // set start timestamp
+        this.mainClass.setStartTimeStamp(System.currentTimeMillis());
+
+        // run through every file ...
+        for (File file : this.files) {
+
+            System.out.println("- File " + file.getName() + " is the next one.");
+
+            $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + pictureCount + ", name: " + file.getName() + "\r\n");
+
+            // set type
+            if (file.getName().contains("_Text_")) {
+                type = 0;
+            } else if (file.getName().contains("_Code_")) {
+                type = 1;
+            } else if (file.getName().contains("_Icons_")) {
+                type = 2;
+            } else {
+                type = 3;
+            }
+
+//            $(dataParser.readFile(file)).map(new F1<Rectangle, Void> (){
+//                public Void f(Rectangle test){
+//                }
+//            }, index);
+            
+            // read placed targets
+            for (Rectangle rectangle : dataParser.readFile(file)) {
+
+                // read screenshot
+                screenShot = dataParser.getRelatedImage(file);
+
+                // reste fixations
+                fixationCount = 0;
+
+                // create target
+                target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+
+                // run through all calculated fixations
+                for (Point fixation : this.calculateFixations(screenShot, target)) {
+
+                    System.out.println(fixation + " " + screenShot.getWidth() + " " + screenShot.getHeight());
+
+                    // transform screenshot
+                    try {
+                        subImage = new BufferedImage(screenShot.getWidth() + this.dimension, screenShot.getHeight() + this.dimension, screenShot.getType());
+                        Graphics2D graphics = subImage.createGraphics();
+                        graphics.drawImage(screenShot, this.dimension / 2, this.dimension / 2, null);
+                        subImage = subImage.getSubimage(fixation.x, fixation.y, this.dimension, this.dimension);
+                    } catch (RasterFormatException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    // reset detector
+                    detectorCount = 0;
+
+                    // ... and every detector
+                    for (SaliencyDetector detector : this.selectedDetectors) {
+
+                        // calculate offset
+                        offset = detector.analyse(subImage);
+                        offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
+
+                        // translate
+                        translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
+                        translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
+
+                        // calculate distance
+                        distance = offset.distance(translatedRelated);
+
+                        // calculate x offset
+                        if (offset.x < translatedRectangle.x) {
+                            offsetX = translatedRectangle.x - translatedRectangle.x;
+                        } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
+                            offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
+                        } else {
+                            offsetX = 0;
+                        }
+
+                        // calculate y offset
+                        if (offset.y < translatedRectangle.y) {
+                            offsetY = offset.y - translatedRectangle.y;
+                        } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
+                            offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
+                        } else {
+                            offsetY = 0;
+                        }
+
+                        // calculate hit
+                        if ((offsetX == 0) && (offsetY == 0)) {
+                            hit = 1;
+                        } else {
+                            hit = 0;
+                        }
+
+                        // update file
+                        input = $(type, pictureCount, rectangleCount, fixationCount, detectorCount, distance, hit, offsetX, offsetY).string().join(",");
+                        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluation.txt").file().append(input + "\r\n");
+
+                        // draw image
+                        if (this.drawImages)
+                            this.drawPicture(detector, offset, "./evaluation/detector evaluation/Session_" + this.timestamp + "/" + type + "_" + pictureCount + "_" + rectangleCount + "_" + fixationCount + ".png", subImage, translatedRectangle);
+
+                        // check if should continue
+                        if (this.stop) return;
+
+                        // update progress bar
+                        this.mainClass.updateProgressBar();
+
+                        // next detector
+                        detectorCount++;
+                    }
+
+                    // step forward
+                    fixationCount++;
+                }
+
+                // step forward
+                rectangleCount++;
+            }
+
+            // step forward
+            pictureCount++;
+
+            System.out.println("- File " + file.getName() + " finished.\r\n");
+        }
+
+        // stop all detectors
+        for (SaliencyDetector detector : this.selectedDetectors)
+            detector.stop();
+
+        // finish the evaluation
+        this.mainClass.finish();
+    }
+
+    /**
+     * calculates randomized fixations
+     * 
+     * @param image
+     * @param point
+     * @return list of fixations
+     */
+    private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
+        // initialize variables
+        int deviation = 20;
+        int x;
+        int y;
+        ArrayList<Point> calculatedFixations = new ArrayList<Point>();
+        Random random = new Random();
+
+        // calculate fixations
+        for (int i = 0; i < this.mainClass.getAmount(); i++) {
+            x = (int) (point.x + (random.nextGaussian() * deviation));
+            x = Math.max(point.x - this.mainClass.getDimension() / 2, Math.min(point.x + this.mainClass.getDimension() / 2, x));
+            x = Math.max(1, Math.min(image.getWidth() - 1, x));
+            y = (int) (point.y + (random.nextGaussian() * deviation));
+            y = Math.max(point.y - this.mainClass.getDimension() / 2, Math.min(point.y + this.mainClass.getDimension() / 2, y));
+            y = Math.max(1, Math.min(image.getHeight() - 1, y));
+            calculatedFixations.add(new Point(x, y));
+        }
+
+        // return list
+        return calculatedFixations;
+    }
+
+    /**
+     * draws the png-file withe the calculated results
+     * 
+     * @param detector
+     *            used to get the name
+     * @param point
+     *            where the detector recognized a target
+     * @param path
+     *            where the image will be written
+     * @param image
+     *            screenshot where the data will be written in, maybe it will be
+     *            not used when the screenshot is already drawn to a file
+     * @param relatedRectangle
+     *            target that was given or was pointed by the mouse
+     */
+    private void drawPicture(SaliencyDetector detector, Point point, String path,
+                             BufferedImage image, Rectangle relatedRectangle) {
+        // initialize variables
+        int color = (int) (Math.random() * 255);
+        File file = new File(path);
+        BufferedImage screenShot;
+        boolean alreadyExists = file.exists();
+
+        try {
+            // if the screenshot file already exists, the given screenshot is
+            // overwritten by the existing one to update new data
+            if (alreadyExists) {
+                screenShot = ImageIO.read(file);
+            } else {
+                screenShot = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+                Graphics2D graphics = screenShot.createGraphics();
+                graphics.drawImage(image, 0, 0, null);
+            }
+
+            // create screenshot graphic
+            Graphics2D graphic = screenShot.createGraphics();
+            graphic.setFont(graphic.getFont().deriveFont(5));
+
+            if (!alreadyExists) {
+                // visualize fixation point
+                graphic.setColor(new Color(255, 255, 0, 255));
+                graphic.drawOval(this.dimension / 2 - 5, this.dimension / 2 - 5, 10, 10);
+                graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + this.dimension / 2, 12 + this.dimension / 2);
+                graphic.setColor(new Color(255, 255, 0, 32));
+                graphic.fillOval(this.dimension / 2 - 5, this.dimension / 2 - 5, 10, 10);
+
+                // visualize related point
+                graphic.setColor(new Color(255, 0, 0, 255));
+                graphic.drawRect(relatedRectangle.x, relatedRectangle.y, relatedRectangle.width, relatedRectangle.height);
+                graphic.setColor(new Color(255, 0, 0, 32));
+                graphic.fillRect(relatedRectangle.x, relatedRectangle.y, relatedRectangle.width, relatedRectangle.height);
+            }
+
+            // visualize calculations
+            color = (50 + color) % 256;
+            graphic.setColor(new Color(0, 255 - color, color, 255));
+            graphic.drawOval(point.x - 5, point.y - 5, 10, 10);
+            graphic.drawChars(detector.getInformation().getDisplayName().toCharArray(), 0, detector.getInformation().getDisplayName().toCharArray().length, point.x + 12, point.y + 12);
+            graphic.setColor(new Color(0, 255 - color, color, 32));
+            graphic.fillOval(point.x - 5, point.y - 5, 10, 10);
+
+            // write the image
+            file.mkdirs();
+            ImageIO.write(screenShot, "png", file);
+
+        } catch (Exception e) {
+
+            // increase exception count
+            this.exceptionCounter++;
+
+            //indicate exception
+            System.out.println("exception number " + this.exceptionCounter + ": " + e.toString());
+
+            // test if deadlock
+            if (this.exceptionCounter >= 10) return;
+
+            // wait to give the os some time to handle files
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+
+            // retry
+            this.drawPicture(detector, point, path, image, relatedRectangle);
+        }
+    }
+}
