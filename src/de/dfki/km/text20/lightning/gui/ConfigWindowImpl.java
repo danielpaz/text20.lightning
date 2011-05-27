@@ -25,10 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
 
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.Timer;
@@ -70,9 +68,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
 
     /** instance of the mainclass */
     private MainClass main;
-
-    /** file chooser for output path */
-    private JFileChooser chooser;
 
     /** frame for configuration guis of plugins */
     private JFrame child;
@@ -120,7 +115,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxDetector.addActionListener(this);
         this.mainFrame.addWindowListener(this);
         this.buttonClearRecalibration.addActionListener(this);
-        this.buttonSelect.addActionListener(this);
 
         // initialize checkbox
         this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
@@ -131,22 +125,9 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.manageToolTips();
 
         // initialize current evaluation settings
-        this.textFieldOutputPath.setText(new File(this.main.getEvaluationSettings()[1]).getAbsolutePath());
         for (String option : this.main.getEvaluationOptions())
             this.comboBoxMode.addItem(option);
-        this.comboBoxMode.setSelectedItem(this.main.getEvaluationSettings()[0]);
-
-        // initialize file chooser
-        this.chooser = new JFileChooser() {
-            @SuppressWarnings("unqualified-field-access")
-            public void approveSelection() {
-                if (getSelectedFile().isFile()) return;
-                super.approveSelection();
-                textFieldOutputPath.setText(this.getSelectedFile().getAbsolutePath());
-            }
-        };
-        this.chooser.setMultiSelectionEnabled(false);
-        this.chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        this.comboBoxMode.setSelectedItem(this.main.getEvaluationType());
 
         // initialize timer
         this.timer = new Timer(500, new ActionListener() {
@@ -242,20 +223,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.buttonClearActionPerformed();
             return;
         }
-
-        if (event.getSource() == this.buttonSelect) {
-            this.buttonSelectActionPerformed();
-            return;
-        }
     }
 
     /**
      * Fired if the OK button is clicked. All changes were applied.
      */
     protected void buttonOKActionPerformed() {
-        // initialize temporary variables
-        String[] settings = { this.comboBoxMode.getSelectedItem().toString(), this.textFieldOutputPath.getText() };
-
         // change variables in the properties and in the method manager
         this.properties.setDimension(Integer.parseInt(this.spinnerDimension.getValue().toString()));
         this.properties.setUseWarp(this.checkBoxUseWarp.isSelected());
@@ -269,7 +242,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
 
         // set evaluation settings
-        this.main.setEvaluationSettings(settings);
+        this.main.setEvaluationType(this.comboBoxMode.getSelectedItem().toString());
 
         // refresh warper and plugins
         this.main.refreshWarper();
@@ -401,11 +374,8 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         if (!this.checkBoxEvaluation.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
         else
             this.buttonDetectorConfig.setEnabled(false);
-        this.labelOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.buttonSelect.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelMode.setEnabled(this.checkBoxEvaluation.isSelected());
         this.comboBoxMode.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.textFieldOutputPath.setEnabled(this.checkBoxEvaluation.isSelected());
         this.labelEnableMouseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
         this.checkBoxUseWarpActionPerformed();
         if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
@@ -418,13 +388,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             this.buttonOK.setText("Start");
         }
 
-    }
-
-    /**
-     * Fired if the Select button is clicked. Shows the file chooser.
-     */
-    private void buttonSelectActionPerformed() {
-        this.chooser.showOpenDialog(this.mainFrame);
     }
 
     /**

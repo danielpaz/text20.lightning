@@ -123,7 +123,8 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         this.setVisible(true);
 
         // initial file entry
-        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+        new File("evaluation/quickness/Session_" + MainClass.getInstance().getTimestamp()).mkdirs();
+        $("evaluation/quickness/Session_" + MainClass.getInstance().getTimestamp() + "/Quickness.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
 
         // run through files
         this.nextFile();
@@ -146,7 +147,7 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
             this.refresh();
 
             // last file entry
-            $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("\r\n");
+            $("evaluation/quickness/Session_" + MainClass.getInstance().getTimestamp() + "/Quickness.log").file().append("\r\n");
 
             return;
         }
@@ -293,7 +294,7 @@ public class QuicknessStepGuiImpl extends QuicknessStepGui {
         this.contentWindow = null;
 
         // update file
-        $(MainClass.getInstance().getEvaluationSettings()[1] + "/Quickness.log").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
+        $("evaluation/quickness/Session_" + MainClass.getInstance().getTimestamp() + "/Quickness.log").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
 
         // continue
         this.stepForward();

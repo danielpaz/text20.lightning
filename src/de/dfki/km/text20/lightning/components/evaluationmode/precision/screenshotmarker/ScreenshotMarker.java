@@ -120,7 +120,13 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         // deactivate gui elements
         this.buttonSave.setEnabled(false);
         this.buttonRemove.setEnabled(false);
+        this.comboBoxType.setEnabled(false);
         this.labelDescription.setText("");
+
+        // init combobox
+        this.comboBoxType.addItem("Text");
+        this.comboBoxType.addItem("Code");
+        this.comboBoxType.addItem("Icons");
 
         // initialize variables
         this.markedRectangles = new ArrayList<Rectangle>();
@@ -189,7 +195,7 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
 
         // set fullscreen
         this.setExtendedState(Frame.MAXIMIZED_BOTH);
-        
+
         // set visible
         this.setVisible(true);
     }
@@ -217,9 +223,11 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         // deactivate button
         this.buttonRemove.setEnabled(false);
         this.buttonSave.setEnabled(false);
+        this.comboBoxType.setEnabled(false);
 
         // create file
-        File logfile = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "Marks_" + System.currentTimeMillis() + ".xml");
+        String name = this.screenshotFile.getName().substring(0, this.screenshotFile.getName().toLowerCase().lastIndexOf(".png"));
+        File logfile = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "Marks_" + this.comboBoxType.getSelectedItem() + "_" + name + "_" + System.currentTimeMillis() + ".xml");
         File xsd = new File(this.screenshotFile.getAbsolutePath().substring(0, this.screenshotFile.getAbsolutePath().lastIndexOf(File.separator) + 1) + "MarksPattern.xsd");
 
         try {
@@ -279,13 +287,13 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
                 writer.writeEndElement();
                 writer.writeCharacters("\r\n");
                 writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("heigth");
-                writer.writeCharacters("" + mark.height);
+                writer.writeStartElement("width");
+                writer.writeCharacters("" + mark.width);
                 writer.writeEndElement();
                 writer.writeCharacters("\r\n");
                 writer.writeCharacters("\t\t\t");
-                writer.writeStartElement("width");
-                writer.writeCharacters("" + mark.width);
+                writer.writeStartElement("height");
+                writer.writeCharacters("" + mark.height);
                 writer.writeEndElement();
                 writer.writeCharacters("\r\n");
 
@@ -310,6 +318,9 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
             System.out.println();
             System.out.println("Data stored to '" + logfile.getAbsolutePath() + "'.");
             this.labelDescription.setText("Data stored to '" + logfile.getAbsolutePath() + "'.");
+            
+            // clear marks
+            this.markedRectangles.clear();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -325,6 +336,7 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
         if (this.markedRectangles.size() == 0) {
             this.buttonRemove.setEnabled(false);
             this.buttonSave.setEnabled(false);
+            this.comboBoxType.setEnabled(false);
         }
 
         // update image
@@ -347,20 +359,46 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
     @Override
     public void mouseReleased(MouseEvent event) {
         // check tmp
-        if(this.tmp == null) return;
-        
+        if (this.tmp == null) return;
+
         // enable gui elements
         this.buttonRemove.setEnabled(true);
         this.buttonSave.setEnabled(true);
+        this.comboBoxType.setEnabled(true);
 
         // add mousepoint to map
         Point mousePoint = new Point(event.getXOnScreen(), event.getYOnScreen());
         SwingUtilities.convertPointFromScreen(mousePoint, this.paintLabel);
-        this.markedRectangles.add(new Rectangle(this.tmp.x, this.tmp.y, mousePoint.x - this.tmp.x, mousePoint.y - this.tmp.y));
+
+        // create variables
+        int x;
+        int y;
+        int width;
+        int height;
+
+        // set horizontal
+        if (this.tmp.x < mousePoint.x) {
+            x = this.tmp.x;
+            width = mousePoint.x - this.tmp.x;
+        } else {
+            x = mousePoint.x;
+            width = this.tmp.x - mousePoint.x;
+        }
+
+        // set vertical
+        if (this.tmp.y < mousePoint.y) {
+            y = this.tmp.y;
+            height = mousePoint.y - this.tmp.y;
+        } else {
+            y = mousePoint.y;
+            height = this.tmp.y - mousePoint.y;
+        }
+
+        this.markedRectangles.add(new Rectangle(x, y, width, height));
 
         // reset tmp
         this.tmp = null;
-        
+
         // update image
         this.updateImage();
     }
