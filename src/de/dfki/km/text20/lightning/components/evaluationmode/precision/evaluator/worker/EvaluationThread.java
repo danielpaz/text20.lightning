@@ -38,7 +38,6 @@ import net.jcores.interfaces.functions.F1;
 import net.jcores.options.Option;
 import net.jcores.options.OptionIndexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
-import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
@@ -96,29 +95,29 @@ public class EvaluationThread implements Runnable {
         int _type = -1;
 
         // create directories
-        new File("./evaluation/detector evaluation/Session_" + this.timestamp).mkdirs();
+        new File("./evaluation/results/detector evaluation/Session_" + this.timestamp).mkdirs();
 
         // write key file 
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- headings -\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, detector, distance, hit, offsetX, offsetY\r\n\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- filename -\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation.png\r\n\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- values -\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- dataset - \r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("files: " + this.files.size() + "\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("datasets overall: " + this.mainClass.getSize() + "\r\n\r\n");
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- headings -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, detector, distance, hit, offsetX, offsetY\r\n\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- filename -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation.png\r\n\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- values -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- dataset - \r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("files: " + this.files.size() + "\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("datasets overall: " + this.mainClass.getSize() + "\r\n\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
 
         // start all detectors and updfate keyfile
         for (int i = 0; i < this.selectedDetectors.size(); i++) {
             this.selectedDetectors.get(i).start();
-            $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + i + ", name: " + this.selectedDetectors.get(i).getInformation().getDisplayName() + "\r\n");
+            $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + i + ", name: " + this.selectedDetectors.get(i).getInformation().getDisplayName() + "\r\n");
         }
-        $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("\r\n- files -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("\r\n- files -\r\n");
 
         System.out.println();
         System.out.println();
@@ -131,7 +130,7 @@ public class EvaluationThread implements Runnable {
 
             System.out.println("- File " + file.getName() + " is the next one.");
 
-            $("./evaluation/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
+            $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
 
             // set type
             if (file.getName().contains("_Text_")) {
@@ -236,7 +235,7 @@ public class EvaluationThread implements Runnable {
 
                             // draw image
                             if (drawImages)
-                                drawPicture(detector, offset, "./evaluation/detector evaluation/Session_" + timestamp + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + ".png", subImage, translatedRectangle);
+                                drawPicture(detector, offset, "./evaluation/results/detector evaluation/Session_" + timestamp + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + ".png", subImage, translatedRectangle);
 
                             // check if should continue
                             if (!mainClass.isRunning())
@@ -257,7 +256,7 @@ public class EvaluationThread implements Runnable {
                 }
             }, i).expand(String.class).string().join("\r\n");
 
-            $("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+            $("./evaluation/results/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(output + "\r\n");
 
             if (!this.mainClass.isRunning()) return;
 

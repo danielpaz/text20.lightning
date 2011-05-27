@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation;
 
 import static net.jcores.CoreKeeper.$;
 
@@ -36,8 +36,7 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
-import de.dfki.km.text20.lightning.components.evaluationmode.precision.screenshotmarker.ScreenshotMarker;
-import de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui.QuicknessConfigGuiImpl;
+import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveConfigGuiImpl;
 
 /**
  * reads given xml file and returns included data
@@ -71,7 +70,7 @@ public class WordXMLParser {
      * @param configGui 
      * @param xmlFile 
      */
-    public void readFile(QuicknessConfigGuiImpl configGui, File xmlFile) {
+    public void readFile(LiveConfigGuiImpl configGui, File xmlFile) {
         // initialize variables
         this.data = new ArrayList<String>();
         this.fileName = xmlFile.getAbsolutePath();

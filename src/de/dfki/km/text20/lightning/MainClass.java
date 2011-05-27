@@ -44,8 +44,7 @@ import com.melloware.jintellitype.JIntellitype;
 
 import de.dfki.km.text20.lightning.components.FixationWatcher;
 import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
-import de.dfki.km.text20.lightning.components.evaluationmode.doubleblind.DoubleBlindMode;
-import de.dfki.km.text20.lightning.components.evaluationmode.quickness.QuicknessMode;
+import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.LiveMode;
 import de.dfki.km.text20.lightning.components.recalibrator.Recalibrator;
 import de.dfki.km.text20.lightning.components.submitreminder.SubmitReminder;
 import de.dfki.km.text20.lightning.components.warpmouse.WarpCommander;
@@ -94,9 +93,6 @@ public class MainClass {
     /** statistics plugin */
     private Statistics statistics;
 
-    /** necessary to identify the evaluation data */
-    private String evaluationType;
-
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
 
@@ -120,7 +116,7 @@ public class MainClass {
 
     /** ShutDownHook */
     private Thread hook;
-    
+
     /** session timestamp */
     private long timestamp;
 
@@ -258,7 +254,7 @@ public class MainClass {
 
                 // start reminder
                 this.reminder.init();
-                
+
                 // set timestamp
                 this.timestamp = System.currentTimeMillis();
 
@@ -491,6 +487,7 @@ public class MainClass {
     /**
      * Toggles mode between normal an evaluation mode.
      */
+    @SuppressWarnings("unused")
     public void toggleMode() {
         if (this.isNormalMode) {
 
@@ -508,6 +505,9 @@ public class MainClass {
             // shows change in tray and console
             this.showTrayMessage("Evaluation mode activated.");
 
+            // open evaluation
+            new LiveMode();
+
         } else {
 
             // shows change in tray and console
@@ -515,9 +515,6 @@ public class MainClass {
 
             // change mode
             this.isNormalMode = true;
-
-            // reset evaluator
-            this.resetEvaluator();
 
             // activate plugins
             this.internalPluginManager.getCurrentMouseWarper().start();
@@ -550,24 +547,6 @@ public class MainClass {
     }
 
     /**
-     * resets evaluator, used to notify new mode
-     */
-    @SuppressWarnings("unused")
-    public void resetEvaluator() {
-        if (this.isNormalMode) return;
-
-        // block hotkeys
-        Hotkey.getInstance().setBlockHotkeys(true);
-
-        // start choosed mode
-        if (this.evaluationType.equals(this.getEvaluationOptions().get(0))) {
-            new DoubleBlindMode();
-        } else if (this.evaluationType.equals(this.getEvaluationOptions().get(1))) {
-            new QuicknessMode();
-        }
-    }
-
-    /**
      * returns the actual properties which includes all configurations which can
      * be changed in the gui
      * 
@@ -578,16 +557,6 @@ public class MainClass {
     }
 
     /**
-     * @return the evaluationMode 
-     */
-    public String getEvaluationType() {
-        if (this.evaluationType == null) {
-            this.evaluationType = this.getEvaluationOptions().get(0);
-        }
-        return this.evaluationType;
-    }
-
-    /**
      * @return all available evaluation modi
      */
     public ArrayList<String> getEvaluationOptions() {
@@ -595,13 +564,6 @@ public class MainClass {
         options.add("double blind");
         options.add("quickness");
         return options;
-    }
-
-    /**
-     * @param type
-     */
-    public void setEvaluationType(String type) {
-        this.evaluationType = type;
     }
 
     /**

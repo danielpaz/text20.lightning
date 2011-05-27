@@ -39,7 +39,6 @@ import net.jcores.options.Option;
 import net.jcores.options.OptionIndexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.DetectorEvaluator;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
-import de.dfki.km.text20.lightning.plugins.saliency.textdetector.TextDetectorProperties;
 
 /**
  * This thread runs through all given files and detectors and evaluates them.
@@ -81,22 +80,22 @@ public class EvaluationThread implements Runnable {
         this.detector.start();
 
         // create directories
-        new File("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
+        new File("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
 
         // write key file
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- headings -\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\r\n\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- filename -\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation_coverage_height_width_sensitivity_line.png\r\n\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- values -\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- dataset - \r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("files: " + this.container.getFiles().size() + "\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.container.getAmount() + "\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("datasets overall: " + this.container.getSize() + "\r\n\r\n");
-        $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- files -\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- headings -\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\r\n\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- filename -\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation_coverage_height_width_sensitivity_line.png\r\n\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- values -\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- dataset - \r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("files: " + this.container.getFiles().size() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.container.getAmount() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("datasets overall: " + this.container.getSize() + "\r\n\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- files -\r\n");
 
         System.out.println();
         System.out.println();
@@ -109,7 +108,7 @@ public class EvaluationThread implements Runnable {
 
             System.out.println("- File " + file.getName() + " is the next one.");
 
-            $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
+            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
 
             // set type
             if (file.getName().contains("_Text_")) {
@@ -220,7 +219,7 @@ public class EvaluationThread implements Runnable {
                                             
                                             // draw image
                                             if (container.isDrawImages())
-                                                drawPicture(offset, "./evaluation/text detector evaluation/Session_" + container.getTimestamp() + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
+                                                drawPicture(offset, "./evaluation/results/text detector evaluation/Session_" + container.getTimestamp() + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
 
                                             // check if should continue
                                             if (!DetectorEvaluator.getInstance().isRunning())
@@ -258,7 +257,7 @@ public class EvaluationThread implements Runnable {
                 }
             }, i).expand(String.class).string().join("\r\n");
 
-            $("./evaluation/text detector evaluation/Session_" + this.container.getTimestamp()  + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp()  + "/DetectorEvaluation.txt").file().append(output + "\r\n");
 
             if (!DetectorEvaluator.getInstance().isRunning()) return;
 

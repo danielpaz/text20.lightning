@@ -117,11 +117,6 @@ public class ConfigWindow {
         labelWarpMethod = new JLabel();
         comboBoxWarpMethod = new JComboBox();
         buttonWarpConfig = new JButton();
-        panel3 = new JPanel();
-        labelEvaluation = new JLabel();
-        checkBoxEvaluation = new JCheckBox();
-        labelMode = new JLabel();
-        comboBoxMode = new JComboBox();
         panel4 = new JPanel();
         labelDetector = new JLabel();
         comboBoxDetector = new JComboBox();
@@ -148,7 +143,7 @@ public class ConfigWindow {
                 {
                     contentPanel.setLayout(new FormLayout(
                         "3*(20dlu:grow, $lcgap), 20dlu:grow",
-                        "top:default, $lgap, top:48dlu, $lgap, default:grow, 2*($lgap, default)"));
+                        "top:default, $lgap, top:48dlu:grow, $lgap, default"));
                     ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
 
                     //======== panel1 ========
@@ -211,7 +206,7 @@ public class ConfigWindow {
                         buttonClearRecalibration.setText("Clear Recalibration");
                         panel1.add(buttonClearRecalibration, cc.xy(3, 11));
                     }
-                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.TOP));
+                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
                     //======== panel2 ========
                     {
@@ -244,33 +239,6 @@ public class ConfigWindow {
                     }
                     contentPanel.add(panel2, cc.xywh(5, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
 
-                    //======== panel3 ========
-                    {
-                        panel3.setBorder(new TitledBorder("Evaluation "));
-                        panel3.setLayout(new FormLayout(
-                            "80dlu:grow, $lcgap, 80dlu:grow",
-                            "default, $lgap, default"));
-
-                        //---- labelEvaluation ----
-                        labelEvaluation.setText("Evaluation Mode");
-                        panel3.add(labelEvaluation, cc.xywh(1, 1, 2, 1));
-
-                        //---- checkBoxEvaluation ----
-                        checkBoxEvaluation.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                checkBoxTrainingActionPerformed(e);
-                            }
-                        });
-                        panel3.add(checkBoxEvaluation, cc.xy(3, 1));
-
-                        //---- labelMode ----
-                        labelMode.setText("Evaluation Mode");
-                        panel3.add(labelMode, cc.xywh(1, 3, 2, 1));
-                        panel3.add(comboBoxMode, cc.xy(3, 3));
-                    }
-                    contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
-
                     //======== panel4 ========
                     {
                         panel4.setBorder(new TitledBorder("Cursor Warping"));
@@ -295,7 +263,7 @@ public class ConfigWindow {
                         buttonDetectorConfig.setText("Configuration");
                         panel4.add(buttonDetectorConfig, cc.xy(3, 3));
                     }
-                    contentPanel.add(panel4, cc.xywh(1, 5, 3, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
+                    contentPanel.add(panel4, cc.xywh(5, 3, 3, 1, CellConstraints.FILL, CellConstraints.FILL));
 
                     //---- buttonSubmit ----
                     buttonSubmit.setText("Submit");
@@ -305,7 +273,7 @@ public class ConfigWindow {
                             buttonSubmitActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonSubmit, cc.xywh(5, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    contentPanel.add(buttonSubmit, cc.xywh(1, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonDefault ----
                     buttonDefault.setText("Default");
@@ -315,7 +283,7 @@ public class ConfigWindow {
                             buttonDefaultActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonDefault, cc.xywh(7, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    contentPanel.add(buttonDefault, cc.xywh(3, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonOK ----
                     buttonOK.setText("OK");
@@ -325,7 +293,7 @@ public class ConfigWindow {
                             buttonOKActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonOK, cc.xywh(5, 9, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    contentPanel.add(buttonOK, cc.xywh(5, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonCancel ----
                     buttonCancel.setText("Cancel");
@@ -335,12 +303,12 @@ public class ConfigWindow {
                             buttonCancelActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonCancel, cc.xywh(7, 9, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    contentPanel.add(buttonCancel, cc.xywh(7, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
                 }
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(610, 315);
+            mainFrame.setSize(610, 275);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -369,11 +337,6 @@ public class ConfigWindow {
     protected JLabel labelWarpMethod;
     protected JComboBox comboBoxWarpMethod;
     protected JButton buttonWarpConfig;
-    private JPanel panel3;
-    protected JLabel labelEvaluation;
-    protected JCheckBox checkBoxEvaluation;
-    protected JLabel labelMode;
-    protected JComboBox comboBoxMode;
     private JPanel panel4;
     protected JLabel labelDetector;
     protected JComboBox comboBoxDetector;

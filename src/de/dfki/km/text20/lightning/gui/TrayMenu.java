@@ -58,11 +58,15 @@ public class TrayMenu {
             // adds configuration to the menu
             final MenuItem configMenu = new MenuItem("Configuration");
             configMenu.addActionListener(new ActionListener() {
-
+                
                 // the gui is builded here, because it is only there for configuration and this wont be done often
                 @SuppressWarnings("unused")
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    // check for evaluation
+                    if(!MainClass.getInstance().isNormalMode())return;
+                    
+                    // open gui
                     if (MainClass.getInstance().isAllFine()) new ConfigWindowImpl();
                 }
             });
@@ -83,24 +87,23 @@ public class TrayMenu {
                     }
                 }
             });
-            menu.add(changeState);
+            menu.add(changeState);*/
 
             // adds change mode to the menu
-            final MenuItem changeMode = new MenuItem("Change Modus: Evaluation");
+            final MenuItem changeMode = new MenuItem("Evaluation");
             changeMode.addActionListener(new ActionListener() {
 
                 // depending on the current mode, the label for the next mode is printed and the modus is changed 
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    // check for evaluation
+                    if(!MainClass.getInstance().isNormalMode())return;
+                    
+                    // toggle mode
                     MainClass.getInstance().toggleMode();
-                    if (MainClass.getInstance().isNormalMode()) {
-                        changeMode.setLabel("Change Modus: Evaluation");
-                    } else {
-                        changeMode.setLabel("Change Modus: Normal");
-                    }
                 }
             });
-            menu.add(changeMode);*/
+            menu.add(changeMode);
 
             // adds exit to the menu
             final MenuItem exit = new MenuItem("Exit");

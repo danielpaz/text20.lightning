@@ -1,5 +1,5 @@
 /*
- * QuicknessContentGuiImpl.java
+ * LiveContentGuiImpl.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui;
 
 import static net.jcores.CoreKeeper.$;
 
@@ -43,7 +43,7 @@ import javax.swing.text.View;
  * @author Christoph Käding
  */
 @SuppressWarnings("serial")
-public class QuicknessContentGuiImpl extends QuicknessContentGui implements CaretListener {
+public class LiveContentGuiImpl extends LiveContentGui implements CaretListener {
 
     /** */
     private long timestamp;
@@ -52,7 +52,7 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
     private String word;
 
     /** */
-    private QuicknessStepGuiImpl mainWindow;
+    private LiveStepGuiImpl mainWindow;
 
     /** */
     private int formerCarretPosition;
@@ -72,7 +72,7 @@ public class QuicknessContentGuiImpl extends QuicknessContentGui implements Care
     /**
      * @param evalMainWin 
      */
-    public QuicknessContentGuiImpl(QuicknessStepGuiImpl evalMainWin) {
+    public LiveContentGuiImpl(LiveStepGuiImpl evalMainWin) {
         // initialize variables
         this.mainWindow = evalMainWin;
         this.autoUpdate = false;
