@@ -301,6 +301,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.spinnerDimension.setEnabled(false);
             this.checkBoxConfiguration.setEnabled(false);
             this.buttonConfiguration.setEnabled(false);
+            this.labelAmount.setEnabled(false);
+            this.spinnerAmount.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -309,7 +311,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         } else {
 
             // ... reset to startable state
-            this.evaluationThread.stop();
             this.running = false;
             this.currentTimeStamp = System.currentTimeMillis();
             this.progressBar.setValue(0);
@@ -325,6 +326,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.spinnerDimension.setEnabled(true);
             this.checkBoxConfiguration.setEnabled(true);
             this.buttonConfiguration.setEnabled(true);
+            this.labelAmount.setEnabled(true);
+            this.spinnerAmount.setEnabled(true);
         }
     }
 
@@ -605,7 +608,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     private void exit() {
         this.pluginManager.shutdown();
-        this.evaluationThread.stop();
         this.mainFrame.dispose();
         System.out.println("Application closed.");
         System.exit(0);
@@ -641,7 +643,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     public void windowClosing(WindowEvent arg0) {
         this.running = false;
         this.pluginManager.shutdown();
-        this.evaluationThread.stop();
         System.out.println("Application closed.");
         System.exit(0);
     }
@@ -735,5 +736,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public long getCurrentTimeStamp() {
         return this.currentTimeStamp;
+    }
+
+    /**
+     * @return the running
+     */
+    public boolean isRunning() {
+        return this.running;
     }
 }

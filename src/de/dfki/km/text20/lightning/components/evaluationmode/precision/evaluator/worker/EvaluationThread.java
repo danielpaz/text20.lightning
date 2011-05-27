@@ -33,12 +33,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import net.jcores.interfaces.functions.F1;
 import net.jcores.options.Option;
 import net.jcores.options.OptionIndexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker.DataXMLParser;
+import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
 /**
@@ -57,9 +59,6 @@ public class EvaluationThread implements Runnable {
 
     /** given main class */
     private EvaluatorMain mainClass;
-
-    /** indicates if the thread should be stopped */
-    private boolean stop;
 
     /** */
     private int dimension;
@@ -87,25 +86,16 @@ public class EvaluationThread implements Runnable {
         this.timestamp = main.getCurrentTimeStamp();
     }
 
-    /**
-     * stops the processing
-     */
-    public void stop() {
-        this.stop = true;
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
-    @SuppressWarnings("boxing")
+    @SuppressWarnings({ "boxing", "unqualified-field-access" })
     @Override
     public void run() {
         // initialize Variables
         final DataXMLParser dataParser = new DataXMLParser();
         int _pictureCount = 0;
         int _type = -1;
-        
-        this.stop = false;
 
         // create directories
         new File("./evaluation/detector evaluation/Session_" + this.timestamp).mkdirs();
@@ -154,10 +144,12 @@ public class EvaluationThread implements Runnable {
 
             final int pictureCount = _pictureCount;
             final int type = _type;
-            
+
             final OptionIndexer i = Option.INDEXER();
-            String output = $(dataParser.readFile(file)).map(new F1<Rectangle, String[]> (){
-                public String[] f(Rectangle rectangle){
+            String output = $(dataParser.readFile(file)).map(new F1<Rectangle, String[]>() {
+
+                @SuppressWarnings("synthetic-access")
+                public String[] f(Rectangle rectangle) {
                     Point offset;
                     int detectorCount = 0;
                     int hit;
@@ -169,110 +161,111 @@ public class EvaluationThread implements Runnable {
                     String input;
                     ArrayList<String> rval = new ArrayList<String>();
 
-                        // read screenshot
-                        final BufferedImage screenShot = dataParser.getRelatedImage(file);
-                        BufferedImage subImage;
+                    // read screenshot
+                    BufferedImage screenShot = dataParser.getRelatedImage(file);
+                    BufferedImage subImage;
 
-                        // reste fixations
-                        int fixationCount = 0;
+                    // reste fixations
+                    int fixationCount = 0;
 
-                        // create target
-                        Point target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+                    // create target
+                    Point target = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
 
-                        // run through all calculated fixations
-                        for (Point fixation : calculateFixations(screenShot, target)) {
+                    // run through all calculated fixations
+                    for (Point fixation : calculateFixations(screenShot, target)) {
 
-                            System.out.println(fixation + " " + screenShot.getWidth() + " " + screenShot.getHeight());
+                        // transform screenshot
+                        try {
+                            subImage = new BufferedImage(screenShot.getWidth() + dimension, screenShot.getHeight() + dimension, screenShot.getType());
+                            Graphics2D graphics = subImage.createGraphics();
+                            graphics.drawImage(screenShot, dimension / 2, dimension / 2, null);
+                            subImage = subImage.getSubimage(fixation.x, fixation.y, dimension, dimension);
 
-                            // transform screenshot
-                            try {
-                                subImage = new BufferedImage(screenShot.getWidth() + dimension, screenShot.getHeight() + dimension, screenShot.getType());
-                                Graphics2D graphics = subImage.createGraphics();
-                                graphics.drawImage(screenShot, dimension / 2, dimension / 2, null);
-                                subImage = subImage.getSubimage(fixation.x, fixation.y, dimension, dimension);
-                            } catch (RasterFormatException e) {
-                                e.printStackTrace();
-                                return null;
+                            if (subImage == null) {
+                                System.out.println(rectangle + " " + fixation + " " + i.i());
                             }
-
-                            // reset detector
-                            detectorCount = 0;
-                            
-
-                            // ... and every detector
-                            for (SaliencyDetector detector : selectedDetectors) {
-
-                                // calculate offset
-                                offset = detector.analyse(subImage);
-                                offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
-
-                                // translate
-                                translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
-                                translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
-
-                                // calculate distance
-                                distance = offset.distance(translatedRelated);
-
-                                // calculate x offset
-                                if (offset.x < translatedRectangle.x) {
-                                    offsetX = translatedRectangle.x - translatedRectangle.x;
-                                } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
-                                    offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
-                                } else {
-                                    offsetX = 0;
-                                }
-
-                                // calculate y offset
-                                if (offset.y < translatedRectangle.y) {
-                                    offsetY = offset.y - translatedRectangle.y;
-                                } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
-                                    offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
-                                } else {
-                                    offsetY = 0;
-                                }
-
-                                // calculate hit
-                                if ((offsetX == 0) && (offsetY == 0)) {
-                                    hit = 1;
-                                } else {
-                                    hit = 0;
-                                }
-
-                                // update file
-                                input = $(type, pictureCount, i.i(), fixationCount, detectorCount, distance, hit, offsetX, offsetY).string().join(",");
-                                //$("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(input + "\r\n");
-
-                                rval.add(input);
-                                
-                                // draw image
-                                if (drawImages)
-                                    drawPicture(detector, offset, "./evaluation/detector evaluation/Session_" + timestamp + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + ".png", subImage, translatedRectangle);
-
-                                // check if should continue
-                                if (stop) return null;
-
-                                // update progress bar
-                                mainClass.updateProgressBar();
-
-                                // next detector
-                                detectorCount++;
-                            }
-
-                            // step forward
-                            fixationCount++;
+                        } catch (RasterFormatException e) {
+                            e.printStackTrace();
+                            return $(rval).array(String.class);
                         }
-                        
-                        return $(rval).array(String.class);
+
+                        // reset detector
+                        detectorCount = 0;
+
+                        // ... and every detector
+                        for (SaliencyDetector detector : selectedDetectors) {
+
+                            // calculate offset
+                            offset = detector.analyse(subImage);
+                            offset.translate(subImage.getHeight() / 2, subImage.getWidth() / 2);
+
+                            // translate
+                            translatedRelated = new Point(target.x - fixation.x + subImage.getHeight() / 2, target.y - fixation.y + subImage.getWidth() / 2);
+                            translatedRectangle = new Rectangle(translatedRelated.x - rectangle.width / 2, translatedRelated.y - rectangle.height / 2, rectangle.width, rectangle.height);
+
+                            // calculate distance
+                            distance = offset.distance(translatedRelated);
+
+                            // calculate x offset
+                            if (offset.x < translatedRectangle.x) {
+                                offsetX = translatedRectangle.x - translatedRectangle.x;
+                            } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
+                                offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
+                            } else {
+                                offsetX = 0;
+                            }
+
+                            // calculate y offset
+                            if (offset.y < translatedRectangle.y) {
+                                offsetY = offset.y - translatedRectangle.y;
+                            } else if (offset.y > (translatedRectangle.y + translatedRectangle.height)) {
+                                offsetY = offset.y - (translatedRectangle.y + translatedRectangle.height);
+                            } else {
+                                offsetY = 0;
+                            }
+
+                            // calculate hit
+                            if ((offsetX == 0) && (offsetY == 0)) {
+                                hit = 1;
+                            } else {
+                                hit = 0;
+                            }
+
+                            // update file
+                            input = $(type, pictureCount, i.i(), fixationCount, detectorCount, distance, hit, offsetX, offsetY).string().join(",");
+                            //$("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(input + "\r\n");
+
+                            rval.add(input);
+
+                            // draw image
+                            if (drawImages)
+                                drawPicture(detector, offset, "./evaluation/detector evaluation/Session_" + timestamp + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + ".png", subImage, translatedRectangle);
+
+                            // check if should continue
+                            if (!mainClass.isRunning())
+                                return $(rval).array(String.class);
+
+                            // update progress bar
+                            mainClass.updateProgressBar();
+
+                            // next detector
+                            detectorCount++;
+                        }
+
+                        // step forward
+                        fixationCount++;
                     }
+
+                    return $(rval).array(String.class);
+                }
             }, i).expand(String.class).string().join("\r\n");
 
-            
             $("./evaluation/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt").file().append(output + "\r\n");
 
             // step forward
             _pictureCount++;
 
-            // System.out.println("- File " + file.getName() + " finished.\r\n");
+            System.out.println("- File " + file.getName() + " finished.\r\n");
         }
 
         // stop all detectors
