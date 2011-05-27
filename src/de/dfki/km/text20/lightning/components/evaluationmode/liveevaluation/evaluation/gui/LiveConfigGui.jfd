@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>1dlu, linegap, default:grow, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 1dlu</string> 
+        <string>1dlu, linegap, default:grow, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 1dlu</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -143,10 +143,10 @@
         <string>javax.swing.JLabel</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>Detector</string> 
+         <string>Algorithm A</string> 
         </void> 
         <void property="name"> 
-         <string>labelDetector</string> 
+         <string>labelOne</string> 
         </void> 
         <void method="auxiliary"> 
          <void method="setProperty"> 
@@ -175,7 +175,7 @@
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JComboBox</string> 
         <void property="name"> 
-         <string>comboBoxDetector</string> 
+         <string>comboBoxOne</string> 
         </void> 
         <void method="auxiliary"> 
          <void method="setProperty"> 
@@ -204,7 +204,7 @@
          <string>Configuration</string> 
         </void> 
         <void property="name"> 
-         <string>buttonDetector</string> 
+         <string>buttonOneConfig</string> 
         </void> 
         <void method="auxiliary"> 
          <void method="setProperty"> 
@@ -230,10 +230,10 @@
         <string>javax.swing.JLabel</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>start with Detector</string> 
+         <string>Algorithm B</string> 
         </void> 
         <void property="name"> 
-         <string>label1</string> 
+         <string>labelTwo</string> 
         </void> 
         <void method="auxiliary"> 
          <void method="setProperty"> 
@@ -252,13 +252,17 @@
          <string>gridY</string> 
          <int>11</int> 
         </void> 
+        <void method="setProperty"> 
+         <string>gridHeight</string> 
+         <int>3</int> 
+        </void> 
        </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JCheckBox</string> 
+        <string>javax.swing.JComboBox</string> 
         <void property="name"> 
-         <string>checkBoxStartWithDetector</string> 
+         <string>comboBoxTwo</string> 
         </void> 
         <void method="auxiliary"> 
          <void method="setProperty"> 
@@ -276,6 +280,35 @@
         <void method="setProperty"> 
          <string>gridY</string> 
          <int>11</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormComponent"> 
+        <string>javax.swing.JButton</string> 
+        <void method="setProperty"> 
+         <string>text</string> 
+         <string>Configuration</string> 
+        </void> 
+        <void property="name"> 
+         <string>buttonTwoConfig</string> 
+        </void> 
+        <void method="auxiliary"> 
+         <void method="setProperty"> 
+          <string>JavaCodeGenerator.variableModifiers</string> 
+          <int>4</int> 
+         </void> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>13</int> 
         </void> 
        </object> 
       </void> 
@@ -304,7 +337,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>13</int> 
+         <int>15</int> 
         </void> 
        </object> 
       </void> 
@@ -340,7 +373,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>13</int> 
+         <int>15</int> 
         </void> 
        </object> 
       </void> 
@@ -369,7 +402,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>15</int> 
+         <int>17</int> 
         </void> 
        </object> 
       </void> 
@@ -398,7 +431,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>15</int> 
+         <int>17</int> 
         </void> 
        </object> 
       </void> 

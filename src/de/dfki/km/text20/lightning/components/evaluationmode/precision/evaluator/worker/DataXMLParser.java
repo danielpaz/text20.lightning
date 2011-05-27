@@ -20,7 +20,6 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,7 +35,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.w3c.dom.css.Rect;
 import org.xml.sax.SAXException;
 
 /**
@@ -85,9 +83,6 @@ public class DataXMLParser {
     /** indicates that the next entry should be the amount of data */
     private boolean amount;
 
-    /** temporary stored amount */
-    private int amountTmp;
-
     /**
      * tries to read the included StorageContainer of the given XML-file
      * 
@@ -108,7 +103,6 @@ public class DataXMLParser {
         this.heightTmp = 0;
         this.widthTmp = 0;
         this.amount = false;
-        this.amountTmp = 0;
         this.relatedFile = false;
         this.relatedFileTmp = "";
         FileInputStream inputStream = null;
@@ -222,9 +216,6 @@ public class DataXMLParser {
 
             // if the readed characters should be the amount ...
             if (this.amount) {
-
-                // ... store it
-                this.amountTmp = Integer.parseInt(value);
 
                 // return success
                 return true;

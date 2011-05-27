@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Sat May 14 15:15:39 CEST 2011
  */
 
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -12,8 +12,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class QuicknessStepGui extends JFrame {
-    public QuicknessStepGui() {
+public class LiveStepGui extends JFrame {
+    public LiveStepGui() {
         initComponents();
     }
 

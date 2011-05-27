@@ -108,7 +108,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.comboBoxActionHotkey.addActionListener(this);
         this.comboBoxStatusHotkey.addActionListener(this);
         this.checkBoxUseWarp.addActionListener(this);
-        this.checkBoxEvaluation.addActionListener(this);
         this.buttonDetectorConfig.addActionListener(this);
         this.buttonWarpConfig.addActionListener(this);
         this.comboBoxWarpMethod.addActionListener(this);
@@ -117,17 +116,10 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.buttonClearRecalibration.addActionListener(this);
 
         // initialize checkbox
-        this.checkBoxEvaluation.setSelected(!this.main.isNormalMode());
-        this.checkBockEvaluationActionPerformed();
         this.checkBoxSound.setSelected(this.properties.isSoundActivated());
 
         // initializes tooltips
         this.manageToolTips();
-
-        // initialize current evaluation settings
-        for (String option : this.main.getEvaluationOptions())
-            this.comboBoxMode.addItem(option);
-        this.comboBoxMode.setSelectedItem(this.main.getEvaluationType());
 
         // initialize timer
         this.timer = new Timer(500, new ActionListener() {
@@ -194,11 +186,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
             return;
         }
 
-        if (event.getSource() == this.checkBoxEvaluation) {
-            this.checkBockEvaluationActionPerformed();
-            return;
-        }
-
         if (event.getSource() == this.buttonWarpConfig) {
             this.buttonWarpConfigActionPerformed();
             return;
@@ -241,24 +228,12 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.internalPluginManager.setCurrentSaliencyDetector(((PluginInformation) this.comboBoxDetector.getSelectedItem()).getId());
         this.internalPluginManager.setCurrentMouseWarper(((PluginInformation) this.comboBoxWarpMethod.getSelectedItem()).getId());
 
-        // set evaluation settings
-        this.main.setEvaluationType(this.comboBoxMode.getSelectedItem().toString());
-
         // refresh warper and plugins
         this.main.refreshWarper();
-
-        // set mode
-        if (this.main.isNormalMode() && this.checkBoxEvaluation.isSelected())
-            this.main.toggleMode();
-        if (!this.main.isNormalMode() && !this.checkBoxEvaluation.isSelected())
-            this.main.toggleMode();
 
         // update statistics
         this.main.addToStatistic("settings changed");
         this.main.setupStatistics();
-
-        // reset evaluator
-        if (this.checkBoxEvaluation.isSelected()) this.main.resetEvaluator();
 
         // close the gui
         this.mainFrame.dispose();
@@ -361,33 +336,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     private void comboBoxActionHotkeyActionPerformed() {
         Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()), false);
         this.manageHotkeyComboBox();
-    }
-
-    /**
-     * fired if the checkbock evaluation is selected
-     */
-    private void checkBockEvaluationActionPerformed() {
-        // change enable status of some components
-        this.checkBoxUseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
-        this.labelDetector.setEnabled(!this.checkBoxEvaluation.isSelected());
-        this.comboBoxDetector.setEnabled(!this.checkBoxEvaluation.isSelected());
-        if (!this.checkBoxEvaluation.isSelected() && this.internalPluginManager.getCurrentSaliencyDetector().getInformation().isGuiAvailable()) this.buttonDetectorConfig.setEnabled(true);
-        else
-            this.buttonDetectorConfig.setEnabled(false);
-        this.labelMode.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.comboBoxMode.setEnabled(this.checkBoxEvaluation.isSelected());
-        this.labelEnableMouseWarp.setEnabled(!this.checkBoxEvaluation.isSelected());
-        this.checkBoxUseWarpActionPerformed();
-        if (!this.checkBoxEvaluation.isSelected() && this.checkBoxUseWarp.isSelected()) this.enableWarpConfig(true);
-        else
-            this.enableWarpConfig(false);
-        this.buttonSubmit.setEnabled(!this.checkBoxEvaluation.isSelected());
-        if (!this.checkBoxEvaluation.isSelected()) {
-            this.buttonOK.setText("OK");
-        } else {
-            this.buttonOK.setText("Start");
-        }
-
     }
 
     /**
@@ -544,7 +492,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         String labelDetectorTT = "<HTML><body>Method to check the radius around the fixation point.</body></HTML>";
         String labelEnableMouseWarpTT = "<HTML><body>Enables/Disables the mouse warp permanently.</body></HTML>";
         String labelWarpMethodTT = "<HTML><body>Method which is used to warp the mouse.</body></HTML>";
-        String labelEvaluationTT = "<HTML><body>This activates the evaluation mode.<br>This mode is used to collect data<br>which can be evaluated later.</body></HTML>";
         String labelSoundTT = "<HTML><body>Enables/Disables the sound notifications.</body></HTML>";
         String buttonSubmitTT = "<HTML><body>Submits collected statistic data<br>to the statistic-server.</body></HTML>";
         String labelRecalibrationTT = "<HTML><body>Every cursor warp and evaluation<br>step recalibrates the Trackingserver<br>if this checkboxs is selected.<br>This feature will only work with<br>Trackingserver 1.4 or higher.</HTML></body>";
@@ -558,7 +505,6 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
         this.labelDetector.setToolTipText(labelDetectorTT);
         this.labelEnableMouseWarp.setToolTipText(labelEnableMouseWarpTT);
         this.labelWarpMethod.setToolTipText(labelWarpMethodTT);
-        this.labelEvaluation.setToolTipText(labelEvaluationTT);
         this.labelSound.setToolTipText(labelSoundTT);
         this.buttonSubmit.setToolTipText(buttonSubmitTT);
         this.labelRecalibration.setToolTipText(labelRecalibrationTT);

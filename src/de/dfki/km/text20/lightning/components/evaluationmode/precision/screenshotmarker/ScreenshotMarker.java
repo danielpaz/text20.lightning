@@ -54,7 +54,9 @@ import de.dfki.km.text20.lightning.components.evaluationmode.precision.screensho
 /**
  * Utility to mark point in a screenshot and store its coordinates to a xml file.
  * 
- * FIXME: horizontal scrollbar doesn't work probably
+ * FIXME: something strange with scrollbars 
+ *  - if the image is smaller than the screen, there is an offset (seems to be the distance between scrollpane and image border)
+ *  - horizontal scrollbar doesn't resize if window is not big enough
  * 
  * @author Christoph Käding
  */

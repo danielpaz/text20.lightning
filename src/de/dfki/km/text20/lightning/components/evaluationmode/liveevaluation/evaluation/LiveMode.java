@@ -1,5 +1,5 @@
 /*
- * QuicknessMode.java
+ * LiveMode.java
  * 
  * Copyright (c) 2011, Christoph Käding, DFKI. All rights reserved.
  *
@@ -18,20 +18,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui.QuicknessConfigGuiImpl;
-import de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui.QuicknessStepGuiImpl;
+import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveConfigGuiImpl;
+import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveStepGuiImpl;
 
 /**
  * opens config dialog, then evaluation gui
  * 
  * @author Christoph Käding
  */
-public class QuicknessMode {
+public class LiveMode {
 
     /** 
      * stored words for evaluation
@@ -44,19 +44,22 @@ public class QuicknessMode {
     /** */
     private int steps;
 
-    /** */
-    private boolean startWithDetector;
+    /** id of algorithm one */
+    private int one;
+
+    /** id of algorithm two */
+    private int two;
 
     /**
      * creates instance, initializes some stuff and opens config gui
      */
     @SuppressWarnings("unused")
-    public QuicknessMode() {
+    public LiveMode() {
         // initialize variables 
         this.data = new HashMap<String, ArrayList<String>>();
 
         // open config gui
-        new QuicknessConfigGuiImpl(this);
+        new LiveConfigGuiImpl(this);
     }
 
     /**
@@ -64,7 +67,7 @@ public class QuicknessMode {
      */
     @SuppressWarnings("unused")
     public void start() {
-        new QuicknessStepGuiImpl(this.steps, this.startWithDetector, this.data);
+        new LiveStepGuiImpl(this.steps, this.data, this.one, this.two);
     }
 
     /**
@@ -84,9 +87,16 @@ public class QuicknessMode {
     }
 
     /**
-     * @param startWithDetector the startWithDetector to set
+     * @param one the one to set
      */
-    public void setStartWithDetector(boolean startWithDetector) {
-        this.startWithDetector = startWithDetector;
+    public void setOne(int one) {
+        this.one = one;
+    }
+
+    /**
+     * @param two the two to set
+     */
+    public void setTwo(int two) {
+        this.two = two;
     }
 }

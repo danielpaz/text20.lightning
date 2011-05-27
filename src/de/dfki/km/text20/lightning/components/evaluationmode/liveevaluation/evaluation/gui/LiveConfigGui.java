@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Sat May 14 15:09:43 CEST 2011
  */
 
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -12,8 +12,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class QuicknessConfigGui extends JFrame {
-    public QuicknessConfigGui() {
+public class LiveConfigGui extends JFrame {
+    public LiveConfigGui() {
         initComponents();
     }
 
@@ -24,11 +24,12 @@ public class QuicknessConfigGui extends JFrame {
         listFiles = new JList();
         buttonSelect = new JButton();
         buttonRemove = new JButton();
-        labelDetector = new JLabel();
-        comboBoxDetector = new JComboBox();
-        buttonDetector = new JButton();
-        label1 = new JLabel();
-        checkBoxStartWithDetector = new JCheckBox();
+        labelOne = new JLabel();
+        comboBoxOne = new JComboBox();
+        buttonOneConfig = new JButton();
+        labelTwo = new JLabel();
+        comboBoxTwo = new JComboBox();
+        buttonTwoConfig = new JButton();
         labelSteps = new JLabel();
         spinnerSteps = new JSpinner();
         buttonOK = new JButton();
@@ -41,7 +42,7 @@ public class QuicknessConfigGui extends JFrame {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "1dlu, 2*($lcgap, 60dlu:grow), $lcgap, 1dlu",
-            "1dlu, $lgap, default:grow, 6*($lgap, default), $lgap, 1dlu"));
+            "1dlu, $lgap, default:grow, 7*($lgap, default), $lgap, 1dlu"));
 
         //======== scrollPane1 ========
         {
@@ -57,35 +58,39 @@ public class QuicknessConfigGui extends JFrame {
         buttonRemove.setText("Remove");
         contentPane.add(buttonRemove, cc.xy(5, 5));
 
-        //---- labelDetector ----
-        labelDetector.setText("Detector");
-        contentPane.add(labelDetector, cc.xywh(3, 7, 1, 3));
-        contentPane.add(comboBoxDetector, cc.xy(5, 7));
+        //---- labelOne ----
+        labelOne.setText("Algorithm A");
+        contentPane.add(labelOne, cc.xywh(3, 7, 1, 3));
+        contentPane.add(comboBoxOne, cc.xy(5, 7));
 
-        //---- buttonDetector ----
-        buttonDetector.setText("Configuration");
-        contentPane.add(buttonDetector, cc.xy(5, 9));
+        //---- buttonOneConfig ----
+        buttonOneConfig.setText("Configuration");
+        contentPane.add(buttonOneConfig, cc.xy(5, 9));
 
-        //---- label1 ----
-        label1.setText("start with Detector");
-        contentPane.add(label1, cc.xy(3, 11));
-        contentPane.add(checkBoxStartWithDetector, cc.xy(5, 11));
+        //---- labelTwo ----
+        labelTwo.setText("Algorithm B");
+        contentPane.add(labelTwo, cc.xywh(3, 11, 1, 3));
+        contentPane.add(comboBoxTwo, cc.xy(5, 11));
+
+        //---- buttonTwoConfig ----
+        buttonTwoConfig.setText("Configuration");
+        contentPane.add(buttonTwoConfig, cc.xy(5, 13));
 
         //---- labelSteps ----
         labelSteps.setText("Steps");
-        contentPane.add(labelSteps, cc.xy(3, 13));
+        contentPane.add(labelSteps, cc.xy(3, 15));
 
         //---- spinnerSteps ----
         spinnerSteps.setModel(new SpinnerNumberModel(1, 1, null, 1));
-        contentPane.add(spinnerSteps, cc.xy(5, 13));
+        contentPane.add(spinnerSteps, cc.xy(5, 15));
 
         //---- buttonOK ----
         buttonOK.setText("Start");
-        contentPane.add(buttonOK, cc.xy(3, 15));
+        contentPane.add(buttonOK, cc.xy(3, 17));
 
         //---- buttonCancel ----
         buttonCancel.setText("Cancel");
-        contentPane.add(buttonCancel, cc.xy(5, 15));
+        contentPane.add(buttonCancel, cc.xy(5, 17));
         setSize(465, 300);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -97,11 +102,12 @@ public class QuicknessConfigGui extends JFrame {
     protected JList listFiles;
     protected JButton buttonSelect;
     protected JButton buttonRemove;
-    protected JLabel labelDetector;
-    protected JComboBox comboBoxDetector;
-    protected JButton buttonDetector;
-    protected JLabel label1;
-    protected JCheckBox checkBoxStartWithDetector;
+    protected JLabel labelOne;
+    protected JComboBox comboBoxOne;
+    protected JButton buttonOneConfig;
+    protected JLabel labelTwo;
+    protected JComboBox comboBoxTwo;
+    protected JButton buttonTwoConfig;
     protected JLabel labelSteps;
     protected JSpinner spinnerSteps;
     protected JButton buttonOK;

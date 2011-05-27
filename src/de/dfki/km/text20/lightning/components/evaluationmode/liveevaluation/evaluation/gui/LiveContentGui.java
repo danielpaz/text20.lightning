@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Sat May 14 15:28:48 CEST 2011
  */
 
-package de.dfki.km.text20.lightning.components.evaluationmode.quickness.gui;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui;
 
 import javax.swing.*;
 import com.jgoodies.forms.layout.*;
@@ -11,8 +11,8 @@ import com.jgoodies.forms.layout.*;
  * @author Ralf Biedert
  */
 @SuppressWarnings("all")
-public class QuicknessContentGui extends JPanel {
-    public QuicknessContentGui() {
+public class LiveContentGui extends JPanel {
+    public LiveContentGui() {
         initComponents();
     }
 
