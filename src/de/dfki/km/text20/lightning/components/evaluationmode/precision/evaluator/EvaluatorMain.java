@@ -35,7 +35,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -47,10 +46,8 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.gui.EvaluationWindow;
-import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.plugins.CoverageAnalyser;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.DataXMLParser;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.EvaluationThread;
-import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker.EvaluatorWorker;
 import de.dfki.km.text20.lightning.plugins.PluginInformation;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
@@ -77,23 +74,11 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     /** list of available detectors */
     private ArrayList<SaliencyDetector> saliencyDetectors;
 
-    /** list of available detectors */
-    private ArrayList<CoverageAnalyser> coverageDetectors;
-
     /** list of plugin information of the available detectors */
     private ArrayList<PluginInformation> saliencyInformation;
 
-    /** list of plugin information of the available detectors */
-    private ArrayList<PluginInformation> coverageInformation;
-
     /** list of the from listDetectors selected detectors */
     private ArrayList<SaliencyDetector> selectedDetectors;
-
-    /** current choosed coverage analyser */
-    private CoverageAnalyser currentAnalyser;
-
-    /** evaluation worker which runs the detectors */
-    private EvaluatorWorker worker;
 
     /** indicates if the tool is running */
     private boolean running;
@@ -118,9 +103,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** frame for configuration guis of plugins */
     private JFrame child;
-
-    /** threshold for text coverage */
-    private double treshold;
 
     /** amount of generated fixations */
     private int amount;
@@ -161,7 +143,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize arraylists
         this.files = new ArrayList<File>();
         this.saliencyInformation = new ArrayList<PluginInformation>();
-        this.coverageInformation = new ArrayList<PluginInformation>();
         this.selectedDetectors = new ArrayList<SaliencyDetector>();
         this.progress = 1;
         this.amount = 0;
@@ -174,8 +155,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.mainFrame.addWindowListener(this);
         this.checkBoxConfiguration.addActionListener(this);
         this.buttonConfiguration.addActionListener(this);
-        this.comboBoxTextPlugin.addActionListener(this);
-        this.buttonTextConfig.addActionListener(this);
         this.listDetectors.addListSelectionListener(new ListSelectionListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
@@ -191,7 +170,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonStart.setText("Start");
         this.labelDescription.setText("Step 1: Select *_data.xml files.");
         this.checkBoxImages.setSelected(true);
-        this.checkBoxSummary.setSelected(true);
         this.buttonStart.setEnabled(false);
         this.listDetectors.setEnabled(false);
         this.progressBar.setEnabled(false);
@@ -227,47 +205,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.saliencyDetectors.get(i).getInformation().setId(i);
             this.saliencyInformation.add(this.saliencyDetectors.get(i).getInformation());
         }
-
-        // initialize coverage analyzer
-        this.coverageDetectors = new ArrayList<CoverageAnalyser>(new PluginManagerUtil(this.pluginManager).getPlugins(CoverageAnalyser.class));
-        for (int i = 0; i < this.coverageDetectors.size(); i++) {
-            this.coverageDetectors.get(i).getInformation().setId(i);
-            this.coverageInformation.add(this.coverageDetectors.get(i).getInformation());
-        }
-
-        // create new worker and channel
-        this.worker = new EvaluatorWorker(this, this.currentTimeStamp);
-
-        // initialize coverage combobox
-        for (CoverageAnalyser analyzer : this.coverageDetectors)
-            this.comboBoxTextPlugin.addItem(analyzer.getInformation());
-        this.comboBoxTextPlugin.setRenderer(new DefaultListCellRenderer() {
-
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value,
-                                                          int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                // set new displayed attribute
-                if (value instanceof PluginInformation) {
-                    setText(((PluginInformation) value).getDisplayName());
-                    setToolTipText(((PluginInformation) value).getToolTip());
-                }
-
-                return this;
-            }
-        });
-
-        // initialize coverage configuration button
-        this.buttonTextConfig.setEnabled(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).isGuiAvailable());
-
-        // initialize analyzer
-        this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
-
-        // initialize coverage spinner
-        this.treshold = 15;
-        this.spinnerThresh.setModel(new SpinnerNumberModel(this.treshold, 0, 100, 0.1));
 
         // initialize listDetectors
         this.listDetectors.setListData(this.saliencyInformation.toArray());
@@ -328,16 +265,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.buttonConfigActionPerformed();
             return;
         }
-
-        if (event.getSource() == this.buttonTextConfig) {
-            this.buttonTextConfigActionPerformed();
-            return;
-        }
-
-        if (event.getSource() == this.comboBoxTextPlugin) {
-            this.comboboxAnalyzerActionPerformed();
-            return;
-        }
     }
 
     /**
@@ -370,15 +297,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.listDetectors.setEnabled(false);
             this.listFiles.setEnabled(false);
             this.checkBoxImages.setEnabled(false);
-            this.checkBoxSummary.setEnabled(false);
             this.labelDimension.setEnabled(false);
             this.spinnerDimension.setEnabled(false);
             this.checkBoxConfiguration.setEnabled(false);
             this.buttonConfiguration.setEnabled(false);
-            this.comboBoxTextPlugin.setEnabled(false);
-            this.buttonTextConfig.setEnabled(false);
-            this.labelThresh.setEnabled(false);
-            this.spinnerThresh.setEnabled(false);
 
             // start evaluation
             this.startEvaluation();
@@ -391,7 +313,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.running = false;
             this.currentTimeStamp = System.currentTimeMillis();
             this.progressBar.setValue(0);
-            this.progress = 0;
+            this.progress = 1;
             this.labelDescription.setText("Step 2: Select the detectors you want to use and press 'Start'.");
             this.buttonStart.setText("Start");
             this.buttonRemove.setEnabled(true);
@@ -399,15 +321,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             this.listDetectors.setEnabled(true);
             this.listFiles.setEnabled(true);
             this.checkBoxImages.setEnabled(true);
-            this.checkBoxSummary.setEnabled(true);
             this.labelDimension.setEnabled(true);
             this.spinnerDimension.setEnabled(true);
             this.checkBoxConfiguration.setEnabled(true);
             this.buttonConfiguration.setEnabled(true);
-            this.comboBoxTextPlugin.setEnabled(true);
-            this.buttonTextConfig.setEnabled(true);
-            this.labelThresh.setEnabled(true);
-            this.spinnerThresh.setEnabled(true);
         }
     }
 
@@ -448,13 +365,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.buttonSelect.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.listFiles.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.checkBoxImages.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.checkBoxSummary.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.labelDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.comboBoxTextPlugin.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.buttonTextConfig.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.labelThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
-        this.spinnerThresh.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.buttonConfiguration.setEnabled(!this.checkBoxConfiguration.isSelected());
     }
 
@@ -468,30 +380,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.child.setVisible(true);
         this.mainFrame.setEnabled(false);
         this.timer.start();
-    }
-
-    /**
-     * fired when the buttonConfig is clicked opens the gui for coverage
-     * analyzer
-     */
-    private void buttonTextConfigActionPerformed() {
-        if (this.comboBoxTextPlugin.getSelectedItem() instanceof PluginInformation)
-            this.child = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId()).getGui();
-        this.child.setVisible(true);
-        this.mainFrame.setEnabled(false);
-        this.timer.start();
-    }
-
-    /**
-     * fired when the selection of the analyzer combobox is changed
-     * enables/disables config button and changes currentAnalyser
-     */
-    private void comboboxAnalyzerActionPerformed() {
-        // initialize coverage configuration button
-        this.buttonTextConfig.setEnabled(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).isGuiAvailable());
-
-        // initialize analyzer
-        this.currentAnalyser = this.coverageDetectors.get(((PluginInformation) this.comboBoxTextPlugin.getSelectedItem()).getId());
     }
 
     /**
@@ -626,15 +514,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // initialize variables
         DataXMLParser dataParser = new DataXMLParser();
         ArrayList<File> tmpFile = new ArrayList<File>(this.files);
-        ArrayList<String> tmpPath = new ArrayList<String>();
         int size = 0;
 
-        // set threshold and amount
-        this.treshold = Double.parseDouble(this.spinnerThresh.getValue().toString());
+        // set amount
         this.amount = Integer.parseInt(this.spinnerAmount.getValue().toString());
-
-        // start coverage analyzer
-        this.currentAnalyser.start();
 
         // add selected detectors to array list
         for (Object selected : this.listDetectors.getSelectedValues())
@@ -656,12 +539,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         // calculate size
         for (File file : this.files) {
             size = size + dataParser.count(file);
-            if (!tmpPath.contains(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1))) {
-                tmpPath.add(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator) + 1));
-            }
         }
         size = size * this.selectedDetectors.size() * this.amount;
-        if (this.writeLog()) size = size * tmpPath.size();
 
         // initialize progress bar
         this.progressBar.setMaximum(size);
@@ -678,9 +557,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public void finish() {
         // write results
-        String locations = this.worker.writeResults(this.selectedDetectors);
-        this.labelDescription.setText("Evaluation finished. Results written to " + locations);
-        System.out.println("Evaluation finished. Results written to " + locations + ".\n");
+        this.labelDescription.setText("Evaluation finished.");
+        System.out.println("Evaluation finished.");
 
         // inidicate finish
         this.selectedDetectors.clear();
@@ -726,7 +604,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      * closes tool cleanly
      */
     private void exit() {
-        this.currentAnalyser.stop();
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
         this.mainFrame.dispose();
@@ -762,7 +639,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     @Override
     public void windowClosing(WindowEvent arg0) {
-        if (this.running) this.currentAnalyser.stop();
         this.running = false;
         this.pluginManager.shutdown();
         this.evaluationThread.stop();
@@ -827,13 +703,6 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * @return the worker
-     */
-    public EvaluatorWorker getWorker() {
-        return this.worker;
-    }
-
-    /**
      * @return true if they should be written
      */
     public boolean writeImages() {
@@ -841,31 +710,10 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
     }
 
     /**
-     * @return true if it should be written
-     */
-    public boolean writeLog() {
-        return this.checkBoxSummary.isSelected();
-    }
-
-    /**
      * @return the dimension
      */
     public int getDimension() {
         return Integer.parseInt(this.spinnerDimension.getValue().toString());
-    }
-
-    /**
-     * @return current choosed analyser
-     */
-    public CoverageAnalyser getCoverageAnalyser() {
-        return this.currentAnalyser;
-    }
-
-    /**
-     * @return current threshold
-     */
-    public double getCoverageThreshold() {
-        return this.treshold;
     }
 
     /**
@@ -880,5 +728,12 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
      */
     public void setStartTimeStamp(long startTimeStamp) {
         this.startTimeStamp = startTimeStamp;
+    }
+
+    /**
+     * @return the currentTimeStamp
+     */
+    public long getCurrentTimeStamp() {
+        return this.currentTimeStamp;
     }
 }

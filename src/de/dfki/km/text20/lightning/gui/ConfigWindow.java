@@ -122,9 +122,6 @@ public class ConfigWindow {
         checkBoxEvaluation = new JCheckBox();
         labelMode = new JLabel();
         comboBoxMode = new JComboBox();
-        labelOutputPath = new JLabel();
-        buttonSelect = new JButton();
-        textFieldOutputPath = new JTextField();
         panel4 = new JPanel();
         labelDetector = new JLabel();
         comboBoxDetector = new JComboBox();
@@ -151,7 +148,7 @@ public class ConfigWindow {
                 {
                     contentPanel.setLayout(new FormLayout(
                         "3*(20dlu:grow, $lcgap), 20dlu:grow",
-                        "top:default, $lgap, top:48dlu, $lgap, default:grow, $lgap, default"));
+                        "top:default, $lgap, top:48dlu, $lgap, default:grow, 2*($lgap, default)"));
                     ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
 
                     //======== panel1 ========
@@ -252,7 +249,7 @@ public class ConfigWindow {
                         panel3.setBorder(new TitledBorder("Evaluation "));
                         panel3.setLayout(new FormLayout(
                             "80dlu:grow, $lcgap, 80dlu:grow",
-                            "3*(default, $lgap), default"));
+                            "default, $lgap, default"));
 
                         //---- labelEvaluation ----
                         labelEvaluation.setText("Evaluation Mode");
@@ -271,15 +268,6 @@ public class ConfigWindow {
                         labelMode.setText("Evaluation Mode");
                         panel3.add(labelMode, cc.xywh(1, 3, 2, 1));
                         panel3.add(comboBoxMode, cc.xy(3, 3));
-
-                        //---- labelOutputPath ----
-                        labelOutputPath.setText("Output Path");
-                        panel3.add(labelOutputPath, cc.xywh(1, 5, 1, 3));
-
-                        //---- buttonSelect ----
-                        buttonSelect.setText("Select");
-                        panel3.add(buttonSelect, cc.xy(3, 5));
-                        panel3.add(textFieldOutputPath, cc.xy(3, 7));
                     }
                     contentPanel.add(panel3, cc.xywh(5, 3, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
@@ -307,7 +295,7 @@ public class ConfigWindow {
                         buttonDetectorConfig.setText("Configuration");
                         panel4.add(buttonDetectorConfig, cc.xy(3, 3));
                     }
-                    contentPanel.add(panel4, cc.xywh(1, 5, 3, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
+                    contentPanel.add(panel4, cc.xywh(1, 5, 3, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
 
                     //---- buttonSubmit ----
                     buttonSubmit.setText("Submit");
@@ -317,7 +305,7 @@ public class ConfigWindow {
                             buttonSubmitActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonSubmit, cc.xy(1, 7));
+                    contentPanel.add(buttonSubmit, cc.xywh(5, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonDefault ----
                     buttonDefault.setText("Default");
@@ -327,7 +315,7 @@ public class ConfigWindow {
                             buttonDefaultActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonDefault, cc.xy(3, 7));
+                    contentPanel.add(buttonDefault, cc.xywh(7, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonOK ----
                     buttonOK.setText("OK");
@@ -337,7 +325,7 @@ public class ConfigWindow {
                             buttonOKActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonOK, cc.xywh(5, 7, 1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
+                    contentPanel.add(buttonOK, cc.xywh(5, 9, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonCancel ----
                     buttonCancel.setText("Cancel");
@@ -347,12 +335,12 @@ public class ConfigWindow {
                             buttonCancelActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonCancel, cc.xy(7, 7));
+                    contentPanel.add(buttonCancel, cc.xywh(7, 9, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
                 }
                 dialogPane.add(contentPanel);
             }
             mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(570, 340);
+            mainFrame.setSize(610, 315);
             mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -386,9 +374,6 @@ public class ConfigWindow {
     protected JCheckBox checkBoxEvaluation;
     protected JLabel labelMode;
     protected JComboBox comboBoxMode;
-    protected JLabel labelOutputPath;
-    protected JButton buttonSelect;
-    protected JTextField textFieldOutputPath;
     private JPanel panel4;
     protected JLabel labelDetector;
     protected JComboBox comboBoxDetector;

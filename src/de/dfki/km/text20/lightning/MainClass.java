@@ -95,7 +95,7 @@ public class MainClass {
     private Statistics statistics;
 
     /** necessary to identify the evaluation data */
-    private String[] evaluationSettings;
+    private String evaluationType;
 
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
@@ -120,6 +120,9 @@ public class MainClass {
 
     /** ShutDownHook */
     private Thread hook;
+    
+    /** session timestamp */
+    private long timestamp;
 
     /**
      * creates a new instance of the mainclass and initializes it
@@ -255,6 +258,9 @@ public class MainClass {
 
                 // start reminder
                 this.reminder.init();
+                
+                // set timestamp
+                this.timestamp = System.currentTimeMillis();
 
                 // add shutdownhook
                 Runtime.getRuntime().addShutdownHook(this.hook);
@@ -554,9 +560,9 @@ public class MainClass {
         Hotkey.getInstance().setBlockHotkeys(true);
 
         // start choosed mode
-        if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(0))) {
+        if (this.evaluationType.equals(this.getEvaluationOptions().get(0))) {
             new DoubleBlindMode();
-        } else if (this.evaluationSettings[0].equals(this.getEvaluationOptions().get(1))) {
+        } else if (this.evaluationType.equals(this.getEvaluationOptions().get(1))) {
             new QuicknessMode();
         }
     }
@@ -572,18 +578,13 @@ public class MainClass {
     }
 
     /**
-     * @return the evaluationSettings 
-     * 
-     * 0 = evaluation mode
-     * 1 = output path
+     * @return the evaluationMode 
      */
-    public String[] getEvaluationSettings() {
-        if (this.evaluationSettings == null) {
-            this.evaluationSettings = new String[2];
-            this.evaluationSettings[0] = this.getEvaluationOptions().get(0);
-            this.evaluationSettings[1] = ".";
+    public String getEvaluationType() {
+        if (this.evaluationType == null) {
+            this.evaluationType = this.getEvaluationOptions().get(0);
         }
-        return this.evaluationSettings;
+        return this.evaluationType;
     }
 
     /**
@@ -597,22 +598,10 @@ public class MainClass {
     }
 
     /**
-     * @param settings
-     * 
-     * 0 = evaluation mode
-     * 1 = output path
+     * @param type
      */
-    public void setEvaluationSettings(String[] settings) {
-        String tmpString = this.evaluationSettings[1];
-
-        this.evaluationSettings = settings;
-
-        File tmpFile = new File(this.evaluationSettings[1]);
-        if (tmpFile.exists() && !tmpFile.isDirectory())
-            this.evaluationSettings[1] = tmpString;
-
-        if (this.evaluationSettings[1].endsWith(File.separator + "."))
-            this.evaluationSettings[1] = this.evaluationSettings[1].substring(0, this.evaluationSettings[1].lastIndexOf(File.separator + "."));
+    public void setEvaluationType(String type) {
+        this.evaluationType = type;
     }
 
     /**
@@ -628,6 +617,13 @@ public class MainClass {
      */
     public void setTrackingValid(boolean trackingValid) {
         this.trackingValid = trackingValid;
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public long getTimestamp() {
+        return this.timestamp;
     }
 
     /**
