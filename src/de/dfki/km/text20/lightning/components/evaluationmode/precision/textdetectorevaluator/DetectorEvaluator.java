@@ -352,8 +352,8 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             this.spinnerHeightMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
             this.spinnerWidthMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 1));
             this.spinnerWidthMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 1));
-            this.spinnerSizeMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
+            this.spinnerSizeMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 10));
         }
     }
 

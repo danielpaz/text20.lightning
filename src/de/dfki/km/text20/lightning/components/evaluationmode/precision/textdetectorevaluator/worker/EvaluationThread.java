@@ -68,7 +68,7 @@ public class EvaluationThread implements Runnable {
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
-    @SuppressWarnings({ "static-access", "boxing" })
+    @SuppressWarnings("boxing")
     @Override
     public void run() {
         // initialize Variables
@@ -226,7 +226,7 @@ public class EvaluationThread implements Runnable {
                                                 return $(rval).array(String.class);
 
                                             // check for big steps
-                                            if (container.isBigSteps()) line = line + 9;
+                                            line = line + 9;
 
                                             // update progress bar
                                             DetectorEvaluator.getInstance().updateProgressBar();
