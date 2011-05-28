@@ -279,8 +279,9 @@ public class EvaluationThread implements Runnable {
      * @return list of fixations
      */
     private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
-     // initialize variables
-        int deviation = 25;
+        // initialize variables
+        int deviation = 13;
+        int deviationMax = 25;
         int x;
         int y;
         int tmp;
@@ -293,7 +294,7 @@ public class EvaluationThread implements Runnable {
             tmp = Integer.MAX_VALUE;
 
             // calculate x
-            while (Math.abs(tmp) > deviation)
+            while (Math.abs(tmp) > deviationMax)
                 tmp = (int) random.nextGaussian() * deviation;
             x = point.x + tmp;
             x = Math.max(1, Math.min(image.getWidth() - 1, x));
@@ -302,7 +303,7 @@ public class EvaluationThread implements Runnable {
             tmp = Integer.MAX_VALUE;
 
             // calculate y
-            while (Math.abs(tmp) > deviation)
+            while (Math.abs(tmp) > deviationMax)
                 tmp = (int) random.nextGaussian() * deviation;
             y = point.y + tmp;
             y = Math.max(1, Math.min(image.getHeight() - 1, y));
