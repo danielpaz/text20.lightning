@@ -333,27 +333,27 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
     private void checkboxBigStepsActionPerformed() {
         // initialize spinner
         if (this.checkBoxBigSteps.isSelected()) {
-            this.spinnerSensitivityMax.setModel(new SpinnerNumberModel(10, 0.1, Double.MAX_VALUE, 1));
+            this.spinnerSensitivityMax.setModel(new SpinnerNumberModel(10, 0.0, Double.MAX_VALUE, 1));
             this.spinnerSensitivityMin.setModel(new SpinnerNumberModel(0, 0, Double.MAX_VALUE, 1));
-            this.spinnerCoverageMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
+            this.spinnerCoverageMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 10));
             this.spinnerCoverageMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10));
-            this.spinnerHeightMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
+            this.spinnerHeightMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 10));
             this.spinnerHeightMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10));
-            this.spinnerWidthMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
+            this.spinnerWidthMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 10));
             this.spinnerWidthMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10));
-            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
+            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 10));
             this.spinnerSizeMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10));
         } else {
-            this.spinnerSensitivityMax.setModel(new SpinnerNumberModel(10, 0.1, Double.MAX_VALUE, 0.1));
-            this.spinnerSensitivityMin.setModel(new SpinnerNumberModel(0.1, 0.1, Double.MAX_VALUE, 0.1));
-            this.spinnerCoverageMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 1));
-            this.spinnerCoverageMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-            this.spinnerHeightMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 1));
-            this.spinnerHeightMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-            this.spinnerWidthMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 1));
-            this.spinnerWidthMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 1, Integer.MAX_VALUE, 10));
-            this.spinnerSizeMin.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 10));
+            this.spinnerSensitivityMax.setModel(new SpinnerNumberModel(10, 0.0, Double.MAX_VALUE, 0.1));
+            this.spinnerSensitivityMin.setModel(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+            this.spinnerCoverageMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 1));
+            this.spinnerCoverageMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+            this.spinnerHeightMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 1));
+            this.spinnerHeightMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+            this.spinnerWidthMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 1));
+            this.spinnerWidthMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+            this.spinnerSizeMax.setModel(new SpinnerNumberModel(100, 0, Integer.MAX_VALUE, 10));
+            this.spinnerSizeMin.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10));
         }
     }
 
