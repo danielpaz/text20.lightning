@@ -279,19 +279,33 @@ public class EvaluationThread implements Runnable {
      * @return list of fixations
      */
     private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
-        // initialize variables
-        int deviation = 20;
+     // initialize variables
+        int deviation = 25;
         int x;
         int y;
+        int tmp;
         ArrayList<Point> calculatedFixations = new ArrayList<Point>();
         Random random = new Random();
 
         // calculate fixations
         for (int i = 0; i < this.container.getAmount(); i++) {
-            x = (int) (point.x + (random.nextGaussian() * deviation));
-            x = Math.max(point.x - this.container.getDimension() / 2, Math.min(point.x + this.container.getDimension() / 2, x));
-            y = (int) (point.y + (random.nextGaussian() * deviation));
-            y = Math.max(point.y - this.container.getDimension() / 2, Math.min(point.y + this.container.getDimension() / 2, y));
+            // reset tmp
+            tmp = Integer.MAX_VALUE;
+
+            // calculate x
+            while (Math.abs(tmp) > deviation)
+                tmp = (int) random.nextGaussian() * deviation;
+            x = point.x + tmp;
+            x = Math.max(1, Math.min(image.getWidth() - 1, x));
+
+            // reset tmp
+            tmp = Integer.MAX_VALUE;
+
+            // calculate y
+            while (Math.abs(tmp) > deviation)
+                tmp = (int) random.nextGaussian() * deviation;
+            y = point.y + tmp;
+            y = Math.max(1, Math.min(image.getHeight() - 1, y));
             calculatedFixations.add(new Point(x, y));
         }
 
