@@ -75,7 +75,7 @@ public class EvaluationThread implements Runnable {
         final DataXMLParser dataParser = new DataXMLParser();
         int _pictureCount = 0;
         int _type = -1;
-        
+
         // start detector
         this.detector.start();
 
@@ -216,7 +216,7 @@ public class EvaluationThread implements Runnable {
                                             // update file
                                             input = $(type, pictureCount, i.i(), fixationCount, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY).string().join(",");
                                             rval.add(input);
-                                            
+
                                             // draw image
                                             if (container.isDrawImages())
                                                 drawPicture(offset, "./evaluation/results/text detector evaluation/Session_" + container.getTimestamp() + "/" + type + "_" + pictureCount + "_" + i.i() + "_" + fixationCount + "_" + coverage + "_" + height + "_" + width + "_" + sensitivity + "_" + line + ".png", subImage, translatedRectangle);
@@ -257,7 +257,7 @@ public class EvaluationThread implements Runnable {
                 }
             }, i).expand(String.class).string().join("\r\n");
 
-            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp()  + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/DetectorEvaluation.txt").file().append(output + "\r\n");
 
             if (!DetectorEvaluator.getInstance().isRunning()) return;
 
@@ -280,7 +280,7 @@ public class EvaluationThread implements Runnable {
      */
     private ArrayList<Point> calculateFixations(BufferedImage image, Point point) {
         // initialize variables
-        int deviation = 13;
+        int deviation = 5;
         int deviationMax = 25;
         int x;
         int y;
@@ -295,7 +295,7 @@ public class EvaluationThread implements Runnable {
 
             // calculate x
             while (Math.abs(tmp) > deviationMax)
-                tmp = (int) random.nextGaussian() * deviation;
+                tmp = (int) (random.nextGaussian() * 2 * deviation);
             x = point.x + tmp;
             x = Math.max(1, Math.min(image.getWidth() - 1, x));
 
@@ -304,7 +304,7 @@ public class EvaluationThread implements Runnable {
 
             // calculate y
             while (Math.abs(tmp) > deviationMax)
-                tmp = (int) random.nextGaussian() * deviation;
+                tmp = (int) (random.nextGaussian() * 2 * deviation);
             y = point.y + tmp;
             y = Math.max(1, Math.min(image.getHeight() - 1, y));
             calculatedFixations.add(new Point(x, y));
