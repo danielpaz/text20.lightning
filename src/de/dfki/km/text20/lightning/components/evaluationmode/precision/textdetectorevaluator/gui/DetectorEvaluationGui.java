@@ -11,6 +11,7 @@ import com.jgoodies.forms.layout.*;
 /**
  * @author Ralf Biedert
  */
+@SuppressWarnings("all")
 public class DetectorEvaluationGui extends JFrame {
     public DetectorEvaluationGui() {
         initComponents();
