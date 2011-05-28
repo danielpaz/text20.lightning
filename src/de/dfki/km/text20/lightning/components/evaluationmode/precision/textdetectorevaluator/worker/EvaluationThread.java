@@ -226,7 +226,11 @@ public class EvaluationThread implements Runnable {
                                                 return $(rval).array(String.class);
 
                                             // check for big steps
-                                            line = line + 9;
+                                            if ((line + 9) <= container.getLineMax()) {
+                                                line = line + 9;
+                                            } else {
+                                                break;
+                                            }
 
                                             // update progress bar
                                             DetectorEvaluator.getInstance().updateProgressBar();
@@ -234,19 +238,38 @@ public class EvaluationThread implements Runnable {
 
                                         // check for big steps
                                         if (container.isBigSteps())
-                                            sensitivity = sensitivity + 0.9;
+                                            if ((sensitivity + 0.9) <= container.getSensitivityMax()) {
+                                                sensitivity = sensitivity + 0.9;
+                                            } else {
+                                                break;
+                                            }
                                     }
 
                                     // check for big steps
-                                    if (container.isBigSteps()) width = width + 9;
+                                    if (container.isBigSteps())
+                                        if ((width + 9) <= container.getWidthMax()) {
+                                            width = width + 9;
+                                        } else {
+                                            break;
+                                        }
                                 }
 
                                 // check for big steps
-                                if (container.isBigSteps()) height = height + 9;
+                                if (container.isBigSteps())
+                                    if ((height + 9) <= container.getHeightMax()) {
+                                        height = height + 9;
+                                    } else {
+                                        break;
+                                    }
                             }
 
                             // check for big steps
-                            if (container.isBigSteps()) coverage = coverage + 9;
+                            if (container.isBigSteps())
+                                if ((coverage + 9) <= container.getCoverageMax()) {
+                                    coverage = coverage + 9;
+                                } else {
+                                    break;
+                                }
                         }
 
                         // step forward
