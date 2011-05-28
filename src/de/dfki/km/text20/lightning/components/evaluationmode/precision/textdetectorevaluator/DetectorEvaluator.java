@@ -273,9 +273,10 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             if (this.checkBoxBigSteps.isSelected()) size = size * ((widthMax - widthMin + 10) / 10);
             else
                 size = size * (widthMax - widthMin + 1);
-            if (this.checkBoxBigSteps.isSelected()) size = size * ((lineMax - lineMin + 10) / 10);
-            else
-                size = size * (lineMax - lineMin + 1);
+            //            if (this.checkBoxBigSteps.isSelected()) size = size * ((lineMax - lineMin + 10) / 10);
+            //            else
+            //                size = size * (lineMax - lineMin + 1);
+            size = size * ((lineMax - lineMin + 10) / 10);
             if (this.checkBoxBigSteps.isSelected()) size = size * (((int) ((sensitivityMax - sensitivityMin + 1) * 10)) / 10);
             else
                 size = size * ((int) ((sensitivityMax - sensitivityMin + 0.1) * 10));
