@@ -167,7 +167,7 @@ public class Properties implements Serializable {
      */
     public void restoreDefault() {
         // set default values
-        this.dimension = 200;
+        this.dimension = 150;
         this.actionHotkey = null;
         this.statusHotkey = null;
         this.useWarp = false;

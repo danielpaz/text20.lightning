@@ -71,7 +71,7 @@ public class DetectorEvaluationGui extends JFrame {
         contentPane.add(labelDimension, cc.xywh(3, 7, 3, 1));
 
         //---- spinnerDimension ----
-        spinnerDimension.setModel(new SpinnerNumberModel(200, 1, null, 1));
+        spinnerDimension.setModel(new SpinnerNumberModel(150, 1, null, 1));
         contentPane.add(spinnerDimension, cc.xy(7, 7));
 
         //======== scrollPane1 ========
