@@ -83,6 +83,15 @@ public class EvaluationThread implements Runnable {
         new File("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
 
         // write key file
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- options -\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("big steps: " + this.container.isBigSteps() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("dimension: " + this.container.getDimension() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.container.getAmount() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("coverage - min: " + this.container.getCoverageMin() + " - max: " + this.container.getCoverageMax() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("height - min: " + this.container.getHeightMin() + " - max: " + this.container.getHeightMax() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("width - min: " + this.container.getWidthMin() + " - max: " + this.container.getWidthMax() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("line size - min: " + this.container.getLineMin() + " - max: " + this.container.getLineMax() + "\r\n");
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("sensitivity - min: " + this.container.getSensitivityMin() + " - max: " + this.container.getSensitivityMax() + "\r\n\r\n");
         $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- headings -\r\n");
         $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\r\n\r\n");
         $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- filename -\r\n");
