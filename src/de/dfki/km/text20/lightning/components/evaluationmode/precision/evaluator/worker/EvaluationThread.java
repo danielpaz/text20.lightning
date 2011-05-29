@@ -109,7 +109,6 @@ public class EvaluationThread implements Runnable {
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- dataset - \r\n");
-        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("files: " + this.files.size() + "\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("datasets overall: " + this.mainClass.getSize() + "\r\n\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
 
