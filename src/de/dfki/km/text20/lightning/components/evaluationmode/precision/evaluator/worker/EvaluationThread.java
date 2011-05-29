@@ -98,7 +98,9 @@ public class EvaluationThread implements Runnable {
         new File("./evaluation/results/detector evaluation/Session_" + this.timestamp).mkdirs();
 
         // write key file 
-        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- headings -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- options -\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("dimension: " + this.mainClass.getDimension() + "\r\n");
+        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, detector, distance, hit, offsetX, offsetY\r\n\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- filename -\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation.png\r\n\r\n");
@@ -108,7 +110,6 @@ public class EvaluationThread implements Runnable {
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- dataset - \r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("files: " + this.files.size() + "\r\n");
-        $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("datasets overall: " + this.mainClass.getSize() + "\r\n\r\n");
         $("./evaluation/results/detector evaluation/Session_" + this.timestamp + "/DetectorEvaluationKeys.log").file().append("- detectors -\r\n");
 
