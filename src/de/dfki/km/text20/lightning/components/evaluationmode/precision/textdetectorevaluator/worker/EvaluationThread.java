@@ -190,7 +190,7 @@ public class EvaluationThread implements Runnable {
 
                                             // calculate x offset
                                             if (offset.x < translatedRectangle.x) {
-                                                offsetX = translatedRectangle.x - translatedRectangle.x;
+                                                offsetX = offset.x - translatedRectangle.x;
                                             } else if (offset.x > (translatedRectangle.x + translatedRectangle.width)) {
                                                 offsetX = offset.x - (translatedRectangle.x + translatedRectangle.width);
                                             } else {
