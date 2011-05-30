@@ -41,12 +41,12 @@ public class DetectorEvaluationGui extends JFrame {
         labelWidth = new JLabel();
         spinnerWidthMin = new JSpinner();
         spinnerWidthMax = new JSpinner();
-        labelSize = new JLabel();
-        spinnerSizeMin = new JSpinner();
-        spinnerSizeMax = new JSpinner();
         labelSensitivity = new JLabel();
         spinnerSensitivityMin = new JSpinner();
         spinnerSensitivityMax = new JSpinner();
+        labelSize = new JLabel();
+        spinnerSizeMin = new JSpinner();
+        spinnerSizeMax = new JSpinner();
         buttonSelect = new JButton();
         buttonRemove = new JButton();
         labelDescription = new JLabel();
@@ -138,23 +138,23 @@ public class DetectorEvaluationGui extends JFrame {
         spinnerWidthMax.setModel(new SpinnerNumberModel(10, 1, null, 1));
         contentPane.add(spinnerWidthMax, cc.xy(7, 17));
 
+        //---- labelSensitivity ----
+        labelSensitivity.setText("sensitivity");
+        contentPane.add(labelSensitivity, cc.xy(3, 19));
+        contentPane.add(spinnerSensitivityMin, cc.xy(5, 19));
+        contentPane.add(spinnerSensitivityMax, cc.xy(7, 19));
+
         //---- labelSize ----
         labelSize.setText("line size");
-        contentPane.add(labelSize, cc.xy(3, 19));
+        contentPane.add(labelSize, cc.xy(3, 21));
 
         //---- spinnerSizeMin ----
         spinnerSizeMin.setModel(new SpinnerNumberModel(1, 1, null, 1));
-        contentPane.add(spinnerSizeMin, cc.xy(5, 19));
+        contentPane.add(spinnerSizeMin, cc.xy(5, 21));
 
         //---- spinnerSizeMax ----
         spinnerSizeMax.setModel(new SpinnerNumberModel(80, 1, null, 1));
-        contentPane.add(spinnerSizeMax, cc.xy(7, 19));
-
-        //---- labelSensitivity ----
-        labelSensitivity.setText("sensitivity");
-        contentPane.add(labelSensitivity, cc.xy(3, 21));
-        contentPane.add(spinnerSensitivityMin, cc.xy(5, 21));
-        contentPane.add(spinnerSensitivityMax, cc.xy(7, 21));
+        contentPane.add(spinnerSizeMax, cc.xy(7, 21));
 
         //---- buttonSelect ----
         buttonSelect.setText("Select");
@@ -200,12 +200,12 @@ public class DetectorEvaluationGui extends JFrame {
     protected JLabel labelWidth;
     protected JSpinner spinnerWidthMin;
     protected JSpinner spinnerWidthMax;
-    protected JLabel labelSize;
-    protected JSpinner spinnerSizeMin;
-    protected JSpinner spinnerSizeMax;
     protected JLabel labelSensitivity;
     protected JSpinner spinnerSensitivityMin;
     protected JSpinner spinnerSensitivityMax;
+    protected JLabel labelSize;
+    protected JSpinner spinnerSizeMin;
+    protected JSpinner spinnerSizeMax;
     protected JButton buttonSelect;
     protected JButton buttonRemove;
     protected JLabel labelDescription;

@@ -278,7 +278,7 @@ public class EvaluationThread implements Runnable {
                                     break;
                                 }
                         }
-
+                        
                         // step forward
                         fixationCount++;
                     }
@@ -296,6 +296,9 @@ public class EvaluationThread implements Runnable {
 
             System.out.println("- File " + file.getName() + " finished.\r\n");
         }
+
+        // evaluate log
+        new LogEvaluator().evaluateLog("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/DetectorEvaluation.txt");
 
         // finish the evaluation
         DetectorEvaluator.getInstance().finish();
