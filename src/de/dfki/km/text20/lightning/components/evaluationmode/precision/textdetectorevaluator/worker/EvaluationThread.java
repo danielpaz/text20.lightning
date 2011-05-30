@@ -177,7 +177,7 @@ public class EvaluationThread implements Runnable {
                                 for (int width = container.getWidthMin(); width <= container.getWidthMax(); width++) {
                                     for (double sensitivity = container.getSensitivityMin(); sensitivity <= container.getSensitivityMax(); sensitivity = sensitivity + 0.1) {
                                         for (int line = container.getLineMin(); line <= container.getLineMax(); line++) {
-
+                                            
                                             // wtf why?
                                             sensitivity = (double) Math.round(sensitivity * 10) / 10;
 
@@ -248,7 +248,7 @@ public class EvaluationThread implements Runnable {
                                             if ((sensitivity + 0.9) <= container.getSensitivityMax()) {
                                                 sensitivity = sensitivity + 0.9;
                                             } else {
-                                                break;
+                                                sensitivity = container.getSensitivityMax();
                                             }
                                     }
 
@@ -257,7 +257,7 @@ public class EvaluationThread implements Runnable {
                                         if ((width + 9) <= container.getWidthMax()) {
                                             width = width + 9;
                                         } else {
-                                            break;
+                                            width = container.getWidthMax();
                                         }
                                 }
 
@@ -266,7 +266,7 @@ public class EvaluationThread implements Runnable {
                                     if ((height + 9) <= container.getHeightMax()) {
                                         height = height + 9;
                                     } else {
-                                        break;
+                                        height = container.getHeightMax();
                                     }
                             }
 
@@ -275,7 +275,7 @@ public class EvaluationThread implements Runnable {
                                 if ((coverage + 9) <= container.getCoverageMax()) {
                                     coverage = coverage + 9;
                                 } else {
-                                    break;
+                                    coverage = container.getCoverageMax();
                                 }
                         }
                         
