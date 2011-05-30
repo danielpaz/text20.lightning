@@ -177,7 +177,7 @@ public class EvaluationThread implements Runnable {
                                 for (int width = container.getWidthMin(); width <= container.getWidthMax(); width++) {
                                     for (double sensitivity = container.getSensitivityMin(); sensitivity <= container.getSensitivityMax(); sensitivity = sensitivity + 0.1) {
                                         for (int line = container.getLineMin(); line <= container.getLineMax(); line++) {
-                                            
+
                                             // wtf why?
                                             sensitivity = (double) Math.round(sensitivity * 10) / 10;
 
@@ -232,12 +232,8 @@ public class EvaluationThread implements Runnable {
                                             if (!DetectorEvaluator.getInstance().isRunning())
                                                 return $(rval).array(String.class);
 
-                                            // check for big steps
-                                            if ((line + 9) <= container.getLineMax()) {
-                                                line = line + 9;
-                                            } else {
-                                                break;
-                                            }
+                                            // step forward
+                                            line = line + 9;
 
                                             // update progress bar
                                             DetectorEvaluator.getInstance().updateProgressBar();
@@ -245,40 +241,21 @@ public class EvaluationThread implements Runnable {
 
                                         // check for big steps
                                         if (container.isBigSteps())
-                                            if ((sensitivity + 0.9) <= container.getSensitivityMax()) {
-                                                sensitivity = sensitivity + 0.9;
-                                            } else {
-                                                sensitivity = container.getSensitivityMax();
-                                            }
+                                            sensitivity = sensitivity + 0.9;
                                     }
 
                                     // check for big steps
-                                    if (container.isBigSteps())
-                                        if ((width + 9) <= container.getWidthMax()) {
-                                            width = width + 9;
-                                        } else {
-                                            width = container.getWidthMax();
-                                        }
+                                    if (container.isBigSteps()) width = width + 9;
                                 }
 
                                 // check for big steps
-                                if (container.isBigSteps())
-                                    if ((height + 9) <= container.getHeightMax()) {
-                                        height = height + 9;
-                                    } else {
-                                        height = container.getHeightMax();
-                                    }
+                                if (container.isBigSteps()) height = height + 9;
                             }
 
                             // check for big steps
-                            if (container.isBigSteps())
-                                if ((coverage + 9) <= container.getCoverageMax()) {
-                                    coverage = coverage + 9;
-                                } else {
-                                    coverage = container.getCoverageMax();
-                                }
+                            if (container.isBigSteps()) coverage = coverage + 9;
                         }
-                        
+
                         // step forward
                         fixationCount++;
                     }
