@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src.plugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="dependencies/jcores.jar"/>
+	<classpathentry kind="lib" path="dependencies/trackingserver-remoteapi-1.0.0.jar"/>
+	<classpathentry kind="lib" path="dependencies/jspf.statistics-0.1.jar"/>
+	<classpathentry kind="lib" path="dependencies/forms.jar"/>
+	<classpathentry kind="lib" path="dependencies/jintellitype-1.3.6.jar"/>
+	<classpathentry kind="lib" path="dependencies/jspf.updatecheck.jar"/>
+	<classpathentry kind="lib" path="dependencies/text20.jar"/>
+	<classpathentry kind="lib" path="dependencies/jxl.jar"/>
+	<classpathentry kind="lib" path="dependencies/mysql-connector-java-5.1.15-bin.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

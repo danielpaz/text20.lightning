@@ -1,0 +1,27 @@
+
+syntax: regexp
+^diagnosis\.record$
+syntax: regexp
+^jspf\.plugin\.cache$
+syntax: regexp
+^properties\.prop$
+syntax: regexp
+^dist$
+syntax: regexp
+^evaluation$
+syntax: regexp
+^plugins$
+syntax: regexp
+^tmp$
+syntax: regexp
+^blabla\.txt$
+syntax: regexp
+^JIntellitype\.dll$
+syntax: regexp
+^Quickness\.log$
+syntax: regexp
+^Quickness\.txt$
+syntax: regexp
+^Quickness\.xls$
+syntax: regexp
+^QuicknessKeys\.txt$
