@@ -264,28 +264,22 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             for (File file : this.files) {
                 size = size + dataParser.count(file);
             }
-            System.out.println("rects " + size);
             if (this.checkBoxBigSteps.isSelected()) size = size * ((coverageMax - coverageMin + 10) / 10);
             else
                 size = size * (coverageMax - coverageMin + 1);
-            System.out.println("cov " + size);
             if (this.checkBoxBigSteps.isSelected()) size = size * ((heightMax - heightMin + 10) / 10);
             else
                 size = size * (heightMax - heightMin + 1);
-            System.out.println("hei " + size);
             if (this.checkBoxBigSteps.isSelected()) size = size * ((widthMax - widthMin + 10) / 10);
             else
                 size = size * (widthMax - widthMin + 1);
-            System.out.println("wid " + size);
             //            if (this.checkBoxBigSteps.isSelected()) size = size * ((lineMax - lineMin + 10) / 10);
             //            else
             //                size = size * (lineMax - lineMin + 1);
             size = size * ((lineMax - lineMin + 10) / 10);
-            System.out.println("line " + size);
             if (this.checkBoxBigSteps.isSelected()) size = size * (((int) ((sensitivityMax - sensitivityMin + 1) * 10)) / 10);
             else
                 size = size * ((int) ((sensitivityMax - sensitivityMin + 0.1) * 10));
-            System.out.println("sen " + size);
             size = size * this.amount;
 
             if (size > Integer.MAX_VALUE) {
