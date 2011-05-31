@@ -270,6 +270,9 @@ public class EvaluationThread implements Runnable {
         for (SaliencyDetector detector : this.selectedDetectors)
             detector.stop();
 
+        // run evaluator
+        new LogEvaluator().evaluateLog("./evaluation/results/detector evaluation/Session_" + timestamp + "/DetectorEvaluation.txt");
+        
         // finish the evaluation
         this.mainClass.finish();
     }
