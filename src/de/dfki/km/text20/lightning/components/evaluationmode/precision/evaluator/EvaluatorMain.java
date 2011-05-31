@@ -376,6 +376,8 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.labelDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.spinnerDimension.setEnabled(!this.checkBoxConfiguration.isSelected());
         this.buttonConfiguration.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.labelAmount.setEnabled(!this.checkBoxConfiguration.isSelected());
+        this.spinnerAmount.setEnabled(!this.checkBoxConfiguration.isSelected());
     }
 
     /**
