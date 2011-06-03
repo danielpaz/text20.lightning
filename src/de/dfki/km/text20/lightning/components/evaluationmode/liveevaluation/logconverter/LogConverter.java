@@ -48,10 +48,10 @@ public class LogConverter {
                 String path = file.getAbsolutePath();
 
                 // check if file exists
-                if (!(new File(path + "/LiveEvaluation.log").exists())) continue;
+                if (!(new File(path + "/LiveEvaluation_raw.txt").exists())) continue;
                 
                 // indicate file
-                System.out.println("next file: " + new File(path + "/LiveEvaluation.log").getAbsolutePath());
+                System.out.println("next file: " + new File(path + "/LiveEvaluation_raw.txt").getAbsolutePath());
                 System.out.println();
 
                 // initialize cvs stuff
@@ -61,11 +61,11 @@ public class LogConverter {
                 int indexTypes;
                 int indexFiles;
                 int indexWords;
-                $(path + "/LiveEvaluation.txt").file().delete();
-                $(path + "/LiveEvaluationKeys.txt").file().delete();
+                $(path + "/LiveEvaluation_evaluated.txt").file().delete();
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().delete();
 
                 // initialize reader
-                BufferedReader lineReader = new BufferedReader(new FileReader(path + "/LiveEvaluation.log"));
+                BufferedReader lineReader = new BufferedReader(new FileReader(path + "/LiveEvaluation_raw.txt"));
                 String line = null;
                 double distanceTmp;
                 long timeTmp;
@@ -132,18 +132,18 @@ public class LogConverter {
                         if (words.get(i).equals(wordTmp)) indexWords = i;
 
                     // write to txt
-                    $(path + "/LiveEvaluation.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeTmp).string().join(",") + "\n");
+                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeTmp).string().join(",") + "\n");
                 }
 
                 // write key file
                 for (int i = 0; i < types.size(); i++)
-                    $(path + "/LiveEvaluationKeys.txt").file().append("index: " + i + " detector: " + types.get(i) + "\r\n");
-                $(path + "/LiveEvaluationKeys.txt").file().append("\r\n");
+                    $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " detector: " + types.get(i) + "\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("\r\n");
                 for (int i = 0; i < files.size(); i++)
-                    $(path + "/LiveEvaluationKeys.txt").file().append("index: " + i + " file: " + files.get(i) + "\r\n");
-                $(path + "/LiveEvaluationKeys.txt").file().append("\r\n");
+                    $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " file: " + files.get(i) + "\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("\r\n");
                 for (int i = 0; i < words.size(); i++)
-                    $(path + "/LiveEvaluationKeys.txt").file().append("index: " + i + " word: " + words.get(i) + "\r\n");
+                    $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " word: " + words.get(i) + "\r\n");
 
                 // inidicate finish
                 System.out.println();
