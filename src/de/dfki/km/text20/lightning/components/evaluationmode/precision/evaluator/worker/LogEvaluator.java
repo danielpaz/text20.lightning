@@ -22,7 +22,9 @@ package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluato
 
 import static net.jcores.CoreKeeper.$;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.HashMap;
 
 /**
@@ -51,9 +53,9 @@ public class LogEvaluator {
             String path = file.getAbsolutePath();
 
             // check if file exists
-            if (!(new File(path + "/DetectorEvaluation.txt").exists())) continue;
+            if (!(new File(path + "/DetectorEvaluationData_raw.txt").exists())) continue;
 
-            LogEvaluator.getInstance().evaluateLog(path + "/DetectorEvaluation.txt");
+            LogEvaluator.getInstance().evaluateLog(path + "/DetectorEvaluationData_raw.txt");
         }
         
         // inidicate finish
@@ -75,19 +77,21 @@ public class LogEvaluator {
     public void evaluateLog(String path) {
 
         try {
-            $(path.replace("DetectorEvaluation.txt", "Evaluated.txt")).file().delete();
-            $(path.replace("DetectorEvaluation.txt", "EvaluatedKeys.log")).file().delete();
-            $(path.replace("DetectorEvaluation.txt", "EvaluatedKeys.log")).file().append("- headings -\r\n");
-            $(path.replace("DetectorEvaluation.txt", "EvaluatedKeys.log")).file().append("coverage, height, width, sensitivity, line, hits, overall, percentage");
+            $(path.replace("DetectorEvaluationData_raw.txt", "DetectorEvaluationData_evaluated.txt")).file().delete();
+            $(path.replace("DetectorEvaluationData_raw.txt", "DetectorEvaluationKeys_evaluated.log")).file().delete();
+            $(path.replace("DetectorEvaluationData_raw.txt", "DetectorEvaluationKeys_evaluated.log")).file().append("- headings -\r\n");
+            $(path.replace("DetectorEvaluationData_raw.txt", "DetectorEvaluationKeys_evaluated.log")).file().append("coverage, height, width, sensitivity, line, hits, overall, percentage");
 
             // initialize reader
             String[] line = null;
+            String currentLine;
             int hit;
             HashMap<String, long[]> values = new HashMap<String, long[]>();
+            BufferedReader fileReader = new BufferedReader(new FileReader(new File(path)));
 
             // read
             // NOTE: -> Run -> Arguments -> VM Arguments -> -Xms1024m -Xmx1024m
-            for (String currentLine : $(path).file().text().string().split("\n").array(String.class)){
+            while ((currentLine = fileReader.readLine()) != null) {
                 // read line
                 line = currentLine.split(",");
 
@@ -104,7 +108,7 @@ public class LogEvaluator {
 
             // write evaluation
             for (String curKey : values.keySet()) {
-                $(path.replace("DetectorEvaluation.txt", "Evaluated.txt")).file().append(curKey + "," + values.get(curKey)[0] + "," + values.get(curKey)[1] + "," + (((double) values.get(curKey)[0] / values.get(curKey)[1]) * 100) + "\r\n");
+                $(path.replace("DetectorEvaluationData_raw.txt", "DetectorEvaluationData_evaluated.txt")).file().append(curKey + "," + values.get(curKey)[0] + "," + values.get(curKey)[1] + "," + (((double) values.get(curKey)[0] / values.get(curKey)[1]) * 100) + "\r\n");
             }
 
         } catch (Exception e) {

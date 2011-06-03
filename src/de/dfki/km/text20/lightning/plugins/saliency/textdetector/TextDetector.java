@@ -24,7 +24,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
@@ -113,7 +112,7 @@ public class TextDetector implements SaliencyDetector {
                 } else if (((String) option).startsWith("TDline=")) {
                     line = Integer.parseInt(((String) option).substring(((String) option).lastIndexOf("=") + 1));
                 }
-            } 
+            }
         }
 
         GetImageText analyser = new GetImageText(screenShot, height, line, sensitivity);
@@ -122,7 +121,7 @@ public class TextDetector implements SaliencyDetector {
         // get text boxes
         for (Object textRegion : analyser.getTextBoxes()) {
             if (textRegion instanceof TextRegion)
-                if (((TextRegion) textRegion).width() >= width)
+                if ((((TextRegion) textRegion).width() >= width) && (((TextRegion) textRegion).height() >= height))
                     boxes.add((TextRegion) textRegion);
         }
 
