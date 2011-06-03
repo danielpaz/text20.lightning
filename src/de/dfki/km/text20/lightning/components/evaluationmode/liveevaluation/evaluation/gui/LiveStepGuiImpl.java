@@ -148,16 +148,16 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
 
         // initial file entry
         new File("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp()).mkdirs();
-        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
 
         // write log
-        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys_raw.log").file().append("Session: " + new SimpleDateFormat("dd.MM.yyyy', 'HH:mm:ss").format(new Date()) + "\r\n");
         if (this.currentAlg == this.one) {
-            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n");
-            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n\r\n");
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys_raw.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n");
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys_raw.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n\r\n");
         } else {
-            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n");
-            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n\r\n");
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys_raw.log").file().append("- algorithm A: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName() + "\r\n");
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluationKeys_raw.log").file().append("- algorithm B: " + MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.two).getInformation().getDisplayName() + "\r\n\r\n");
         }
 
         // run through files
@@ -181,7 +181,7 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
             this.refresh();
 
             // last file entry
-            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation.log").file().append("\r\n");
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("\r\n");
 
             return;
         }
@@ -334,7 +334,7 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
         this.contentWindow = null;
 
         // update file
-        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation.log").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
 
         // continue
         this.stepForward();
