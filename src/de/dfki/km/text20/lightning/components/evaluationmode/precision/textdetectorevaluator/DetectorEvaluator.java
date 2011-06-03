@@ -214,7 +214,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             this.timestamp = System.currentTimeMillis();
 
         } else {
-            
+
             // initialize variables
             int coverageMin = Integer.parseInt(this.spinnerCoverageMin.getValue().toString());
             int coverageMax = Integer.parseInt(this.spinnerCoverageMax.getValue().toString());
@@ -259,25 +259,22 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
                 this.labelDescription.setText("ERROR: no valid files");
                 return;
             }
-            
+
             // calculate size
             for (File file : this.files) {
                 size = size + dataParser.count(file);
             }
-            if (this.checkBoxBigSteps.isSelected()) size = size * ((coverageMax - coverageMin + 10) / 10);
+            if (this.checkBoxBigSteps.isSelected()) size = size * ((coverageMax - coverageMin + 5) / 5);
             else
                 size = size * (coverageMax - coverageMin + 1);
-            if (this.checkBoxBigSteps.isSelected()) size = size * ((heightMax - heightMin + 10) / 10);
+            if (this.checkBoxBigSteps.isSelected()) size = size * ((heightMax - heightMin + 5) / 5);
             else
                 size = size * (heightMax - heightMin + 1);
-            if (this.checkBoxBigSteps.isSelected()) size = size * ((widthMax - widthMin + 10) / 10);
+            if (this.checkBoxBigSteps.isSelected()) size = size * ((widthMax - widthMin + 5) / 5);
             else
                 size = size * (widthMax - widthMin + 1);
-            //            if (this.checkBoxBigSteps.isSelected()) size = size * ((lineMax - lineMin + 10) / 10);
-            //            else
-            //                size = size * (lineMax - lineMin + 1);
             size = size * ((lineMax - lineMin + 10) / 10);
-            if (this.checkBoxBigSteps.isSelected()) size = size * (((int) ((sensitivityMax - sensitivityMin + 1) * 10)) / 10);
+            if (this.checkBoxBigSteps.isSelected()) size = size * (((int) ((sensitivityMax - sensitivityMin + 0.5) * 10)) / 5);
             else
                 size = size * ((int) ((sensitivityMax - sensitivityMin + 0.1) * 10));
             size = size * this.amount;
@@ -286,7 +283,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
                 this.labelDescription.setText("ERROR: to many datasets");
                 return;
             }
-            
+
             // set running
             this.running = true;
 
@@ -318,8 +315,8 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             data.setAmount(Integer.parseInt(this.spinnerAmount.getValue().toString()));
             data.setDrawImages(this.checkBoxDrawImages.isSelected());
             data.setBigSteps(this.checkBoxBigSteps.isSelected());
-            data.setSize((int)size);
-            
+            data.setSize((int) size);
+
             // initialize and start evaluationThread
             this.evaluationThread.init(data, this.textDetector);
             Thread thread = new Thread(this.evaluationThread);

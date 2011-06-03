@@ -83,26 +83,26 @@ public class EvaluationThread implements Runnable {
         new File("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp()).mkdirs();
 
         // write key file
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- options -\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("big steps: " + this.container.isBigSteps() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("dimension: " + this.container.getDimension() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("amount of synthetic fixations per rectangle: " + this.container.getAmount() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("coverage - min: " + this.container.getCoverageMin() + " - max: " + this.container.getCoverageMax() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("height - min: " + this.container.getHeightMin() + " - max: " + this.container.getHeightMax() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("width - min: " + this.container.getWidthMin() + " - max: " + this.container.getWidthMax() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("line size - min: " + this.container.getLineMin() + " - max: " + this.container.getLineMax() + "\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("sensitivity - min: " + this.container.getSensitivityMin() + " - max: " + this.container.getSensitivityMax() + "\r\n\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- headings -\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type, image, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\r\n\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- filename -\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type_image_rectangle_fixation_coverage_height_width_sensitivity_line.png\r\n\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- values -\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("type: Text = 0, Code = 1, Icons = 2, Undefined = 3\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("hit: hit = 1, miss = 0\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("offset: left/top < 0, right/bottom >0\r\n\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- dataset - \r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("datasets overall: " + this.container.getSize() + "\r\n\r\n");
-        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("- files -\r\n");
+        this.addToFile("- options -");
+        this.addToFile("big steps: " + this.container.isBigSteps());
+        this.addToFile("dimension: " + this.container.getDimension() );
+        this.addToFile("amount of synthetic fixations per rectangle: " + this.container.getAmount() );
+        this.addToFile("coverage - min: " + this.container.getCoverageMin() + " - max: " + this.container.getCoverageMax() );
+        this.addToFile("height - min: " + this.container.getHeightMin() + " - max: " + this.container.getHeightMax());
+        this.addToFile("width - min: " + this.container.getWidthMin() + " - max: " + this.container.getWidthMax());
+        this.addToFile("line size - min: " + this.container.getLineMin() + " - max: " + this.container.getLineMax());
+        this.addToFile("sensitivity - min: " + this.container.getSensitivityMin() + " - max: " + this.container.getSensitivityMax() + "\r\n");
+        this.addToFile("- headings -");
+        this.addToFile("type, image, rectangle, fixation, coverage, height, width, sensitivity, line, distance, hit, offsetX, offsetY\r\n");
+        this.addToFile("- filename -");
+        this.addToFile("type_image_rectangle_fixation_coverage_height_width_sensitivity_line.png\r\n");
+        this.addToFile("- values -");
+        this.addToFile("type: Text = 0, Code = 1, Icons = 2, Undefined = 3");
+        this.addToFile("hit: hit = 1, miss = 0");
+        this.addToFile("offset: left/top < 0, right/bottom >0\r\n");
+        this.addToFile("- dataset -");
+        this.addToFile("datasets overall: " + this.container.getSize() + "\r\n");
+        this.addToFile("- files -");
 
         System.out.println();
         System.out.println();
@@ -115,7 +115,7 @@ public class EvaluationThread implements Runnable {
 
             System.out.println("- File " + file.getName() + " is the next one.");
 
-            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys.log").file().append("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
+            this.addToFile("index: " + _pictureCount + ", name: " + file.getName() + "\r\n");
 
             // set type
             if (file.getName().contains("_Text_")) {
@@ -241,19 +241,19 @@ public class EvaluationThread implements Runnable {
 
                                         // check for big steps
                                         if (container.isBigSteps())
-                                            sensitivity = sensitivity + 0.9;
+                                            sensitivity = sensitivity + 0.4;
                                     }
 
                                     // check for big steps
-                                    if (container.isBigSteps()) width = width + 9;
+                                    if (container.isBigSteps()) width = width + 4;
                                 }
 
                                 // check for big steps
-                                if (container.isBigSteps()) height = height + 9;
+                                if (container.isBigSteps()) height = height + 4;
                             }
 
                             // check for big steps
-                            if (container.isBigSteps()) coverage = coverage + 9;
+                            if (container.isBigSteps()) coverage = coverage + 4;
                         }
 
                         // step forward
@@ -264,7 +264,7 @@ public class EvaluationThread implements Runnable {
                 }
             }, i).expand(String.class).string().join("\r\n");
 
-            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/DetectorEvaluation.txt").file().append(output + "\r\n");
+            $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationData_raw.txt").file().append(output + "\r\n");
 
             if (!DetectorEvaluator.getInstance().isRunning()) return;
 
@@ -275,7 +275,7 @@ public class EvaluationThread implements Runnable {
         }
 
         // evaluate log
-        new LogEvaluator().evaluateLog("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/DetectorEvaluation.txt");
+        new LogEvaluator().evaluateLog("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationData_raw.txt");
 
         // finish the evaluation
         DetectorEvaluator.getInstance().finish();
@@ -380,5 +380,13 @@ public class EvaluationThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * adds given string to file
+     * @param input
+     */
+    private void addToFile(String input) {
+        $("./evaluation/results/text detector evaluation/Session_" + this.container.getTimestamp() + "/TextDetectorEvaluationKeys_raw.log").file().append(input + "\r\n");
     }
 }
