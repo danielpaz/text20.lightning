@@ -135,9 +135,20 @@ public class LiveConfigGuiImpl extends LiveConfigGui implements ActionListener,
             }
         });
 
+        // preselect files
+        if (new File("evaluation/data/prepared text/used/codeDiagnosis.xml").exists())
+            this.files.add(new File("evaluation/data/prepared text/used/codeDiagnosis.xml"));
+        if (new File("evaluation/data/prepared text/used/codeProperties.xml").exists())
+            this.files.add(new File("evaluation/data/prepared text/used/codeProperties.xml"));
+        if (new File("evaluation/data/prepared text/used/wikiJavaShort.xml").exists())
+            this.files.add(new File("evaluation/data/prepared text/used/wikiJavaShort.xml"));
+        if (new File("evaluation/data/prepared text/used/wikiTrackerHistory.xml").exists())
+            this.files.add(new File("evaluation/data/prepared text/used/WikiTrackerHistory.xml"));
+        this.listFiles.setListData(this.files.toArray());
+
         // preselect steps
-        this.spinnerSteps.setValue(25);
-        
+        this.spinnerSteps.setValue(15);
+
         // show gui
         this.setVisible(true);
     }

@@ -119,7 +119,7 @@ public class ImprovedWarperConfigImpl extends ImprovedWarperConfig implements
         String labelDistanceThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal this way in pixels to<br>activate the mouse warp. The higher this value<br>the more pixels you have to pass.<br>This means you have to move faster.</body></HTML>";
         String labelDurationThresholdTT = "<HTML><body>If you move your mouse to your fixation point,<br>you must move minimal this time in ms to<br>activate the mouse warp. The higher this value<br>the more exact the calculation can be done and<br>the mouse only warps when you really want it.</body></HTML>";
         String labelHomeRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your cursor is within this radius, your<br>mousecursor will not be warped.</body></HTML>";
-        String labelSetRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your mouse warp is activated, it will be set<br>in the choosed distance from the fixation point<br>to allow you to stop the movement by<br>yourself.</body></HTML>";
+        String labelSetRadiusTT = "<HTML><body>If you move your mouse to your fixation point<br>and your mouse warp is activated, it will be set<br>in the chosen distance from the fixation point<br>to allow you to stop the movement by<br>yourself.</body></HTML>";
 
         // add tooltip
         this.labelAngleThreshold.setToolTipText(labelAngleThresholdTT);

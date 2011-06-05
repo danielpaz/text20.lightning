@@ -70,7 +70,7 @@ public class ScreenshotMarker extends MarkerWindow implements MouseListener,
     /** chooser for screenshot files */
     private JFileChooser chooser;
 
-    /** current choosed file */
+    /** current chosen file */
     private File screenshotFile;
 
     /** label to draw the screenshots into it */
