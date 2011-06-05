@@ -331,7 +331,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     }
 
     /**
-     * Fired if something changed at the actionhotkey combobox. Sets the choosed hotkey as actionhotkey.
+     * Fired if something changed at the actionhotkey combobox. Sets the chosen hotkey as actionhotkey.
      */
     private void comboBoxActionHotkeyActionPerformed() {
         Hotkey.getInstance().setHotkey(1, ((HotkeyContainer) this.comboBoxActionHotkey.getSelectedItem()), false);
@@ -339,7 +339,7 @@ public class ConfigWindowImpl extends ConfigWindow implements ActionListener,
     }
 
     /**
-     * Fired if something changed at the statushotkey combobox. Sets the choosed hotkey as statushotkey.
+     * Fired if something changed at the statushotkey combobox. Sets the chosen hotkey as statushotkey.
      */
     private void comboBoxStatusHotkeyActionPerformed() {
         Hotkey.getInstance().setHotkey(2, ((HotkeyContainer) this.comboBoxStatusHotkey.getSelectedItem()), false);

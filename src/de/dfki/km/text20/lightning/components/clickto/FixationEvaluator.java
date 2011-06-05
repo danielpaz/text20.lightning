@@ -108,7 +108,7 @@ public class FixationEvaluator {
     }
 
     /**
-     * makes a screenshot with choosed dimension around the fixation point an starts the processing of it. 
+     * makes a screenshot with chosen dimension around the fixation point an starts the processing of it. 
      * At the end a mouseclick were taken to the calculated point.
      * 
      * @return true if successful
