@@ -235,7 +235,7 @@ public class TextDetectorWorker {
             if (textRegion instanceof TextRegion) {
 
                 // check if current box could contain points with a better distance
-                if ((Math.abs(((TextRegion) textRegion).y1 - height / 2) <= minDistance) || (Math.abs(((TextRegion) textRegion).y2 - height / 2) <= minDistance))
+                if ((Math.abs(((TextRegion) textRegion).y1 + height / 2) <= minDistance) || (Math.abs(((TextRegion) textRegion).y2 - height / 2) <= minDistance))
 
                 // run through all point in the vertical half of the box
                     for (int i = 0; i < ((TextRegion) textRegion).width(); i++) {

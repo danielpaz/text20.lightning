@@ -138,9 +138,6 @@ public class Hotkey implements HotkeyListener {
 
         // action hotkey
         case 1:
-            // check if the tool is activated
-            if (!this.main.isActivated()) return;
-
             // check if initializing was successful
             if (!this.main.isAllFine()) return;
 
@@ -231,6 +228,24 @@ public class Hotkey implements HotkeyListener {
         }
     }
 
+    /**
+     * disables action hotkey
+     */
+    public void disableActionHotkey() {
+        JIntellitype.getInstance().unregisterHotKey(1);
+    }
+    
+    /**
+     * enables action hotkey
+     */
+    public void enablesActionHotkey() {
+        if(this.actionHotkey.buttonCode >0){
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getModificator(), this.actionHotkey.getButtonCode());
+        } else {
+            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getButtonString());
+        }
+    }
+    
     /**
      * Returns the current hotkey for a given function.
      * 
@@ -327,12 +342,8 @@ public class Hotkey implements HotkeyListener {
         // do not work... don't know why?!?
         // this.hotkeys.add(new HotkeyContainer("^", "^"));
         // this.hotkeys.add(new HotkeyContainer("<", "<"));
-        // this.hotkeys.add(new
-        // HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_MINUS,
-        // "CTRL + -"));
-        // this.hotkeys.add(new
-        // HotkeyContainer(JIntellitypeConstants.MOD_CONTROL,
-        // KeyEvent.VK_PERIOD, "CTRL + ."));
+        // this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_MINUS, "CTRL + -"));
+        // this.hotkeys.add(new HotkeyContainer(JIntellitypeConstants.MOD_CONTROL, KeyEvent.VK_PERIOD, "CTRL + ."));
         // this.hotkeys.add(new HotkeyContainer("CTRL + /", "CTRL + /"));
     }
 }

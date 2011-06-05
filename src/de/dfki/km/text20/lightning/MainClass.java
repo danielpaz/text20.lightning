@@ -381,6 +381,9 @@ public class MainClass {
     public void toggleStatus() {
         if (this.isActivated) {
 
+            // deactivate hotkey
+            Hotkey.getInstance().disableActionHotkey();
+            
             // show change in tray
             // this.showTrayMessage("Status: tool is now deactivated");
             this.trayIcon.setDeactivatedIcon();
@@ -394,6 +397,9 @@ public class MainClass {
             this.isActivated = false;
 
         } else {
+            
+            // enable hotkey
+            Hotkey.getInstance().enablesActionHotkey();
 
             // show change in tray
             // this.showTrayMessage("Status: tool is now activated");

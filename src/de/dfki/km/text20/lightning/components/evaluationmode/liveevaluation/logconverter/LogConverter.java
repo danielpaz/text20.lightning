@@ -40,7 +40,7 @@ public class LogConverter {
         try {
             System.out.println("LogConverter started...");
             System.out.println();
-            
+
             // run through all files
             for (File file : new File("evaluation/results/live evaluation").listFiles()) {
 
@@ -49,7 +49,7 @@ public class LogConverter {
 
                 // check if file exists
                 if (!(new File(path + "/LiveEvaluation_raw.txt").exists())) continue;
-                
+
                 // indicate file
                 System.out.println("next file: " + new File(path + "/LiveEvaluation_raw.txt").getAbsolutePath());
                 System.out.println();
@@ -72,6 +72,7 @@ public class LogConverter {
                 String typeTmp;
                 String wordTmp;
                 String fileTmp;
+                int buttonsTmp;
 
                 // read
                 while ((line = lineReader.readLine()) != null) {
@@ -98,6 +99,9 @@ public class LogConverter {
                     // extract time
                     timeTmp = Integer.parseInt(line.substring(line.lastIndexOf("time") + 7, line.indexOf(" ms")));
                     System.out.println(timeTmp + "|");
+
+                    // extract buttons
+                    buttonsTmp = line.substring(line.lastIndexOf("=") + 2).split(" ").length;
 
                     // reset index
                     indexTypes = -1;
@@ -132,16 +136,20 @@ public class LogConverter {
                         if (words.get(i).equals(wordTmp)) indexWords = i;
 
                     // write to txt
-                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeTmp).string().join(",") + "\n");
+                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeTmp, buttonsTmp - 2).string().join(",") + "\n");
                 }
 
                 // write key file
-                for (int i = 0; i < types.size(); i++)
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- headings -\r\nindexTypes, indexFiles, indexWords, distance, time, buttons\r\n\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- detectors -\r\n");
+                 for (int i = 0; i < types.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " detector: " + types.get(i) + "\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- files -\r\n");
                 for (int i = 0; i < files.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " file: " + files.get(i) + "\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- words -\r\n");
                 for (int i = 0; i < words.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " word: " + words.get(i) + "\r\n");
 

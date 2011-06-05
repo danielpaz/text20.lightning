@@ -70,6 +70,12 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
     private String currentWord;
 
     /** */
+    private int nextWordIndex;
+
+    /** */
+    private String nextWord;
+
+    /** */
     private String currentFile;
 
     /** */
@@ -211,12 +217,15 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
             this.formerWordIndexOne = -1;
             this.formerWordIndexTwo = -1;
             this.currentWordIndex = -1;
+            this.nextWordIndex = Integer.parseInt($.range(0, this.data.get(this.currentFile).size()).random(1).string().join());
+            this.nextWord = this.data.get(this.currentFile).get(this.nextWordIndex);
 
             // set method
             this.currentMethod = "Normal";
+            Hotkey.getInstance().setBlockHotkeys(true);
 
             // show dialog and react on answer
-            if (JOptionPane.showOptionDialog(null, "Ready to start with normal mouse/keyboard?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+            if (JOptionPane.showOptionDialog(null, "Ready to start with normal mouse/keyboard?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0) != 0) {
                 this.dispose();
                 MainClass.getInstance().toggleMode();
                 return;
@@ -245,7 +254,7 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
             this.currentMethod = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().getDisplayName();
 
             // show dialog and react on answer
-            if (JOptionPane.showOptionDialog(null, "Ready to start with algorithm A?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+            if (JOptionPane.showOptionDialog(null, "Ready to start with algorithm A?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0) != 0) {
                 this.dispose();
                 return;
             }
@@ -272,7 +281,7 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
             this.currentMethod = MainClass.getInstance().getInternalPluginManager().getCurrentSaliencyDetector().getInformation().getDisplayName();
 
             // show dialog and react on answer
-            if (JOptionPane.showOptionDialog(null, "Ready to start with algorithm B?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Yes", "No" }, 0) != 0) {
+            if (JOptionPane.showOptionDialog(null, "Ready to start with algorithm B?", "Evaluation - Project Lightning", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK" }, 0) != 0) {
                 this.dispose();
                 MainClass.getInstance().toggleMode();
                 return;
@@ -290,14 +299,16 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
         }
 
         // choose word randomized 
-        // TODO: add sth that catches this.data.get(this.currentFile).size() == 2
-        while ((this.formerWordIndexOne == this.currentWordIndex) || (this.formerWordIndexTwo == this.currentWordIndex))
-            this.currentWordIndex = Integer.parseInt($.range(0, this.data.get(this.currentFile).size()).random(1).string().join());
+        // TODO: add sth that catches this.data.get(this.currentFile).size() <= 5
+        this.currentWordIndex = this.nextWordIndex;
+        while ((this.formerWordIndexOne == this.nextWordIndex) || (this.formerWordIndexTwo == this.nextWordIndex) || (this.currentWordIndex == this.nextWordIndex))
+            this.nextWordIndex = Integer.parseInt($.range(0, this.data.get(this.currentFile).size()).random(1).string().join());
         this.formerWordIndexTwo = this.formerWordIndexOne;
         this.formerWordIndexOne = this.currentWordIndex;
 
         // set current word and current file
-        this.currentWord = this.data.get(this.currentFile).get(this.currentWordIndex);
+        this.currentWord = this.nextWord;
+        this.nextWord = this.data.get(this.currentFile).get(this.nextWordIndex);
 
         // add text
         this.panelContent.removeAll();
@@ -325,8 +336,10 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
      * @param distance
      * @param time
      * @param currentCarretPosition
+     * @param buttons 
      */
-    public void stepDone(double distance, long time, int currentCarretPosition) {
+    public void stepDone(double distance, long time, int currentCarretPosition,
+                         ArrayList<Integer> buttons) {
         // set caret position
         this.carretPosition = currentCarretPosition;
 
@@ -334,7 +347,10 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
         this.contentWindow = null;
 
         // update file
-        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms\r\n");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms, buttons = ");
+        for (int button : buttons)
+            $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append(button + " ");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("\r\n");
 
         // continue
         this.stepForward();
@@ -359,6 +375,13 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
      */
     public String getWord() {
         return this.currentWord;
+    }
+
+    /**
+     * @return current word
+     */
+    public String getNextWord() {
+        return this.nextWord;
     }
 
     /* (non-Javadoc)
