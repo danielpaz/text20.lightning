@@ -100,7 +100,8 @@ public class EvaluationThread implements Runnable {
         // write key file 
         this.addToFile("- options -");
         this.addToFile("dimension: " + this.mainClass.getDimension());
-        this.addToFile("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount());
+        this.addToFile("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
+        this.addToFile("- headings -");
         this.addToFile("type, image, rectangle, fixation, detector, distance, hit, offsetX, offsetY\r\n");
         this.addToFile("- filename -");
         this.addToFile("type_image_rectangle_fixation.png\r\n");
