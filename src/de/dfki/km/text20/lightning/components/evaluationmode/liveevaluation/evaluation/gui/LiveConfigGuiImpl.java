@@ -80,6 +80,7 @@ public class LiveConfigGuiImpl extends LiveConfigGui implements ActionListener,
      * 
      * @param liveMode
      */
+    @SuppressWarnings("boxing")
     public LiveConfigGuiImpl(LiveMode liveMode) {
         // initialize variables
         this.liveMode = liveMode;
@@ -134,6 +135,9 @@ public class LiveConfigGuiImpl extends LiveConfigGui implements ActionListener,
             }
         });
 
+        // preselect steps
+        this.spinnerSteps.setValue(25);
+        
         // show gui
         this.setVisible(true);
     }
@@ -214,7 +218,7 @@ public class LiveConfigGuiImpl extends LiveConfigGui implements ActionListener,
         this.dispose();
 
         // start quickness evaluation
-        this.liveMode.start();
+        this.liveMode.startTraining();
     }
 
     private void comboBoxActionPerformed() {
@@ -266,6 +270,7 @@ public class LiveConfigGuiImpl extends LiveConfigGui implements ActionListener,
      */
     private void buttonCancelActionPerformed() {
         this.dispose();
+        MainClass.getInstance().toggleMode();
     }
 
     /**

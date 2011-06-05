@@ -23,8 +23,10 @@ package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.eva
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveConfigGuiImpl;
 import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveStepGuiImpl;
+import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui.LiveTrainingGuiImpl;
 
 /**
  * opens config dialog, then evaluation gui
@@ -63,10 +65,21 @@ public class LiveMode {
     }
 
     /**
-     * starts quickness mode
+     * starts training
      */
     @SuppressWarnings("unused")
-    public void start() {
+    public void startTraining() {
+        int index = this.one;
+        if (MainClass.getInstance().getInternalPluginManager().getSaliencyDetectors().get(this.one).getInformation().getDisplayName().equals("Dummy Filter"))
+            index = this.two;
+        new LiveTrainingGuiImpl(this, index, this.data);
+    }
+
+    /**
+     * starts evaluation
+     */
+    @SuppressWarnings("unused")
+    public void startEvaluation() {
         new LiveStepGuiImpl(this.steps, this.data, this.one, this.two);
     }
 

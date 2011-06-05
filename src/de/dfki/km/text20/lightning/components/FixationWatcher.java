@@ -29,9 +29,6 @@ import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
-import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEvent;
-import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationEventType;
-import de.dfki.km.text20.services.evaluators.gaze.listenertypes.fixation.FixationListener;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataEvent;
 import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataListener;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDevice;
@@ -120,8 +117,47 @@ public class FixationWatcher {
      * The whole algorithm for fixation watching and its processing is started by a call of this method.
      */
     public void startWatching() {
+        this.evaluator.addEvaluationListener(new RawDataListener() {
+            @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
+            @Override
+            public void newEvaluationEvent(RawDataEvent event) {
+                // check if the fixation should be stored
+                if (!main.isActivated()) return;
+
+                // reset status
+                isValid = true;
+
+                // add current event to storage
+                lastEvents.add(event);
+
+                // cut the storage down
+                if (lastEvents.size() > 10) lastEvents.remove(0);
+
+                // check validity of storage
+                for (RawDataEvent storedEvent : lastEvents) {
+                    isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
+                }
+
+                // set valid
+                main.setTrackingValid(isValid);
+
+                // return if tracking is not valid
+                if (!isValid) return;
+
+                // if the tool is activated and a fixation occurs, it will be stored 
+                fixationEvaluator.setFixationPoint(event.getTrackingEvent().getGazeCenter());
+                if (manager.getCurrentMouseWarper() != null)
+                    manager.getCurrentMouseWarper().setFixationPoint(event.getTrackingEvent().getGazeCenter());
+            }
+
+            @Override
+            public boolean requireUnfilteredEvents() {
+                return false;
+            }
+        });
+
         // add fixation listener
-        this.evaluator.addEvaluationListener(new FixationListener() {
+        /*this.evaluator.addEvaluationListener(new FixationListener() {
 
             @SuppressWarnings({ "unqualified-field-access", "synthetic-access" })
             @Override
@@ -169,6 +205,6 @@ public class FixationWatcher {
             public boolean requireUnfilteredEvents() {
                 return false;
             }
-        });
+        });*/
     }
 }

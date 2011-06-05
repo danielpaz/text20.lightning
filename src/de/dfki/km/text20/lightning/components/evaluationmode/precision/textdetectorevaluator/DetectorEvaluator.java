@@ -545,7 +545,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             // build string
             if (timeLeftH > 0) timeLeft = timeLeft + timeLeftH + "h ";
             if (timeLeftMin > 0) timeLeft = timeLeft + timeLeftMin + "min ";
-            timeLeft = timeLeft + timeLeftS + "s";
+            if (timeLeftS > 0) timeLeft = timeLeft + timeLeftS + "s";
         }
 
         // indicate time remaining

@@ -106,7 +106,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
     /** amount of generated fixations */
     private int amount;
-    
+
     /** */
     private int size;
 
@@ -574,7 +574,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
         this.selectedDetectors.clear();
         this.finished = true;
         this.buttonStart.setText("Exit");
-        
+
         // because of multithreading sometimes updates will be not done  
         this.progressBar.setValue(this.progressBar.getMaximum());
     }
@@ -602,7 +602,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
             // build string
             if (timeLeftH > 0) timeLeft = timeLeft + timeLeftH + "h ";
             if (timeLeftMin > 0) timeLeft = timeLeft + timeLeftMin + "min ";
-            timeLeft = timeLeft + timeLeftS + "s";
+            if (timeLeftS > 0) timeLeft = timeLeft + timeLeftS + "s";
         }
 
         // indicate time remaining
