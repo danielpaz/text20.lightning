@@ -37,6 +37,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.View;
 
+import de.dfki.km.text20.lightning.hotkey.Hotkey;
+
 /**
  * shows current text and highlights given currentWord
  * gives time distance and carretpostion back
@@ -85,7 +87,16 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
     private boolean lTyped;
 
     /** */
+    private boolean wTyped;
+
+    /** */
+    private boolean pTyped;
+
+    /** */
     private ArrayList<Integer> buttons;
+
+    /** */
+    private long hitTime;
 
     /**
      * @param evalMainWin 
@@ -97,6 +108,9 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
         this.inWord = false;
         this.aTyped = false;
         this.lTyped = false;
+        this.wTyped = false;
+        this.pTyped = false;
+        this.hitTime = 0;
         this.currentWord = this.mainWindow.getWord();
         this.nextWord = this.mainWindow.getNextWord();
         this.formerCarretPosition = this.mainWindow.getCarretPosition();
@@ -104,6 +118,9 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
         int preferredWidth;
         int preferredHeight;
         View view;
+
+        // reset hotkey count
+        Hotkey.getInstance().resetEvaluationCount();
 
         // add key listener
         this.textPaneContent.addKeyListener(new KeyListener() {
@@ -118,6 +135,12 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
                 } else if ((event.getKeyCode() == KeyEvent.VK_L) && inWord) {
                     lTyped = true;
                     //                    System.out.println("l typed");
+                } else if ((event.getKeyCode() == KeyEvent.VK_W) && inWord) {
+                    wTyped = true;
+                    //                    System.out.println("w typed");
+                } else if ((event.getKeyCode() == KeyEvent.VK_P) && inWord) {
+                    pTyped = true;
+                    //                    System.out.println("p typed");
                 }
             }
 
@@ -172,10 +195,9 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
 
         // initialize textpane
         this.textPaneContent.setContentType("text/html");
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
-        this.textPaneContent.setCaretPosition(this.formerCarretPosition);
         this.textPaneContent.addCaretListener(this);
-        this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
+        this.reloadText();
+        this.textPaneContent.setCaretPosition(this.formerCarretPosition);
 
         // resize
         preferredWidth = this.mainWindow.getSize().width;
@@ -210,7 +232,7 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
 
         // test if a or l was typed inside the text
         if (this.inWord)
-            if (this.aTyped && this.lTyped) {
+            if (this.aTyped && this.lTyped && this.wTyped && this.pTyped) {
                 try {
                     long neededTime = System.currentTimeMillis() - this.timestamp;
                     Rectangle formerCaretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, this.formerCarretPosition);
@@ -219,7 +241,7 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
                     Rectangle currentCaretRectangle = this.textPaneContent.getUI().modelToView(this.textPaneContent, caretIndex);
                     Point caretPoint = new Point(currentCaretRectangle.x + currentCaretRectangle.width / 2, currentCaretRectangle.y + currentCaretRectangle.height / 2);
                     SwingUtilities.convertPointToScreen(caretPoint, this.textPaneContent);
-                    this.mainWindow.stepDone(caretPoint.distance(this.formerCarretPoint), neededTime, this.textPaneContent.getCaretPosition(), this.buttons);
+                    this.mainWindow.stepDone(caretPoint.distance(this.formerCarretPoint), this.hitTime, neededTime, this.textPaneContent.getCaretPosition(), this.buttons, Hotkey.getInstance().getEvaluationCount());
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -246,7 +268,9 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
         //        System.out.println("|" + currentWord + "|");
 
         if (actualWord.equals(this.currentWord)) {
+            this.hitTime = System.currentTimeMillis() - this.timestamp;
             this.inWord = true;
+            this.reloadText();
             //            System.out.println("in word");
         } else {
             this.inWord = false;
@@ -263,8 +287,15 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
         // update text
         this.autoUpdate = true;
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
-        this.currentCarretPosition = this.textPaneContent.getCaretPosition() - 1;
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        this.currentCarretPosition = this.textPaneContent.getCaretPosition();
+
+        if (this.inWord) {
+            this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        } else {
+            this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>"));
+            this.currentCarretPosition = Math.max(this.currentCarretPosition - 1, 0);
+        }
+
         this.textPaneContent.setCaretPosition(this.currentCarretPosition);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
@@ -297,9 +328,12 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
 
         // update text
         this.autoUpdate = true;
+        int carretPos = this.textPaneContent.getCaretPosition();
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
-        this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
-        this.textPaneContent.setCaretPosition(1);
+        if (this.inWord) this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        else
+            this.textPaneContent.setText($(this.mainWindow.getTextFile()).text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>"));
+        this.textPaneContent.setCaretPosition(carretPos);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
         this.textPaneContent.setVisible(true);

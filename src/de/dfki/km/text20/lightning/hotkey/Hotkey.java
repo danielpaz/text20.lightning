@@ -67,9 +67,12 @@ public class Hotkey implements HotkeyListener {
 
     /** singleton instance of the main class */
     private MainClass main;
-    
+
     /** block hotkeys in some periods at evaluation mode */
     private boolean blockHotkeys;
+
+    /** count of hotkeys during one evaluation step */
+    private int evaluationCount;
 
     /** */
     private Hotkey(FixationEvaluator fixationEvaluator) {
@@ -143,8 +146,10 @@ public class Hotkey implements HotkeyListener {
 
             // check if trackingdevice provides correct data
             if (!this.main.isTrackingValid()) {
+
                 this.main.showTrayMessage("Eyes not found!");
                 this.main.playError();
+
                 return;
             }
 
@@ -153,15 +158,22 @@ public class Hotkey implements HotkeyListener {
 
             // decide which mode
             if (this.main.isNormalMode()) {
+
                 // if the hotkey is typed, the stored fixation will be evaluated
                 if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
+
                 break;
             }
 
             // evaluation mode
             if (!this.main.isNormalMode() && !this.blockHotkeys) {
+
                 // if the hotkey is typed, the stored fixation will be evaluated
                 if (this.fixationEvaluator.evaluateLocation()) this.main.playDing();
+
+                // add use
+                this.evaluationCount++;
+
                 break;
             }
 
@@ -170,11 +182,11 @@ public class Hotkey implements HotkeyListener {
         case 2:
             // check if evaluation mode
             if (!this.main.isNormalMode()) return;
-            
+
             // change status
             this.main.toggleStatus();
             break;
-            
+
         default:
             return;
         }
@@ -234,18 +246,18 @@ public class Hotkey implements HotkeyListener {
     public void disableActionHotkey() {
         JIntellitype.getInstance().unregisterHotKey(1);
     }
-    
+
     /**
      * enables action hotkey
      */
     public void enablesActionHotkey() {
-        if(this.actionHotkey.buttonCode >0){
+        if (this.actionHotkey.buttonCode > 0) {
             JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getModificator(), this.actionHotkey.getButtonCode());
         } else {
             JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getButtonString());
         }
     }
-    
+
     /**
      * Returns the current hotkey for a given function.
      * 
@@ -316,6 +328,20 @@ public class Hotkey implements HotkeyListener {
      */
     public void setBlockHotkeys(boolean blockHotkeys) {
         this.blockHotkeys = blockHotkeys;
+    }
+
+    /**
+     * @return the evaluationCount
+     */
+    public int getEvaluationCount() {
+        return this.evaluationCount;
+    }
+
+    /**
+     * resets evaluation count
+     */
+    public void resetEvaluationCount() {
+        this.evaluationCount = 0;
     }
 
     /**

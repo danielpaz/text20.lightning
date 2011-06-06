@@ -45,6 +45,10 @@ import de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.eval
 import de.dfki.km.text20.lightning.hotkey.Hotkey;
 
 /**
+ * super quick and dirty implementation of trainings mode
+ * 
+ * TODO: integrate this into the normal mode
+ * 
  * @author Christoph Käding
  */
 @SuppressWarnings("serial")
@@ -93,6 +97,13 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
     /** */
     private boolean lTyped;
 
+    /** */
+    private boolean wTyped;
+
+    /** */
+    private boolean pTyped;
+
+    /** */
     private String file;
 
     /**
@@ -115,6 +126,8 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
         this.inWord = false;
         this.aTyped = false;
         this.lTyped = false;
+        this.wTyped = false;
+        this.pTyped = false;
 
         // add listener
         this.buttonReady.addActionListener(this);
@@ -137,6 +150,12 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
                 } else if ((event.getKeyCode() == KeyEvent.VK_L) && inWord) {
                     lTyped = true;
                     //                    System.out.println("l typed");
+                } else if ((event.getKeyCode() == KeyEvent.VK_W) && inWord) {
+                    wTyped = true;
+                    //                    System.out.println("w typed");
+                } else if ((event.getKeyCode() == KeyEvent.VK_P) && inWord) {
+                    pTyped = true;
+                    //                    System.out.println("p typed");
                 }
             }
 
@@ -236,13 +255,15 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
         String actualWord = "";
         int caretIndex = this.textPaneContent.getCaretPosition();
 
-        // test if a or l was typed inside the text
-        if (this.inWord) if (this.aTyped && this.lTyped) {
+        // test if a, w, p and l was typed inside the text
+        if (this.inWord) if (this.aTyped && this.lTyped && this.wTyped && this.pTyped) {
 
             // reset
             this.inWord = false;
             this.aTyped = false;
             this.lTyped = false;
+            this.wTyped = false;
+            this.pTyped = false;
 
             // choose next word
             this.chooseWord();
@@ -280,6 +301,7 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
 
         if (actualWord.equals(this.currentWord)) {
             this.inWord = true;
+            this.reloadText();
             //            System.out.println("in word");
         } else {
             this.inWord = false;
@@ -314,9 +336,15 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
         // update text
         this.autoUpdate = true;
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
-        int carretPos = this.textPaneContent.getCaretPosition() - 1;
-        if (carretPos < 0) carretPos = 0;
-        this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        int carretPos = this.textPaneContent.getCaretPosition();
+
+        if (this.inWord) {
+            this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        } else {
+            this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>"));
+            carretPos = Math.max(carretPos - 1, 0);
+        }
+
         this.textPaneContent.setCaretPosition(carretPos);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
@@ -349,9 +377,12 @@ public class LiveTrainingGuiImpl extends LiveTrainingGui implements ActionListen
 
         // update text
         this.autoUpdate = true;
+        int carretPos = this.textPaneContent.getCaretPosition();
         this.textPaneContent.getDocument().removeDocumentListener(this.documentListener);
-        this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
-        this.textPaneContent.setCaretPosition(1);
+        if (this.inWord) this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>").replace(this.nextWord, "<font size=\"5\" color=\"green\"><b>" + this.nextWord + "</b></font>"));
+        else
+            this.textPaneContent.setText($(this.file).file().text().join().replace(this.currentWord, "<font size=\"5\" color=\"red\"><b>" + this.currentWord + "</b></font>"));
+        this.textPaneContent.setCaretPosition(carretPos);
         this.textPaneContent.getDocument().addDocumentListener(this.documentListener);
         this.textPaneContent.setVisible(false);
         this.textPaneContent.setVisible(true);

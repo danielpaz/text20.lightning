@@ -37,13 +37,12 @@ public class LogConverter {
      */
     @SuppressWarnings("boxing")
     public static void main(String[] args) {
-        try {
-            System.out.println("LogConverter started...");
-            System.out.println();
+        System.out.println("LogConverter started...");
+        System.out.println();
 
-            // run through all files
-            for (File file : new File("evaluation/results/live evaluation").listFiles()) {
-
+        // run through all files
+        for (File file : new File("evaluation/results/live evaluation").listFiles()) {
+            try {
                 // build path
                 String path = file.getAbsolutePath();
 
@@ -68,11 +67,14 @@ public class LogConverter {
                 BufferedReader lineReader = new BufferedReader(new FileReader(path + "/LiveEvaluation_raw.txt"));
                 String line = null;
                 double distanceTmp;
-                long timeTmp;
+                long timeOneTmp;
+                long timeTwoTmp;
                 String typeTmp;
                 String wordTmp;
                 String fileTmp;
                 int buttonsTmp;
+                int hotkeys;
+                String[] components;
 
                 // read
                 while ((line = lineReader.readLine()) != null) {
@@ -84,24 +86,44 @@ public class LogConverter {
                     typeTmp = line.substring(line.indexOf("-") + 2, line.indexOf(":"));
                     System.out.print("|" + typeTmp + "|");
 
+                    // cut method of
+                    line = line.substring(line.indexOf(":") + 2);
+
+                    // split line
+                    components = line.split(" ");
+
                     // extract file
-                    fileTmp = line.substring(line.indexOf("file") + 7, line.indexOf(","));
+                    fileTmp = components[2].substring(0, components[2].length() - 1);
                     System.out.print(fileTmp + "|");
 
                     // extract word
-                    wordTmp = line.substring(line.indexOf("word") + 7, line.lastIndexOf("distance") - 2);
+                    wordTmp = components[5].substring(0, components[5].length() - 1);
                     System.out.print(wordTmp + "|");
 
                     // extract distance
-                    distanceTmp = Double.parseDouble(line.substring(line.lastIndexOf("distance") + 10, line.indexOf(" Pixel")));
+                    distanceTmp = Double.parseDouble(components[8].substring(0, components[8].length()));
                     System.out.print(distanceTmp + "|");
 
                     // extract time
-                    timeTmp = Integer.parseInt(line.substring(line.lastIndexOf("time") + 7, line.indexOf(" ms")));
-                    System.out.println(timeTmp + "|");
+                    timeOneTmp = Integer.parseInt(components[12].substring(0, components[12].length()));
+                    System.out.print(timeOneTmp + "|");
+
+                    // extract time
+                    timeTwoTmp = Integer.parseInt(components[16].substring(0, components[16].length()));
+                    System.out.print(timeTwoTmp + "|");
+
+                    // extract time
+                    if (components[18].equals("hotkeys")) {
+                        hotkeys = Integer.parseInt(components[20].substring(0, components[20].length() - 1));
+                        System.out.print(hotkeys + "|");
+                    } else {
+                        hotkeys = -1;
+                        System.out.print("no hotkeys|");
+                    }
 
                     // extract buttons
                     buttonsTmp = line.substring(line.lastIndexOf("=") + 2).split(" ").length;
+                    System.out.println(buttonsTmp + "|");
 
                     // reset index
                     indexTypes = -1;
@@ -136,13 +158,13 @@ public class LogConverter {
                         if (words.get(i).equals(wordTmp)) indexWords = i;
 
                     // write to txt
-                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeTmp, buttonsTmp - 2).string().join(",") + "\n");
+                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
                 }
 
                 // write key file
-                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- headings -\r\nindexTypes, indexFiles, indexWords, distance, time, buttons\r\n\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- headings -\r\ntypes, file, word, distance, time, hotkeys, buttons\r\n\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- detectors -\r\n");
-                 for (int i = 0; i < types.size(); i++)
+                for (int i = 0; i < types.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " detector: " + types.get(i) + "\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- files -\r\n");
@@ -156,10 +178,11 @@ public class LogConverter {
                 // inidicate finish
                 System.out.println();
                 System.out.println("Done.");
+                System.out.println();
 
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
