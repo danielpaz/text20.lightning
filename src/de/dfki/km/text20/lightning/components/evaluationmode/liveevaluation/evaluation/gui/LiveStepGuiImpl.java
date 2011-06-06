@@ -334,12 +334,15 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
      * called if the carret is inside highlighted text
      * 
      * @param distance
-     * @param time
+     * @param timeOne
+     * @param timeTwo
      * @param currentCarretPosition
      * @param buttons 
+     * @param hotkeys 
      */
-    public void stepDone(double distance, long time, int currentCarretPosition,
-                         ArrayList<Integer> buttons) {
+    public void stepDone(double distance, long timeOne, long timeTwo,
+                         int currentCarretPosition, ArrayList<Integer> buttons,
+                         int hotkeys) {
         // set caret position
         this.carretPosition = currentCarretPosition;
 
@@ -347,7 +350,7 @@ public class LiveStepGuiImpl extends LiveStepGui implements WindowListener {
         this.contentWindow = null;
 
         // update file
-        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, time = " + time + " ms, buttons = ");
+        $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("- " + this.currentMethod + ": file = " + this.currentFile.substring(this.currentFile.lastIndexOf(File.separator) + 1, this.currentFile.lastIndexOf(".")) + ", word = " + this.currentWord + ", distance = " + ((double) Math.round(distance * 100) / 100) + " Pixel, timeOne = " + timeOne + " ms, timeTwo = " + timeTwo + " ms, hotkeys = " + hotkeys + ", buttons = ");
         for (int button : buttons)
             $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append(button + " ");
         $("evaluation/results/live evaluation/Session_" + MainClass.getInstance().getTimestamp() + "/LiveEvaluation_raw.txt").file().append("\r\n");

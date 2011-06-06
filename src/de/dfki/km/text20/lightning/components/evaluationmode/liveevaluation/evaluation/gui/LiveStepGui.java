@@ -25,7 +25,7 @@ public class LiveStepGui extends JFrame {
         CellConstraints cc = new CellConstraints();
 
         //======== this ========
-        setTitle("Quickness Mode");
+        setTitle("Project Lightning live evaluation");
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "center:default:grow",

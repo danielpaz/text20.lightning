@@ -22,7 +22,7 @@
       </object> 
       <void method="setProperty"> 
        <string>title</string> 
-       <string>Quickness Mode</string> 
+       <string>Project Lightning live evaluation</string> 
       </void> 
       <void method="setProperty"> 
        <string>$sizePolicy</string> 
