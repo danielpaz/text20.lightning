@@ -60,69 +60,65 @@ public class LogConverter {
                 int indexTypes;
                 int indexFiles;
                 int indexWords;
+                int user = -1;
                 $(path + "/LiveEvaluation_evaluated.txt").file().delete();
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().delete();
 
                 // initialize reader
                 BufferedReader lineReader = new BufferedReader(new FileReader(path + "/LiveEvaluation_raw.txt"));
                 String line = null;
-                double distanceTmp;
-                long timeOneTmp;
-                long timeTwoTmp;
-                String typeTmp;
-                String wordTmp;
-                String fileTmp;
-                int buttonsTmp;
-                int hotkeys;
-                String[] components;
 
                 // read
                 while ((line = lineReader.readLine()) != null) {
 
                     // test if line contains data
-                    if (!line.startsWith("- ")) continue;
+                    if (!line.startsWith("- ")) {
+
+                        // test if user changed
+                        if (line.startsWith("Session: ")) {
+                            user++;
+                        }
+                        continue;
+                    }
+
+                    System.out.print("|" + user + "|");
 
                     // extract type
-                    typeTmp = line.substring(line.indexOf("-") + 2, line.indexOf(":"));
-                    System.out.print("|" + typeTmp + "|");
+                    String typeTmp = line.substring(line.indexOf("-") + 2, line.indexOf(":"));
+                    System.out.print(typeTmp + "|");
 
                     // cut method of
                     line = line.substring(line.indexOf(":") + 2);
 
                     // split line
-                    components = line.split(" ");
+                    String[] components = line.split(" ");
 
                     // extract file
-                    fileTmp = components[2].substring(0, components[2].length() - 1);
+                    String fileTmp = components[2].substring(0, components[2].length() - 1);
                     System.out.print(fileTmp + "|");
 
                     // extract word
-                    wordTmp = components[5].substring(0, components[5].length() - 1);
+                    String wordTmp = components[5].substring(0, components[5].length() - 1);
                     System.out.print(wordTmp + "|");
 
                     // extract distance
-                    distanceTmp = Double.parseDouble(components[8].substring(0, components[8].length()));
+                    double distanceTmp = Double.parseDouble(components[8].substring(0, components[8].length()));
                     System.out.print(distanceTmp + "|");
 
                     // extract time
-                    timeOneTmp = Integer.parseInt(components[12].substring(0, components[12].length()));
+                    long timeOneTmp = Integer.parseInt(components[12].substring(0, components[12].length()));
                     System.out.print(timeOneTmp + "|");
 
                     // extract time
-                    timeTwoTmp = Integer.parseInt(components[16].substring(0, components[16].length()));
+                    long timeTwoTmp = Integer.parseInt(components[16].substring(0, components[16].length()));
                     System.out.print(timeTwoTmp + "|");
 
                     // extract time
-                    if (components[18].equals("hotkeys")) {
-                        hotkeys = Integer.parseInt(components[20].substring(0, components[20].length() - 1));
-                        System.out.print(hotkeys + "|");
-                    } else {
-                        hotkeys = -1;
-                        System.out.print("no hotkeys|");
-                    }
+                    int hotkeys = Integer.parseInt(components[20].substring(0, components[20].length() - 1));
+                    System.out.print(hotkeys + "|");
 
                     // extract buttons
-                    buttonsTmp = line.substring(line.lastIndexOf("=") + 2).split(" ").length;
+                    int buttonsTmp = line.substring(line.lastIndexOf("=") + 2).split(" ").length;
                     System.out.println(buttonsTmp + "|");
 
                     // reset index
@@ -158,11 +154,13 @@ public class LogConverter {
                         if (words.get(i).equals(wordTmp)) indexWords = i;
 
                     // write to txt
-                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
+                    $(path + "/LiveEvaluation_evaluated.txt").file().append($(user, indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
+                    //                   $(path + "/LiveEvaluation_user" + user + "_evaluated.txt").file().append($(user, indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
                 }
 
                 // write key file
-                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- headings -\r\ntypes, file, word, distance, time, hotkeys, buttons\r\n\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- headings -\r\nuser, types, file, word, distance, timeHit, timeAll, hotkeys, buttons\r\n\r\n");
+                $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- user -\r\nparticipants = " + (user + 1) + "\r\n\r\n");
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().append("- detectors -\r\n");
                 for (int i = 0; i < types.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " detector: " + types.get(i) + "\r\n");
