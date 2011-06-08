@@ -192,6 +192,9 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
                 });
             }
         };
+        
+        // set timestamp
+        this.timestamp = System.currentTimeMillis();
 
         // initialize textpane
         this.textPaneContent.setContentType("text/html");
@@ -215,8 +218,6 @@ public class LiveContentGuiImpl extends LiveContentGui implements CaretListener 
                 textPaneContent.requestFocus();
             }
         });
-
-        this.timestamp = System.currentTimeMillis();
 
         // show current currentWord
         System.out.println("current currentWord: " + this.currentWord);
