@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Christoph Käding
@@ -57,12 +58,20 @@ public class LogConverter {
                 ArrayList<String> types = new ArrayList<String>();
                 ArrayList<String> files = new ArrayList<String>();
                 ArrayList<String> words = new ArrayList<String>();
+                ArrayList<Long> methA = new ArrayList<Long>();
+                ArrayList<Long> methB = new ArrayList<Long>();
+                ArrayList<Long> methC = new ArrayList<Long>();
                 int indexTypes;
                 int indexFiles;
                 int indexWords;
                 int user = -1;
                 $(path + "/LiveEvaluation_evaluated.txt").file().delete();
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().delete();
+                $(path + "/tHit_median.txt").file().delete();
+
+                // write tHitLog
+                $(path + "/tHit_median.log").file().delete();
+                $(path + "/tHit_median.log").file().append("- headings -\r\nuser, type, median");
 
                 // initialize reader
                 BufferedReader lineReader = new BufferedReader(new FileReader(path + "/LiveEvaluation_raw.txt"));
@@ -76,6 +85,14 @@ public class LogConverter {
 
                         // test if user changed
                         if (line.startsWith("Session: ")) {
+                            if ((methA.size() > 0) && (methB.size() > 0) && (methC.size() > 0)) {
+                                calcMedian(user, 0, path, methA);
+                                methA.clear();
+                                calcMedian(user, 1, path, methB);
+                                methB.clear();
+                                calcMedian(user, 2, path, methC);
+                                methC.clear();
+                            }
                             user++;
                         }
                         continue;
@@ -113,7 +130,7 @@ public class LogConverter {
                     long timeTwoTmp = Integer.parseInt(components[16].substring(0, components[16].length()));
                     System.out.print(timeTwoTmp + "|");
 
-                    // extract time
+                    // extract hotkeys
                     int hotkeys = Integer.parseInt(components[20].substring(0, components[20].length() - 1));
                     System.out.print(hotkeys + "|");
 
@@ -153,9 +170,32 @@ public class LogConverter {
                     for (int i = 0; i < words.size(); i++)
                         if (words.get(i).equals(wordTmp)) indexWords = i;
 
+                    // add value to arraylists
+                    if (indexTypes == 0) {
+                        methA.add(timeOneTmp);
+                    } else if (indexTypes == 1) {
+                        methB.add(timeOneTmp);
+                    } else if (indexTypes == 2) {
+                        methC.add(timeOneTmp);
+                    } else {
+                        System.out.println("unexpected method");
+                    }
+
                     // write to txt
                     $(path + "/LiveEvaluation_evaluated.txt").file().append($(user, indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
-                    //                   $(path + "/LiveEvaluation_user" + user + "_evaluated.txt").file().append($(user, indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
+                    new File(path + "/individual").mkdirs();
+                    $(path + "/individual/LiveEvaluation_user" + user + "_evaluated.txt").file().delete();
+                    $(path + "/individual/LiveEvaluation_user" + user + "_evaluated.txt").file().append($(user, indexTypes, indexFiles, indexWords, distanceTmp, timeOneTmp, timeTwoTmp, hotkeys, buttonsTmp - 4).string().join(",") + "\n");
+                }
+
+                // write last median
+                if ((methA.size() > 0) && (methB.size() > 0) && (methC.size() > 0)) {
+                    calcMedian(user, 0, path, methA);
+                    methA.clear();
+                    calcMedian(user, 1, path, methB);
+                    methB.clear();
+                    calcMedian(user, 2, path, methC);
+                    methC.clear();
                 }
 
                 // write key file
@@ -182,5 +222,33 @@ public class LogConverter {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * @param user
+     * @param type
+     * @param path
+     * @param values
+     */
+    @SuppressWarnings("boxing")
+    private static void calcMedian(int user, int type, String path, ArrayList<Long> values) {
+        // convert and sort array
+        long[] array = new long[values.size()];
+        for (int i = 0; i < values.size(); i++)
+            array[i] = values.get(i);
+        Arrays.sort(array);
+
+        // get median
+        long median;
+        int medianIndex = (values.size() / 2) - 1;
+        if (values.size() % 2 == 1) {
+            median = array[medianIndex];
+        } else {
+            int medianIndexTwo = values.size() / 2;
+            median = (array[medianIndex] + array[medianIndexTwo]) / 2;
+        }
+
+        // write median
+        $(path + "/tHit_median.txt").file().append($(user, type, median).string().join(",") + "\n");
     }
 }
