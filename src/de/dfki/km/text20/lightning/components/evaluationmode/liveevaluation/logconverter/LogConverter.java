@@ -61,13 +61,17 @@ public class LogConverter {
                 ArrayList<Long> methA = new ArrayList<Long>();
                 ArrayList<Long> methB = new ArrayList<Long>();
                 ArrayList<Long> methC = new ArrayList<Long>();
+                ArrayList<Long> methAAll = new ArrayList<Long>();
+                ArrayList<Long> methBAll = new ArrayList<Long>();
+                ArrayList<Long> methCAll = new ArrayList<Long>();
                 int indexTypes;
                 int indexFiles;
                 int indexWords;
                 int user = -1;
                 $(path + "/LiveEvaluation_evaluated.txt").file().delete();
                 $(path + "/LiveEvaluationKeys_evaluated.log").file().delete();
-                $(path + "/tHit_median.txt").file().delete();
+                $(path + "/tHit_median_perUser.txt").file().delete();
+                $(path + "/tHit_median_overAll.txt").file().delete();
 
                 // write tHitLog
                 $(path + "/tHit_median.log").file().delete();
@@ -86,11 +90,11 @@ public class LogConverter {
                         // test if user changed
                         if (line.startsWith("Session: ")) {
                             if ((methA.size() > 0) && (methB.size() > 0) && (methC.size() > 0)) {
-                                calcMedian(user, 0, path, methA);
+                                calcMedian(user, 0, path + "/tHit_median_perUser.txt", methA);
                                 methA.clear();
-                                calcMedian(user, 1, path, methB);
+                                calcMedian(user, 1, path + "/tHit_median_perUser.txt", methB);
                                 methB.clear();
-                                calcMedian(user, 2, path, methC);
+                                calcMedian(user, 2, path + "/tHit_median_perUser.txt", methC);
                                 methC.clear();
                             }
                             user++;
@@ -173,10 +177,13 @@ public class LogConverter {
                     // add value to arraylists
                     if (indexTypes == 0) {
                         methA.add(timeOneTmp);
+                        methAAll.add(timeOneTmp);
                     } else if (indexTypes == 1) {
                         methB.add(timeOneTmp);
+                        methBAll.add(timeOneTmp);
                     } else if (indexTypes == 2) {
                         methC.add(timeOneTmp);
+                        methCAll.add(timeOneTmp);
                     } else {
                         System.out.println("unexpected method");
                     }
@@ -190,12 +197,16 @@ public class LogConverter {
 
                 // write last median
                 if ((methA.size() > 0) && (methB.size() > 0) && (methC.size() > 0)) {
-                    calcMedian(user, 0, path, methA);
-                    methA.clear();
-                    calcMedian(user, 1, path, methB);
-                    methB.clear();
-                    calcMedian(user, 2, path, methC);
-                    methC.clear();
+                    calcMedian(user, 0, path + "/tHit_median_perUser.txt", methA);
+                    calcMedian(user, 1, path + "/tHit_median_perUser.txt", methB);
+                    calcMedian(user, 2, path + "/tHit_median_perUser.txt", methC);
+                }
+
+                // write overall median
+                if ((methAAll.size() > 0) && (methBAll.size() > 0) && (methCAll.size() > 0)) {
+                    calcMedian(user + 1, 0, path + "/tHit_median_overAll.txt", methAAll);
+                    calcMedian(user + 1, 1, path + "/tHit_median_overAll.txt", methBAll);
+                    calcMedian(user + 1, 2, path + "/tHit_median_overAll.txt", methCAll);
                 }
 
                 // write key file
@@ -249,6 +260,6 @@ public class LogConverter {
         }
 
         // write median
-        $(path + "/tHit_median.txt").file().append($(user, type, median).string().join(",") + "\n");
+        $(path).file().append($(user, type, median).string().join(",") + "\n");
     }
 }
