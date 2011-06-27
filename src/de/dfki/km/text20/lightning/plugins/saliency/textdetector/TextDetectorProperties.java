@@ -128,9 +128,9 @@ public class TextDetectorProperties implements Serializable {
      */
     public void restoreDefault() {
         // set default values
-        this.threshold = 2;
-        this.letterHeight = 7;
-        this.letterWidth = 13;
+        this.threshold = 1;
+        this.letterHeight = 8;
+        this.letterWidth = 5;
         this.lineSize = 100;
         this.debug = false;
         this.sensitivity = 1.7;
