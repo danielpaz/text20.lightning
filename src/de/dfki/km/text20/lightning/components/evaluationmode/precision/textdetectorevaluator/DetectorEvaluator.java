@@ -74,6 +74,9 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
     /** progress of the progress bar */
     private int progress;
 
+    /** progress of the part progress bar */
+    private int progressPart;
+
     /**
      * manager which handles the detector plugins, statitic plugin, logging
      * plugin ....
@@ -127,14 +130,18 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
         this.finished = false;
         boolean found = false;
         this.progress = 1;
+        this.progressPart = 1;
         this.amount = 0;
         this.startTimeStamp = 0;
         this.labelDescription.setText("");
+        this.labelPart.setText("");
 
         // initialize gui
         this.buttonStart.setEnabled(false);
         this.progressBar.setEnabled(false);
+        this.progressBarPart.setEnabled(false);
         this.labelDescription.setEnabled(false);
+        this.labelPart.setEnabled(false);
         this.checkBoxDrawImages.setSelected(false);
         this.checkBoxBigSteps.setSelected(true);
         this.checkboxBigStepsActionPerformed();
@@ -210,7 +217,9 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             this.labelDescription.setText("stoped");
             this.enableGui(true);
             this.progressBar.setValue(0);
+            this.progressBarPart.setValue(0);
             this.progress = 1;
+            this.progressPart = 1;
             this.timestamp = System.currentTimeMillis();
 
         } else {
@@ -227,7 +236,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             double sensitivityMin = Double.parseDouble(this.spinnerSensitivityMin.getValue().toString());
             double sensitivityMax = Double.parseDouble(this.spinnerSensitivityMax.getValue().toString());
             this.amount = Integer.parseInt(this.spinnerAmount.getValue().toString());
-            long size = 0;
+            long size = 1;
             DataXMLParser dataParser = new DataXMLParser();
             ArrayList<File> tmpFile = new ArrayList<File>(this.files);
 
@@ -261,9 +270,6 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             }
 
             // calculate size
-            for (File file : this.files) {
-                size = size + dataParser.count(file);
-            }
             if (this.checkBoxBigSteps.isSelected()) size = size * ((coverageMax - coverageMin + 5) / 5);
             else
                 size = size * (coverageMax - coverageMin + 1);
@@ -278,6 +284,12 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             else
                 size = size * ((int) ((sensitivityMax - sensitivityMin + 0.1) * 10));
             size = size * this.amount;
+            long sizePart = size;
+            long tmp = 0;
+            for (File file : this.files) {
+                tmp = tmp + dataParser.count(file);
+            }
+            size = size * tmp;
 
             if (size > Integer.MAX_VALUE) {
                 this.labelDescription.setText("ERROR: to many datasets");
@@ -296,6 +308,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             // initialize progress bar
             this.progressBar.setMaximum((int) size);
             this.progressBar.setStringPainted(true);
+            this.progressBarPart.setStringPainted(true);
 
             // create package
             DataPackage data = new DataPackage();
@@ -316,6 +329,7 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
             data.setDrawImages(this.checkBoxDrawImages.isSelected());
             data.setBigSteps(this.checkBoxBigSteps.isSelected());
             data.setSize((int) size);
+            data.setSizePart((int) sizePart);
 
             // initialize and start evaluationThread
             this.evaluationThread.init(data, this.textDetector);
@@ -452,6 +466,8 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
                 buttonStart.setEnabled(true);
                 progressBar.setEnabled(true);
                 labelDescription.setEnabled(true);
+                progressBarPart.setEnabled(true);
+                labelPart.setEnabled(true);
             }
         };
 
@@ -551,9 +567,21 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
         // indicate time remaining
         this.labelDescription.setText("estimated time remaining: " + timeLeft);
 
-        // update progress bar
+        // update progress bars
         this.progressBar.setValue(this.progress++);
-        this.progressBar.paint(this.progressBar.getGraphics());
+        //        this.progressBar.paint(this.progressBar.getGraphics());
+        this.progressBarPart.setValue(this.progressPart++);
+        //        this.progressBarPart.paint(this.progressBarPart.getGraphics());
+    }
+
+    /**
+     * @param overall
+     * @param currentFile
+     */
+    public void setPart(int overall, String currentFile) {
+        this.progressPart = 1;
+        this.progressBarPart.setMaximum(overall);
+        this.labelPart.setText("current file: " + currentFile);
     }
 
     /**
@@ -568,9 +596,11 @@ public class DetectorEvaluator extends DetectorEvaluationGui implements ActionLi
      */
     public void finish() {
         // inidicate finish
-        this.labelDescription.setText("Evaluation finished");
+        this.labelDescription.setText("Evaluation finished.");
+        this.labelPart.setText("All files done.");
         // because of multithreading sometimes updates will be not done  
         this.progressBar.setValue(this.progressBar.getMaximum());
+        this.progressBarPart.setValue(this.progressBarPart.getMaximum());
         this.finished = true;
         this.buttonStart.setText("Exit");
     }

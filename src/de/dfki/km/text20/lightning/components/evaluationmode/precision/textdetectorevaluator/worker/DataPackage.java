@@ -78,6 +78,9 @@ public class DataPackage {
     
     /** */
     private int size; 
+    
+    /** */
+    private int sizePart;
 
     /**
      * @return the coverageMin
@@ -315,5 +318,19 @@ public class DataPackage {
      */
     public void setSize(int size) {
         this.size = size;
+    }
+
+    /**
+     * @return the sizePart
+     */
+    public int getSizePart() {
+        return this.sizePart;
+    }
+
+    /**
+     * @param sizePart the sizePart to set
+     */
+    public void setSizePart(int sizePart) {
+        this.sizePart = sizePart;
     }
 }

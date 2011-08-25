@@ -317,6 +317,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
             // ... reset to startable state
             this.running = false;
+            this.selectedDetectors.clear();
             this.currentTimeStamp = System.currentTimeMillis();
             this.progressBar.setValue(0);
             this.progress = 1;
@@ -610,7 +611,7 @@ public class EvaluatorMain extends EvaluationWindow implements ActionListener,
 
         // update progress bar
         this.progressBar.setValue(this.progress++);
-        this.progressBar.paint(this.progressBar.getGraphics());
+        //        this.progressBar.paint(this.progressBar.getGraphics());
     }
 
     /**

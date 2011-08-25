@@ -47,10 +47,12 @@ public class DetectorEvaluationGui extends JFrame {
         labelSize = new JLabel();
         spinnerSizeMin = new JSpinner();
         spinnerSizeMax = new JSpinner();
+        buttonStart = new JButton();
         buttonSelect = new JButton();
         buttonRemove = new JButton();
+        labelPart = new JLabel();
+        progressBarPart = new JProgressBar();
         labelDescription = new JLabel();
-        buttonStart = new JButton();
         progressBar = new JProgressBar();
         CellConstraints cc = new CellConstraints();
 
@@ -60,7 +62,7 @@ public class DetectorEvaluationGui extends JFrame {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "1dlu, 5*($lcgap, 60dlu), $lcgap, 60dlu:grow, $lcgap, 1dlu",
-            "1dlu, 10*($lgap, default), $lgap, default:grow, $lgap, default, $lgap, 1dlu"));
+            "1dlu, 10*($lgap, default), $lgap, default:grow, 3*($lgap, 15dlu), $lgap, 1dlu"));
 
         //---- labelDrawImages ----
         labelDrawImages.setText("draw images");
@@ -156,23 +158,28 @@ public class DetectorEvaluationGui extends JFrame {
         spinnerSizeMax.setModel(new SpinnerNumberModel(80, 1, null, 1));
         contentPane.add(spinnerSizeMax, cc.xy(7, 21));
 
+        //---- buttonStart ----
+        buttonStart.setText("Start");
+        contentPane.add(buttonStart, cc.xy(9, 21));
+
         //---- buttonSelect ----
         buttonSelect.setText("Select");
-        contentPane.add(buttonSelect, cc.xy(9, 21));
+        contentPane.add(buttonSelect, cc.xy(11, 21));
 
         //---- buttonRemove ----
         buttonRemove.setText("Remove");
-        contentPane.add(buttonRemove, cc.xy(11, 21));
+        contentPane.add(buttonRemove, cc.xy(13, 21));
+
+        //---- labelPart ----
+        labelPart.setText("text");
+        contentPane.add(labelPart, cc.xywh(3, 23, 11, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+        contentPane.add(progressBarPart, cc.xywh(3, 25, 11, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
 
         //---- labelDescription ----
         labelDescription.setText("text");
-        contentPane.add(labelDescription, cc.xywh(3, 23, 12, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
-
-        //---- buttonStart ----
-        buttonStart.setText("Start");
-        contentPane.add(buttonStart, cc.xy(3, 25));
-        contentPane.add(progressBar, cc.xywh(5, 25, 9, 1, CellConstraints.FILL, CellConstraints.FILL));
-        setSize(600, 350);
+        contentPane.add(labelDescription, cc.xywh(3, 27, 12, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+        contentPane.add(progressBar, cc.xywh(3, 29, 11, 1, CellConstraints.FILL, CellConstraints.FILL));
+        setSize(600, 410);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -206,10 +213,12 @@ public class DetectorEvaluationGui extends JFrame {
     protected JLabel labelSize;
     protected JSpinner spinnerSizeMin;
     protected JSpinner spinnerSizeMax;
+    protected JButton buttonStart;
     protected JButton buttonSelect;
     protected JButton buttonRemove;
+    protected JLabel labelPart;
+    protected JProgressBar progressBarPart;
     protected JLabel labelDescription;
-    protected JButton buttonStart;
     protected JProgressBar progressBar;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

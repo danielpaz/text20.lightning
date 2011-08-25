@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.logconverter;
+package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.postprocessing.logconverter;
 
 import static net.jcores.CoreKeeper.$;
 
@@ -102,11 +102,11 @@ public class LogConverter {
                         continue;
                     }
 
-                    System.out.print("|" + user + "|");
+//                    System.out.print("|" + user + "|");
 
                     // extract type
                     String typeTmp = line.substring(line.indexOf("-") + 2, line.indexOf(":"));
-                    System.out.print(typeTmp + "|");
+//                    System.out.print(typeTmp + "|");
 
                     // cut method of
                     line = line.substring(line.indexOf(":") + 2);
@@ -116,31 +116,31 @@ public class LogConverter {
 
                     // extract file
                     String fileTmp = components[2].substring(0, components[2].length() - 1);
-                    System.out.print(fileTmp + "|");
+//                    System.out.print(fileTmp + "|");
 
                     // extract word
                     String wordTmp = components[5].substring(0, components[5].length() - 1);
-                    System.out.print(wordTmp + "|");
+//                    System.out.print(wordTmp + "|");
 
                     // extract distance
                     double distanceTmp = Double.parseDouble(components[8].substring(0, components[8].length()));
-                    System.out.print(distanceTmp + "|");
+//                    System.out.print(distanceTmp + "|");
 
                     // extract time
                     long timeOneTmp = Integer.parseInt(components[12].substring(0, components[12].length()));
-                    System.out.print(timeOneTmp + "|");
+//                    System.out.print(timeOneTmp + "|");
 
                     // extract time
                     long timeTwoTmp = Integer.parseInt(components[16].substring(0, components[16].length()));
-                    System.out.print(timeTwoTmp + "|");
+//                    System.out.print(timeTwoTmp + "|");
 
                     // extract hotkeys
                     int hotkeys = Integer.parseInt(components[20].substring(0, components[20].length() - 1));
-                    System.out.print(hotkeys + "|");
+//                    System.out.print(hotkeys + "|");
 
                     // extract buttons
                     int buttonsTmp = line.substring(line.lastIndexOf("=") + 2).split(" ").length;
-                    System.out.println(buttonsTmp + "|");
+//                    System.out.println(buttonsTmp + "|");
 
                     // reset index
                     indexTypes = -1;
@@ -224,15 +224,13 @@ public class LogConverter {
                 for (int i = 0; i < words.size(); i++)
                     $(path + "/LiveEvaluationKeys_evaluated.log").file().append("index: " + i + " word: " + words.get(i) + "\r\n");
 
-                // inidicate finish
-                System.out.println();
-                System.out.println("Done.");
-                System.out.println();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        
+        // inidicate finish
+        System.out.println("LogConverter finished.");
     }
 
     /**

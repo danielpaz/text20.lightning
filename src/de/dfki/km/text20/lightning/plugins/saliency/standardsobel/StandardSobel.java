@@ -69,14 +69,13 @@ public class StandardSobel implements SaliencyDetector {
         screenShot = converter.filter(screenShot, null);
         BufferedImage derivatedScreenShot = new BufferedImage(screenShot.getHeight(), screenShot.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 
-        // Go through each pixel position in the derivate image ... 
-        for (int x = 0; x < screenShot.getHeight(); x++) {
-            for (int y = 0; y < screenShot.getHeight() - 1; y++) {
-                // ... and subtract the grey value of a pixel by the value of the following one to 
+        // Go through each pixel position in the image 
+        for (int x = 0; x < screenShot.getWidth(); x++)
+            for (int y = 0; y < screenShot.getHeight() - 1; y++)
+                
                 // derivate the screenshot in y-direction
                 derivatedScreenShot.setRGB(x, y, (screenShot.getRGB(x, y) & 0xFF) - (screenShot.getRGB(x, y + 1) & 0xFF));
-            }
-        }
+        
         return derivatedScreenShot;
     }
 
