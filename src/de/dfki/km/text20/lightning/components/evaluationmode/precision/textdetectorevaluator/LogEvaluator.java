@@ -75,11 +75,14 @@ public class LogEvaluator {
             int hit;
             HashMap<String, long[]> values = new HashMap<String, long[]>();
 
+            int D = 0;
+            
             // read
-            while ((lineReader.readLine() != null) && (!lineReader.readLine().equals("\n"))) {
+            String[] lines = $(path).file().text().split("\n").array(String.class);
+            for(String _line: lines) {
                 // read line
-                line = lineReader.readLine().split(",");
-
+                line = _line.split(",");
+                
                 // parse variables
                 coverage = Integer.parseInt(line[4]);
                 height = Integer.parseInt(line[5]);
@@ -99,10 +102,17 @@ public class LogEvaluator {
                 if (!values.containsKey(key)) {
                     values.put(key, new long[2]);
                 }
+                
+                D++;
+                
                 values.get(key)[0] = values.get(key)[0] + hit;
                 values.get(key)[1]++;
             }
 
+            System.out.println("LBALAODASLDKJASLDKHASLK");
+            System.out.println(D);
+            System.out.println();
+            System.out.println(values.keySet().size());
             // write evaluation
             for (String curKey : values.keySet()) {
                 $(path.replace("DetectorEvaluation.txt", "Evaluated.txt")).file().append(curKey + "," + values.get(curKey)[0] + "," + values.get(curKey)[1] + "," + (((double) values.get(curKey)[0] / values.get(curKey)[1]) * 100) + "\r\n");
