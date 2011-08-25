@@ -150,7 +150,8 @@ public class FixationEvaluator {
         this.main.getRecalibrator().updateCalibration(this.fixation, this.offset);
 
         // TODO: for debugging
-        //        this.drawPicture();
+        //        this.drawPicture(false);
+        //        this.drawPicture(true);
 
         // reset fixation point and status
         this.fixation = null;
@@ -165,7 +166,7 @@ public class FixationEvaluator {
      * this is for debugging
      */
     @SuppressWarnings("unused")
-    private void drawPicture() {
+    private void drawPicture(boolean inclusiveResult) {
         // initialize variables
         int dimension = this.screenShot.getHeight();
         File file = new File("tmp/click_" + System.currentTimeMillis() + ".png");
@@ -176,18 +177,20 @@ public class FixationEvaluator {
             graphic.setFont(graphic.getFont().deriveFont(5));
 
             // visualize fixation point 
-            graphic.setColor(new Color(255, 255, 0, 255));
+            graphic.setColor(new Color(0, 255, 0, 255));
             graphic.drawOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
-            graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
-            graphic.setColor(new Color(255, 255, 0, 32));
+            //            graphic.drawChars(("fixation point").toCharArray(), 0, 14, 12 + dimension / 2, 12 + dimension / 2);
+            graphic.setColor(new Color(0, 255, 0, 32));
             graphic.fillOval(dimension / 2 - 5, dimension / 2 - 5, 10, 10);
 
             // visualize calculations
-            graphic.setColor(new Color(0, 0, 255, 255));
-            graphic.drawOval(this.offset.x - 5 + dimension / 2, this.offset.y - 5 + dimension / 2, 10, 10);
-            graphic.drawChars(this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName().toCharArray(), 0, this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName().toCharArray().length, this.offset.x + 12 + dimension / 2, this.offset.y + 12 + dimension / 2);
-            graphic.setColor(new Color(0, 0, 255, 32));
-            graphic.fillOval(this.offset.x - 5 + dimension / 2, this.offset.y - 5 + dimension / 2, 10, 10);
+            if (inclusiveResult) {
+                graphic.setColor(new Color(0, 0, 255, 255));
+                graphic.drawOval(this.offset.x - 5 + dimension / 2, this.offset.y - 5 + dimension / 2, 10, 10);
+                //            graphic.drawChars(this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName().toCharArray(), 0, this.manager.getCurrentSaliencyDetector().getInformation().getDisplayName().toCharArray().length, this.offset.x + 12 + dimension / 2, this.offset.y + 12 + dimension / 2);
+                graphic.setColor(new Color(0, 0, 255, 32));
+                graphic.fillOval(this.offset.x - 5 + dimension / 2, this.offset.y - 5 + dimension / 2, 10, 10);
+            }
 
             // write the image
             file.mkdirs();

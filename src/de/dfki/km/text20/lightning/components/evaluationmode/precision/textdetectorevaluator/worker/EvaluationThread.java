@@ -128,6 +128,9 @@ public class EvaluationThread implements Runnable {
                 _type = 3;
             }
 
+            // set part bar
+            DetectorEvaluator.getInstance().setPart(this.container.getSizePart() * dataParser.count(file), file.getName());
+            
             final int pictureCount = _pictureCount;
             final int type = _type;
 
