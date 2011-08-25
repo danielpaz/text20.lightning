@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
+import net.jcores.script.JCoresScript;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.screenshotviewer.gui.ScreenshotViewerGUI;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.screenshotviewer.worker.DataXMLParser;
 
@@ -53,6 +54,8 @@ public class ScreenshotViewer extends ScreenshotViewerGUI implements ActionListe
      * @param args
      */
     public static void main(String[] args) {
+        JCoresScript.SCRIPT("Viewer", args).pack();
+        
         // Set global look and feel. 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
