@@ -112,7 +112,7 @@ public class GetImageText {
     private LinkedList storedBoxes;
 
     // modified by Christoph Käding
-    private int [][] storedContrast;
+    private int[][] storedContrast;
 
     /**
      * Default constructor
@@ -157,17 +157,10 @@ public class GetImageText {
      * Constructor for integration with Project lightning
      * 
      * Author: Christoph Käding
-     * @param img 
-     * @param m_densityFactor 
-     * @param m_mass 
-     * @param m_dist1 
-     * @param m_distfac 
-     * @param m_dist2 
      * @param letterHeight 
      * @param stemSize 
      * @param lineSize 
-     * @param useMerge 
-     * @param useDelete 
+     * @param sensitivity
      */
     public GetImageText(BufferedImage img, int letterHeight, int lineSize,
                         double sensitivity) {
@@ -175,6 +168,19 @@ public class GetImageText {
         this.letterHeight = letterHeight;
         this.lineSize = lineSize;
         this.sensitivity = sensitivity;
+        this.storedBoxes = new LinkedList<TextRegion>();
+
+        //        new File("thesis").mkdirs();
+        //        try {
+        //            ImageIO.write(image, "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
+
+        // modified by Christoph Käding
+        this.stemSize = 70;
+        this.letterHeight = 10;
+        this.sensitivity = 1;
         this.storedBoxes = new LinkedList<TextRegion>();
     }
 
@@ -424,7 +430,7 @@ public class GetImageText {
                     this.contrastjpg.setRGB(i, j, 0xffffff * contrast[i][j]);
             //            encoder.encode( contrastjpg );
             //            out.close();
-            //            ImageIO.write(contrastjpg, "png", new File("./tmp/" + System.currentTimeMillis() + "_area_contranst.png"));
+            //            ImageIO.write(contrastjpg, "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
@@ -517,17 +523,26 @@ public class GetImageText {
         }
 
         // modified by Christoph Käding
-        //        System.out.println( boxes.size() + " bounding boxes" );
-        //        shrink( boxes, contrast );
-        //        boxes = merge( boxes );
-        //        shrink( boxes, contrast );
-        //        System.out.println( boxes.size() + " bounding boxes after merge" );
-        //        boxes = discardNonText( boxes, contrast );
-        //        System.out.println( boxes.size() + " bounding boxes after delete" );
+        //        try {
+        //            System.out.println(boxes.size() + " bounding boxes");
+        //            ImageIO.write(this.isolateText(boxes), "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //            shrink(boxes, contrast);
+        //            ImageIO.write(this.isolateText(boxes), "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //            boxes = merge(boxes);
+        //            ImageIO.write(this.isolateText(boxes), "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //            shrink(boxes, contrast);
+        //            ImageIO.write(this.isolateText(boxes), "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //            System.out.println(boxes.size() + " bounding boxes after merge");
+        //            boxes = discardNonText(boxes, contrast);
+        //            ImageIO.write(this.isolateText(boxes), "png", new File("thesis/textdetector_" + System.currentTimeMillis() + ".png"));
+        //            System.out.println(boxes.size() + " bounding boxes after delete");
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
 
         this.storedBoxes = boxes;
         this.storedContrast = contrast;
-        
+
         return boxes;
     }
 
@@ -539,7 +554,7 @@ public class GetImageText {
     public LinkedList<TextRegion> getShrinkedBoxes() {
         return this.shrink(this.storedBoxes, this.storedContrast);
     }
-    
+
     /**
      * Isolate text
      * @return a <code>BufferedImage</code> value
