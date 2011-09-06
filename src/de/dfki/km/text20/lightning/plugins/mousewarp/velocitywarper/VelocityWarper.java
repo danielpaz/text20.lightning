@@ -20,7 +20,7 @@
  */
 package de.dfki.km.text20.lightning.plugins.mousewarp.velocitywarper;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.awt.AWTException;
 import java.awt.Color;

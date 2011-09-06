@@ -21,7 +21,7 @@
  */
 package de.dfki.km.text20.lightning;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
@@ -37,7 +37,6 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.JSPFProperties;
 import net.xeoh.plugins.diagnosis.local.Diagnosis;
 import net.xeoh.plugins.diagnosis.local.DiagnosisChannel;
-import net.xeoh.plugins.meta.statistics.Statistics;
 import net.xeoh.plugins.meta.updatecheck.UpdateCheck;
 
 import com.melloware.jintellitype.JIntellitype;
@@ -89,9 +88,6 @@ public class MainClass {
 
     /** warps mouse cursor */
     private WarpCommander warper;
-
-    /** statistics plugin */
-    private Statistics statistics;
 
     /** indicates if the trackinddata is valid */
     private boolean trackingValid;
@@ -156,10 +152,7 @@ public class MainClass {
         props.setProperty(PluginManager.class, "cache.mode", "weak");
         props.setProperty(UpdateCheck.class, "update.url", "http://api.text20.net/common/versioncheck/");
         props.setProperty(UpdateCheck.class, "product.name", "text20.lightning");
-        props.setProperty(UpdateCheck.class, "product.version", "1.4");
-
-        // set statistic properties
-        props.setProperty(Statistics.class, "application.id", "StatisticsTest");
+        props.setProperty(UpdateCheck.class, "product.version", "1.4.1");
 
         // initialize plugin manager
         this.pluginManager = PluginManagerFactory.createPluginManager(props);
@@ -175,7 +168,6 @@ public class MainClass {
         // initialize other variables
         this.allFine = false;
         this.properties = new Properties();
-        this.statistics = this.pluginManager.getPlugin(Statistics.class);
         this.channel = this.pluginManager.getPlugin(Diagnosis.class).channel(LightningTracer.class);
         this.internalPluginManager = new InternalPluginManager(this.pluginManager);
         Thread pluginThread = new Thread(this.internalPluginManager);
@@ -300,7 +292,6 @@ public class MainClass {
      * @param text
      */
     public void addToStatistic(String text) {
-        this.statistics.collect(text);
     }
 
     /**
@@ -310,7 +301,6 @@ public class MainClass {
      * @param key
      */
     public void addToStatistic(String key, String text) {
-        this.statistics.collect(key, text);
     }
 
     /**
@@ -322,16 +312,6 @@ public class MainClass {
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void run() {
-                if (statistics.publish(new String[] { "participant", "pwd" }, "//localhost/feedback?")) {
-                    showTrayMessage("Submitting statistics was successful.");
-                    addToStatistic("Submitting statistics was successful.");
-                    getChannel().status("Submitting statistics was successful.");
-                    setupStatistics();
-                } else {
-                    showTrayMessage("Submitting statistics failed!");
-                    addToStatistic("Submitting statistics failed!");
-                    getChannel().status("Submitting statistics failed!");
-                }
 
             }
         });

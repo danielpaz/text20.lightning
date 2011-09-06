@@ -20,7 +20,7 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.liveevaluation.evaluation.gui;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.awt.Color;
 import java.awt.Dimension;

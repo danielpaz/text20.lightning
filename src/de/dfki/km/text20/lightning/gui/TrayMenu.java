@@ -90,6 +90,7 @@ public class TrayMenu {
             menu.add(changeState);*/
 
             // adds change mode to the menu
+            /*
             final MenuItem changeMode = new MenuItem("Evaluation");
             changeMode.addActionListener(new ActionListener() {
 
@@ -104,7 +105,7 @@ public class TrayMenu {
                 }
             });
             menu.add(changeMode);
-
+*/
             // adds exit to the menu
             final MenuItem exit = new MenuItem("Exit");
             exit.addActionListener(new ActionListener() {

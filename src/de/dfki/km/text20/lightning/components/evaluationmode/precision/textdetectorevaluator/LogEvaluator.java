@@ -1,6 +1,6 @@
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.io.BufferedReader;
 import java.io.File;
