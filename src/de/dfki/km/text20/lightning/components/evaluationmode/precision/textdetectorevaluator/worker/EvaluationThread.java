@@ -20,7 +20,7 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.worker;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -34,9 +34,8 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import net.jcores.interfaces.functions.F1;
-import net.jcores.options.Option;
-import net.jcores.options.OptionIndexer;
+import net.jcores.jre.interfaces.functions.F1;
+import net.jcores.jre.options.Indexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.textdetectorevaluator.DetectorEvaluator;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
@@ -134,7 +133,7 @@ public class EvaluationThread implements Runnable {
             final int pictureCount = _pictureCount;
             final int type = _type;
 
-            final OptionIndexer i = Option.INDEXER();
+            final Indexer i = Indexer.NEW();
             String output = $(dataParser.readFile(file)).map(new F1<Rectangle, String[]>() {
 
                 @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })

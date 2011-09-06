@@ -24,10 +24,10 @@
  */
 package de.dfki.km.text20.lightning.gui;
 
-import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -36,12 +36,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.border.*;
+import javax.swing.border.TitledBorder;
 
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -96,220 +93,220 @@ public class ConfigWindow {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
-        mainFrame = new JFrame();
-        dialogPane = new JPanel();
-        contentPanel = new JPanel();
-        panel1 = new JPanel();
-        labelActionHotkey = new JLabel();
-        comboBoxActionHotkey = new JComboBox();
-        labelStatusHotkey = new JLabel();
-        comboBoxStatusHotkey = new JComboBox();
-        labelSound = new JLabel();
-        checkBoxSound = new JCheckBox();
-        labelDimension = new JLabel();
-        spinnerDimension = new JSpinner();
-        labelRecalibration = new JLabel();
-        checkBoxRecalibration = new JCheckBox();
-        buttonClearRecalibration = new JButton();
-        panel2 = new JPanel();
-        labelEnableMouseWarp = new JLabel();
-        checkBoxUseWarp = new JCheckBox();
-        labelWarpMethod = new JLabel();
-        comboBoxWarpMethod = new JComboBox();
-        buttonWarpConfig = new JButton();
-        panel4 = new JPanel();
-        labelDetector = new JLabel();
-        comboBoxDetector = new JComboBox();
-        buttonDetectorConfig = new JButton();
-        buttonSubmit = new JButton();
-        buttonDefault = new JButton();
-        buttonOK = new JButton();
-        buttonCancel = new JButton();
+        this.mainFrame = new JFrame();
+        this.dialogPane = new JPanel();
+        this.contentPanel = new JPanel();
+        this.panel1 = new JPanel();
+        this.labelActionHotkey = new JLabel();
+        this.comboBoxActionHotkey = new JComboBox();
+        this.labelStatusHotkey = new JLabel();
+        this.comboBoxStatusHotkey = new JComboBox();
+        this.labelSound = new JLabel();
+        this.checkBoxSound = new JCheckBox();
+        this.labelDimension = new JLabel();
+        this.spinnerDimension = new JSpinner();
+        this.labelRecalibration = new JLabel();
+        this.checkBoxRecalibration = new JCheckBox();
+        this.buttonClearRecalibration = new JButton();
+        this.panel2 = new JPanel();
+        this.labelEnableMouseWarp = new JLabel();
+        this.checkBoxUseWarp = new JCheckBox();
+        this.labelWarpMethod = new JLabel();
+        this.comboBoxWarpMethod = new JComboBox();
+        this.buttonWarpConfig = new JButton();
+        this.panel4 = new JPanel();
+        this.labelDetector = new JLabel();
+        this.comboBoxDetector = new JComboBox();
+        this.buttonDetectorConfig = new JButton();
+        this.buttonSubmit = new JButton();
+        this.buttonDefault = new JButton();
+        this.buttonOK = new JButton();
+        this.buttonCancel = new JButton();
         CellConstraints cc = new CellConstraints();
 
         //======== mainFrame ========
         {
-            mainFrame.setTitle("Project Lightning (Desktop)");
-            mainFrame.setResizable(false);
-            Container mainFrameContentPane = mainFrame.getContentPane();
+            this.mainFrame.setTitle("Project Lightning (Desktop)");
+            this.mainFrame.setResizable(false);
+            Container mainFrameContentPane = this.mainFrame.getContentPane();
             mainFrameContentPane.setLayout(new GridLayout());
 
             //======== dialogPane ========
             {
-                dialogPane.setBorder(Borders.DIALOG_BORDER);
-                dialogPane.setLayout(new BoxLayout(dialogPane, BoxLayout.X_AXIS));
+                this.dialogPane.setBorder(Borders.DIALOG_BORDER);
+                this.dialogPane.setLayout(new BoxLayout(this.dialogPane, BoxLayout.X_AXIS));
 
                 //======== contentPanel ========
                 {
-                    contentPanel.setLayout(new FormLayout(
+                    this.contentPanel.setLayout(new FormLayout(
                         "3*(20dlu:grow, $lcgap), 20dlu:grow",
                         "top:default, $lgap, top:48dlu:grow, $lgap, default"));
-                    ((FormLayout)contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
+                    ((FormLayout)this.contentPanel.getLayout()).setColumnGroups(new int[][] {{1, 3}, {5, 7}});
 
                     //======== panel1 ========
                     {
-                        panel1.setBorder(new TitledBorder("General Options"));
-                        panel1.setLayout(new FormLayout(
+                        this.panel1.setBorder(new TitledBorder("General Options"));
+                        this.panel1.setLayout(new FormLayout(
                             "20dlu:grow, $lcgap, 20dlu:grow",
                             "5*(default, $lgap), default"));
 
                         //---- labelActionHotkey ----
-                        labelActionHotkey.setText("Cursorwarp Key");
-                        labelActionHotkey.setIcon(null);
-                        panel1.add(labelActionHotkey, cc.xywh(1, 1, 2, 1));
+                        this.labelActionHotkey.setText("Cursorwarp Key");
+                        this.labelActionHotkey.setIcon(null);
+                        this.panel1.add(this.labelActionHotkey, cc.xywh(1, 1, 2, 1));
 
                         //---- comboBoxActionHotkey ----
-                        comboBoxActionHotkey.addActionListener(new ActionListener() {
+                        this.comboBoxActionHotkey.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 comboBoxActionHotkeyActionPerformed(e);
                             }
                         });
-                        panel1.add(comboBoxActionHotkey, cc.xy(3, 1));
+                        this.panel1.add(this.comboBoxActionHotkey, cc.xy(3, 1));
 
                         //---- labelStatusHotkey ----
-                        labelStatusHotkey.setText("Key to Enable & Disable");
-                        panel1.add(labelStatusHotkey, cc.xywh(1, 3, 2, 1));
+                        this.labelStatusHotkey.setText("Key to Enable & Disable");
+                        this.panel1.add(this.labelStatusHotkey, cc.xywh(1, 3, 2, 1));
 
                         //---- comboBoxStatusHotkey ----
-                        comboBoxStatusHotkey.addActionListener(new ActionListener() {
+                        this.comboBoxStatusHotkey.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 comboBoxStatusHotkeyActionPerformed(e);
                             }
                         });
-                        panel1.add(comboBoxStatusHotkey, cc.xy(3, 3));
+                        this.panel1.add(this.comboBoxStatusHotkey, cc.xy(3, 3));
 
                         //---- labelSound ----
-                        labelSound.setText("Play Sounds");
-                        panel1.add(labelSound, cc.xy(1, 5));
+                        this.labelSound.setText("Play Sounds");
+                        this.panel1.add(this.labelSound, cc.xy(1, 5));
 
                         //---- checkBoxSound ----
-                        checkBoxSound.setSelectedIcon(null);
-                        panel1.add(checkBoxSound, cc.xy(3, 5));
+                        this.checkBoxSound.setSelectedIcon(null);
+                        this.panel1.add(this.checkBoxSound, cc.xy(3, 5));
 
                         //---- labelDimension ----
-                        labelDimension.setText("Pixels to Consider");
-                        labelDimension.setIcon(null);
-                        panel1.add(labelDimension, cc.xywh(1, 7, 2, 1));
+                        this.labelDimension.setText("Pixels to Consider");
+                        this.labelDimension.setIcon(null);
+                        this.panel1.add(this.labelDimension, cc.xywh(1, 7, 2, 1));
 
                         //---- spinnerDimension ----
-                        spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
-                        panel1.add(spinnerDimension, cc.xy(3, 7));
+                        this.spinnerDimension.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+                        this.panel1.add(this.spinnerDimension, cc.xy(3, 7));
 
                         //---- labelRecalibration ----
-                        labelRecalibration.setText("Use Recalibration");
-                        panel1.add(labelRecalibration, cc.xywh(1, 9, 1, 3));
-                        panel1.add(checkBoxRecalibration, cc.xy(3, 9));
+                        this.labelRecalibration.setText("Use Recalibration");
+                        this.panel1.add(this.labelRecalibration, cc.xywh(1, 9, 1, 3));
+                        this.panel1.add(this.checkBoxRecalibration, cc.xy(3, 9));
 
                         //---- buttonClearRecalibration ----
-                        buttonClearRecalibration.setText("Clear Recalibration");
-                        panel1.add(buttonClearRecalibration, cc.xy(3, 11));
+                        this.buttonClearRecalibration.setText("Clear Recalibration");
+                        this.panel1.add(this.buttonClearRecalibration, cc.xy(3, 11));
                     }
-                    contentPanel.add(panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
+                    this.contentPanel.add(this.panel1, cc.xywh(1, 1, 3, 3, CellConstraints.FILL, CellConstraints.FILL));
 
                     //======== panel2 ========
                     {
-                        panel2.setBorder(new TitledBorder("Mouse Warping"));
-                        panel2.setLayout(new FormLayout(
+                        this.panel2.setBorder(new TitledBorder("Mouse Warping"));
+                        this.panel2.setLayout(new FormLayout(
                             "80dlu:grow, $lcgap, 80dlu:grow",
                             "2*(default, $lgap), default"));
 
                         //---- labelEnableMouseWarp ----
-                        labelEnableMouseWarp.setText("Enable Mouse Warp");
-                        panel2.add(labelEnableMouseWarp, cc.xywh(1, 1, 2, 1));
+                        this.labelEnableMouseWarp.setText("Enable Mouse Warp");
+                        this.panel2.add(this.labelEnableMouseWarp, cc.xywh(1, 1, 2, 1));
 
                         //---- checkBoxUseWarp ----
-                        checkBoxUseWarp.addActionListener(new ActionListener() {
+                        this.checkBoxUseWarp.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 checkBoxUseWarpActionPerformed(e);
                             }
                         });
-                        panel2.add(checkBoxUseWarp, cc.xy(3, 1));
+                        this.panel2.add(this.checkBoxUseWarp, cc.xy(3, 1));
 
                         //---- labelWarpMethod ----
-                        labelWarpMethod.setText("Warp Method");
-                        panel2.add(labelWarpMethod, cc.xywh(1, 3, 2, 3));
-                        panel2.add(comboBoxWarpMethod, cc.xy(3, 3));
+                        this.labelWarpMethod.setText("Warp Method");
+                        this.panel2.add(this.labelWarpMethod, cc.xywh(1, 3, 2, 3));
+                        this.panel2.add(this.comboBoxWarpMethod, cc.xy(3, 3));
 
                         //---- buttonWarpConfig ----
-                        buttonWarpConfig.setText("Configuration");
-                        panel2.add(buttonWarpConfig, cc.xy(3, 5));
+                        this.buttonWarpConfig.setText("Configuration");
+                        this.panel2.add(this.buttonWarpConfig, cc.xy(3, 5));
                     }
-                    contentPanel.add(panel2, cc.xywh(5, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
+                    this.contentPanel.add(this.panel2, cc.xywh(5, 1, 3, 1, CellConstraints.FILL, CellConstraints.TOP));
 
                     //======== panel4 ========
                     {
-                        panel4.setBorder(new TitledBorder("Cursor Warping"));
-                        panel4.setLayout(new FormLayout(
+                        this.panel4.setBorder(new TitledBorder("Cursor Warping"));
+                        this.panel4.setLayout(new FormLayout(
                             "20dlu:grow, $lcgap, 20dlu:grow",
                             "default, $lgap, default"));
 
                         //---- labelDetector ----
-                        labelDetector.setText("Text Detector / Warping");
-                        panel4.add(labelDetector, cc.xywh(1, 1, 2, 3));
+                        this.labelDetector.setText("Text Detector / Warping");
+                        this.panel4.add(this.labelDetector, cc.xywh(1, 1, 2, 3));
 
                         //---- comboBoxDetector ----
-                        comboBoxDetector.addActionListener(new ActionListener() {
+                        this.comboBoxDetector.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 comboBoxSearchMethodActionPerformed(e);
                             }
                         });
-                        panel4.add(comboBoxDetector, cc.xy(3, 1));
+                        this.panel4.add(this.comboBoxDetector, cc.xy(3, 1));
 
                         //---- buttonDetectorConfig ----
-                        buttonDetectorConfig.setText("Configuration");
-                        panel4.add(buttonDetectorConfig, cc.xy(3, 3));
+                        this.buttonDetectorConfig.setText("Configuration");
+                        this.panel4.add(this.buttonDetectorConfig, cc.xy(3, 3));
                     }
-                    contentPanel.add(panel4, cc.xywh(5, 3, 3, 1, CellConstraints.FILL, CellConstraints.FILL));
+                    this.contentPanel.add(this.panel4, cc.xywh(5, 3, 3, 1, CellConstraints.FILL, CellConstraints.FILL));
 
                     //---- buttonSubmit ----
-                    buttonSubmit.setText("Submit");
-                    buttonSubmit.addActionListener(new ActionListener() {
+                    this.buttonSubmit.setText("Submit");
+                    this.buttonSubmit.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             buttonSubmitActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonSubmit, cc.xywh(1, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    this.contentPanel.add(this.buttonSubmit, cc.xy(1, 5, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonDefault ----
-                    buttonDefault.setText("Default");
-                    buttonDefault.addActionListener(new ActionListener() {
+                    this.buttonDefault.setText("Default");
+                    this.buttonDefault.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             buttonDefaultActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonDefault, cc.xywh(3, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    this.contentPanel.add(this.buttonDefault, cc.xy(3, 5, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonOK ----
-                    buttonOK.setText("OK");
-                    buttonOK.addActionListener(new ActionListener() {
+                    this.buttonOK.setText("OK");
+                    this.buttonOK.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             buttonOKActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonOK, cc.xywh(5, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    this.contentPanel.add(this.buttonOK, cc.xy(5, 5, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
 
                     //---- buttonCancel ----
-                    buttonCancel.setText("Cancel");
-                    buttonCancel.addActionListener(new ActionListener() {
+                    this.buttonCancel.setText("Cancel");
+                    this.buttonCancel.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             buttonCancelActionPerformed(e);
                         }
                     });
-                    contentPanel.add(buttonCancel, cc.xywh(7, 5, 1, 1, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
+                    this.contentPanel.add(this.buttonCancel, cc.xy(7, 5, CellConstraints.DEFAULT, CellConstraints.BOTTOM));
                 }
-                dialogPane.add(contentPanel);
+                this.dialogPane.add(this.contentPanel);
             }
-            mainFrameContentPane.add(dialogPane);
-            mainFrame.setSize(610, 275);
-            mainFrame.setLocationRelativeTo(mainFrame.getOwner());
+            mainFrameContentPane.add(this.dialogPane);
+            this.mainFrame.setSize(730, 335);
+            this.mainFrame.setLocationRelativeTo(this.mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

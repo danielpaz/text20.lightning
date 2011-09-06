@@ -20,7 +20,7 @@
  */
 package de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.worker;
 
-import static net.jcores.CoreKeeper.$;
+import static net.jcores.jre.CoreKeeper.$;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -34,9 +34,8 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import net.jcores.interfaces.functions.F1;
-import net.jcores.options.Option;
-import net.jcores.options.OptionIndexer;
+import net.jcores.jre.interfaces.functions.F1;
+import net.jcores.jre.options.Indexer;
 import de.dfki.km.text20.lightning.components.evaluationmode.precision.evaluator.EvaluatorMain;
 import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
 
@@ -44,7 +43,7 @@ import de.dfki.km.text20.lightning.plugins.saliency.SaliencyDetector;
  * This thread runs through all given files and detectors and evaluates them.
  * 
  * @author Christoph Käding
- *
+ * 
  */
 public class EvaluationThread implements Runnable {
 
@@ -83,7 +82,9 @@ public class EvaluationThread implements Runnable {
         this.timestamp = main.getCurrentTimeStamp();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Runnable#run()
      */
     @SuppressWarnings({ "boxing", "unqualified-field-access" })
@@ -97,7 +98,7 @@ public class EvaluationThread implements Runnable {
         // create directories
         new File("./evaluation/results/detector evaluation/Session_" + this.timestamp).mkdirs();
 
-        // write key file 
+        // write key file
         this.addToFile("- options -");
         this.addToFile("dimension: " + this.mainClass.getDimension());
         this.addToFile("amount of synthetic fixations per rectangle: " + this.mainClass.getAmount() + "\r\n");
@@ -147,7 +148,7 @@ public class EvaluationThread implements Runnable {
             final int pictureCount = _pictureCount;
             final int type = _type;
 
-            final OptionIndexer i = Option.INDEXER();
+            final Indexer i = Indexer.NEW();
             String output = $(dataParser.readFile(file)).map(new F1<Rectangle, String[]>() {
 
                 @SuppressWarnings("synthetic-access")
@@ -325,16 +326,16 @@ public class EvaluationThread implements Runnable {
      * draws the png-file withe the calculated results
      * 
      * @param detector
-     *            used to get the name
+     * used to get the name
      * @param point
-     *            where the detector recognized a target
+     * where the detector recognized a target
      * @param path
-     *            where the image will be written
+     * where the image will be written
      * @param image
-     *            screenshot where the data will be written in, maybe it will be
-     *            not used when the screenshot is already drawn to a file
+     * screenshot where the data will be written in, maybe it will be
+     * not used when the screenshot is already drawn to a file
      * @param relatedRectangle
-     *            target that was given or was pointed by the mouse
+     * target that was given or was pointed by the mouse
      */
     private void drawPicture(SaliencyDetector detector, Point point, String path,
                              BufferedImage image, Rectangle relatedRectangle) {
@@ -391,7 +392,7 @@ public class EvaluationThread implements Runnable {
             // increase exception count
             this.exceptionCounter++;
 
-            //indicate exception
+            // indicate exception
             System.out.println("exception number " + this.exceptionCounter + ": " + e.toString());
 
             // test if deadlock
@@ -411,6 +412,7 @@ public class EvaluationThread implements Runnable {
 
     /**
      * adds given string to file
+     * 
      * @param input
      */
     private void addToFile(String input) {

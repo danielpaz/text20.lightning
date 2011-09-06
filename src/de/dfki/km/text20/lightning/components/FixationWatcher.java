@@ -29,8 +29,8 @@ import de.dfki.km.text20.lightning.components.clickto.FixationEvaluator;
 import de.dfki.km.text20.lightning.plugins.InternalPluginManager;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluator;
 import de.dfki.km.text20.services.evaluators.gaze.GazeEvaluatorManager;
-import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataEvent;
-import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawDataListener;
+import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawGazeEvent;
+import de.dfki.km.text20.services.evaluators.gaze.listenertypes.raw.RawGazeListener;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDevice;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingDeviceProvider;
 import de.dfki.km.text20.services.trackingdevices.eyes.EyeTrackingEventValidity;
@@ -61,7 +61,7 @@ public class FixationWatcher {
     private boolean isValid;
 
     /** a list of last fixation events */
-    private ArrayList<RawDataEvent> lastEvents;
+    private ArrayList<RawGazeEvent> lastEvents;
 
     /** list of things which will be proved to check validity */
     private EyeTrackingEventValidity[] eventValidity;
@@ -77,7 +77,7 @@ public class FixationWatcher {
         this.main = MainClass.getInstance();
         this.manager = MainClass.getInstance().getInternalPluginManager();
         this.isValid = true;
-        this.lastEvents = new ArrayList<RawDataEvent>();
+        this.lastEvents = new ArrayList<RawGazeEvent>();
         this.eventValidity = new EyeTrackingEventValidity[6];
         this.eventValidity[0] = EyeTrackingEventValidity.CENTER_POSITION_VALID;
         this.eventValidity[1] = EyeTrackingEventValidity.HEAD_POSITION_VALID;
@@ -117,10 +117,10 @@ public class FixationWatcher {
      * The whole algorithm for fixation watching and its processing is started by a call of this method.
      */
     public void startWatching() {
-        this.evaluator.addEvaluationListener(new RawDataListener() {
+        this.evaluator.addEvaluationListener(new RawGazeListener() {
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
-            public void newEvaluationEvent(RawDataEvent event) {
+            public void newEvaluationEvent(RawGazeEvent event) {
                 // check if the fixation should be stored
                 if (!main.isActivated()) return;
 
@@ -134,7 +134,7 @@ public class FixationWatcher {
                 if (lastEvents.size() > 10) lastEvents.remove(0);
 
                 // check validity of storage
-                for (RawDataEvent storedEvent : lastEvents) {
+                for (RawGazeEvent storedEvent : lastEvents) {
                     isValid &= storedEvent.getTrackingEvent().areValid(eventValidity);
                 }
 
@@ -175,7 +175,7 @@ public class FixationWatcher {
         });
 
         //add rawdata listener
-        this.evaluator.addEvaluationListener(new RawDataListener() {
+        this.evaluator.addEvaluationListener(new RawGazeListener() {
 
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
