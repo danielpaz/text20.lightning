@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import com.melloware.jintellitype.JIntellitypeConstants;
+import com.melloware.jintellitype.JIntellitypeException;
 
 import de.dfki.km.text20.lightning.MainClass;
 import de.dfki.km.text20.lightning.Properties;
@@ -83,34 +84,42 @@ public class Hotkey implements HotkeyListener {
         this.tmpActionHotkey = null;
         this.tmpStatusHotkey = null;
 
-        if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {
-            // if already hotekeys are stored in the properties, these will be
-            // used as current hotkeys
-            this.actionHotkey = this.properties.getActionHotkey();
-            this.statusHotkey = this.properties.getStatusHotkey();
+        try {
+            if ((this.properties.getActionHotkey() != null) && (this.properties.getStatusHotkey() != null)) {
+                // if already hotekeys are stored in the properties, these will be
+                // used as current hotkeys
+                this.actionHotkey = this.properties.getActionHotkey();
+                this.statusHotkey = this.properties.getStatusHotkey();
 
-        } else {
-            // otherwise the default hotkeys were set and stored to properties
-            this.getCurrentHotkey(1, true);
-            this.properties.setActionHotkey(this.actionHotkey);
-            this.getCurrentHotkey(2, true);
-            this.properties.setStatusHotkey(this.statusHotkey);
-        }
+            } else {
+                // otherwise the default hotkeys were set and stored to properties
+                this.getCurrentHotkey(1, true);
+                this.properties.setActionHotkey(this.actionHotkey);
+                this.getCurrentHotkey(2, true);
+                this.properties.setStatusHotkey(this.statusHotkey);
+            }
 
-        // add hotkeys to listener
-        if (this.actionHotkey.getButtonCode() > 0) {
-            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getModificator(), this.actionHotkey.getButtonCode());
-        } else {
-            JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getButtonString());
-        }
-        if (this.statusHotkey.getButtonCode() > 0) {
-            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getModificator(), this.statusHotkey.getButtonCode());
-        } else {
-            JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getButtonString());
-        }
+            // add hotkeys to listener
+            if (this.actionHotkey.getButtonCode() > 0) {
+                JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getModificator(), this.actionHotkey.getButtonCode());
+            } else {
+                JIntellitype.getInstance().registerHotKey(1, this.actionHotkey.getButtonString());
+            }
+            if (this.statusHotkey.getButtonCode() > 0) {
+                JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getModificator(), this.statusHotkey.getButtonCode());
+            } else {
+                JIntellitype.getInstance().registerHotKey(2, this.statusHotkey.getButtonString());
+            }
 
-        // enable hotkey listener
-        JIntellitype.getInstance().addHotKeyListener(this);
+            // enable hotkey listener
+            JIntellitype.getInstance().addHotKeyListener(this);
+
+        } catch (JIntellitypeException e) {
+            String msg = "Failed to load JIntellitype! Hotkeysystem will not be usable!";
+            System.err.println(msg);
+            MainClass.getInstance().showTrayMessage(msg);
+            MainClass.getInstance().getChannel().status(msg);
+        }
     }
 
     /**

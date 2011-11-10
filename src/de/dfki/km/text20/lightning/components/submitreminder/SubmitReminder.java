@@ -109,6 +109,7 @@ public class SubmitReminder {
 
                     // ... open browser
                     Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.google.de");
+                    //TODO: change google to survey-url
                 }
 
                 // if no ...
