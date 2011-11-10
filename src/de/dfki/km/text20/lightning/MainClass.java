@@ -292,6 +292,7 @@ public class MainClass {
      * @param text
      */
     public void addToStatistic(String text) {
+        // TODO: add to statistics
     }
 
     /**
@@ -301,6 +302,7 @@ public class MainClass {
      * @param key
      */
     public void addToStatistic(String key, String text) {
+        // TODO: add to statistics
     }
 
     /**
@@ -312,7 +314,7 @@ public class MainClass {
             @SuppressWarnings({ "synthetic-access", "unqualified-field-access" })
             @Override
             public void run() {
-
+                // TODO: add publishing here
             }
         });
 
@@ -625,24 +627,31 @@ public class MainClass {
      */
     private boolean checkDll() {
 
-        // TODO: test these for XP, Win7 32Bit, ... works fine for Win7 64Bit
-        File destination = new File("JIntellitype.dll");
+        // create target file
+        File destination = new File(System.getenv("SYSTEMROOT") + "/System32/JIntellitype.dll");
 
-        // check if it is already the
+        // check if it is already there
         if (!destination.exists()) {
+            System.out.println("JIntellytype.dll was not found.");
+
+            // try to unzip it to the windows directory
+            $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(System.getenv("SYSTEMROOT") + "/System32/");
+            if (destination.exists()) {
+                System.out.println("... but we copied it to the system directory..\r\n");
+                // return successful
+                return true;
+            }
 
             // try to unzip it to "."
             $(MainClass.class.getResourceAsStream("resources/JIntellitype.zip")).zipstream().unzip(".");
 
-            if (!destination.exists()) {
-                // Display an error message
-                String msg = new String("Initializing failed. The DLL 'JIntellitype.dll' could not be copied to " + new File(".").getAbsolutePath() + ".");
-                this.showTrayMessage(msg);
-                this.channel.status(msg);
+            // Display an error message
+            String msg = new String("Initializing failed. The DLL 'JIntellitype.dll' could not be copied to the windows/system32 directory. Please copy it yourself or start this tool as admin.");
+            this.showTrayMessage(msg);
+            this.channel.status(msg);
 
-                // return not successful
-                return false;
-            }
+            // return not successful
+            return false;
         }
 
         // return successful
