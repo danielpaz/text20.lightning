@@ -92,65 +92,71 @@ public class SubmitReminder {
      * initiates the reminder window and reacts depending on what part should be shown 
      */
     private void showReminder() {
-        // initialize variables
-        final Object[] options = { "Yes", "No, thanks" };
-        int choice = -1;
-        try {
-            // first survey part
-            if (!this.properties.isFirstSubmitted()) {
-
-                // show dialog
-                choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you and we only ask once. Would you like to participate " + "in a usability survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-                // evaluate answer, if yes...  
-                if (choice == 0) {
-                    //  ... skip first part and ...
-                    this.properties.setFirstSubmitted(true);
-
-                    // ... open browser
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.google.de");
-                    //TODO: change google to survey-url
-                }
-
-                // if no ...
-                else if (choice == 1) {
-
-                    // ... cancel second part and ...
-                    this.properties.setSecondSubmitted(true);
-
-                    // ... first part
-                    this.properties.setFirstSubmitted(true);
-                }
-
-                // second survey part
-            } else {
-                // show dialog
-                choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you a second time. Would you like to participate " + "in the second part of the survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-                // evaluate answer, if yes ... 
-                if (choice == 0) {
-
-                    // ... skip second part, ...
-                    this.properties.setSecondSubmitted(true);
-
-                    // ... open url and ...
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.google.de");
-
-                    // ...  publish statistics
-                    MainClass.getInstance().publishStatistics();
-                }
-
-                // if no ...
-                else if (choice == 1) {
-                    
-                    // ... skip second part
-                    this.properties.setSecondSubmitted(true);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            MainClass.getInstance().showTrayMessage("-- ERROR -- an error occures while opening the browser. Please Try again later.");
-        }
+        
+        // NOTE: deactivated submitreminder
+        System.out.println("Submitreminder is deactivated.");
+        return;
+        
+//        // initialize variables
+//        final Object[] options = { "Yes", "No, thanks" };
+//        int choice = -1;
+//        try {
+//            // first survey part
+//            if (!this.properties.isFirstSubmitted()) {
+//
+//                // show dialog
+//                choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you and we only ask once. Would you like to participate " + "in a usability survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+//
+//                // evaluate answer, if yes...  
+//                if (choice == 0) {
+//                    //  ... skip first part and ...
+//                    this.properties.setFirstSubmitted(true);
+//
+//                    // ... open browser
+//                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.google.de");
+//                    //TODO: change google to survey-url
+//                }
+//
+//                // if no ...
+//                else if (choice == 1) {
+//
+//                    // ... cancel second part and ...
+//                    this.properties.setSecondSubmitted(true);
+//
+//                    // ... first part
+//                    this.properties.setFirstSubmitted(true);
+//                }
+//
+//                // second survey part
+//            } else {
+//                // show dialog
+//                choice = JOptionPane.showOptionDialog(null, "Sorry to interrupt you a second time. Would you like to participate " + "in the second part of the survey about this tool?", "Text 2.0 Lightning Survey", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+//
+//                // evaluate answer, if yes ... 
+//                if (choice == 0) {
+//
+//                    // ... skip second part, ...
+//                    this.properties.setSecondSubmitted(true);
+//
+//                    // ... open url and ...
+//                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.google.de");
+//                    // TODO: add survey url
+//
+//                    // ...  publish statistics
+//                    MainClass.getInstance().publishStatistics();
+//                }
+//
+//                // if no ...
+//                else if (choice == 1) {
+//                    
+//                    // ... skip second part
+//                    this.properties.setSecondSubmitted(true);
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            MainClass.getInstance().showTrayMessage("-- ERROR -- an error occures while opening the browser. Please Try again later.");
+//        }
     }
 
     /**
