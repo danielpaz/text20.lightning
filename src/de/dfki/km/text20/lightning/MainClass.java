@@ -412,6 +412,11 @@ public class MainClass {
     public SubmitReminder getReminder() {
         return this.reminder;
     }
+    
+    /** */
+    public void setDdlFailed() {
+        this.dllStatus = false;
+    }
 
     /**
      * Shuts down the application

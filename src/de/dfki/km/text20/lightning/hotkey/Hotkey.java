@@ -115,6 +115,7 @@ public class Hotkey implements HotkeyListener {
             JIntellitype.getInstance().addHotKeyListener(this);
 
         } catch (JIntellitypeException e) {
+            MainClass.getInstance().setDdlFailed();
             String msg = "Failed to load JIntellitype! The Hotkeysystem will not be usable. Please have a look in your windows/system32 directory and check if the \"JIntellitype.dll\" is there. If no, please copy it from the lightning directory into it. Otherwise report to lightning@text20.net, please.";
             System.err.println(msg);
             MainClass.getInstance().showTrayMessage(msg);
